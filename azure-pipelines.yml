@@ -1,0 +1,237 @@
+name: $(SourceBranchName)_$(Hours)-$(Minutes)_$(Date:yyyy_MM_dd)_$(BuildID)$(Rev:.r)
+
+schedules:
+- cron: "0 0 * * *"
+  displayName: Daily midnight build
+  branches:
+    include:
+    - develop
+    
+variables:
+  - group: build-global
+  - template: azure-pipelines-vars.yml
+ 
+parameters:
+  - name: pool
+    displayName: Agent Pool
+    type: string
+    default: Azure Pipelines
+    values:
+    - Azure Pipelines
+    - Azure SelfHosted
+  
+  - name: image
+    displayName: Pool Image
+    type: string
+    default: 'ubuntu-latest'
+    values:
+    - windows-latest
+    - vs2017-win2016
+    - ubuntu-latest
+    - ubuntu-16.04
+    - macOS-latest
+    - macOS-10.14
+
+  - name: checkoutClean
+    displayName: Checkout clean
+    type: boolean
+    values:
+    - false
+    - true
+    default: true
+
+  - name: publishProject
+    displayName: Publish project
+    type: boolean
+    values:
+    - false
+    - true
+    default: true
+
+  - name: codeCoverage
+    displayName: Enable code coverage
+    type: boolean
+    values:
+      - false
+      - true
+    default: false
+
+  - name: dockerBuild
+    displayName: Enable docker build
+    type: boolean
+    values:
+      - false
+      - true
+    default: true
+
+  - name: k8sBuild
+    displayName: Enable k8s
+    type: boolean
+    values:
+      - false
+      - true
+    default: true
+    
+  - name: sonarScaner
+    displayName: Enable sonar scanner
+    type: boolean
+    values:
+      - false
+      - true
+    default: false
+
+  - name: buildPlatform
+    displayName: Platform
+    type: string
+    default: x64
+    values:
+      - x64
+      - x86
+      - Any CPU
+      
+  - name: buildConfiguration
+    displayName: Configuration
+    type: string
+    default: Release
+    values:
+      - Release
+      - Debug
+
+  - name: envsMain
+    type: object
+    default:
+      - name: 'drmax-uat'
+        pool: 'SHIFTIN UAT'
+
+      - name: 'htss-prod'
+        pool: 'Azure Pipelines'
+        poolImage: 'ubuntu-latest'
+
+  - name: envsDevelop
+    type: object
+    default: 
+      - name: 'htss-aks-dev'
+        pool: 'Azure Pipelines'
+        poolImage: 'ubuntu-latest'
+    
+resources:
+  repositories: 
+    - repository: DevOps
+      type: git
+      name: DevOps/Azure Pipelines
+      endpoint: devops
+      ref: refs/heads/develop
+
+stages:
+- ${{if eq(variables['Build.Reason'], 'PullRequest')}}:
+  - template: build-dotnet-pullrequest-validation.yml@Devops
+    parameters:  
+      pool: ${{ parameters.pool }}
+      image: ${{ parameters.image }}
+      checkoutClean: ${{ parameters.checkoutClean }}
+      buildPlatform: ${{ parameters.buildPlatform }}
+      buildConfiguration: ${{ parameters.buildConfiguration }}
+      feedsToUse: ${{variables.feedsToUse}}
+      nugetConfigPath : ${{variables.baseFolder}}/${{variables.projectService}}.${{variables.projectName}}/nuget.config
+      sonarQubeProjectKey: ${{variables.sonarQubeProjectKey}}
+      sonarQubeProjectName:  ${{variables.sonarQubeProjectName}}
+      sonarScaner: true
+      dotnetVersion: ${{ variables.dotnetVersion }}
+      #ef
+      runMigration: ${{variables.runMigration}}
+      domainProjectPath: ${{ variables.domainProjectPath }}
+      domainSettingsFilename: ${{ variables.domainSettingsFilename }}
+      startupProjectPath: ${{ variables.startupProjectPath }}
+      appSettingsFilename: ${{ variables.appSettingsFilename }} 
+      projectContext: ${{ variables.projectContext }}
+      sqlServerResourceGroup: $(sqlServerResourceGroup)
+      sqlServer: $(sqlServer)
+      databaseName: $(sqlDatabaseName)
+      sqlLogin: $(sqlLogin)
+      sqlLoginPassword: $(sqlLoginPassword)
+      azureServiceConnection: $(azureServiceConnection)
+
+- ${{if eq(variables['Build.Reason'], 'Schedule')}}:
+  - template: build-dotnet-schedule-validation.yml@Devops
+    parameters:  
+      pool: ${{ parameters.pool }}
+      image: ${{ parameters.image }}
+      checkoutClean: ${{ parameters.checkoutClean }}
+      buildPlatform: ${{ parameters.buildPlatform }}
+      buildConfiguration: ${{ parameters.buildConfiguration }}
+      feedsToUse: ${{variables.feedsToUse}}
+      nugetConfigPath : ${{variables.baseFolder}}/${{variables.projectService}}.${{variables.projectName}}/nuget.config
+      sonarQubeProjectKey: ${{variables.sonarQubeProjectKey}}
+      sonarQubeProjectName:  ${{variables.sonarQubeProjectName}}
+      sonarScaner: true
+      dotnetVersion: ${{ variables.dotnetVersion }}
+      
+- ${{if or(or(eq(variables['Build.Reason'], 'IndividualCI'), eq(variables['Build.Reason'], 'BatchedCI')), eq(variables['Build.Reason'], 'Manual'))}}:      
+  - template: build-dotnet-validation.yml@Devops
+    parameters:
+      pool: ${{ parameters.pool }}
+      image: ${{ parameters.image }}
+      checkoutClean: ${{ parameters.checkoutClean }}
+      publishProject: ${{ parameters.publishProject }}
+      dockerBuild: ${{ parameters.dockerBuild }}
+      k8sBuild: ${{ parameters.k8sBuild }}
+      buildPlatform: ${{ parameters.buildPlatform }}
+      buildConfiguration: ${{ parameters.buildConfiguration }}
+      sonarQubeProjectKey: ${{variables.sonarQubeProjectKey}}
+      sonarQubeProjectName:  ${{variables.sonarQubeProjectName}}
+      dockerFilePath: ${{variables.baseFolder}}
+      feedsToUse: ${{variables.feedsToUse}}
+      nugetConfigPath : ${{variables.baseFolder}}/${{variables.projectService}}.${{variables.projectName}}/nuget.config
+      dotnetPublishFolder: ${{variables.baseFolder}}/${{variables.projectService}}.${{variables.projectName}}/bin/${{ parameters.buildConfiguration }}/net$(dotnet.major)/publish
+      dockerContainerRegistry: ${{ variables.dockerContainerRegistry}}
+      dockerRepository: ${{ variables.dockerRepository}}
+      sonarScaner: ${{parameters.sonarScaner}}
+      dotnetVersion: ${{ variables.dotnetVersion }}
+ 
+  - ${{if and(eq(parameters.k8sBuild, 'true'), eq(variables['Build.SourceBranchName'], 'main'))}}:  
+    - ${{ each env in parameters.envsMain }}:
+      - stage: deploy_stage_${{ replace(env.name, '-', '_') }}
+        displayName: 'Deploy - ${{ env.name }}'  
+        variables:
+          - group: ${{ env.name }}.${{variables.projectService}}.${{variables.projectName}}
+          - group: ${{ env.name }}.${{variables.projectService}}.Common
+          - name: environment
+            value: ${{ env.name }}
+        jobs:          
+        - template: deploy-dotnet-k8s.yml@Devops
+          parameters:
+            environment: ${{ env.name }}
+            pool:
+              name: ${{ env.pool }}
+              ${{ if eq(env.pool, 'Azure Pipelines') }}: 
+                vmImage: ${{ env.poolImage }}
+            projectName: ${{ variables.projectName}}
+            dockerContainerRegistry: ${{ variables.dockerContainerRegistry}}
+            dockerRepository: ${{ variables.dockerRepository}}
+            kubernetesServiceConnection: $(kubernetesServiceConnection) #workaround bug azure devops - replace var at runtime
+            kubernetesNamespace: ${{ variables.kubernetesNamespace}}
+            helmValues: ${{ variables.helmValues }}
+  # Enable after fix k8s
+  #- ${{if and(eq(parameters.k8sBuild, 'true'), ne(variables['Build.SourceBranchName'], 'main'))}}:  
+  #  - ${{ each env in parameters.envsDevelop }}:
+  #    - stage: deploy_stage_${{ replace(env.name, '-', '_') }}
+  #      displayName: 'Deploy - ${{ env.name }}'  
+  #      variables:
+  #        - group: ${{ env.name }}.${{variables.projectService}}.${{variables.projectName}}
+  #        - group: ${{ env.name }}.${{variables.projectService}}.Common
+  #        - name: environment
+  #          value: ${{ env.name }}
+  #      jobs:          
+  #      - template: deploy-dotnet-k8s.yml@Devops
+  #        parameters:
+  #          environment: ${{ env.name }}
+  #          pool:
+  #            name: ${{ env.pool }}
+  #            ${{ if eq(env.pool, 'Azure Pipelines') }}: 
+  #              vmImage: ${{ env.poolImage }}
+  #          projectName: ${{ variables.projectName}}
+  #          dockerContainerRegistry: ${{ variables.dockerContainerRegistry}}
+  #          dockerRepository: ${{ variables.dockerRepository}}
+  #          kubernetesServiceConnection: $(kubernetesServiceConnection) #workaround bug azure devops - replace var at runtime
+  #          kubernetesNamespace: ${{ variables.kubernetesNamespace}}
+  #          helmValues: ${{ variables.helmValues }}

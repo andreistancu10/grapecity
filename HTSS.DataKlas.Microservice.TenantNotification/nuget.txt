@@ -1,0 +1,6 @@
+																																			   
+cd ./.nuget
+
+nuget push *.nupkg 1234 -SkipDuplicate -Source https://nugetreg.azurewebsites.net/nuget
+
+rm *.nupkg

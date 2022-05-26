@@ -1,0 +1,99 @@
+﻿
+PUT tenant-notification_notification-type-cover-gap-extension
+{
+  "settings": {
+    "max_result_window" : 2147483647,
+    "analysis": {
+      "analyzer": {
+        "autocomplete": {
+          "tokenizer": "autocomplete",
+          "filter": [
+            "lowercase"
+          ]
+        },
+        "autocomplete_search": {
+          "type": "custom",
+          "tokenizer": "keyword",
+          "filter": "lowercase"
+        }
+      },
+      "tokenizer": {
+        "autocomplete": {
+          "type": "edge_ngram",
+          "min_gram": 1,
+          "max_gram": 500,
+          "token_chars": [
+            "letter",
+            "digit",
+            "punctuation",
+            "symbol",
+            "whitespace"
+          ]
+        }
+      }
+    }
+  },
+ "mappings": {
+    "properties": {
+      "active": {
+        "type": "boolean"
+      },
+      "tenantId": {
+        "type": "long"
+      },      
+      "notificationTypeStatus": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 512
+          }
+        },
+        "analyzer": "autocomplete",
+        "search_analyzer": "autocomplete_search"
+      },
+      "notificationTypeActor": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 512
+          }
+        },
+        "analyzer": "autocomplete",
+        "search_analyzer": "autocomplete_search"
+      },
+      "notificationTypeActionId": {
+        "type": "long"
+      },
+      "notificationTypeId": {
+        "type": "long"
+      },
+      "notificationTypeCode": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 512
+          }
+        },
+        "analyzer": "autocomplete",
+        "search_analyzer": "autocomplete_search"
+      },
+      "notificationTypeMessage": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+              "ignore_above": 512
+          }
+        },
+        "analyzer": "autocomplete",
+        "search_analyzer": "autocomplete_search"
+      },
+      "id": {
+        "type": "long"
+      }
+    }
+  }
+}

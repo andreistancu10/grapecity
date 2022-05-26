@@ -1,0 +1,15 @@
+--init
+dotnet tool install --global dotnet-ef
+
+--ef add initial create
+dotnet ef migrations add InitialCreate --project ShiftIn.Domain.TenantNotification --startup-project Microservice.TenantNotification --context TenantNotificationDbContext  --configuration --verbose
+
+--ef update database
+dotnet ef database update --project ShiftIn.Domain.TenantNotification --startup-project Microservice.TenantNotification --context TenantNotificationDbContext --configuration --verbose
+
+--add new migration
+dotnet-ef migrations add NotificationTypeAndStatus --project ShiftIn.Domain.TenantNotification --startup-project Microservice.TenantNotification --context TenantNotificationDbContext  --configuration --verbose
+
+--ef undo last migration
+dotnet ef database update <previous-migration-name> --project ShiftIn.Domain.TenantNotification --startup-project Microservice.TenantNotification --context TenantNotificationDbContext --configuration --verbose
+dotnet ef migrations remove --project ShiftIn.Domain.TenantNotification --startup-project Microservice.TenantNotification --context TenantNotificationDbContext --configuration --verbose

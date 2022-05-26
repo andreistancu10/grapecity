@@ -1,0 +1,25 @@
+﻿{
+  "TenantNotificationConnectionString": {
+    "TenantNotification": {
+      "DbProvider": "MSSQL",
+      "ConnectionString": "Server=127.0.0.1,1433;Database=DEV_SHIFTPLANNING_DataKlas_TenantNotification_1;User Id=sa;Password=admin123!;",
+      "Options": [
+        {
+          "ConnectionString": "Server=127.0.0.1,1433;Database=DEV_SHIFTPLANNING_TENANT1_DataKlas_TenantNotification_1;User Id=sa;Password=admin123!;",
+          "TenantInfoId": 1
+        },
+        {
+          "ConnectionString": "Server=127.0.0.1,1433;Database=DEV_SHIFTPLANNING_TENANT2_DataKlas_TenantNotification_2;User Id=sa;Password=admin123!;",
+          "TenantInfoId": 12
+        }
+      ]
+    }
+  },
+  "TenantNotificationConnectionStringQuery": {
+    "ElasticSearch": {
+      "Url": "http://127.0.0.1:9200/",
+      "Username": "devuser",
+      "password": "-t?xUhPrQ94gCa!#"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Product>TenantNotification Client</Product>
+		<Version>6.0.3</Version>
+		<AssemblyName>Domain.TenantNotification.Client</AssemblyName>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include=".configurations\ServiceCollectionExtensions.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="HTSS.Platform.Infrastructure.MassTransit" Version="6.0.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Domain.TenantNotification.Contracts\Domain.TenantNotification.Contracts.csproj" />
+	</ItemGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<OutputPath>../.nuget</OutputPath>
+	</PropertyGroup>
+
+</Project>

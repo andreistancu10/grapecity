@@ -1,0 +1,25 @@
+﻿{
+  "TenantNotificationConnectionString": {
+    "TenantNotification": {
+      "DbProvider": "MSSQL",
+      "ConnectionString": "Server=htsqlshared02.database.windows.net;Database=DEV_SHIFTPLANNING_DataKlas_TenantNotification;User Id=shift-dev-tenantnot;Password=slbf5GfGSN3rmw1YG3",
+      "Options": [
+        {
+          "ConnectionString": "Server=htsqlshared02.database.windows.net;Database=DEV_SHIFTPLANNING_TENANT1_DataKlas_TenantNotification;User Id=shift-dev-t1-tenantnotification;Password=jc6HalbJtG7Xg2MR",
+          "TenantInfoId": 1
+        },
+        {
+          "ConnectionString": "Server=htsqlshared02.database.windows.net;Database=DEV_SHIFTPLANNING_TENANT2_DataKlas_TenantNotification;User Id=shift-dev-t2-tenantnotification;Password=EbK3gs8isYV8EUX8",
+          "TenantInfoId": 12
+        }
+      ]
+    }
+  },
+  "TenantNotificationConnectionStringQuery": {
+    "ElasticSearch": {
+      "Url": "http://13.74.68.10:9200/",
+      "Username": "devuser",
+      "password": "-t?xUhPrQ94gCa!#"
+    }
+  }
+}

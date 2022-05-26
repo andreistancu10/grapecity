@@ -1,0 +1,74 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="Root.vstemplate" />
+	</ItemGroup>
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Include=".configurations\ConfigureElasticContextExtensions.cs" />
+		<Compile Include=".configurations\ConfigureDbContextExtensions.cs" />
+		<Compile Include=".configurations\HostedServices\ConfigureElasticSearchHostedService.cs" />
+		<Compile Include=".configurations\HostedServices\MigrateDatabaseHostedService.cs" />
+		<Compile Include=".configurations\MassTransitExtensions.cs" />
+		<Compile Include=".configurations\DomainServiceExtensions.cs" />
+		<Compile Include=".configurations\IConfigurationBuilderExtensions.cs" />
+		<Compile Include=".extensions\Autocorrect\StringExtensions.cs" />
+		<Compile Include=".extensions\Validators\RuleBuilderExtensions.cs" />
+		<Compile Include=".utils\DevOnlyActionFilter.cs" />
+		<Compile Include=".utils\FilterDescriptor.cs" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Domain.Localization.Client" Version="1.0.7" />
+		<PackageReference Include="HTSS.Platform.Core.Files" Version="6.0.2" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.Api.Tools" Version="6.0.1" />
+		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+		<PackageReference Include="HTSS.Platform.Core.CQRS" Version="6.0.0" />
+		<PackageReference Include="HTSS.Platform.Core.Domain" Version="6.0.2" />
+		<PackageReference Include="HTSS.Platform.Core.Files.Csv" Version="6.0.2" />
+		<PackageReference Include="HTSS.Platform.Core.Files.Excel" Version="6.0.2" />
+		<PackageReference Include="HTSS.Platform.Core.Files.Json" Version="6.0.0" />
+		<PackageReference Include="HTSS.Platform.Core.Files.Xml" Version="6.0.0" />
+		<PackageReference Include="HTSS.Platform.Core.Helpers" Version="6.0.0" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.BusinessValidators.MassTransit" Version="1.0.1" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.Data.EntityFramework.MultiTenant" Version="6.0.5" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.ElasticsearchProvider.MultiTenant" Version="6.0.1" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.Cache.MultiTenant" Version="6.0.3" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.Environment" Version="6.0.0" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.Cache" Version="6.0.2" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.Data.EntityFramework" Version="6.0.5" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.ElasticsearchProvider" Version="6.0.0" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.MassTransit.MultiTenant" Version="6.0.3" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.ModelValidators.MassTransit" Version="1.0.1" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.Security" Version="6.0.2" />
+		<PackageReference Include="ShiftIn.Domain.Authentication.Client" Version="6.0.1" />
+		<PackageReference Include="ShiftIn.Utils" Version="6.0.2" />
+		<PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="6.13.15" />
+		<PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="6.13.15" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="domain.TenantNotificationSettings.Development.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="domain.TenantNotificationSettings.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="domain.TenantNotificationSettings.tokenized.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Domain.TenantNotification.Contracts\Domain.TenantNotification.Contracts.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Migrations\" />
+	</ItemGroup>
+</Project>

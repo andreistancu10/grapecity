@@ -1,0 +1,55 @@
+variables:
+  - name: repoConfiguration
+    ${{ if or(eq(variables['Build.SourceBranchName'], 'develop'), ne(variables['Build.SourceBranchName'], 'main')) }}:
+      value: develop
+    ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+      value: main
+  - name: projectName
+    value: TenantNotification
+  - name: domainSettingsFilename
+    value: domain.$(projectName)Settings.json
+  - name: appSettingsFilename
+    value: appsettings.json
+  - name: projectService
+    value: Microservice
+  - name: suffix
+    ${{ if eq(variables['Build.SourceBranchName'], 'develop') }}:
+      value: Development
+    ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
+      value: Main
+  - name: artifactName
+    value: artifacts
+  - name: dockerContainerRegistry
+    value: htssn
+  - name: kubernetesServiceConnection
+    value: SHIFTIN-AKS-DEV
+  - name: kubernetesNamespace
+    value: default
+  - name: helmValues
+    value: helm-values.yml
+  - name: baseFolder
+    value: HTSS.DataKlas.$(projectService).$(projectName)
+  - name: sonarQubeProjectKey
+    value: $(prefix)_$(projectService)_$(projectName)
+  - name: sonarQubeProjectName
+    value: $(prefix).$(projectService).$(projectName)
+  - name: feedsToUse
+    value: config
+  - name: dockerRepository
+    value: $(prefix)/microservices/$(repoConfiguration)/$(projectName)
+  - name: dotnetVersion
+    value: 6.0.200
+#ef vars
+  - name: runMigration
+    value: false
+  - name: azureServiceConnection
+    value: HTSS-CLOUDAPPS-DEV (2afeaed6-50e9-45d2-93a1-ff1bdc2d4bfe)
+  - name: startupProjectPath
+    value: HTSS.DataKlas.$(projectService).$(projectName)/$(projectService).$(projectName)/$(projectService).$(projectName).csproj
+  - name: domainProjectPath
+    value: HTSS.DataKlas.$(projectService).$(projectName)/ShiftIn.Domain.$(projectName)/ShiftIn.Domain.$(projectName).csproj
+  - name: projectContext
+    value: TenantNotificationDbContext  
+  # ef check using htss-aks-dev env
+  - group: htss-aks-dev.${{variables.projectService}}.${{variables.projectName}}
+  - group: htss-aks-dev.${{variables.projectService}}.Common    
