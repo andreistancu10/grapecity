@@ -3,22 +3,22 @@
     "windowsAuthentication": false,
     "anonymousAuthentication": true,
     "iisExpress": {
-      "applicationUrl": "http://localhost:7012",
+      "applicationUrl": "http://localhost:7021",
       "sslPort": 0
     }
   },
   "$schema": "http://json.schemastore.org/launchsettings.json",
   "profiles": {
-    "Microservice.TenantNotification": {
+    "Microservice.DocumentManagement": {
       "commandName": "Project",
       "workingDirectory": ".\\bin\\Debug\\net6.0",
       "launchBrowser": false,
       "environmentVariables": {
-        "DISCOVERY_ADDRESS": "http://localhost:7012",
+        "DISCOVERY_ADDRESS": "http://localhost:7021",
         "ASPNETCORE_ENVIRONMENT": "Development",
         "MIGRATE_DATABASE": "true"
       },
-      "applicationUrl": "http://localhost:7012"
+      "applicationUrl": "http://localhost:7021"
     }
   }
 }
