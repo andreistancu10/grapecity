@@ -20,7 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Domain.TenantNotification\DigitNow.Domain.DocumentManagement.csproj" />
+		<ProjectReference Include="..\DigitNow.Domain.DocumentManagement\DigitNow.Domain.DocumentManagement.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -4,7 +4,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<Product>TenantNotification Client</Product>
 		<Version>6.0.3</Version>
-		<AssemblyName>Domain.TenantNotification.Client</AssemblyName>
+		<AssemblyName>DigitNow.Domain.DocumentManagement.Client</AssemblyName>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -16,7 +16,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Domain.TenantNotification.Contracts\DigitNow.Domain.DocumentManagement.Contracts.csproj" />
+		<ProjectReference Include="..\DigitNow.Domain.DocumentManagement.Contracts\DigitNow.Domain.DocumentManagement.Contracts.csproj" />
 	</ItemGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

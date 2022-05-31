@@ -53,19 +53,19 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="domain.TenantNotificationSettings.Development.json">
+		<None Update="DigitNow.Domain.DocumentManagementSettings.Development.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="domain.TenantNotificationSettings.json">
+		<None Update="DigitNow.Domain.DocumentManagementSettings.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="domain.TenantNotificationSettings.tokenized.json">
+		<None Update="DigitNow.Domain.DocumentManagementSettings.tokenized.json">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Domain.TenantNotification.Contracts\DigitNow.Domain.DocumentManagement.Contracts.csproj" />
+		<ProjectReference Include="..\DigitNow.Domain.DocumentManagement.Contracts\DigitNow.Domain.DocumentManagement.Contracts.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

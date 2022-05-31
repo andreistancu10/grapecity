@@ -4,7 +4,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<Product>TenantNotification Contracts</Product>
 		<Version>6.0.3</Version>
-		<AssemblyName>Domain.TenantNotification.Contracts</AssemblyName>
+		<AssemblyName>DigitNow.Domain.DocumentManagement.Contracts</AssemblyName>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
