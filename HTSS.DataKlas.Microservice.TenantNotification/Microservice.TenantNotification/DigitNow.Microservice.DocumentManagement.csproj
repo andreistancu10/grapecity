@@ -42,8 +42,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Domain.TenantNotification.Contracts\Domain.TenantNotification.Contracts.csproj" />
-		<ProjectReference Include="..\Domain.TenantNotification\Domain.TenantNotification.csproj" />
+		<ProjectReference Include="..\Domain.TenantNotification.Contracts\DigitNow.Domain.DocumentManagement.Contracts.csproj" />
+		<ProjectReference Include="..\Domain.TenantNotification\DigitNow.Domain.DocumentManagement.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<Content Update="appsettings.Development.json">

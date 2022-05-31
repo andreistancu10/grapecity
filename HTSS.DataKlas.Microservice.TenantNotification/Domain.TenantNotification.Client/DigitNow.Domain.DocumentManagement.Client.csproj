@@ -16,7 +16,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Domain.TenantNotification.Contracts\Domain.TenantNotification.Contracts.csproj" />
+		<ProjectReference Include="..\Domain.TenantNotification.Contracts\DigitNow.Domain.DocumentManagement.Contracts.csproj" />
 	</ItemGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
