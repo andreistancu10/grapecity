@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Product>TenantNotification Contracts</Product>
+		<Version>6.0.3</Version>
+		<AssemblyName>DigitNow.Domain.DocumentManagement.Contracts</AssemblyName>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<OutputPath>../.nuget</OutputPath>
+	</PropertyGroup>
+</Project>

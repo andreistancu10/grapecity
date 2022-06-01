@@ -1,0 +1,25 @@
+﻿{
+  "DocumentManagementConnectionString": {
+    "DocumentManagement": {
+      "DbProvider": "MSSQL",
+      "ConnectionString": "",
+      "Options": [
+        {
+          "ConnectionString": "",
+          "TenantInfoId": 1
+        },
+        {
+          "ConnectionString": "",
+          "TenantInfoId": 12
+        }
+      ]
+    }
+  },
+  "DocumentManagementConnectionStringQuery": {
+    "ElasticSearch": {
+      "Url": "http://13.74.68.10:9200/",
+      "Username": "devuser",
+      "password": "-t?xUhPrQ94gCa!#"
+    }
+  }
+}

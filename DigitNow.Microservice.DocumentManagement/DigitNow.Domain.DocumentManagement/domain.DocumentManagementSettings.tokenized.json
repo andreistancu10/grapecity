@@ -1,0 +1,18 @@
+﻿{
+  "DocumentManagementConnectionString": {
+    "DocumentManagement": {
+      "DbProvider": "MSSQL",
+      "ConnectionString": "#{DocumentManagementConnectionString}#",
+      "Options": [
+        #{noescape(MultiTenant.DocumentManagementConnectionStrings)}#
+      ]
+    }
+  },
+  "DocumentManagementConnectionStringQuery": {
+    "ElasticSearch": {
+      "Url": "#{ElasticSearch.Url}#",
+      "Username": "#{ElasticSearch.Username}#",
+      "password": "#{ElasticSearch.Password}#"
+    }
+  }
+}
