@@ -10,7 +10,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations
 {
     public static class ConfigureElasticContextExtensions
     {
-        private const string _applicationConfigurationDbContextSection = "TenantNotificationConnectionStringQuery:ElasticSearch";
+        private const string _applicationConfigurationDbContextSection = "DocumentManagementConnectionStringQuery:ElasticSearch";
 
         private static readonly Assembly _currentAssembly = typeof(DomainServiceExtensions).Assembly;
 

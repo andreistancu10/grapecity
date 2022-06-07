@@ -2,7 +2,10 @@
 using DigitNow.Domain.DocumentManagement.Data.NotificationStatuses;
 using DigitNow.Domain.DocumentManagement.Data.NotificationTypeCoverGapExtensions;
 using DigitNow.Domain.DocumentManagement.Data.NotificationTypes;
+using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
 using Microsoft.EntityFrameworkCore;
+using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
+using DigitNow.Domain.DocumentManagement.Data.ContactDetails;
 
 namespace DigitNow.Domain.DocumentManagement.Data
 {
@@ -21,6 +24,12 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<NotificationType> NotificationTypes { get; set; }
 
         public DbSet<NotificationTypeCoverGapExtension> NotificationTypeCoverGapExtensions { get; set; }
+
+        public DbSet<IncomingDocument> IncomingDocuments { get; set; }
+
+        public DbSet<ConnectedDocument> ConnectedDocuments { get; set; }
+
+        public DbSet<ContactDetail> ContactDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

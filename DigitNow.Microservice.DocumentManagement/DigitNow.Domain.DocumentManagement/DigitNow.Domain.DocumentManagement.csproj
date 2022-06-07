@@ -46,6 +46,11 @@
 		<PackageReference Include="HTSS.Platform.Infrastructure.MassTransit.MultiTenant" Version="6.0.3" />
 		<PackageReference Include="HTSS.Platform.Infrastructure.ModelValidators.MassTransit" Version="1.0.1" />
 		<PackageReference Include="HTSS.Platform.Infrastructure.Security" Version="6.0.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.5" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.5">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="ShiftIn.Domain.Authentication.Client" Version="6.0.1" />
 		<PackageReference Include="ShiftIn.Utils" Version="6.0.2" />
 		<PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="6.13.15" />
