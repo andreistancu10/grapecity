@@ -7,7 +7,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
     public class CreateIncomingDocumentCommand : ICommand<ResultObject>
     {
         public DateTime? RegistrationDate { get; set; }
-        public int RegistrationNumber { get; set; }
         public int InputChannelId { get; set; }
         public int IssuerTypeId { get; set; }
         public string IssuerName { get; set; }
