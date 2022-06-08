@@ -8,7 +8,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries
 {
     public interface IDocumentsQueryService
     {
-        Task<IList<IncomingDocument>> GetDocsByRegistrationNumber(string registrationNumber, CancellationToken cancellationToken);
+        Task<IList<IncomingDocument>> GetDocsByRegistrationNumber(int registrationNumber, CancellationToken cancellationToken);
     }
     public class IncomingDocumentsQueryService : IDocumentsQueryService
     {
@@ -18,10 +18,10 @@ namespace DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries
         {
             _dbContext = dbContext;
         }
-        public async Task<IList<IncomingDocument>> GetDocsByRegistrationNumber(string registrationNumber, CancellationToken cancellationToken)
+        public async Task<IList<IncomingDocument>> GetDocsByRegistrationNumber(int registrationNumber, CancellationToken cancellationToken)
         {
             return await _dbContext.IncomingDocuments
-                .Where(doc => doc.RegistrationNumber.StartsWith(registrationNumber)).ToListAsync(cancellationToken);
+                .Where(doc => doc.RegistrationNumber == registrationNumber).ToListAsync(cancellationToken);
         }
     }
 }

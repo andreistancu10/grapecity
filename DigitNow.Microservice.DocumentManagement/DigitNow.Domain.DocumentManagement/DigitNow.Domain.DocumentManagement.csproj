@@ -67,6 +67,9 @@
 		<None Update="domain.DocumentManagementSettings.tokenized.json">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="domain.TenantNotificationSettings.Development.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>

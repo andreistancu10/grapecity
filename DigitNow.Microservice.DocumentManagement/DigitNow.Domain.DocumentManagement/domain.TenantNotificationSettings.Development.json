@@ -1,0 +1,25 @@
+{
+  "DocumentManagementConnectionString": {
+    "DocumentManagement": {
+      "DbProvider": "MSSQL",
+      "ConnectionString": "Server=127.0.0.1,1433;Database=DEV_SHIFTPLANNING_DataKlas_Catalog;User Id=sa;Password=admin123!;",
+      "Options": [
+        {
+          "ConnectionString": "",
+          "TenantInfoId": 1
+        },
+        {
+          "ConnectionString": "",
+          "TenantInfoId": 12
+        }
+      ]
+    }
+  },
+  "DocumentManagementConnectionStringQuery": {
+    "ElasticSearch": {
+      "Url": "http://127.0.0.1:9200/",
+      "Username": "devuser",
+      "password": "-t?xUhPrQ94gCa!#"
+    }
+  }
+}

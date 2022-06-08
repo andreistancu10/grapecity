@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
+using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries;
 using DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
@@ -8,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments
@@ -38,7 +40,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetByRegistrationNumber([FromQuery] string registrationNumber)
+        public async Task<IActionResult> GetByRegistrationNumber([FromQuery] int registrationNumber)
         {
             return await _mediator.Send(new GetDocsByRegistrationNumberQuery { RegistrationNumber = registrationNumber })
                 switch
@@ -46,6 +48,15 @@ namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments
                 null => NotFound(),
                 var result => Ok(result)
             };
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateIncomingDocument([FromRoute] int id, [FromBody] UpdateIncomingDocumentRequest request, CancellationToken cancellationToken)
+        {
+            var updateIncomingDocumentCommand = _mapper.Map<UpdateIncomingDocumentCommand>(request);
+            updateIncomingDocumentCommand.Id = id;
+
+            return CreateResponse(await _mediator.Send(updateIncomingDocumentCommand, cancellationToken));
         }
     }
 }
