@@ -10,6 +10,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries
     {
         Task<IList<IncomingDocument>> GetDocsByRegistrationNumber(string registrationNumber, CancellationToken cancellationToken);
     }
+
     public class IncomingDocumentsQueryService : IDocumentsQueryService
     {
         protected readonly DocumentManagementDbContext _dbContext;
