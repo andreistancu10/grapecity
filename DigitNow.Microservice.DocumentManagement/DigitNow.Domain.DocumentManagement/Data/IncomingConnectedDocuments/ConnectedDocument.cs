@@ -1,9 +1,9 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
 
-namespace DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments
+namespace DigitNow.Domain.DocumentManagement.Data.IncomingConnectedDocuments
 {
-    public class ConnectedDocument
+    public class IncomingConnectedDocument
     {
         public int Id { get; set; }
         public string RegistrationNumber { get; set; }

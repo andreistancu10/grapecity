@@ -10,9 +10,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries
     public class GetDocsByRegistrationNumberHandler : IQueryHandler<GetDocsByRegistrationNumberQuery, List<GetDocsByRegistrationNumberResponse>>
     {
         private readonly IMapper _mapper;
-        private readonly IDocumentsQueryService _queryService;
+        private readonly IIncomingDocumentsQueryService _queryService;
 
-        public GetDocsByRegistrationNumberHandler(IMapper mapper, IDocumentsQueryService queryService)
+        public GetDocsByRegistrationNumberHandler(IMapper mapper, IIncomingDocumentsQueryService queryService)
         {
             _mapper = mapper;
             _queryService = queryService;

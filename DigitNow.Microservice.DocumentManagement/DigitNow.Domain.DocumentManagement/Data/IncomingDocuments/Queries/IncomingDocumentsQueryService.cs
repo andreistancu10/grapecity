@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries
 {
-    public interface IDocumentsQueryService
+    public interface IIncomingDocumentsQueryService
     {
         Task<IList<IncomingDocument>> GetDocsByRegistrationNumber(string registrationNumber, CancellationToken cancellationToken);
     }
 
-    public class IncomingDocumentsQueryService : IDocumentsQueryService
+    public class IncomingDocumentsQueryService : IIncomingDocumentsQueryService
     {
         protected readonly DocumentManagementDbContext _dbContext;
 

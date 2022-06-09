@@ -66,7 +66,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddScoped<INotificationService, NotificationService>();
-            services.AddScoped<IDocumentsQueryService, IncomingDocumentsQueryService>();
+            services.AddScoped<IIncomingDocumentsQueryService, IncomingDocumentsQueryService>();
             services.AddScoped<IOutgoingDocumentsQueryService, OutgoingDocumentsQueryService>();
 
             return services;

@@ -4,8 +4,9 @@ using DigitNow.Domain.DocumentManagement.Data.NotificationTypeCoverGapExtensions
 using DigitNow.Domain.DocumentManagement.Data.NotificationTypes;
 using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
 using Microsoft.EntityFrameworkCore;
-using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 using DigitNow.Domain.DocumentManagement.Data.ContactDetails;
+using DigitNow.Domain.DocumentManagement.Data.IncomingConnectedDocuments;
+using DigitNow.Domain.DocumentManagement.Data.OutgoingConnectedDocuments;
 using DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments;
 
 namespace DigitNow.Domain.DocumentManagement.Data
@@ -30,7 +31,9 @@ namespace DigitNow.Domain.DocumentManagement.Data
 
         public DbSet<OutgoingDocument> OutgoingDocuments { get; set; }
 
-        public DbSet<ConnectedDocument> ConnectedDocuments { get; set; }
+        public DbSet<IncomingConnectedDocument> IncomingConnectedDocuments { get; set; }
+
+        public DbSet<OutgoingConnectedDocument> OutgoingConnectedDocuments { get; set; }
 
         public DbSet<ContactDetail> ContactDetails { get; set; }
 

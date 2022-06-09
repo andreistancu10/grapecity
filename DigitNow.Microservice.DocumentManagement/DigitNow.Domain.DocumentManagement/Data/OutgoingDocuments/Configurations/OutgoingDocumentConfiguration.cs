@@ -1,20 +1,19 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DigitNow.Domain.DocumentManagement.Data.OutgoingConnectedDocuments;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments.Configurations
 {
-    public class OutgoingDocumentConfiguration : IEntityTypeConfiguration<OutgoingDocument>
+    public class OutgoingConnectedDocumentConfiguration : IEntityTypeConfiguration<OutgoingConnectedDocument>
     {
-        public void Configure(EntityTypeBuilder<OutgoingDocument> builder)
+        public void Configure(EntityTypeBuilder<OutgoingConnectedDocument> builder)
         {
-            builder.ToTable(nameof(OutgoingDocument), DocumentManagementDbContext.Schema);
+            builder.ToTable(nameof(OutgoingConnectedDocument), DocumentManagementDbContext.Schema);
 
             builder.HasKey(p => p.Id);
 
-            //builder.Property(p => p.IssuerName).IsRequired();
-            //builder.Property(p => p.NumberOfPages).IsRequired();
-            //builder.Property(p => p.ContentSummary).IsRequired();
-            //builder.Property(p => p.User).IsRequired();
+            builder.Property(p => p.RegistrationNumber).IsRequired();
+            builder.Property(p => p.DocumentType).IsRequired();
         }
     }
 }

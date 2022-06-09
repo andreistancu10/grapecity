@@ -3,11 +3,11 @@ using DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments;
 
 namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries
 {
-    public class GetDocsByIdMapping : Profile
+    public class GetDocsByRegistrationNumberMapping : Profile
     {
-        public GetDocsByIdMapping()
+        public GetDocsByRegistrationNumberMapping()
         {
-            CreateMap<OutgoingDocument, GetDocsByIdResponse>();
+            CreateMap<OutgoingDocument, GetDocsByRegistrationNumberResponse>();
         }
     }
 }

@@ -8,8 +8,8 @@ namespace DigitNow.Domain.DocumentManagement.Public.OutgoingDocuments.Models
         public DateTime? RegistrationDate { get; set; }
         public string RegistrationNumber { get; set; }
         public int InputChannelId { get; set; }
-        public int IssuerTypeId { get; set; }
-        public string IssuerName { get; set; }
+        public int RecipientTypeId { get; set; }
+        public string RecipientName { get; set; }
         public string IdentificationNumber { get; set; }
         public int ExternalNumber { get; set; }
         public DateTime? ExternalNumberDate { get; set; }

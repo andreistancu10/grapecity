@@ -1,12 +1,13 @@
-﻿using AutoMapper;
+﻿using System.Collections.Generic;
+using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DigitNow.Domain.DocumentManagement.Data.IncomingConnectedDocuments;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create
 {
@@ -20,24 +21,25 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
             _dbContext = dbContext;
             _mapper = mapper;
         }
+
         public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
         {
             var incomingDocumentForCreation = _mapper.Map<IncomingDocument>(request);
 
             if (request.ConnectedDocumentIds.Any())
             {
-                var connectedDocuments = await _dbContext.IncomingDocuments
-                    .Where(doc => request.ConnectedDocumentIds.Contains(doc.RegistrationNumber)).ToListAsync();
+                List<IncomingDocument> connectedDocuments = await _dbContext.IncomingDocuments
+                    .Where(doc => request.ConnectedDocumentIds.Contains(doc.RegistrationNumber)).ToListAsync(cancellationToken: cancellationToken);
 
-                foreach (var doc in connectedDocuments)
+                foreach (IncomingDocument doc in connectedDocuments)
                 {
                     incomingDocumentForCreation.ConnectedDocuments
-                        .Add(new ConnectedDocument() { RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });
+                        .Add(new IncomingConnectedDocument { RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });
                 }
             }
 
-            await _dbContext.IncomingDocuments.AddAsync(incomingDocumentForCreation);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.IncomingDocuments.AddAsync(incomingDocumentForCreation, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return ResultObject.Created(incomingDocumentForCreation.Id);
         }
