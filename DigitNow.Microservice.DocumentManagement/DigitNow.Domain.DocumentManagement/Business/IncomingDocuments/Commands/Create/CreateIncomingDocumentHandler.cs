@@ -4,6 +4,7 @@ using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -22,7 +23,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
         }
         public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
         {
-            var incomingDocumentForCreation = _mapper.Map<IncomingDocument>(request);
+            var incomingDocumentForCreation          = _mapper.Map<IncomingDocument>(request);
+            incomingDocumentForCreation.CreationDate = DateTime.Now;
 
             if (request.ConnectedDocumentIds.Any())
             {
@@ -32,9 +34,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
                 foreach (var doc in connectedDocuments)
                 {
                     incomingDocumentForCreation.ConnectedDocuments
-                        .Add(new ConnectedDocument() { RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });
+                        .Add(new ConnectedDocument() { ChildIncomingDocumentId = doc.Id, RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });
                 }
             }
+
+            var currentMaxRegistrationNo = _dbContext.IncomingDocuments.Where(doc => doc.CreationDate.Year == DateTime.Now.Year).Count();
+            incomingDocumentForCreation.RegistrationNumber = ++currentMaxRegistrationNo;
 
             await _dbContext.IncomingDocuments.AddAsync(incomingDocumentForCreation);
             await _dbContext.SaveChangesAsync();
