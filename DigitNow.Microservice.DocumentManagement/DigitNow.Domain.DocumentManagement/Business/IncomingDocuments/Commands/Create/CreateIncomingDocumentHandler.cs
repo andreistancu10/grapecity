@@ -38,7 +38,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
                 }
             }
 
-            var currentMaxRegistrationNo = _dbContext.IncomingDocuments.Where(doc => doc.CreationDate.Year == DateTime.Now.Year).Count();
+            var currentMaxRegistrationNo = _dbContext.IncomingDocuments.Count(doc => doc.CreationDate.Year == DateTime.Now.Year);
             incomingDocumentForCreation.RegistrationNumber = ++currentMaxRegistrationNo;
 
             await _dbContext.IncomingDocuments.AddAsync(incomingDocumentForCreation);
