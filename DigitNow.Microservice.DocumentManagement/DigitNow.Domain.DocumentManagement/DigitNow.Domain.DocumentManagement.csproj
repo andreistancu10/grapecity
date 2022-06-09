@@ -13,7 +13,6 @@
 	<ItemGroup>
 		<Compile Include=".configurations\ConfigureElasticContextExtensions.cs" />
 		<Compile Include=".configurations\ConfigureDbContextExtensions.cs" />
-		<Compile Include=".configurations\HostedServices\ConfigureElasticSearchHostedService.cs" />
 		<Compile Include=".configurations\HostedServices\MigrateDatabaseHostedService.cs" />
 		<Compile Include=".configurations\MassTransitExtensions.cs" />
 		<Compile Include=".configurations\DomainServiceExtensions.cs" />
@@ -74,6 +73,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Business\Consumers\" />
 		<Folder Include="Migrations\" />
+		<Folder Include="Public\Maintenance\" />
 	</ItemGroup>
 </Project>

@@ -4,6 +4,7 @@ using HTSS.Platform.Core.CQRS;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries
 {
@@ -19,7 +20,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries
         }
         public async Task<List<GetDocsByRegistrationNumberResponse>> Handle(GetDocsByRegistrationNumberQuery request, CancellationToken cancellationToken)
         {
-            var result = await _queryService.GetDocsByRegistrationNumber(request.RegistrationNumber, cancellationToken);
+            IList<IncomingDocument> result = await _queryService.GetDocsByRegistrationNumber(request.RegistrationNumber, cancellationToken);
             return _mapper.Map<List<GetDocsByRegistrationNumberResponse>>(result);
         }
     }

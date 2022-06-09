@@ -20,7 +20,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddSingleton<IElasticClient>(serviceProvider =>
             {
                 var elasticSearchUri = new Uri(options.Url);
-                var connectionSettings = new ConnectionSettings(elasticSearchUri).BasicAuthentication(options.Username, options.Password);
+                ConnectionSettings connectionSettings = new ConnectionSettings(elasticSearchUri).BasicAuthentication(options.Username, options.Password);
                 connectionSettings.ApplyFromAssembly(_currentAssembly);
                 return new ElasticClient(connectionSettings);
             });

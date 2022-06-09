@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using DigitNow.Domain.DocumentManagement.Business.Notifications.Services;
 using DigitNow.Domain.DocumentManagement.configurations.HostedServices;
 using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries;
 using Domain.Localization.Client.configurations;
@@ -30,7 +29,6 @@ namespace DigitNow.Domain.DocumentManagement.configurations
 
             // apply hosted services
             services.AddHostedService<MigrateDatabaseHostedService>();
-            services.AddHostedService<ConfigureElasticSearchHostedService>();
 
             services.AddMediatR(_currentAssembly);
             services.AddAutoMapper(_currentAssembly);
@@ -64,7 +62,6 @@ namespace DigitNow.Domain.DocumentManagement.configurations
         
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
-            services.AddScoped<INotificationService, NotificationService>();
             services.AddScoped<IDocumentsQueryService, IncomingDocumentsQueryService>();
             return services;
         }

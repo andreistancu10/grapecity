@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Collections.Generic;
+using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
@@ -26,10 +27,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
 
             if (request.ConnectedDocumentIds.Any())
             {
-                var connectedDocuments = await _dbContext.IncomingDocuments
+                List<IncomingDocument> connectedDocuments = await _dbContext.IncomingDocuments
                     .Where(doc => request.ConnectedDocumentIds.Contains(doc.RegistrationNumber)).ToListAsync();
 
-                foreach (var doc in connectedDocuments)
+                foreach (IncomingDocument doc in connectedDocuments)
                 {
                     incomingDocumentForCreation.ConnectedDocuments
                         .Add(new ConnectedDocument() { RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });

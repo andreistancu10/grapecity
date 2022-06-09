@@ -32,14 +32,14 @@ namespace DigitNow.Domain.DocumentManagement.configurations
                 {
                     var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
                     if (loggerFactory == null) return;
-                    var logger = loggerFactory.CreateLogger<IServiceCollection>();
+                    ILogger<IServiceCollection> logger = loggerFactory.CreateLogger<IServiceCollection>();
 
                     var efTenantService = serviceProvider.GetService<IEfTenantService>();
                     logger.LogDebug("Trying to identity the tenant...");
 
                     if (efTenantService != null)
                     {
-                        var tenantInfo = efTenantService.GetTenantInfo();
+                        TenantInfo tenantInfo = efTenantService.GetTenantInfo();
 
                         if (tenantInfo is null)
                             throw new NullReferenceException("Tenant Info Configurations not found for current context");
