@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries;
 using HTSS.Platform.Core.CQRS;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,7 +20,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries
         }
         public async Task<List<GetDocsByRegistrationNumberResponse>> Handle(GetDocsByRegistrationNumberQuery request, CancellationToken cancellationToken)
         {
-            var result = await _queryService.GetDocsByRegistrationNumber(request.RegistrationNumber, cancellationToken);
+            request.Year = request.Year == 0 ? DateTime.Now.Year : request.Year;
+
+            var result = await _queryService.GetDocsByRegistrationNumberAndYear(request.RegistrationNumber, request.Year, cancellationToken);
             return _mapper.Map<List<GetDocsByRegistrationNumberResponse>>(result);
         }
     }
