@@ -5,7 +5,6 @@ namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models
 {
     public class CreateIncomingDocumentRequest
     {
-        public DateTime? RegistrationDate { get; set; }
         public int InputChannelId { get; set; }
         public int IssuerTypeId { get; set; }
         public string IssuerName { get; set; }
