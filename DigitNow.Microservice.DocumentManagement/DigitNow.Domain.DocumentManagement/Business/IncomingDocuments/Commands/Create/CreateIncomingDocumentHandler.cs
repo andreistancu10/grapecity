@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business._Common.Documents.Interfaces;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
@@ -15,11 +16,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IMapper _mapper;
+        private readonly IDocumentService _service;
 
-        public CreateIncomingDocumentHandler(DocumentManagementDbContext dbContext, IMapper mapper)
+        public CreateIncomingDocumentHandler(DocumentManagementDbContext dbContext, IMapper mapper, IDocumentService service)
         {
             _dbContext = dbContext;
             _mapper = mapper;
+            _service = service;
         }
         public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
         {
@@ -38,11 +41,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
                 }
             }
 
-            var currentMaxRegistrationNo = _dbContext.IncomingDocuments.Count(doc => doc.CreationDate.Year == DateTime.Now.Year);
-            incomingDocumentForCreation.RegistrationNumber = ++currentMaxRegistrationNo;
-
-            await _dbContext.IncomingDocuments.AddAsync(incomingDocumentForCreation);
-            await _dbContext.SaveChangesAsync();
+            await _service.AssignRegNumberAndSaveDocument(incomingDocumentForCreation);
 
             return ResultObject.Created(incomingDocumentForCreation.Id);
         }

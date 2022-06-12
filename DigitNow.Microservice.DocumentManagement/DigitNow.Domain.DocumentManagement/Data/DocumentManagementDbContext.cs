@@ -28,6 +28,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
 
         public DbSet<ConnectedDocument> ConnectedDocuments { get; set; }
 
+        public DbSet<RegistrationNoCounter.RegistrationNumberCounter> RegistrationNumberCounter { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema(Schema);
