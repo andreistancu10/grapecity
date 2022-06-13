@@ -22,7 +22,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries
         {
             request.Year = request.Year == 0 ? DateTime.Now.Year : request.Year;
 
-            var result = await _queryService.GetIncomingDocsByRegistrationNumberAndYear(request.RegistrationNumber, request.Year, cancellationToken);
+            var result = await _queryService.GetDocsByRegistrationNumberAndYear(request.RegistrationNumber, request.Year, cancellationToken);
             return _mapper.Map<List<GetDocsByRegistrationNumberResponse>>(result);
         }
     }

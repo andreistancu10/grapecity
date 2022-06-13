@@ -8,18 +8,17 @@ namespace DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries
 {
     public interface IDocumentsQueryService
     {
-        Task<IList<IncomingDocument>> GetIncomingDocsByRegistrationNumberAndYear(int registrationNumber, int year, CancellationToken cancellationToken);
+        Task<IList<IncomingDocument>> GetDocsByRegistrationNumberAndYear(int registrationNumber, int year, CancellationToken cancellationToken);
     }
-    public class DocumentsQueryService : IDocumentsQueryService
+    public class IncomingDocumentsQueryService : IDocumentsQueryService
     {
-        private readonly DocumentManagementDbContext _dbContext;
+        protected readonly DocumentManagementDbContext _dbContext;
 
-        public DocumentsQueryService(DocumentManagementDbContext dbContext)
+        public IncomingDocumentsQueryService(DocumentManagementDbContext dbContext)
         {
             _dbContext = dbContext;
         }
-        
-        public async Task<IList<IncomingDocument>> GetIncomingDocsByRegistrationNumberAndYear(int registrationNumber, int year, CancellationToken cancellationToken)
+        public async Task<IList<IncomingDocument>> GetDocsByRegistrationNumberAndYear(int registrationNumber, int year, CancellationToken cancellationToken)
         {
             return await _dbContext.IncomingDocuments
                 .Where(doc => doc.RegistrationNumber == registrationNumber && doc.CreationDate.Year == year).ToListAsync(cancellationToken);
