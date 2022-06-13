@@ -2,6 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
@@ -57,6 +58,16 @@ namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments
             updateIncomingDocumentCommand.Id = id;
 
             return CreateResponse(await _mediator.Send(updateIncomingDocumentCommand, cancellationToken));
+        }
+
+        [HttpPost("{id}/submit-workflow")]
+        public async Task<IActionResult> SubmitWorkflowDecision([FromRoute] int id, [FromBody] CreateWorkflowDecisionRequest request)
+        {
+            var command = _mapper.Map<CreateWorkflowDecisionCommand>(request);
+            command.InitiatorName = GetUserId() ?? "";
+            command.DocumentId = id;
+
+            return CreateResponse(await _mediator.Send(command));
         }
     }
 }
