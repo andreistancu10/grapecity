@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/incoming-documents")]
     public class IncomingDocumentsController : ApiController
     {
@@ -34,7 +34,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments
         public async Task<IActionResult> CreateIncomingDocument([FromBody] CreateIncomingDocumentRequest request)
         {
             var command = _mapper.Map<CreateIncomingDocumentCommand>(request);
-            command.User = GetUserId() ?? "";
+            command.User = GetUserId();
 
             return CreateResponse(await _mediator.Send(command));
         }
