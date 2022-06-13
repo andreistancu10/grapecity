@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
-using DigitNow.Domain.DocumentManagement.Business._Common.Documents.Interfaces;
 using DigitNow.Domain.DocumentManagement.Business._Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Notifications.Services;
 using DigitNow.Domain.DocumentManagement.configurations.HostedServices;
+using DigitNow.Domain.DocumentManagement.Contracts.Documents;
 using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries;
 using Domain.Localization.Client.configurations;
 using HTSS.Platform.Core.Files.MicrosoftExtensions;

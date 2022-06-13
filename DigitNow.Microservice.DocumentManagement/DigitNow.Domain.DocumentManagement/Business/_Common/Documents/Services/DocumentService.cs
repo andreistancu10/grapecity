@@ -1,4 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Business._Common.Documents.Interfaces;
+﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.RegistrationNoCounter;
 using Microsoft.EntityFrameworkCore;
