@@ -9,9 +9,9 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             this IConfigurationBuilder configurationBuilder,
             IHostEnvironment environment)
         {
-            string appSettingsJson = "domain.TenantNotificationSettings.json";
+            string appSettingsJson = "domain.DocumentManagementSettings.json";
             if (!environment.IsProduction())
-                appSettingsJson = "domain.TenantNotificationSettings.Development.json";
+                appSettingsJson = "domain.DocumentManagementSettings.Development.json";
 
             configurationBuilder.AddJsonFile(appSettingsJson, true, true);
 

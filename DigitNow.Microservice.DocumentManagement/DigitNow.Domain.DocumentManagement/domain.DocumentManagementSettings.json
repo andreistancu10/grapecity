@@ -2,7 +2,7 @@
   "DocumentManagementConnectionString": {
     "DocumentManagement": {
       "DbProvider": "MSSQL",
-      "ConnectionString": "",
+      "ConnectionString": "Server=localhost,1433;Database=DigitNow-dev-DocumentManagement;User Id=sa;Password=admin123!;",
       "Options": [
         {
           "ConnectionString": "",
