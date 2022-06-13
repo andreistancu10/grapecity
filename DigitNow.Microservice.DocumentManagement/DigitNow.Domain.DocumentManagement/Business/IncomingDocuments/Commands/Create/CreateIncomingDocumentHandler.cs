@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents;
+using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
+using DigitNow.Domain.DocumentManagement.Data.WorkflowHistories;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -26,9 +28,27 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
         }
         public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
         {
-            var incomingDocumentForCreation          = _mapper.Map<IncomingDocument>(request);
-            incomingDocumentForCreation.CreationDate = DateTime.Now;
+            var incomingDocumentForCreation             = _mapper.Map<IncomingDocument>(request);
+            incomingDocumentForCreation.CreationDate    = DateTime.Now;
 
+            await AttachConnectedDocuments(request, incomingDocumentForCreation);
+
+            incomingDocumentForCreation.WorkflowHistory.Add(
+                new WorkflowHistory() 
+                { 
+                    RecipientType   = (int)RecipientType.HeadOfDepartment,
+                    RecipientId     = request.RecipientId, 
+                    Status          = (int)Status.in_work_unallocated,
+                    CreationDate    = DateTime.Now  
+                });
+
+            await _service.AssignRegNumberAndSaveDocument(incomingDocumentForCreation);
+
+            return ResultObject.Created(incomingDocumentForCreation.Id);
+        }
+
+        private async Task AttachConnectedDocuments(CreateIncomingDocumentCommand request, IncomingDocument incomingDocumentForCreation)
+        {
             if (request.ConnectedDocumentIds.Any())
             {
                 var connectedDocuments = await _dbContext.IncomingDocuments
@@ -40,10 +60,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
                         .Add(new ConnectedDocument() { ChildIncomingDocumentId = doc.Id, RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });
                 }
             }
-
-            await _service.AssignRegNumberAndSaveDocument(incomingDocumentForCreation);
-
-            return ResultObject.Created(incomingDocumentForCreation.Id);
         }
     }
 }

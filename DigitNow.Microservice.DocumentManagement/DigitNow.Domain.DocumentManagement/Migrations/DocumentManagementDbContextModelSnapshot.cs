@@ -978,7 +978,52 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RegistrationNumberCounter", "documentamangement");
+                    b.ToTable("RegistrationNumberCounter", "DocumentMangement");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.WorkflowHistories.WorkflowHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int?>("ActionType")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("DeclineReason")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("IncomingDocumentId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("OpionionRequestedUntil")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RecipientId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RecipientType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Resolution")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IncomingDocumentId");
+
+                    b.ToTable("WorkflowHistory", "DocumentMangement");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments.ConnectedDocument", b =>
@@ -1019,9 +1064,18 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("NotificationStatus");
                 });
 
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.WorkflowHistories.WorkflowHistory", b =>
+                {
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.IncomingDocument", null)
+                        .WithMany("WorkflowHistory")
+                        .HasForeignKey("IncomingDocumentId");
+                });
+
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.IncomingDocument", b =>
                 {
                     b.Navigation("ConnectedDocuments");
+
+                    b.Navigation("WorkflowHistory");
                 });
 #pragma warning restore 612, 618
         }

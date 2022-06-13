@@ -1,8 +1,5 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,23 +23,24 @@ namespace DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries
             if (incomingDoc != null)
                 return incomingDoc;
 
-            //TODO Implement methods
             var internalDoc = await CheckInternalDocumentsByRegistrationNumber(registrationNumber, year);
             if (incomingDoc != null)
                 return internalDoc;
 
-
-            return await CheckOutgoingDocumentsByRegistrationNumber(registrationNumber, year);
+            return null;
         }
 
-        private Task<ConnectedDocument> CheckInternalDocumentsByRegistrationNumber(int registrationNumber, int year)
+        private async Task<ConnectedDocument> CheckInternalDocumentsByRegistrationNumber(int registrationNumber, int year)
         {
-            throw new NotImplementedException();
-        }
+            var internalDoc = await _dbContext.InternalDocuments
+                .FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNumber && doc.RegistrationDate.Year == year);
 
-        private Task<ConnectedDocument> CheckOutgoingDocumentsByRegistrationNumber(int registrationNumber, int year)
-        {
-            throw new NotImplementedException();
+            if (internalDoc != null)
+            {
+                return new ConnectedDocument() { RegistrationNumber = internalDoc.RegistrationNumber, Id = internalDoc.Id, DocumentType = internalDoc.InternalDocumentTypeId };
+            }
+
+            return null;
         }
 
         private async Task<ConnectedDocument> CheckIncomingDocumentsByRegistrationNumber(int registrationNumber, int year)
