@@ -9,9 +9,6 @@ namespace DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries
     public interface IDocumentsQueryService
     {
         Task<IList<IncomingDocument>> GetIncomingDocsByRegistrationNumberAndYear(int registrationNumber, int year, CancellationToken cancellationToken);
-
-        Task<IList<InternalDocument.InternalDocument>> GetInternalDocsByRegistrationNumberAndYear(
-            int registrationNumber, int year, CancellationToken cancellationToken);
     }
     public class DocumentsQueryService : IDocumentsQueryService
     {
@@ -26,12 +23,6 @@ namespace DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries
         {
             return await _dbContext.IncomingDocuments
                 .Where(doc => doc.RegistrationNumber == registrationNumber && doc.CreationDate.Year == year).ToListAsync(cancellationToken);
-        }        
-        
-        public async Task<IList<InternalDocument.InternalDocument>> GetInternalDocsByRegistrationNumberAndYear(int registrationNumber, int year, CancellationToken cancellationToken)
-        {
-            return await _dbContext.InternalDocuments
-                .Where(doc => doc.RegistrationNumber == registrationNumber && doc.RegistrationDate.Year == year).ToListAsync(cancellationToken);
         }
     }
 }
