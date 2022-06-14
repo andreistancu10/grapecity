@@ -24,7 +24,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries
                 return incomingDoc;
 
             var internalDoc = await CheckInternalDocumentsByRegistrationNumber(registrationNumber, year);
-            if (incomingDoc != null)
+            if (internalDoc != null)
                 return internalDoc;
 
             return null;
