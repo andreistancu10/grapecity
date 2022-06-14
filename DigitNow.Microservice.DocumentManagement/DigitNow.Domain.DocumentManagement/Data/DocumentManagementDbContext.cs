@@ -1,4 +1,5 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.Notifications;
+﻿using System;
+using DigitNow.Domain.DocumentManagement.Data.Notifications;
 using DigitNow.Domain.DocumentManagement.Data.NotificationStatuses;
 using DigitNow.Domain.DocumentManagement.Data.NotificationTypeCoverGapExtensions;
 using DigitNow.Domain.DocumentManagement.Data.NotificationTypes;
@@ -8,6 +9,7 @@ using DigitNow.Domain.DocumentManagement.Data.ContactDetails;
 using DigitNow.Domain.DocumentManagement.Data.IncomingConnectedDocuments;
 using DigitNow.Domain.DocumentManagement.Data.OutgoingConnectedDocuments;
 using DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace DigitNow.Domain.DocumentManagement.Data
 {
@@ -36,9 +38,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<OutgoingConnectedDocument> OutgoingConnectedDocuments { get; set; }
         
         public DbSet<InternalDocument.InternalDocument> InternalDocuments { get; set; }
-
-        public DbSet<ConnectedDocument> ConnectedDocuments { get; set; }
-
+        
         public DbSet<RegistrationNoCounter.RegistrationNumberCounter> RegistrationNumberCounter { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -51,7 +51,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
         {
             public DocumentManagementDbContext CreateDbContext(string[] args)
             {
-                var optionsBuilder = new DbContextOptionsBuilder<DocumentManagementDbContext>();
+                DbContextOptionsBuilder<DocumentManagementDbContext> optionsBuilder = new();
 
                 optionsBuilder.UseSqlServer("Server=localhost,1433;Database=DigitNow-dev-DocumentManagement;User Id=sa;Password=admin123!;", builder =>
                 {

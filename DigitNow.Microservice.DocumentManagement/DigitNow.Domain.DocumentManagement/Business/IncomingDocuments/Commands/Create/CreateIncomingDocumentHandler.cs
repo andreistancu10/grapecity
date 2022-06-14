@@ -30,18 +30,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
 
         public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
         {
-            var incomingDocumentForCreation             = _mapper.Map<IncomingDocument>(request);
-            incomingDocumentForCreation.CreationDate    = DateTime.Now;
+            IncomingDocument incomingDocumentForCreation = _mapper.Map<IncomingDocument>(request);
+            incomingDocumentForCreation.CreationDate = DateTime.Now;
 
-            await AttachConnectedDocuments(request, incomingDocumentForCreation);
+            await AttachConnectedDocuments(request, incomingDocumentForCreation, cancellationToken);
 
             incomingDocumentForCreation.WorkflowHistory.Add(
-                new WorkflowHistory() 
-                { 
-                    RecipientType   = (int)RecipientType.HeadOfDepartment,
-                    RecipientId     = request.RecipientId, 
-                    Status          = (int)Status.in_work_unallocated,
-                    CreationDate    = DateTime.Now  
+                new WorkflowHistory
+                {
+                    RecipientType = (int)RecipientType.HeadOfDepartment,
+                    RecipientId = request.RecipientId,
+                    Status = (int)Status.in_work_unallocated,
+                    CreationDate = DateTime.Now
                 });
 
             await _service.AssignRegNumberAndSaveDocument(incomingDocumentForCreation);
@@ -49,7 +49,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
             return ResultObject.Created(incomingDocumentForCreation.Id);
         }
 
-        private async Task AttachConnectedDocuments(CreateIncomingDocumentCommand request, IncomingDocument incomingDocumentForCreation)
+        private async Task AttachConnectedDocuments(CreateIncomingDocumentCommand request, IncomingDocument incomingDocumentForCreation, CancellationToken cancellationToken)
         {
             if (request.ConnectedDocumentIds.Any())
             {
@@ -65,8 +65,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
 
             await _dbContext.IncomingDocuments.AddAsync(incomingDocumentForCreation, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
-
-            return ResultObject.Created(incomingDocumentForCreation.Id);
         }
     }
 }

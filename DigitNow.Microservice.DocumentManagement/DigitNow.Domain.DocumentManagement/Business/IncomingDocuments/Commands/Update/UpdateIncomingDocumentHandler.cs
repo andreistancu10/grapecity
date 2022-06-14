@@ -1,6 +1,6 @@
-﻿using AutoMapper;
+﻿using System.Collections.Generic;
+using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DigitNow.Domain.DocumentManagement.Data.IncomingConnectedDocuments;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update
 {
@@ -23,8 +24,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
         }
         public async Task<ResultObject> Handle(UpdateIncomingDocumentCommand request, CancellationToken cancellationToken)
         {
-            var incomingDocFromDb = await _dbContext.IncomingDocuments.Include(cd => cd.ConnectedDocuments)
-                                                    .FirstOrDefaultAsync(doc => doc.Id == request.Id);
+            IncomingDocument incomingDocFromDb = await _dbContext.IncomingDocuments.Include(cd => cd.ConnectedDocuments)
+                                                    .FirstOrDefaultAsync(doc => doc.Id == request.Id, cancellationToken: cancellationToken);
 
             if (incomingDocFromDb is null)
                 return ResultObject.Error(new ErrorMessage
@@ -39,40 +40,40 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
 
             _mapper.Map(request, incomingDocFromDb);
 
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return ResultObject.Ok(incomingDocFromDb.Id);
         }
 
         private void AddConnectedDocs(UpdateIncomingDocumentCommand request, IncomingDocument incomingDocFromDb)
         {
-            var incomingDocIds = incomingDocFromDb.ConnectedDocuments.Select(cd => cd.RegistrationNumber).ToList();
-            var idsToAdd = request.ConnectedDocumentIds.Except(incomingDocIds);
+            List<int> incomingDocIds = incomingDocFromDb.ConnectedDocuments.Select(cd => cd.RegistrationNumber).ToList();
+            IEnumerable<int> idsToAdd = request.ConnectedDocumentIds.Except(incomingDocIds);
 
             if (idsToAdd.Any())
             {
-                var connectedDocuments = _dbContext.IncomingDocuments
+                List<IncomingDocument> connectedDocuments = _dbContext.IncomingDocuments
                                                    .Where(doc => idsToAdd
                                                    .Contains(doc.RegistrationNumber))
                                                    .ToList();
 
-                foreach (var doc in connectedDocuments)
+                foreach (IncomingDocument doc in connectedDocuments)
                 {
                     incomingDocFromDb.ConnectedDocuments
-                        .Add(new ConnectedDocument() { ChildIncomingDocumentId = doc.Id, RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });
+                        .Add(new IncomingConnectedDocument() { ChildIncomingDocumentId = doc.Id, RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });
                 }
             }
         }
 
         private void RemoveConnectedDocs(UpdateIncomingDocumentCommand request, IncomingDocument incomingDocFromDb)
         {
-            var incomingDocIds = incomingDocFromDb.ConnectedDocuments.Select(cd => cd.RegistrationNumber).ToList();
-            var idsToRemove = incomingDocIds.Except(request.ConnectedDocumentIds);
+            List<int> incomingDocIds = incomingDocFromDb.ConnectedDocuments.Select(cd => cd.RegistrationNumber).ToList();
+            IEnumerable<int> idsToRemove = incomingDocIds.Except(request.ConnectedDocumentIds);
 
             if (idsToRemove.Any())
             {
 
-                _dbContext.ConnectedDocuments
+                _dbContext.IncomingConnectedDocuments
                           .RemoveRange(incomingDocFromDb.ConnectedDocuments
                           .Where(cd => idsToRemove
                           .Contains(cd.RegistrationNumber))
