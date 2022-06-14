@@ -3,8 +3,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries
 {
     public class GetDocsByRegistrationNumberResponse
     {
+        public int RegistrationNumber { get; set; }
         public int Id { get; set; }
-        public string RegistrationNumber { get; set; }
-        public int DocumentTypeId { get; set; }
+        public int DocumentType { get; set; }
     }
 }

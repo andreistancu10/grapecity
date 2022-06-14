@@ -5,31 +5,16 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
-                name: "documentamangement");
-
-            migrationBuilder.CreateTable(
-                name: "ConnectedDocument",
-                schema: "documentamangement",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RegistrationNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DocumentType = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ConnectedDocument", x => x.Id);
-                });
+                name: "DocumentMangement");
 
             migrationBuilder.CreateTable(
                 name: "ContactDetail",
-                schema: "documentamangement",
+                schema: "DocumentMangement",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -53,8 +38,31 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "InternalDocument",
+                schema: "DocumentMangement",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RegistrationNumber = table.Column<int>(type: "int", nullable: false),
+                    RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DepartmentId = table.Column<int>(type: "int", nullable: false),
+                    InternalDocumentTypeId = table.Column<int>(type: "int", nullable: false),
+                    DeadlineDaysNumber = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Observation = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReceiverDepartmentId = table.Column<int>(type: "int", nullable: false),
+                    IsUrgent = table.Column<bool>(type: "bit", nullable: true),
+                    User = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InternalDocument", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Notification",
-                schema: "documentamangement",
+                schema: "DocumentMangement",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -79,7 +87,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             migrationBuilder.CreateTable(
                 name: "NotificationStatus",
-                schema: "documentamangement",
+                schema: "DocumentMangement",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -99,12 +107,12 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             migrationBuilder.CreateTable(
                 name: "IncomingDocument",
-                schema: "documentamangement",
+                schema: "DocumentMangement",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    RegistrationNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RegistrationNumber = table.Column<int>(type: "int", nullable: false),
                     RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     User = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     InputChannelId = table.Column<int>(type: "int", nullable: false),
@@ -121,7 +129,8 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     Detail = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ResolutionPeriod = table.Column<double>(type: "float", nullable: false),
                     IsUrgent = table.Column<bool>(type: "bit", nullable: true),
-                    IsGDPRAgreed = table.Column<bool>(type: "bit", nullable: true)
+                    IsGDPRAgreed = table.Column<bool>(type: "bit", nullable: true),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -129,14 +138,14 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     table.ForeignKey(
                         name: "FK_IncomingDocument_ContactDetail_ContactDetailId",
                         column: x => x.ContactDetailId,
-                        principalSchema: "documentamangement",
+                        principalSchema: "DocumentMangement",
                         principalTable: "ContactDetail",
                         principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "NotificationType",
-                schema: "documentamangement",
+                schema: "DocumentMangement",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -161,42 +170,38 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     table.ForeignKey(
                         name: "FK_NotificationType_NotificationStatus_NotificationStatusId",
                         column: x => x.NotificationStatusId,
-                        principalSchema: "documentamangement",
+                        principalSchema: "DocumentMangement",
                         principalTable: "NotificationStatus",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "ConnectedDocumentIncomingDocument",
-                schema: "documentamangement",
+                name: "ConnectedDocument",
+                schema: "DocumentMangement",
                 columns: table => new
                 {
-                    ConnectedDocumentsId = table.Column<int>(type: "int", nullable: false),
-                    IncomingDocumentsId = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ChildIncomingDocumentId = table.Column<int>(type: "int", nullable: false),
+                    RegistrationNumber = table.Column<int>(type: "int", nullable: false),
+                    DocumentType = table.Column<int>(type: "int", nullable: false),
+                    IncomingDocumentId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ConnectedDocumentIncomingDocument", x => new { x.ConnectedDocumentsId, x.IncomingDocumentsId });
+                    table.PrimaryKey("PK_ConnectedDocument", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ConnectedDocumentIncomingDocument_ConnectedDocument_ConnectedDocumentsId",
-                        column: x => x.ConnectedDocumentsId,
-                        principalSchema: "documentamangement",
-                        principalTable: "ConnectedDocument",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ConnectedDocumentIncomingDocument_IncomingDocument_IncomingDocumentsId",
-                        column: x => x.IncomingDocumentsId,
-                        principalSchema: "documentamangement",
+                        name: "FK_ConnectedDocument_IncomingDocument_IncomingDocumentId",
+                        column: x => x.IncomingDocumentId,
+                        principalSchema: "DocumentMangement",
                         principalTable: "IncomingDocument",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
                 name: "NotificationTypeCoverGapExtension",
-                schema: "documentamangement",
+                schema: "DocumentMangement",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -214,14 +219,14 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     table.ForeignKey(
                         name: "FK_NotificationTypeCoverGapExtension_NotificationType_NotificationTypeId",
                         column: x => x.NotificationTypeId,
-                        principalSchema: "documentamangement",
+                        principalSchema: "DocumentMangement",
                         principalTable: "NotificationType",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
-                schema: "documentamangement",
+                schema: "DocumentMangement",
                 table: "NotificationStatus",
                 columns: new[] { "Id", "Active", "Code", "CreatedBy", "CreatedOn", "ModifiedBy", "ModifiedOn", "Name" },
                 values: new object[,]
@@ -233,7 +238,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 });
 
             migrationBuilder.InsertData(
-                schema: "documentamangement",
+                schema: "DocumentMangement",
                 table: "NotificationType",
                 columns: new[] { "Id", "Active", "Code", "CreatedBy", "CreatedOn", "EntityType", "Expression", "IsInformative", "IsUrgent", "ModifiedBy", "ModifiedOn", "Name", "NotificationStatusId", "TranslationLabel" },
                 values: new object[,]
@@ -281,40 +286,40 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ConnectedDocumentIncomingDocument_IncomingDocumentsId",
-                schema: "documentamangement",
-                table: "ConnectedDocumentIncomingDocument",
-                column: "IncomingDocumentsId");
+                name: "IX_ConnectedDocument_IncomingDocumentId",
+                schema: "DocumentMangement",
+                table: "ConnectedDocument",
+                column: "IncomingDocumentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_IncomingDocument_ContactDetailId",
-                schema: "documentamangement",
+                schema: "DocumentMangement",
                 table: "IncomingDocument",
                 column: "ContactDetailId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_NotificationStatus_Code",
-                schema: "documentamangement",
+                schema: "DocumentMangement",
                 table: "NotificationStatus",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_NotificationType_Code",
-                schema: "documentamangement",
+                schema: "DocumentMangement",
                 table: "NotificationType",
                 column: "Code",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_NotificationType_NotificationStatusId",
-                schema: "documentamangement",
+                schema: "DocumentMangement",
                 table: "NotificationType",
                 column: "NotificationStatusId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_NotificationTypeCoverGapExtension_NotificationTypeId",
-                schema: "documentamangement",
+                schema: "DocumentMangement",
                 table: "NotificationTypeCoverGapExtension",
                 column: "NotificationTypeId");
         }
@@ -322,36 +327,36 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ConnectedDocumentIncomingDocument",
-                schema: "documentamangement");
+                name: "ConnectedDocument",
+                schema: "DocumentMangement");
+
+            migrationBuilder.DropTable(
+                name: "InternalDocument",
+                schema: "DocumentMangement");
 
             migrationBuilder.DropTable(
                 name: "Notification",
-                schema: "documentamangement");
+                schema: "DocumentMangement");
 
             migrationBuilder.DropTable(
                 name: "NotificationTypeCoverGapExtension",
-                schema: "documentamangement");
-
-            migrationBuilder.DropTable(
-                name: "ConnectedDocument",
-                schema: "documentamangement");
+                schema: "DocumentMangement");
 
             migrationBuilder.DropTable(
                 name: "IncomingDocument",
-                schema: "documentamangement");
+                schema: "DocumentMangement");
 
             migrationBuilder.DropTable(
                 name: "NotificationType",
-                schema: "documentamangement");
+                schema: "DocumentMangement");
 
             migrationBuilder.DropTable(
                 name: "ContactDetail",
-                schema: "documentamangement");
+                schema: "DocumentMangement");
 
             migrationBuilder.DropTable(
                 name: "NotificationStatus",
-                schema: "documentamangement");
+                schema: "DocumentMangement");
         }
     }
 }
