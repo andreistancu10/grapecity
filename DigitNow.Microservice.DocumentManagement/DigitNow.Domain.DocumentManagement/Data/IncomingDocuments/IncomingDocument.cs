@@ -28,5 +28,6 @@ namespace DigitNow.Domain.DocumentManagement.Data.IncomingDocuments
         public bool? IsGDPRAgreed { get; set; }
         public DateTime CreationDate { get; set; }
         public List<ConnectedDocument> ConnectedDocuments { get; set; } = new();
+        public List<WorkflowHistories.WorkflowHistory> WorkflowHistory { get; set; } = new();
     }
 }
