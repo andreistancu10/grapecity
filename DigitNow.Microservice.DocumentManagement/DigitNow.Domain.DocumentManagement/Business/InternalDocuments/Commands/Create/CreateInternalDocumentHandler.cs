@@ -1,8 +1,8 @@
 ﻿using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Contracts.Documents;
 using DigitNow.Domain.DocumentManagement.Data;
 using HTSS.Platform.Core.CQRS;
 
@@ -12,24 +12,23 @@ public class CreateInternalDocumentHandler : ICommandHandler<CreateInternalDocum
 {
     private readonly DocumentManagementDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly IDocumentService _service;
 
-    public CreateInternalDocumentHandler(DocumentManagementDbContext dbContext, IMapper mapper)
+    public CreateInternalDocumentHandler(DocumentManagementDbContext dbContext, IMapper mapper, IDocumentService service)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _service = service;
     }
-
 
     public async Task<ResultObject> Handle(CreateInternalDocumentCommand request, CancellationToken cancellationToken)
     {
         var internalDocumentForCreation =
             _mapper.Map<Data.InternalDocument.InternalDocument>(request);
         internalDocumentForCreation.RegistrationDate = DateTime.Now;
-        
-        var currentMaxRegistrationNo = _dbContext.InternalDocuments.Count(doc => doc.RegistrationDate.Year == DateTime.Now.Year);
-        internalDocumentForCreation.RegistrationNumber = ++currentMaxRegistrationNo;
 
-        await _dbContext.InternalDocuments.AddAsync(internalDocumentForCreation, cancellationToken);
+        await _service.AssignRegNumberAndSaveDocument(internalDocumentForCreation);
+
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return ResultObject.Created(internalDocumentForCreation.Id);
