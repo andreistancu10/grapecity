@@ -1,14 +1,15 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.InternalDocument.Commands.Create;
-using DigitNow.Domain.DocumentManagement.Business.InternalDocument.Queries.GetByRegistrationNumber;
+using DigitNow.Domain.DocumentManagement.Business.InternalDocuments.Commands.Create;
+using DigitNow.Domain.DocumentManagement.Business.InternalDocuments.Queries.GetByRegistrationNumber;
+using DigitNow.Domain.DocumentManagement.Data.InternalDocuments;
 
-namespace DigitNow.Domain.DocumentManagement.Business.InternalDocument.Commands.Maping;
+namespace DigitNow.Domain.DocumentManagement.Business.InternalDocuments.Maping;
 
 public class InternalDocumentMappings: Profile
 {
     public InternalDocumentMappings()
     {
-        CreateMap<CreateInternalDocumentCommand, Data.InternalDocument.InternalDocument>();
-        CreateMap<Data.InternalDocument.InternalDocument, GetInternalDocumentByRegistrationNumberResponse>();
+        CreateMap<CreateInternalDocumentCommand, InternalDocument>();
+        CreateMap<InternalDocument, GetInternalDocumentByRegistrationNumberResponse>();
     }
 }

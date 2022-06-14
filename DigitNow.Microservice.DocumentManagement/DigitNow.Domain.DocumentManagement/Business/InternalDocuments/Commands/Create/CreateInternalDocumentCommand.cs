@@ -1,6 +1,6 @@
 ﻿using HTSS.Platform.Core.CQRS;
 
-namespace DigitNow.Domain.DocumentManagement.Business.InternalDocument.Commands.Create;
+namespace DigitNow.Domain.DocumentManagement.Business.InternalDocuments.Commands.Create;
 
 public class CreateInternalDocumentCommand : ICommand<ResultObject>
 {

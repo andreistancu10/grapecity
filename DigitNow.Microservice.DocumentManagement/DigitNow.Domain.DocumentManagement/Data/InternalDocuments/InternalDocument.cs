@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DigitNow.Domain.DocumentManagement.Data.InternalDocument;
+namespace DigitNow.Domain.DocumentManagement.Data.InternalDocuments;
 
 public class InternalDocument
 {

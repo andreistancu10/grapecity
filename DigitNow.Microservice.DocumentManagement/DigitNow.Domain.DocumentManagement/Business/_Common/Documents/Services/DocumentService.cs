@@ -1,10 +1,10 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.RegistrationNoCounter;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using DigitNow.Domain.DocumentManagement.Data.RegistrationNumberCounter;
 
 namespace DigitNow.Domain.DocumentManagement.Business._Common.Documents.Services
 {

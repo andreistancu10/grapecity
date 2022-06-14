@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DigitNow.Domain.DocumentManagement.Business.InternalDocument.Queries.GetByRegistrationNumber;
+namespace DigitNow.Domain.DocumentManagement.Business.InternalDocuments.Queries.GetByRegistrationNumber;
 
 public record GetInternalDocumentByRegistrationNumberResponse(
     int Id,

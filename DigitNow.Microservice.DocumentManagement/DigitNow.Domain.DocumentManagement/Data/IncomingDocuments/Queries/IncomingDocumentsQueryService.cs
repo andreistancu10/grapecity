@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
+using DigitNow.Domain.DocumentManagement.Data.InternalDocuments;
 
 namespace DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries
 {
@@ -34,7 +35,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries
 
         private async Task<IncomingConnectedDocument> CheckInternalDocumentsByRegistrationNumber(int registrationNumber, int year)
         {
-            InternalDocument.InternalDocument internalDoc = await _dbContext.InternalDocuments
+            InternalDocument internalDoc = await _dbContext.InternalDocuments
                 .FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNumber && doc.RegistrationDate.Year == year);
 
             if (internalDoc != null)

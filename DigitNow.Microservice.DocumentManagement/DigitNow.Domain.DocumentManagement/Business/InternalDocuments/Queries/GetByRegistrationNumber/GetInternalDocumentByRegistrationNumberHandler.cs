@@ -8,7 +8,7 @@ using DigitNow.Domain.DocumentManagement.Data;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
 
-namespace DigitNow.Domain.DocumentManagement.Business.InternalDocument.Queries.GetByRegistrationNumber;
+namespace DigitNow.Domain.DocumentManagement.Business.InternalDocuments.Queries.GetByRegistrationNumber;
 
 public class GetInternalDocumentByRegistrationNumberHandler
     : IQueryHandler<GetInternalDocumentByRegistrationNumberQuery, List<GetInternalDocumentByRegistrationNumberResponse>>

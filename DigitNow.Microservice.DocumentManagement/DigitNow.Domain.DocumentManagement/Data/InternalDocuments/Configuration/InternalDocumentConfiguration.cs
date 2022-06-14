@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DigitNow.Domain.DocumentManagement.Data.InternalDocument.Configuration;
+namespace DigitNow.Domain.DocumentManagement.Data.InternalDocuments.Configuration;
 
 public class InternalDocumentConfiguration: IEntityTypeConfiguration<InternalDocument>
 {

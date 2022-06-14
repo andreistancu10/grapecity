@@ -1,8 +1,7 @@
-﻿
+﻿using System;
 using HTSS.Platform.Core.Domain;
-using System;
 
-namespace DigitNow.Domain.DocumentManagement.Data.RegistrationNoCounter
+namespace DigitNow.Domain.DocumentManagement.Data.RegistrationNumberCounter
 {
     public class RegistrationNumberCounter : Entity
     {

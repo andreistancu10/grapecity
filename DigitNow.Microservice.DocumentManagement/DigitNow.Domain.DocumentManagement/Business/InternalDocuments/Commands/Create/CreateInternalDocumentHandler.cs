@@ -4,9 +4,10 @@ using System.Threading.Tasks;
 using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents;
 using DigitNow.Domain.DocumentManagement.Data;
+using DigitNow.Domain.DocumentManagement.Data.InternalDocuments;
 using HTSS.Platform.Core.CQRS;
 
-namespace DigitNow.Domain.DocumentManagement.Business.InternalDocument.Commands.Create;
+namespace DigitNow.Domain.DocumentManagement.Business.InternalDocuments.Commands.Create;
 
 public class CreateInternalDocumentHandler : ICommandHandler<CreateInternalDocumentCommand, ResultObject>
 {
@@ -24,7 +25,7 @@ public class CreateInternalDocumentHandler : ICommandHandler<CreateInternalDocum
     public async Task<ResultObject> Handle(CreateInternalDocumentCommand request, CancellationToken cancellationToken)
     {
         var internalDocumentForCreation =
-            _mapper.Map<Data.InternalDocument.InternalDocument>(request);
+            _mapper.Map<InternalDocument>(request);
         internalDocumentForCreation.RegistrationDate = DateTime.Now;
 
         await _service.AssignRegNumberAndSaveDocument(internalDocumentForCreation);

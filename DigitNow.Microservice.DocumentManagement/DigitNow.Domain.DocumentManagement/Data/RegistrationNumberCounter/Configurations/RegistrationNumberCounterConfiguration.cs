@@ -5,7 +5,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.RegistrationNumberCounter.Conf
 {
     public class RegistrationNumberCounterConfiguration
     {
-        public void Configure(EntityTypeBuilder<RegistrationNoCounter.RegistrationNumberCounter> builder)
+        public void Configure(EntityTypeBuilder<RegistrationNumberCounter> builder)
         {
             builder.ToTable(nameof(RegistrationNumberCounter), DocumentManagementDbContext.Schema);
 
