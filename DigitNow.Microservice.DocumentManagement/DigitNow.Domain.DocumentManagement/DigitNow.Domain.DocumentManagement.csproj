@@ -11,6 +11,7 @@
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 	<ItemGroup>
+		<Compile Include=".configurations\Adapters\AdaptersExtensions.cs" />
 		<Compile Include=".configurations\ConfigureElasticContextExtensions.cs" />
 		<Compile Include=".configurations\ConfigureDbContextExtensions.cs" />
 		<Compile Include=".configurations\HostedServices\ConfigureElasticSearchHostedService.cs" />
@@ -70,6 +71,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\DigitNow.Adapters.MS.Identity\DigitNow.Adapters.MS.Identity.csproj" />
 		<ProjectReference Include="..\DigitNow.Domain.DocumentManagement.Contracts\DigitNow.Domain.DocumentManagement.Contracts.csproj" />
 	</ItemGroup>
 
