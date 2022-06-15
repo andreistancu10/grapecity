@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Dashboard
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/dashboard")]
     public class DashboardController : ApiController
     {
