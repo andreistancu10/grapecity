@@ -1,7 +1,7 @@
 ﻿
 namespace DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums
 {
-    public enum RecipientType
+    public enum UserRole
     {
         HeadOfDepartment = 1,
         Functionary = 2,

@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
+using DigitNow.Domain.DocumentManagement.Data.WorkflowHistories;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
 {
-    public class UpdateDepartmentForDocumentHandler : ICommandHandler<UpdateDocDepartmentCommand, ResultObject>
+    public class UpdateDepartmentForDocumentHandler : ICommandHandler<UpdateDepartmentForDocumentCommand, ResultObject>
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IMapper _mapper;
@@ -21,23 +23,21 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
             _dbContext = dbContext;
             _mapper = mapper;
         }
-        public async Task<ResultObject> Handle(UpdateDocDepartmentCommand request, CancellationToken cancellationToken)
+        public async Task<ResultObject> Handle(UpdateDepartmentForDocumentCommand request, CancellationToken cancellationToken)
         {
 
             var incomingDocIds = request.DocumentInfo
-                                        .Where(doc => doc.DocType == 1)
+                                        .Where(doc => doc.DocType == (int)DocumentType.Incoming)
                                         .Select(doc => doc.RegistrationNumber)
                                         .ToList();
-
 
             if (incomingDocIds.Any())
                 await UpdateDepartmentForIncomingDocs(incomingDocIds, request.DepartmentId);
 
             var internalDocIds = request.DocumentInfo
-                                        .Where(doc => doc.DocType == 2)
+                                        .Where(doc => doc.DocType == (int)DocumentType.Internal)
                                         .Select(doc => doc.RegistrationNumber)
                                         .ToList();
-
 
             if (internalDocIds.Any())
                 await UpdateDepartmentForInternalDocsAsync(incomingDocIds, request.DepartmentId);
@@ -74,6 +74,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
 
         private void CreateWorkflowRecord(IncomingDocument doc)
         {
+            doc.WorkflowHistory.Add(
+                new WorkflowHistory()
+                {
+                    RecipientType = (int)UserRole.HeadOfDepartment,
+                    Status = (int)Status.in_work_unallocated,
+                    CreationDate = DateTime.Now
+                });
         }
     }
 }

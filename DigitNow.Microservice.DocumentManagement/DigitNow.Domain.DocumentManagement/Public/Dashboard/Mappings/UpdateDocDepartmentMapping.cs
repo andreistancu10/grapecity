@@ -8,7 +8,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Mappings
     {
         public UpdateDocDepartmentMapping()
         {
-            CreateMap<UpdateDocDepartmentRequest, UpdateDocDepartmentCommand>();
+            CreateMap<UpdateDocDepartmentRequest, UpdateDepartmentForDocumentCommand>();
         }
     }
 }

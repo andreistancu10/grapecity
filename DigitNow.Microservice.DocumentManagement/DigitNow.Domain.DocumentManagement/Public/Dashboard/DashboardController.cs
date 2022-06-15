@@ -26,7 +26,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard
         [HttpPut("update-department")]
         public async Task<IActionResult> UpdateDepartmentForDocuments([FromBody] UpdateDocDepartmentRequest request, CancellationToken cancellationToken)
         {
-            var updateDepartmentForDocumentCommand = _mapper.Map<UpdateDocDepartmentCommand>(request);
+            var updateDepartmentForDocumentCommand = _mapper.Map<UpdateDepartmentForDocumentCommand>(request);
 
             return CreateResponse(await _mediator.Send(updateDepartmentForDocumentCommand, cancellationToken));
         }
