@@ -4,7 +4,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.InternalDocument.Commands.
 
 public class CreateInternalDocumentCommand : ICommand<ResultObject>
 {
-    public int RegistrationNumber { get; set; }
     public int DepartmentId { get; set; }
     public int InternalDocumentTypeId { get; set; }
     public int DeadlineDaysNumber { get; set; }
