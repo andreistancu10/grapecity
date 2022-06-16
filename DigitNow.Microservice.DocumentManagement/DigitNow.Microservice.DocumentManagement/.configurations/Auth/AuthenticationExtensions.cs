@@ -48,21 +48,20 @@ internal static class AuthenticationExtensions
         return services;
     }
 
-        private static TokenValidationParameters CreateTokenValidationParameters(AuthorizationOptions options)
+    private static TokenValidationParameters CreateTokenValidationParameters(AuthorizationOptions options)
+    {
+        var signingKey =
+            new SymmetricSecurityKey(Encoding.Default.GetBytes(options.AccessTokenSecretKey));
+        return new TokenValidationParameters
         {
-            var signingKey =
-                new SymmetricSecurityKey(Encoding.Default.GetBytes(options.AccessTokenSecretKey));
-            return new TokenValidationParameters
-            {
-                ValidateIssuerSigningKey = true,
-                IssuerSigningKey = signingKey,
-                ValidateIssuer = true,
-                ValidIssuer = options.Issuer,
-                ValidateAudience = true,
-                ValidAudience = options.Audience,
-                ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero,
-            };
-        }
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = signingKey,
+            ValidateIssuer = true,
+            ValidIssuer = options.Issuer,
+            ValidateAudience = true,
+            ValidAudience = options.Audience,
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero,
+        };
     }
 }

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    [Migration("20220616081425_InitialMigration")]
+    [Migration("20220616083830_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -364,6 +364,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.Property<int>("RecipientId")
                         .HasColumnType("int");
+
+                    b.Property<string>("RecipientName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("RecipientType")
                         .HasColumnType("int");

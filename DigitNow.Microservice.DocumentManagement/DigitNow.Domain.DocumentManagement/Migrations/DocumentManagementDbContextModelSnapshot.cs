@@ -23,33 +23,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments.ConnectedDocument", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("ChildIncomingDocumentId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DocumentType")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("IncomingDocumentId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RegistrationNumber")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IncomingDocumentId");
-
-                    b.ToTable("ConnectedDocument", "DocumentMangement");
-                });
-
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.ContactDetails.ContactDetail", b =>
                 {
                     b.Property<int>("Id")
@@ -97,6 +70,33 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ContactDetail", "DocumentMangement");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.IncomingConnectedDocuments.IncomingConnectedDocument", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<int>("ChildIncomingDocumentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DocumentType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("IncomingDocumentId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RegistrationNumber")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IncomingDocumentId");
+
+                    b.ToTable("IncomingConnectedDocument", "DocumentMangement");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.IncomingDocument", b =>
@@ -174,7 +174,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("IncomingDocument", "DocumentMangement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.InternalDocument.InternalDocument", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.InternalDocuments.InternalDocument", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -219,7 +219,34 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("InternalDocument", "DocumentMangement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Notifications.Notification", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.OutgoingConnectedDocuments.OutgoingConnectedDocument", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<long>("ChildOutgoingDocumentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("DocumentType")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("OutgoingDocumentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("RegistrationNumber")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OutgoingDocumentId");
+
+                    b.ToTable("OutgoingConnectedDocument", "DocumentMangement");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments.OutgoingDocument", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -227,742 +254,68 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
+                    b.Property<int?>("ContactDetailId")
+                        .HasColumnType("int");
 
-                    b.Property<long?>("EntityId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("EntityTypeId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("FromUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Message")
-                        .IsRequired()
-                        .HasMaxLength(2048)
-                        .HasColumnType("nvarchar(2048)");
-
-                    b.Property<DateTime?>("ModifiedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("NotificationStatusId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("NotificationTypeId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("ReactiveSettings")
+                    b.Property<string>("ContentSummary")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("Seen")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("SeenOn")
+                    b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("UserId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Notification", "DocumentMangement");
-                });
-
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.NotificationStatuses.NotificationStatus", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<long?>("CreatedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("ModifiedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime?>("ModifiedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Code")
-                        .IsUnique();
-
-                    b.ToTable("NotificationStatus", "DocumentMangement");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            Active = true,
-                            Code = "Pending",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Name = "Pending"
-                        },
-                        new
-                        {
-                            Id = 2L,
-                            Active = true,
-                            Code = "Approved",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Name = "Approved"
-                        },
-                        new
-                        {
-                            Id = 3L,
-                            Active = true,
-                            Code = "Rejected",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Name = "Rejected"
-                        },
-                        new
-                        {
-                            Id = 4L,
-                            Active = true,
-                            Code = "Cancelled",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            Name = "Cancelled"
-                        });
-                });
-
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.NotificationTypeCoverGapExtensions.NotificationTypeCoverGapExtension", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("bit");
-
-                    b.Property<long?>("CreatedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("ModifiedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime?>("ModifiedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("NotificationTypeId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NotificationTypeId");
-
-                    b.ToTable("NotificationTypeCoverGapExtension", "DocumentMangement");
-                });
-
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.NotificationTypes.NotificationType", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
-
-                    b.Property<bool>("Active")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Code")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
-
-                    b.Property<long?>("CreatedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("CreatedOn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("EntityType")
-                        .HasMaxLength(256)
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Expression")
+                    b.Property<string>("Detail")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsInformative")
+                    b.Property<int>("DocumentTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ExternalNumber")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ExternalNumberDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("IdentificationNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsGDPRAgreed")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsUrgent")
                         .HasColumnType("bit");
 
-                    b.Property<long?>("ModifiedBy")
-                        .HasColumnType("bigint");
+                    b.Property<int>("NumberOfPages")
+                        .HasColumnType("int");
 
-                    b.Property<DateTime?>("ModifiedOn")
+                    b.Property<int>("RecipientId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RecipientName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RecipientTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("RegistrationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("nvarchar(256)");
+                    b.Property<int>("RegistrationNumber")
+                        .HasColumnType("int");
 
-                    b.Property<long>("NotificationStatusId")
-                        .HasColumnType("bigint");
+                    b.Property<double>("ResolutionPeriod")
+                        .HasColumnType("float");
 
-                    b.Property<string>("TranslationLabel")
+                    b.Property<string>("User")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Code")
-                        .IsUnique();
+                    b.HasIndex("ContactDetailId");
 
-                    b.HasIndex("NotificationStatusId");
-
-                    b.ToTable("NotificationType", "DocumentMangement");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            Active = true,
-                            Code = "PendingRequesterInformativeEmployeeRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 1L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Pending Requester Informative Employee Request",
-                            NotificationStatusId = 1L,
-                            TranslationLabel = "Notification.EmployeeRequest.PendingInformativeRequester"
-                        },
-                        new
-                        {
-                            Id = 2L,
-                            Active = true,
-                            Code = "PendingManagerReactiveEmployeeRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 1L,
-                            IsInformative = false,
-                            IsUrgent = false,
-                            Name = "Pending Manager Reactive Employee Request",
-                            NotificationStatusId = 1L,
-                            TranslationLabel = "Notification.EmployeeRequest.PendingReactiveManager"
-                        },
-                        new
-                        {
-                            Id = 3L,
-                            Active = true,
-                            Code = "CancelledRequesterInformativeEmployeeRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 1L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Cancelled Requester Informative Employee Request",
-                            NotificationStatusId = 4L,
-                            TranslationLabel = "Notification.EmployeeRequest.CancelledInformativeRequester"
-                        },
-                        new
-                        {
-                            Id = 4L,
-                            Active = true,
-                            Code = "CancelledManagerInformativeEmployeeRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 1L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Cancelled Manager Informative Employee Request",
-                            NotificationStatusId = 4L,
-                            TranslationLabel = "Notification.EmployeeRequest.CancelledInformativeManager"
-                        },
-                        new
-                        {
-                            Id = 5L,
-                            Active = true,
-                            Code = "ApprovedRequesterInformativeEmployeeRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 1L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Approved Requester Informative Employee Request",
-                            NotificationStatusId = 2L,
-                            TranslationLabel = "Notification.EmployeeRequest.ApprovedInformativeRequester"
-                        },
-                        new
-                        {
-                            Id = 6L,
-                            Active = true,
-                            Code = "ApprovedManagerInformativeEmployeeRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 1L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Approved Manager Informative Employee Request",
-                            NotificationStatusId = 2L,
-                            TranslationLabel = "Notification.EmployeeRequest.ApprovedInformativeManager"
-                        },
-                        new
-                        {
-                            Id = 7L,
-                            Active = true,
-                            Code = "RejectedRequesterInformativeEmployeeRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 1L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Rejected Requester Informative Employee Request",
-                            NotificationStatusId = 3L,
-                            TranslationLabel = "Notification.EmployeeRequest.RejectedInformativeRequester"
-                        },
-                        new
-                        {
-                            Id = 8L,
-                            Active = true,
-                            Code = "RejectedManagerInformativeEmployeeRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 1L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Rejected Manager Informative Employee Request",
-                            NotificationStatusId = 3L,
-                            TranslationLabel = "Notification.EmployeeRequest.RejectedInformativeManager"
-                        },
-                        new
-                        {
-                            Id = 9L,
-                            Active = true,
-                            Code = "ConfiguratorSchedulingTypesNotification",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 3L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Scheduling types settings changed in Configurator",
-                            NotificationStatusId = 2L,
-                            TranslationLabel = "Notification.ConfiguratorNotification.SchedulingTypes"
-                        },
-                        new
-                        {
-                            Id = 10L,
-                            Active = true,
-                            Code = "ConfiguratorSchedulingDetailsTypesNotification",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 3L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Scheduling details types settings changed in Configurator",
-                            NotificationStatusId = 2L,
-                            TranslationLabel = "Notification.ConfiguratorNotification.SchedulingDetailsTypes"
-                        },
-                        new
-                        {
-                            Id = 11L,
-                            Active = true,
-                            Code = "ConfiguratorEmployeeMobilityTypesNotification",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 3L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Employee mobility types settings changed in Configurator",
-                            NotificationStatusId = 2L,
-                            TranslationLabel = "Notification.ConfiguratorNotification.MobilityTypes"
-                        },
-                        new
-                        {
-                            Id = 12L,
-                            Active = true,
-                            Code = "PendingResourceRequestedInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Pending Resource Requested Informative CoverGap Request",
-                            NotificationStatusId = 1L,
-                            TranslationLabel = "Notification.CoverGapRequest.PendingResourceRequestedInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 13L,
-                            Active = true,
-                            Code = "PendingResourceRequesterInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Pending Resource Requester Informative CoverGap Request",
-                            NotificationStatusId = 1L,
-                            TranslationLabel = "Notification.CoverGapRequest.PendingResourceRequesterInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 14L,
-                            Active = true,
-                            Code = "PendingLocationManagerRequestedInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Pending Location Manager Requested Informative CoverGap Request",
-                            NotificationStatusId = 1L,
-                            TranslationLabel = "Notification.CoverGapRequest.PendingLocationManagerRequestedInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 15L,
-                            Active = true,
-                            Code = "PendingLocationManagerRequesterInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Pending Location Manager Requester Informative CoverGap Request",
-                            NotificationStatusId = 1L,
-                            TranslationLabel = "Notification.CoverGapRequest.PendingLocationManagerRequesterInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 16L,
-                            Active = true,
-                            Code = "PendingDivisionManagerRequestedInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Pending Division Manager Requested Informative CoverGap Request",
-                            NotificationStatusId = 1L,
-                            TranslationLabel = "Notification.CoverGapRequest.PendingDivisionManagerRequestedInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 17L,
-                            Active = true,
-                            Code = "PendingDivisionManagerRequesterInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Pending Division Manager Requester Informative CoverGap Request",
-                            NotificationStatusId = 1L,
-                            TranslationLabel = "Notification.CoverGapRequest.PendingDivisionManagerRequesterInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 18L,
-                            Active = true,
-                            Code = "PendingResourceRequestedReactiveCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = false,
-                            IsUrgent = false,
-                            Name = "Pending Resource Requested Reactive CoverGap Request",
-                            NotificationStatusId = 1L,
-                            TranslationLabel = "Notification.CoverGapRequest.PendingResourceRequestedReactiveCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 19L,
-                            Active = true,
-                            Code = "PendingLocationManagerRequestedReactiveCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = false,
-                            IsUrgent = false,
-                            Name = "Pending Location Manager Requested Reactive CoverGap Request",
-                            NotificationStatusId = 1L,
-                            TranslationLabel = "Notification.CoverGapRequest.PendingLocationManagerRequestedReactiveCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 20L,
-                            Active = true,
-                            Code = "PendingDivisionManagerRequestedReactiveCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = false,
-                            IsUrgent = false,
-                            Name = "Pending Division Manager Requested Reactive CoverGap Request",
-                            NotificationStatusId = 1L,
-                            TranslationLabel = "Notification.CoverGapRequest.PendingDivisionManagerRequestedReactiveCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 21L,
-                            Active = true,
-                            Code = "ApprovedResourceRequestedInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Approved Resource Requested Informative CoverGap Request",
-                            NotificationStatusId = 2L,
-                            TranslationLabel = "Notification.CoverGapRequest.ApprovedResourceRequestedInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 22L,
-                            Active = true,
-                            Code = "ApprovedResourceRequesterInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Approved Resource Requester Informative CoverGap Request",
-                            NotificationStatusId = 2L,
-                            TranslationLabel = "Notification.CoverGapRequest.ApprovedResourceRequesterInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 23L,
-                            Active = true,
-                            Code = "ApprovedLocationManagerRequestedInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Approved Location Manager Requested Informative CoverGap Request",
-                            NotificationStatusId = 2L,
-                            TranslationLabel = "Notification.CoverGapRequest.ApprovedLocationManagerRequestedInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 24L,
-                            Active = true,
-                            Code = "ApprovedLocationManagerRequesterInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Approved Location Manager Requester Informative CoverGap Request",
-                            NotificationStatusId = 2L,
-                            TranslationLabel = "Notification.CoverGapRequest.ApprovedLocationManagerRequesterInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 25L,
-                            Active = true,
-                            Code = "ApprovedDivisionManagerRequestedInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Approved Division Manager Requested Informative CoverGap Request",
-                            NotificationStatusId = 2L,
-                            TranslationLabel = "Notification.CoverGapRequest.ApprovedDivisionManagerRequestedInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 26L,
-                            Active = true,
-                            Code = "ApprovedDivisionManagerRequesterInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Approved Division Manager Requester Informative CoverGap Request",
-                            NotificationStatusId = 2L,
-                            TranslationLabel = "Notification.CoverGapRequest.ApprovedDivisionManagerRequesterInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 27L,
-                            Active = true,
-                            Code = "RejectedResourceRequestedInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Rejected Resource Requested Informative CoverGap Request",
-                            NotificationStatusId = 3L,
-                            TranslationLabel = "Notification.CoverGapRequest.RejectedResourceRequestedInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 28L,
-                            Active = true,
-                            Code = "RejectedResourceRequesterInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Rejected Resource Requester Informative CoverGap Request",
-                            NotificationStatusId = 3L,
-                            TranslationLabel = "Notification.CoverGapRequest.RejectedResourceRequesterInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 29L,
-                            Active = true,
-                            Code = "RejectedLocationManagerRequestedInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Rejected Location Manager Requested Informative CoverGap Request",
-                            NotificationStatusId = 3L,
-                            TranslationLabel = "Notification.CoverGapRequest.RejectedLocationManagerRequestedInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 30L,
-                            Active = true,
-                            Code = "RejectedLocationManagerRequesterInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Rejected Location Manager Requester Informative CoverGap Request",
-                            NotificationStatusId = 3L,
-                            TranslationLabel = "Notification.CoverGapRequest.RejectedLocationManagerRequesterInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 31L,
-                            Active = true,
-                            Code = "RejectedDivisionManagerRequestedInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Rejected Division Manager Requested Informative CoverGap Request",
-                            NotificationStatusId = 3L,
-                            TranslationLabel = "Notification.CoverGapRequest.RejectedDivisionManagerRequestedInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 32L,
-                            Active = true,
-                            Code = "RejectedDivisionManagerRequesterInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Rejected Division Manager Requester Informative CoverGap Request",
-                            NotificationStatusId = 3L,
-                            TranslationLabel = "Notification.CoverGapRequest.RejectedDivisionManagerRequesterInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 33L,
-                            Active = true,
-                            Code = "CancelledResourceRequestedInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Cancelled Resource Requested Informative CoverGap Request",
-                            NotificationStatusId = 4L,
-                            TranslationLabel = "Notification.CoverGapRequest.CancelledResourceRequestedInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 34L,
-                            Active = true,
-                            Code = "CancelledResourceRequesterInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Cancelled Resource Requester Informative CoverGap Request",
-                            NotificationStatusId = 4L,
-                            TranslationLabel = "Notification.CoverGapRequest.CancelledResourceRequesterInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 35L,
-                            Active = true,
-                            Code = "CancelledLocationManagerRequestedInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Cancelled Location Manager Requested Informative CoverGap Request",
-                            NotificationStatusId = 4L,
-                            TranslationLabel = "Notification.CoverGapRequest.CancelledLocationManagerRequestedInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 36L,
-                            Active = true,
-                            Code = "CancelledLocationManagerRequesterInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Cancelled Location Manager Requester Informative CoverGap Request",
-                            NotificationStatusId = 4L,
-                            TranslationLabel = "Notification.CoverGapRequest.CancelledLocationManagerRequesterInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 37L,
-                            Active = true,
-                            Code = "CancelledDivisionManagerRequestedInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Cancelled Division Manager Requested Informative CoverGap Request",
-                            NotificationStatusId = 4L,
-                            TranslationLabel = "Notification.CoverGapRequest.CancelledDivisionManagerRequestedInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 38L,
-                            Active = true,
-                            Code = "CancelledDivisionManagerRequesterInformativeCoverGapRequest",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 2L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Cancelled Division Manager Requester Informative CoverGap Request",
-                            NotificationStatusId = 4L,
-                            TranslationLabel = "Notification.CoverGapRequest.CancelledDivisionManagerRequesterInformativeCoverGapRequest"
-                        },
-                        new
-                        {
-                            Id = 39L,
-                            Active = true,
-                            Code = "CancelledRequesterInformativePlanningTeamDetail",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 4L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Cancelled Requester Informative PlanningTeamDetail",
-                            NotificationStatusId = 4L,
-                            TranslationLabel = "Notification.PlanningTeamDetail.CancelledRequesterInformativePlanningTeamDetail"
-                        },
-                        new
-                        {
-                            Id = 40L,
-                            Active = true,
-                            Code = "ApprovedRequesterInformativePlanningTeamDetail",
-                            CreatedOn = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                            EntityType = 4L,
-                            IsInformative = true,
-                            IsUrgent = false,
-                            Name = "Approved Requester Informative PlanningTeamDetail",
-                            NotificationStatusId = 2L,
-                            TranslationLabel = "Notification.PlanningTeamDetail.ApprovedRequesterInformativePlanningTeamDetail"
-                        });
+                    b.ToTable("OutgoingDocuments", "DocumentMangement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.RegistrationNoCounter.RegistrationNumberCounter", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.RegistrationNumberCounter.RegistrationNumberCounter", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1004,6 +357,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<DateTime?>("OpinionRequestedUntil")
                         .HasColumnType("datetime2");
 
+                    b.Property<long?>("OutgoingDocumentId")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("RecipientId")
                         .HasColumnType("int");
 
@@ -1026,10 +382,12 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.HasIndex("IncomingDocumentId");
 
+                    b.HasIndex("OutgoingDocumentId");
+
                     b.ToTable("WorkflowHistory", "DocumentMangement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments.ConnectedDocument", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.IncomingConnectedDocuments.IncomingConnectedDocument", b =>
                 {
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.IncomingDocument", null)
                         .WithMany("ConnectedDocuments")
@@ -1045,26 +403,20 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("ContactDetail");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.NotificationTypeCoverGapExtensions.NotificationTypeCoverGapExtension", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.OutgoingConnectedDocuments.OutgoingConnectedDocument", b =>
                 {
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.NotificationTypes.NotificationType", "NotificationType")
-                        .WithMany()
-                        .HasForeignKey("NotificationTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("NotificationType");
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments.OutgoingDocument", null)
+                        .WithMany("ConnectedDocuments")
+                        .HasForeignKey("OutgoingDocumentId");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.NotificationTypes.NotificationType", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments.OutgoingDocument", b =>
                 {
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.NotificationStatuses.NotificationStatus", "NotificationStatus")
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.ContactDetails.ContactDetail", "ContactDetail")
                         .WithMany()
-                        .HasForeignKey("NotificationStatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ContactDetailId");
 
-                    b.Navigation("NotificationStatus");
+                    b.Navigation("ContactDetail");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.WorkflowHistories.WorkflowHistory", b =>
@@ -1072,9 +424,20 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.IncomingDocument", null)
                         .WithMany("WorkflowHistory")
                         .HasForeignKey("IncomingDocumentId");
+
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments.OutgoingDocument", null)
+                        .WithMany("WorkflowHistory")
+                        .HasForeignKey("OutgoingDocumentId");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.IncomingDocument", b =>
+                {
+                    b.Navigation("ConnectedDocuments");
+
+                    b.Navigation("WorkflowHistory");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments.OutgoingDocument", b =>
                 {
                     b.Navigation("ConnectedDocuments");
 

@@ -205,6 +205,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RecipientType = table.Column<int>(type: "int", nullable: false),
                     RecipientId = table.Column<int>(type: "int", nullable: false),
+                    RecipientName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ActionType = table.Column<int>(type: "int", nullable: true),
                     Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DeclineReason = table.Column<string>(type: "nvarchar(max)", nullable: true),

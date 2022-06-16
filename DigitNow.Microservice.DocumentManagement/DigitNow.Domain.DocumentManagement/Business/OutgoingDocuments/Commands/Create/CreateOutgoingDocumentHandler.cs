@@ -38,7 +38,7 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
         outgoingDocumentForCreation.WorkflowHistory.Add(
             new WorkflowHistory
             {
-                RecipientType = (int)RecipientType.HeadOfDepartment,
+                RecipientType = (int)UserRole.HeadOfDepartment,
                 RecipientId = request.RecipientId,
                 Status = (int)Status.in_work_unallocated,
                 CreationDate = DateTime.Now
