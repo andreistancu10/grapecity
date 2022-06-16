@@ -44,10 +44,10 @@ namespace DigitNow.Domain.DocumentManagement.configurations.HostedServices
             {
                 if (_configuration.GetValue<bool>(MultiTenantOptions.EnableMultiTenant))
                 {
-                    TenantInfoLoader tenantInfoLoader = _serviceProvider.GetRequiredService<TenantInfoLoader>();
+                    var tenantInfoLoader = _serviceProvider.GetRequiredService<TenantInfoLoader>();
 
                     List<TenantInfo> tenants = tenantInfoLoader.GetTenants();
-                    foreach (TenantInfo tenant in tenants)
+                    foreach (var tenant in tenants)
                     {
                         _logger.LogInformation("Starting database migration for tenant: {TenantCode}", tenant.TenantCode);
                         var services = new ServiceCollection();
@@ -57,7 +57,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations.HostedServices
                         services.AddLogging();
                         services.AddMediatR(typeof(MigrateDatabaseHostedService).Assembly);
 
-                        await using ServiceProvider serviceProvider = services.BuildServiceProvider();
+                        await using var serviceProvider = services.BuildServiceProvider();
 
                         var efTenantService = serviceProvider.GetRequiredService<IEfTenantService>();
                         efTenantService.SetTenantInfo(tenant.TenantId);
@@ -89,7 +89,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations.HostedServices
                     services.AddDbContext(_configuration);
                     services.AddMediatR(typeof(MigrateDatabaseHostedService).Assembly);
 
-                    await using ServiceProvider serviceProvider = services.BuildServiceProvider();
+                    await using var serviceProvider = services.BuildServiceProvider();
 
                     var dbContext = serviceProvider.GetRequiredService<DocumentManagementDbContext>();
                     if (dbContext.Database.GetMigrations().Any())

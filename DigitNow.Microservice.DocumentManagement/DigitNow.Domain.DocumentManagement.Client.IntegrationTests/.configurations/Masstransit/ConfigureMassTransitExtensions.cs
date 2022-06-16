@@ -53,7 +53,7 @@ namespace DigitNow.Domain.DocumentManagement.Client.IntegrationTest.configuratio
 
                     rabbit.UseInlineFilter((consumeContext, pipe) =>
                     {
-                        if (!consumeContext.TryGetPayload<IServiceScope>(out IServiceScope? scope)) return pipe.Send(consumeContext);
+                        if (!consumeContext.TryGetPayload<IServiceScope>(out var scope)) return pipe.Send(consumeContext);
                         var tenantService = scope.ServiceProvider.GetRequiredService<ITenantService>();
 
                         long? tenantId = consumeContext.Headers.Get<long>(MassTransitMultiTenantConstants.MultiTenantHeaderName);

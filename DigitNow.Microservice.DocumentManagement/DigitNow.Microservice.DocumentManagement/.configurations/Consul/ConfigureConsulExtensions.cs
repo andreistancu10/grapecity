@@ -40,9 +40,9 @@ namespace DigitNow.Microservice.DocumentManagement.configurations.Consul
                 return app;
             }
 
-            Uri address = new Uri(discoveryAddress);
+            var address = new Uri(discoveryAddress);
 
-            AsyncRetryPolicy asyncRetryPolicy = Policy.Handle<HttpRequestException>()
+            var asyncRetryPolicy = Policy.Handle<HttpRequestException>()
                 .WaitAndRetryForeverAsync(
                     retryAttempt => TimeSpan.FromSeconds(Math.Pow(2, retryAttempt)),
                     (exception, count, context) => logger.LogError($"Polly: Retry {count} consul registration"));

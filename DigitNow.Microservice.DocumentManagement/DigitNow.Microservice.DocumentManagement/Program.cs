@@ -13,7 +13,7 @@ namespace DigitNow.Microservice.DocumentManagement
     {
         public static void Main(string[] args)
         {
-            IConfigurationRoot config = SerilogConfigurationExtensions.BuildConfiguration();
+            var config = SerilogConfigurationExtensions.BuildConfiguration();
             Log.Logger = new LoggerConfiguration().ReadFrom.Configuration(config).CreateLogger();
             try
             {

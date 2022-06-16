@@ -17,7 +17,7 @@ namespace DigitNow.Microservice.DocumentManagement.configurations.DistributedCac
         public static IServiceCollection AddDistributedCacheConfigurations(this IServiceCollection services,
             IConfiguration configuration)
         {
-            DistributedCacheOptions options = configuration.GetSection(DistributedCache).Get<DistributedCacheOptions>();
+            var options = configuration.GetSection(DistributedCache).Get<DistributedCacheOptions>();
 
             void SetupRedis(RedisCacheOptions cacheOptions)
             {

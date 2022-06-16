@@ -23,7 +23,7 @@ public static class ConfigureMassTransitExtensions
     public static IServiceCollection AddMassTransitConfigurations(this IServiceCollection services,
         IConfiguration configuration)
     {
-        MassTransitOptions massTransitOptions =
+        var massTransitOptions =
             configuration.GetSection(MassTransitSection).Get<MassTransitOptions>();
 
         void AddOptions(MassTransitOptions options)
@@ -57,7 +57,7 @@ public static class ConfigureMassTransitExtensions
 
                 rabbit.UseInlineFilter((consumeContext, pipe) =>
                 {
-                    if (!consumeContext.TryGetPayload<IServiceScope>(out IServiceScope scope)) return pipe.Send(consumeContext);
+                    if (!consumeContext.TryGetPayload<IServiceScope>(out var scope)) return pipe.Send(consumeContext);
                     var tenantService = scope.ServiceProvider.GetRequiredService<ITenantService>();
 
                     long? tenantId = consumeContext.Headers.Get<long>(MassTransitMultiTenantConstants.MultiTenantHeaderName);

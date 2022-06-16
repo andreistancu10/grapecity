@@ -39,7 +39,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations
 
                     if (efTenantService != null)
                     {
-                        TenantInfo tenantInfo = efTenantService.GetTenantInfo();
+                        var tenantInfo = efTenantService.GetTenantInfo();
 
                         if (tenantInfo is null)
                             throw new NullReferenceException("Tenant Info Configurations not found for current context");

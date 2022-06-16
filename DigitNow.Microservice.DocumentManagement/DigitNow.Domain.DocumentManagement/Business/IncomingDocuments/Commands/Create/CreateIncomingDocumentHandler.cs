@@ -55,7 +55,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
                 List<IncomingDocument> connectedDocuments = await _dbContext.IncomingDocuments
                     .Where(doc => request.ConnectedDocumentIds.Contains(doc.RegistrationNumber)).ToListAsync();
 
-                foreach (IncomingDocument doc in connectedDocuments)
+                foreach (var doc in connectedDocuments)
                 {
                     incomingDocumentForCreation.ConnectedDocuments
                         .Add(new ConnectedDocument() { ChildIncomingDocumentId = doc.Id, RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });
