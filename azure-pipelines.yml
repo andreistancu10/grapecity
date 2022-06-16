@@ -183,7 +183,7 @@ stages:
       dockerFilePath: ${{variables.baseFolder}}
       feedsToUse: ${{variables.feedsToUse}}
       nugetConfigPath : ${{variables.baseFolder}}/DigitNow.${{variables.projectService}}.${{variables.projectName}}/nuget.config
-      dotnetPublishFolder: ${{variables.baseFolder}}/${{variables.projectService}}.${{variables.projectName}}/bin/${{ parameters.buildConfiguration }}/net$(dotnet.major)/publish
+      dotnetPublishFolder: ${{variables.baseFolder}}/DigitNow.${{variables.projectService}}.${{variables.projectName}}/bin/${{ parameters.buildConfiguration }}/net$(dotnet.major)/publish
       dockerContainerRegistry: ${{ variables.dockerContainerRegistry}}
       dockerRepository: ${{ variables.dockerRepository}}
       sonarScaner: ${{parameters.sonarScaner}}
