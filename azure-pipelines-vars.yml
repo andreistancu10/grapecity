@@ -11,7 +11,7 @@ variables:
   - name: appSettingsFilename
     value: appsettings.json
   - name: projectService
-    value: Microservice
+    value: DigitNow.Microservice
   - name: suffix
     ${{ if eq(variables['Build.SourceBranchName'], 'develop') }}:
       value: Development
