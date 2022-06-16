@@ -28,7 +28,7 @@ variables:
   - name: helmValues
     value: helm-values.yml
   - name: baseFolder
-    value: HTSS.DataKlas.$(projectService).$(projectName)
+    value: DigitNow.$(projectService).$(projectName)
   - name: sonarQubeProjectKey
     value: $(prefix)_$(projectService)_$(projectName)
   - name: sonarQubeProjectName
