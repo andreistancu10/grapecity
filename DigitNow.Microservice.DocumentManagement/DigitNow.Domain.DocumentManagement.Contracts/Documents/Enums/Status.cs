@@ -12,6 +12,8 @@ namespace DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums
         in_work_declined = 7,
         in_work_approved = 8,
         in_work_countersignature = 9,
-        finalized = 10
+        finalized = 10,
+        in_work_delegated = 11,
+        in_work_delegated_unallocated = 12
     }
 }
