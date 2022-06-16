@@ -23,7 +23,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard
             _mapper = mapper;
         }
 
-        [HttpPut("update-recipient")]
+        [HttpPut("update-department")]
         public async Task<IActionResult> UpdateDocumentRecipientByDepartmentId([FromBody] UpdateDocumentRecipientRequest request, CancellationToken cancellationToken)
         {
             var updateDepartmentForDocumentCommand = _mapper.Map<UpdateDocumentRecipientCommand>(request);

@@ -12,6 +12,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using HTSS.Platform.Core.Errors;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create
 {
@@ -29,8 +30,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
         }
         public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
         {
-            var incomingDocumentForCreation             = _mapper.Map<IncomingDocument>(request);
-            incomingDocumentForCreation.CreationDate    = DateTime.Now;
+            var incomingDocumentForCreation              = _mapper.Map<IncomingDocument>(request);
+            incomingDocumentForCreation.CreationDate     = DateTime.Now;
 
             await AttachConnectedDocuments(request, incomingDocumentForCreation);
 
@@ -43,7 +44,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
                     CreationDate    = DateTime.Now  
                 });
 
-            await _service.AssignRegNumberAndSaveDocument(incomingDocumentForCreation);
+            try
+            {
+                await _service.AssignRegNumberAndSaveDocument(incomingDocumentForCreation);
+            }
+            catch (Exception ex)
+            {
+                return ResultObject.Error(new ErrorMessage()
+                {
+                    Message = ex.InnerException.Message
+                });
+            }
 
             return ResultObject.Created(incomingDocumentForCreation.Id);
         }
