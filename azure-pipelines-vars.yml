@@ -28,7 +28,7 @@ variables:
   - name: helmValues
     value: helm-values.yml
   - name: baseFolder
-    value: HTSS.DataKlas.$(projectService).$(projectName)
+    value: DigitNow.$(projectService).$(projectName)
   - name: sonarQubeProjectKey
     value: $(prefix)_$(projectService)_$(projectName)
   - name: sonarQubeProjectName
@@ -45,9 +45,9 @@ variables:
   - name: azureServiceConnection
     value: HTSS-CLOUDAPPS-DEV (2afeaed6-50e9-45d2-93a1-ff1bdc2d4bfe)
   - name: startupProjectPath
-    value: HTSS.DataKlas.$(projectService).$(projectName)/$(projectService).$(projectName)/$(projectService).$(projectName).csproj
+    value: DigitNow.$(projectService).$(projectName)/DigitNow.$(projectService).$(projectName)/DigitNow.$(projectService).$(projectName).csproj
   - name: domainProjectPath
-    value: HTSS.DataKlas.$(projectService).$(projectName)/ShiftIn.Domain.$(projectName)/ShiftIn.Domain.$(projectName).csproj
+    value: DigitNow.$(projectService).$(projectName)/DigitNow.Domain.$(projectName)/DigitNow.Domain.$(projectName).csproj
   - name: projectContext
     value: DocumentManagementDbContext  
   # ef check using htss-aks-dev env
