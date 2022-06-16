@@ -7,6 +7,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.WorkflowHistories
         public int Id { get; set; }
         public int RecipientType { get; set; }
         public int RecipientId { get; set; }
+        public string RecipientName { get; set; }
         public int? ActionType { get; set; }
         public string Remarks { get; set; }
         public string DeclineReason { get; set; }

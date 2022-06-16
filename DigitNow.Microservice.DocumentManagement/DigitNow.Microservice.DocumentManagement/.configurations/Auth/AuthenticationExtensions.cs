@@ -62,7 +62,6 @@ namespace DigitNow.Microservice.DocumentManagement.configurations.Auth
                 ValidAudience = options.Audience,
                 ValidateLifetime = true,
                 ClockSkew = TimeSpan.Zero,
-                RequireExpirationTime = true
             };
         }
     }
