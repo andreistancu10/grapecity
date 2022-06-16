@@ -6,14 +6,13 @@
 
 	<ItemGroup>
 		<Compile Include=".configurations\Api\ConfigureAPIExtensions.cs" />
-		<Compile Include=".configurations\Api\ConfigureTenantMiddlewareExtensions.cs" />
 		<Compile Include=".configurations\Auth\AuthenticationExtensions.cs" />
 		<Compile Include=".configurations\Consul\ConfigureConsulExtensions.cs" />
 		<Compile Include=".configurations\Consul\ConsulOptions.cs" />
 		<Compile Include=".configurations\DistributedCache\DistributedCacheExtensions.cs" />
 		<Compile Include=".configurations\DistributedCache\DistributedCacheOptions.cs" />
 		<Compile Include=".configurations\HostedServices\ConfigureApiBusHostedService.cs" />
-		<Compile Include=".configurations\IConfigurationBuilderExtensions.cs" />
+		<Compile Include=".configurations\ConfigurationBuilderExtensions.cs" />
 		<Compile Include=".configurations\Masstransit\ConfigureMassTransitExtensions.cs" />
 		<Compile Include=".configurations\Serilog\SerilogConfigurationExtensions.cs" />
 		<Compile Include=".configurations\Swagger\ConfigureSwaggerExtensions.cs" />

@@ -1,9 +1,4 @@
-﻿using System;
-using DigitNow.Domain.DocumentManagement.Data.Notifications;
-using DigitNow.Domain.DocumentManagement.Data.NotificationStatuses;
-using DigitNow.Domain.DocumentManagement.Data.NotificationTypeCoverGapExtensions;
-using DigitNow.Domain.DocumentManagement.Data.NotificationTypes;
-using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
+﻿using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
 using Microsoft.EntityFrameworkCore;
 using DigitNow.Domain.DocumentManagement.Data.ContactDetails;
 using DigitNow.Domain.DocumentManagement.Data.IncomingConnectedDocuments;
@@ -21,14 +16,6 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DocumentManagementDbContext(DbContextOptions<DocumentManagementDbContext> options) : base(options)
         {
         }
-
-        public DbSet<Notification> Notifications { get; set; }
-
-        public DbSet<NotificationStatus> NotificationStatuses { get; set; }
-
-        public DbSet<NotificationType> NotificationTypes { get; set; }
-
-        public DbSet<NotificationTypeCoverGapExtension> NotificationTypeCoverGapExtensions { get; set; }
 
         public DbSet<IncomingDocument> IncomingDocuments { get; set; }
 

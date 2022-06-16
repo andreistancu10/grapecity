@@ -18,8 +18,12 @@ namespace DigitNow.Microservice.DocumentManagement.configurations.Auth
             IConfiguration configuration)
         {
             var section = configuration.GetSection(Authorization);
+
             if (!section.Exists())
+            {
                 throw new ApplicationException($"Configurations not found: {Authorization}");
+            }
+
             var options = section.Get<AuthorizationOptions>();
 
             services.AddAuthentication(x =>

@@ -4,6 +4,7 @@ using HTSS.Platform.Core.CQRS;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries
 {

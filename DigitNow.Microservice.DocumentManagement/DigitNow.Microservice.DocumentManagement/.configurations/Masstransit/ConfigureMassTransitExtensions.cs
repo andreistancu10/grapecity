@@ -12,78 +12,77 @@ using MassTransit.RabbitMqTransport;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DigitNow.Microservice.DocumentManagement.configurations.Masstransit
+namespace DigitNow.Microservice.DocumentManagement.configurations.MassTransit;
+
+public static class ConfigureMassTransitExtensions
 {
-    public static class ConfigureMassTransitExtensions
+    private const string MassTransitSection = "MassTransit";
+    private static string CurrentMicroservice => typeof(ConfigureMassTransitExtensions).Assembly.GetName().Name;
+    private static Assembly TenantNotificationDomain => typeof(DomainServiceExtensions).Assembly;
+
+    public static IServiceCollection AddMassTransitConfigurations(this IServiceCollection services,
+        IConfiguration configuration)
     {
-        private const string MassTransitSection = "MassTransit";
-        private static string CurrentMicroservice => typeof(ConfigureMassTransitExtensions).Assembly.GetName().Name;
-        private static Assembly TenantNotificationDomain => typeof(DomainServiceExtensions).Assembly;
+        var massTransitOptions =
+            configuration.GetSection(MassTransitSection).Get<MassTransitOptions>();
 
-        public static IServiceCollection AddMassTransitConfigurations(this IServiceCollection services,
-            IConfiguration configuration)
+        void AddOptions(MassTransitOptions options)
         {
-            var massTransitOptions =
-                configuration.GetSection(MassTransitSection).Get<MassTransitOptions>();
+            options.Microservice = CurrentMicroservice;
+            options.Host = massTransitOptions.Host;
+            options.Password = massTransitOptions.Password;
+            options.Port = massTransitOptions.Port;
+            options.User = massTransitOptions.User;
+            options.VirtualHost = massTransitOptions.VirtualHost;
+        }
 
-            void AddOptions(MassTransitOptions options)
+        void AddServiceConfigurations(IServiceCollectionBusConfigurator serviceCollection)
+        {
+            serviceCollection.AddTenantNotificationMassTransitServiceConfigurations();
+        }
+
+        void AddFactoryConfigurations(IBusRegistrationContext context, IRabbitMqBusFactoryConfigurator rabbit)
+        {
+            rabbit.Host(massTransitOptions.Host, (ushort)massTransitOptions.Port, massTransitOptions.VirtualHost,
+                _ =>
+                {
+                    _.Username(massTransitOptions.User);
+                    _.Password(massTransitOptions.Password);
+                });
+
+            bool enableMultiTenant = configuration.GetValue<bool>(MultiTenantOptions.EnableMultiTenant);
+            if (enableMultiTenant)
             {
-                options.Microservice = CurrentMicroservice;
-                options.Host = massTransitOptions.Host;
-                options.Password = massTransitOptions.Password;
-                options.Port = massTransitOptions.Port;
-                options.User = massTransitOptions.User;
-                options.VirtualHost = massTransitOptions.VirtualHost;
+                rabbit.UseMessageScope(context);
+
+                rabbit.UseInlineFilter((consumeContext, pipe) =>
+                {
+                    if (!consumeContext.TryGetPayload<IServiceScope>(out var scope)) return pipe.Send(consumeContext);
+                    var tenantService = scope.ServiceProvider.GetRequiredService<ITenantService>();
+
+                    long? tenantId = consumeContext.Headers.Get<long>(MassTransitMultiTenantConstants.MultiTenantHeaderName);
+
+                    if (tenantId is > 0) tenantService.SetTenantInfo(tenantId.Value);
+
+                    return pipe.Send(consumeContext);
+                });
+                rabbit.UseSendFilter(typeof(TenantSendFilter<>), context);
+                rabbit.UsePublishFilter(typeof(TenantPublishFilter<>), context);
             }
 
-            void AddServiceConfigurations(IServiceCollectionBusConfigurator serviceCollection)
+            rabbit.AddTenantNotificationMassTransitRabbitConfigurations(context, (registerConfig) =>
             {
-                serviceCollection.AddTenantNotificationMassTransitServiceConfigurations();
-            }
-
-            void AddFactoryConfigurations(IBusRegistrationContext context, IRabbitMqBusFactoryConfigurator rabbit)
-            {
-                rabbit.Host(massTransitOptions.Host, (ushort)massTransitOptions.Port, massTransitOptions.VirtualHost,
-                    _ =>
-                    {
-                        _.Username(massTransitOptions.User);
-                        _.Password(massTransitOptions.Password);
-                    });
-
-                var enableMultiTenant = configuration.GetValue<bool>(MultiTenantOptions.EnableMultiTenant);
                 if (enableMultiTenant)
                 {
-                    rabbit.UseMessageScope(context);
-
-                    rabbit.UseInlineFilter((consumeContext, pipe) =>
-                    {
-                        if (!consumeContext.TryGetPayload<IServiceScope>(out var scope)) return pipe.Send(consumeContext);
-                        var tenantService = scope.ServiceProvider.GetRequiredService<ITenantService>();
-
-                        var tenantId = consumeContext.Headers.Get<long>(MassTransitMultiTenantConstants.MultiTenantHeaderName);
-
-                        if (tenantId is > 0) tenantService.SetTenantInfo(tenantId.Value);
-
-                        return pipe.Send(consumeContext);
-                    });
-                    rabbit.UseSendFilter(typeof(TenantSendFilter<>), context);
-                    rabbit.UsePublishFilter(typeof(TenantPublishFilter<>), context);
+                    registerConfig.UseConsumeFilter(typeof(TenantConsumeFilter<>), context);
                 }
-
-                rabbit.AddTenantNotificationMassTransitRabbitConfigurations(context, (registerConfig) =>
-                {
-                    if (enableMultiTenant)
-                    {
-                        registerConfig.UseConsumeFilter(typeof(TenantConsumeFilter<>), context);
-                    }
-                });
-            }
-
-            return services.AddMassTransitServices<ConfigureApiBusHostedService>(AddOptions, AddServiceConfigurations,
-                AddFactoryConfigurations, new[]
-                {
-                    TenantNotificationDomain
-                });
+            });
         }
+
+        return services.AddMassTransitServices<ConfigureApiBusHostedService>(AddOptions, AddServiceConfigurations,
+            AddFactoryConfigurations, new[]
+            {
+                TenantNotificationDomain
+            });
     }
 }

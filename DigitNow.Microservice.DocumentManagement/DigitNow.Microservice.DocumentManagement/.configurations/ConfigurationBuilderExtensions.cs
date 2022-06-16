@@ -3,7 +3,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace DigitNow.Microservice.DocumentManagement.configurations
 {
-    public static class IConfigurationBuilderExtensions
+    public static class ConfigurationBuilderExtensions
     {
         public static IConfigurationBuilder ConfigureApi(this IConfigurationBuilder configurationBuilder,
             IHostEnvironment environment)
