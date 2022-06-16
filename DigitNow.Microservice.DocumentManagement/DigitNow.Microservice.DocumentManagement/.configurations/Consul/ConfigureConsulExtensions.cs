@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Polly;
+using Polly.Retry;
 
 namespace DigitNow.Microservice.DocumentManagement.configurations.Consul
 {
@@ -29,19 +30,17 @@ namespace DigitNow.Microservice.DocumentManagement.configurations.Consul
 
         public static IApplicationBuilder UseConsulConfigurations(this IApplicationBuilder app, IWebHostEnvironment env)
         {
-            Uri address = null;
+            IOptions<ConsulOptions> options = app.ApplicationServices.GetService<IOptions<ConsulOptions>>();
+            ILogger<IApplicationBuilder> logger = app.ApplicationServices.GetService<ILogger<IApplicationBuilder>>();
 
-            var options = app.ApplicationServices.GetService<IOptions<ConsulOptions>>();
-            var logger = app.ApplicationServices.GetService<ILogger<IApplicationBuilder>>();
-
-            var discoveryAddress = Environment.GetEnvironmentVariable("DISCOVERY_ADDRESS");
+            string discoveryAddress = Environment.GetEnvironmentVariable("DISCOVERY_ADDRESS");
             if (!Uri.IsWellFormedUriString(discoveryAddress, UriKind.Absolute))
             {
                 logger.LogWarning("Consul: Microservice registration failed. Please make sure that EnvironmentVariable:DISCOVERY_ADDRESS is defined!");
                 return app;
             }
 
-            address = new Uri(discoveryAddress);
+            var address = new Uri(discoveryAddress);
 
             var asyncRetryPolicy = Policy.Handle<HttpRequestException>()
                 .WaitAndRetryForeverAsync(

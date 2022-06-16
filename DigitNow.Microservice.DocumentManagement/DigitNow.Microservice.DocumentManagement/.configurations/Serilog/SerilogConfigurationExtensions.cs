@@ -8,8 +8,8 @@ namespace DigitNow.Microservice.DocumentManagement.configurations.Serilog
     {
         public static IConfigurationRoot BuildConfiguration()
         {
-            string enviroment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-            string appSettings = Environments.Development.Equals(enviroment, StringComparison.OrdinalIgnoreCase)
+            string environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+            string appSettings = Environments.Development.Equals(environment, StringComparison.OrdinalIgnoreCase)
                 ? "appsettings.Development.json"
                 : "appsettings.json";
 

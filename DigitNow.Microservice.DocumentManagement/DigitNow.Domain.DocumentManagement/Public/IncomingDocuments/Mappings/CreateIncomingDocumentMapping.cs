@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
-using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
-using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
 using DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
 
 namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Mappings

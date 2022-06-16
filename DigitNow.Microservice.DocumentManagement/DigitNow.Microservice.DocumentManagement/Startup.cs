@@ -4,7 +4,7 @@ using DigitNow.Microservice.DocumentManagement.configurations.Api;
 using DigitNow.Microservice.DocumentManagement.configurations.Auth;
 using DigitNow.Microservice.DocumentManagement.configurations.Consul;
 using DigitNow.Microservice.DocumentManagement.configurations.DistributedCache;
-using DigitNow.Microservice.DocumentManagement.configurations.Masstransit;
+using DigitNow.Microservice.DocumentManagement.configurations.MassTransit;
 using DigitNow.Microservice.DocumentManagement.configurations.Swagger;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -18,7 +18,7 @@ namespace DigitNow.Microservice.DocumentManagement
 {
     public class Startup
     {
-        public const string CORSPolicy = "HTSS.DataKlas.CORS";
+        public const string CorsPolicy = "HTSS.DataKlas.CORS";
 
         public Startup(IConfiguration configuration)
         {
@@ -38,7 +38,7 @@ namespace DigitNow.Microservice.DocumentManagement
             services.AddDistributedCacheConfigurations(Configuration);
 
             services.AddCors(options =>
-                options.AddPolicy(CORSPolicy, builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
+                options.AddPolicy(CorsPolicy, builder => builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod()));
 
             services.AddHttpContextAccessor();
             services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
@@ -64,10 +64,7 @@ namespace DigitNow.Microservice.DocumentManagement
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            app.UseCors(CORSPolicy);
-            
-            // In order to work, a middleware needs to be defined ahead of UseEndpoints
-            app.UseMultiTenant();
+            app.UseCors(CorsPolicy);
             
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }
