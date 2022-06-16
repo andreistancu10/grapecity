@@ -40,9 +40,10 @@ namespace DigitNow.Domain.DocumentManagement.Business._Common.Documents.Services
 
                     dbContextTransaction.Commit();
                 }
-                catch
+                catch(Exception)
                 {
                     dbContextTransaction.Rollback();
+                    throw;
                 }
             }
         }
