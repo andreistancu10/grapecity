@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Collections.Generic;
+using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
@@ -51,7 +52,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
         {
             if (request.ConnectedDocumentIds.Any())
             {
-                var connectedDocuments = await _dbContext.IncomingDocuments
+                List<IncomingDocument> connectedDocuments = await _dbContext.IncomingDocuments
                     .Where(doc => request.ConnectedDocumentIds.Contains(doc.RegistrationNumber)).ToListAsync();
 
                 foreach (var doc in connectedDocuments)

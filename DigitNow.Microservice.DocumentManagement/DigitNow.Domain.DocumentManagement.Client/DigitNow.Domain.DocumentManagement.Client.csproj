@@ -19,6 +19,10 @@
 		<ProjectReference Include="..\DigitNow.Domain.DocumentManagement.Contracts\DigitNow.Domain.DocumentManagement.Contracts.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Internal\Model\" />
+	</ItemGroup>
+
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<OutputPath>../.nuget</OutputPath>
 	</PropertyGroup>
