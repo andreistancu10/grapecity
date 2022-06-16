@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using DigitNow.Domain.DocumentManagement.Client.configurations;
 using DigitNow.Domain.DocumentManagement.Client.IntegrationTest.configurations.HostedServices;
 using GreenPipes;
 using HTSS.Platform.Infrastructure.MassTransit;
@@ -36,7 +35,6 @@ namespace DigitNow.Domain.DocumentManagement.Client.IntegrationTest.configuratio
 
             void AddServiceConfigurations(IServiceCollectionBusConfigurator serviceCollection)
             {
-                serviceCollection.AddTenantNotificationMQServicesConfigs();
             }
 
             void AddFactoryConfigurations(IBusRegistrationContext context, IRabbitMqBusFactoryConfigurator rabbit)
@@ -48,7 +46,7 @@ namespace DigitNow.Domain.DocumentManagement.Client.IntegrationTest.configuratio
                         _.Password(massTransitOptions.Password);
                     });
 
-                var enableMultiTenant = configuration.GetValue<bool>(MultiTenantOptions.EnableMultiTenant);
+                bool enableMultiTenant = configuration.GetValue<bool>(MultiTenantOptions.EnableMultiTenant);
                 if (enableMultiTenant)
                 {
                     rabbit.UseMessageScope(context);
@@ -58,7 +56,7 @@ namespace DigitNow.Domain.DocumentManagement.Client.IntegrationTest.configuratio
                         if (!consumeContext.TryGetPayload<IServiceScope>(out var scope)) return pipe.Send(consumeContext);
                         var tenantService = scope.ServiceProvider.GetRequiredService<ITenantService>();
 
-                        var tenantId = consumeContext.Headers.Get<long>(MassTransitMultiTenantConstants.MultiTenantHeaderName);
+                        long? tenantId = consumeContext.Headers.Get<long>(MassTransitMultiTenantConstants.MultiTenantHeaderName);
 
                         if (tenantId is > 0) tenantService.SetTenantInfo(tenantId.Value);
 

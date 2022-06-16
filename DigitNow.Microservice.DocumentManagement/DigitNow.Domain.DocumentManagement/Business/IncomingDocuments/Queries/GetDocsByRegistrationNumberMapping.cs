@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
+using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries
 {
@@ -7,7 +7,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries
     {
         public GetDocsByRegistrationNumberMapping()
         {
-            CreateMap<IncomingDocument, GetDocsByRegistrationNumberResponse>();
+            CreateMap<ConnectedDocument, GetDocsByRegistrationNumberResponse>();
         }
     }
 }

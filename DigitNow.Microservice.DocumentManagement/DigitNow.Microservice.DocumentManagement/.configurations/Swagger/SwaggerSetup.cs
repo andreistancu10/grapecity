@@ -21,7 +21,7 @@ namespace DigitNow.Microservice.DocumentManagement.configurations.Swagger
             return !string.IsNullOrEmpty(swaggerOptions?.ServerPath) switch
             {
                 true => config => config.PreSerializeFilters.Add((swaggerDoc, httpReq) =>
-                    swaggerDoc.Servers = new List<OpenApiServer> {new OpenApiServer {Url = swaggerOptions.ServerPath}}),
+                    swaggerDoc.Servers = new List<OpenApiServer> {new() {Url = swaggerOptions.ServerPath}}),
                 _ => null
             };
         }
