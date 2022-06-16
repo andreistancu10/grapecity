@@ -11,13 +11,12 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateUserRecipient
 {
-    public class UpdateDocumentUserRecipientHandler
+    public class UpdateDocumentUserRecipientHandler: ICommandHandler<UpdateDocumentUserRecipientCommand, ResultObject>
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IIdentityAdapterClient _identityAdapterClient;
@@ -30,7 +29,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
         }
         public async Task<ResultObject> Handle(UpdateDocumentUserRecipientCommand request, CancellationToken cancellationToken)
         {
-            var _user = await _identityAdapterClient.GetUserByIdAsync(request.UserId);
+            _user = await _identityAdapterClient.GetUserByIdAsync(request.UserId);
 
             if (_user == null)
                 return ResultObject.Error(new ErrorMessage
@@ -69,7 +68,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                 var internalDoc = await _dbContext.InternalDocuments.FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
 
                 if (internalDoc != null)
-                    internalDoc.ReceiverDepartmentId = (int)_user.Id;
+                    internalDoc.ReceiverDepartmentId = (int)_user.Id;     
             }
         }
 
