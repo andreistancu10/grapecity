@@ -12,7 +12,7 @@ using MassTransit.RabbitMqTransport;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DigitNow.Microservice.DocumentManagement.configurations.MassTransit;
+namespace DigitNow.Microservice.DocumentManagement.configurations.Masstransit;
 
 public static class ConfigureMassTransitExtensions
 {

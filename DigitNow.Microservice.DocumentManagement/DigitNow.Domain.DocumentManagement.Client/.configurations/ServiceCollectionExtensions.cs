@@ -1,7 +1,6 @@
-﻿namespace DigitNow.Domain.DocumentManagement.Client.configurations
+﻿namespace DigitNow.Domain.DocumentManagement.Client.configurations;
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
-    {
         
-    }
 }

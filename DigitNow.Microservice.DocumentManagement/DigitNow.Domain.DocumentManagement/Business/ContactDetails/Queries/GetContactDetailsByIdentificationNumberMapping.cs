@@ -1,13 +1,12 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Data.ContactDetails;
 
-namespace DigitNow.Domain.DocumentManagement.Business.ContactDetails.Queries
+namespace DigitNow.Domain.DocumentManagement.Business.ContactDetails.Queries;
+
+public class GetContactDetailsByIdentificationNumberMapping : Profile
 {
-    public class GetContactDetailsByIdentificationNumberMapping : Profile
+    public GetContactDetailsByIdentificationNumberMapping()
     {
-        public GetContactDetailsByIdentificationNumberMapping()
-        {
-            CreateMap<ContactDetail, GetContactDetailsByIdentificationNumberResponse>();
-        }
+        CreateMap<ContactDetail, GetContactDetailsByIdentificationNumberResponse>();
     }
 }

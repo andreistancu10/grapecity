@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
 
-namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
+namespace DigitNow.Domain.DocumentManagement.Public.OutgoingDocuments.Models;
 
-public class UpdateIncomingDocumentRequest
+public class UpdateOutgoingDocumentRequest
 {
     public int InputChannelId { get; set; }
     public int IssuerTypeId { get; set; }

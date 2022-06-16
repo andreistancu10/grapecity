@@ -2,11 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments.Queries
+namespace DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments.Queries;
+
+public interface IOutgoingDocumentsQueryService
 {
-    public interface IOutgoingDocumentsQueryService
-    {
-        Task<IList<OutgoingDocument>> GetDocsByRegistrationNumber(string registrationNumber,
-            CancellationToken cancellationToken);
-    }
+    Task<IList<OutgoingDocument>> GetDocsByRegistrationNumber(int registrationNumber,
+        CancellationToken cancellationToken);
 }

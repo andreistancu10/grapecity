@@ -1,6 +1,6 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
+﻿using System;
+using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
 using Microsoft.EntityFrameworkCore;
-using DigitNow.Domain.DocumentManagement.Data.ContactDetails;
 using DigitNow.Domain.DocumentManagement.Data.IncomingConnectedDocuments;
 using DigitNow.Domain.DocumentManagement.Data.InternalDocuments;
 using DigitNow.Domain.DocumentManagement.Data.OutgoingConnectedDocuments;

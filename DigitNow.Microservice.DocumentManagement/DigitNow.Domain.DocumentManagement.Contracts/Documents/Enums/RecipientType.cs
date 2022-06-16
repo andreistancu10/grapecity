@@ -1,10 +1,9 @@
 ﻿
-namespace DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums
+namespace DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+
+public enum RecipientType
 {
-    public enum RecipientType
-    {
-        HeadOfDepartment = 1,
-        Functionary = 2,
-        Mayor = 3
-    }
+    HeadOfDepartment = 1,
+    Functionary = 2,
+    Mayor = 3
 }

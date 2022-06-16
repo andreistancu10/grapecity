@@ -1,9 +1,8 @@
-﻿namespace DigitNow.Microservice.DocumentManagement.configurations.Swagger
+﻿namespace DigitNow.Microservice.DocumentManagement.configurations.Swagger;
+
+public sealed class SwaggerOptions
 {
-    public sealed class SwaggerOptions
-    {
-        public string Title { get; set; }
-        public string RelativePath { get; set; }
-        public string ServerPath { get; set; }
-    }
+    public string Title { get; set; }
+    public string RelativePath { get; set; }
+    public string ServerPath { get; set; }
 }

@@ -1,20 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DigitNow.Domain.DocumentManagement.Data.RegistrationNumberCounter.Seed
+namespace DigitNow.Domain.DocumentManagement.Data.RegistrationNumberCounter.Seed;
+
+public class Data
 {
-    public class Data
+    public static IEnumerable<RegistrationNumberCounter> GetRegistrationNumberInitialValue()
     {
-        public static IEnumerable<RegistrationNumberCounter> GetRegistrationNumberInitialValue()
+        return new[]
         {
-            return new[]
+            new RegistrationNumberCounter(1)
             {
-                new RegistrationNumberCounter(1)
-                {
-                    RegistrationNumber = 0,
-                    RegistrationDate = DateTime.Now
-                }
-            };
-        }
+                RegistrationNumber = 0,
+                RegistrationDate = DateTime.Now
+            }
+        };
     }
 }

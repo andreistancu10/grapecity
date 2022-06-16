@@ -2,13 +2,12 @@
 using DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Public.OutgoingDocuments.Models;
 
-namespace DigitNow.Domain.DocumentManagement.Public.OutgoingDocuments.Mappings
+namespace DigitNow.Domain.DocumentManagement.Public.OutgoingDocuments.Mappings;
+
+public class CreateOutgoingDocumentMapping : Profile
 {
-    public class CreateOutgoingDocumentMapping : Profile
+    public CreateOutgoingDocumentMapping()
     {
-        public CreateOutgoingDocumentMapping()
-        {
-            CreateMap<CreateOutgoingDocumentRequest, CreateOutgoingDocumentCommand>();
-        }
+        CreateMap<CreateOutgoingDocumentRequest, CreateOutgoingDocumentCommand>();
     }
 }

@@ -8,16 +8,16 @@ namespace DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments.Queries;
 
 public class OutgoingDocumentsQueryService : IOutgoingDocumentsQueryService
 {
-    protected readonly DocumentManagementDbContext _dbContext;
+    protected readonly DocumentManagementDbContext DbContext;
 
     public OutgoingDocumentsQueryService(DocumentManagementDbContext dbContext)
     {
-        _dbContext = dbContext;
+        DbContext = dbContext;
     }
 
-    public async Task<IList<OutgoingDocument>> GetDocsByRegistrationNumber(string registrationNumber, CancellationToken cancellationToken)
+    public async Task<IList<OutgoingDocument>> GetDocsByRegistrationNumber(int registrationNumber, CancellationToken cancellationToken)
     {
-        return await _dbContext.OutgoingDocuments
+        return await DbContext.OutgoingDocuments
             .Where(doc => doc.RegistrationNumber == registrationNumber).ToListAsync(cancellationToken);
     }
 }

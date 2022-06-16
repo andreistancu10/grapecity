@@ -1,13 +1,12 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments;
 
-namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries
+namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries;
+
+public class GetDocsByRegistrationNumberMapping : Profile
 {
-    public class GetDocsByRegistrationNumberMapping : Profile
+    public GetDocsByRegistrationNumberMapping()
     {
-        public GetDocsByRegistrationNumberMapping()
-        {
-            CreateMap<OutgoingDocument, GetDocsByRegistrationNumberResponse>();
-        }
+        CreateMap<OutgoingDocument, GetDocsByRegistrationNumberResponse>();
     }
 }

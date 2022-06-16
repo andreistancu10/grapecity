@@ -17,33 +17,32 @@ namespace DigitNow.Domain.DocumentManagement.Business._Common.Documents.Services
         }
         public async Task AssignRegNumberAndSaveDocument<T>(T document) where T : class
         {
-            using (var dbContextTransaction = _dbContext.Database.BeginTransaction(System.Data.IsolationLevel.Serializable))
+            await using var dbContextTransaction = await _dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
+
+            try
             {
-                try
-                {
-                    var maxRegNumber = await _dbContext.RegistrationNumberCounter
-                                                       .Where(reg => reg.RegistrationDate.Year == DateTime.Now.Year)
-                                                       .Select(reg => reg.RegistrationNumber)
-                                                       .DefaultIfEmpty()
-                                                       .MaxAsync();
+                var maxRegNumber = await _dbContext.RegistrationNumberCounter
+                    .Where(reg => reg.RegistrationDate.Year == DateTime.Now.Year)
+                    .Select(reg => reg.RegistrationNumber)
+                    .DefaultIfEmpty()
+                    .MaxAsync();
 
-                    var newRegNumber = ++maxRegNumber;
+                var newRegNumber = ++maxRegNumber;
 
-                    var type = document.GetType();
-                    var property = type.GetProperty("RegistrationNumber");
+                var type = document.GetType();
+                var property = type.GetProperty("RegistrationNumber");
 
-                    property.SetValue(document, newRegNumber);
+                property.SetValue(document, newRegNumber);
 
-                    await _dbContext.AddAsync(document);
-                    await _dbContext.RegistrationNumberCounter.AddAsync(new RegistrationNumberCounter { RegistrationNumber = newRegNumber, RegistrationDate = DateTime.Now });
-                    await _dbContext.SaveChangesAsync();
+                await _dbContext.AddAsync(document);
+                await _dbContext.RegistrationNumberCounter.AddAsync(new RegistrationNumberCounter { RegistrationNumber = newRegNumber, RegistrationDate = DateTime.Now });
+                await _dbContext.SaveChangesAsync();
 
-                    dbContextTransaction.Commit();
-                }
-                catch
-                {
-                    dbContextTransaction.Rollback();
-                }
+                await dbContextTransaction.CommitAsync();
+            }
+            catch
+            {
+                await dbContextTransaction.RollbackAsync();
             }
         }
     }

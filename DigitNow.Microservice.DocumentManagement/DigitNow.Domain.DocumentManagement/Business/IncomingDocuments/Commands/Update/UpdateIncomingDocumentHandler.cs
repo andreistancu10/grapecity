@@ -10,75 +10,74 @@ using System.Threading;
 using System.Threading.Tasks;
 using DigitNow.Domain.DocumentManagement.Data.IncomingConnectedDocuments;
 
-namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update
+namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update;
+
+public class UpdateIncomingDocumentHandler : ICommandHandler<UpdateIncomingDocumentCommand, ResultObject>
 {
-    public class UpdateIncomingDocumentHandler : ICommandHandler<UpdateIncomingDocumentCommand, ResultObject>
+    private readonly DocumentManagementDbContext _dbContext;
+    private readonly IMapper _mapper;
+
+    public UpdateIncomingDocumentHandler(DocumentManagementDbContext dbContext, IMapper mapper)
     {
-        private readonly DocumentManagementDbContext _dbContext;
-        private readonly IMapper _mapper;
+        _dbContext = dbContext;
+        _mapper = mapper;
+    }
+    public async Task<ResultObject> Handle(UpdateIncomingDocumentCommand request, CancellationToken cancellationToken)
+    {
+        var incomingDocFromDb = await _dbContext.IncomingDocuments.Include(cd => cd.ConnectedDocuments)
+            .FirstOrDefaultAsync(doc => doc.Id == request.Id, cancellationToken: cancellationToken);
 
-        public UpdateIncomingDocumentHandler(DocumentManagementDbContext dbContext, IMapper mapper)
-        {
-            _dbContext = dbContext;
-            _mapper = mapper;
-        }
-        public async Task<ResultObject> Handle(UpdateIncomingDocumentCommand request, CancellationToken cancellationToken)
-        {
-            var incomingDocFromDb = await _dbContext.IncomingDocuments.Include(cd => cd.ConnectedDocuments)
-                                                    .FirstOrDefaultAsync(doc => doc.Id == request.Id, cancellationToken: cancellationToken);
-
-            if (incomingDocFromDb is null)
-                return ResultObject.Error(new ErrorMessage
-                {
-                    Message = $"Incoming Document with id {request.Id} does not exist.",
-                    TranslationCode = "document-management.backend.update.validation.entityNotFound",
-                    Parameters = new object[] { request.Id }
-                });
-
-            RemoveConnectedDocs(request, incomingDocFromDb);
-            AddConnectedDocs(request, incomingDocFromDb);
-
-            _mapper.Map(request, incomingDocFromDb);
-
-            await _dbContext.SaveChangesAsync(cancellationToken);
-
-            return ResultObject.Ok(incomingDocFromDb.Id);
-        }
-
-        private void AddConnectedDocs(UpdateIncomingDocumentCommand request, IncomingDocument incomingDocFromDb)
-        {
-            List<int> incomingDocIds = incomingDocFromDb.ConnectedDocuments.Select(cd => cd.RegistrationNumber).ToList();
-            IEnumerable<int> idsToAdd = request.ConnectedDocumentIds.Except(incomingDocIds);
-
-            if (idsToAdd.Any())
+        if (incomingDocFromDb is null)
+            return ResultObject.Error(new ErrorMessage
             {
-                List<IncomingDocument> connectedDocuments = _dbContext.IncomingDocuments
-                                                   .Where(doc => idsToAdd
-                                                   .Contains(doc.RegistrationNumber))
-                                                   .ToList();
+                Message = $"Incoming Document with id {request.Id} does not exist.",
+                TranslationCode = "document-management.backend.update.validation.entityNotFound",
+                Parameters = new object[] { request.Id }
+            });
 
-                foreach (var doc in connectedDocuments)
-                {
-                    incomingDocFromDb.ConnectedDocuments
-                        .Add(new IncomingConnectedDocument() { ChildIncomingDocumentId = doc.Id, RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });
-                }
+        RemoveConnectedDocs(request, incomingDocFromDb);
+        AddConnectedDocs(request, incomingDocFromDb);
+
+        _mapper.Map(request, incomingDocFromDb);
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return ResultObject.Ok(incomingDocFromDb.Id);
+    }
+
+    private void AddConnectedDocs(UpdateIncomingDocumentCommand request, IncomingDocument incomingDocFromDb)
+    {
+        List<int> incomingDocIds = incomingDocFromDb.ConnectedDocuments.Select(cd => cd.RegistrationNumber).ToList();
+        IEnumerable<int> idsToAdd = request.ConnectedDocumentIds.Except(incomingDocIds);
+
+        if (idsToAdd.Any())
+        {
+            List<IncomingDocument> connectedDocuments = _dbContext.IncomingDocuments
+                .Where(doc => idsToAdd
+                    .Contains(doc.RegistrationNumber))
+                .ToList();
+
+            foreach (var doc in connectedDocuments)
+            {
+                incomingDocFromDb.ConnectedDocuments
+                    .Add(new IncomingConnectedDocument() { ChildIncomingDocumentId = doc.Id, RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });
             }
         }
+    }
 
-        private void RemoveConnectedDocs(UpdateIncomingDocumentCommand request, IncomingDocument incomingDocFromDb)
+    private void RemoveConnectedDocs(UpdateIncomingDocumentCommand request, IncomingDocument incomingDocFromDb)
+    {
+        List<int> incomingDocIds = incomingDocFromDb.ConnectedDocuments.Select(cd => cd.RegistrationNumber).ToList();
+        IEnumerable<int> idsToRemove = incomingDocIds.Except(request.ConnectedDocumentIds);
+
+        if (idsToRemove.Any())
         {
-            List<int> incomingDocIds = incomingDocFromDb.ConnectedDocuments.Select(cd => cd.RegistrationNumber).ToList();
-            IEnumerable<int> idsToRemove = incomingDocIds.Except(request.ConnectedDocumentIds);
 
-            if (idsToRemove.Any())
-            {
-
-                _dbContext.IncomingConnectedDocuments
-                          .RemoveRange(incomingDocFromDb.ConnectedDocuments
-                          .Where(cd => idsToRemove
-                          .Contains(cd.RegistrationNumber))
-                          .ToList());
-            }
+            _dbContext.IncomingConnectedDocuments
+                .RemoveRange(incomingDocFromDb.ConnectedDocuments
+                    .Where(cd => idsToRemove
+                        .Contains(cd.RegistrationNumber))
+                    .ToList());
         }
     }
 }
