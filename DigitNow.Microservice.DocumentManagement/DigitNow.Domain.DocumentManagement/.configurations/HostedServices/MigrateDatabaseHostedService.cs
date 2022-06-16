@@ -46,7 +46,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations.HostedServices
                 {
                     var tenantInfoLoader = _serviceProvider.GetRequiredService<TenantInfoLoader>();
 
-                    List<TenantInfo> tenants = tenantInfoLoader.GetTenants();
+                    var tenants = tenantInfoLoader.GetTenants();
                     foreach (var tenant in tenants)
                     {
                         _logger.LogInformation("Starting database migration for tenant: {TenantCode}", tenant.TenantCode);
@@ -65,8 +65,8 @@ namespace DigitNow.Domain.DocumentManagement.configurations.HostedServices
                         var dbContext = serviceProvider.GetRequiredService<DocumentManagementDbContext>();
                         if (dbContext.Database.GetMigrations().Any())
                         {
-                            IEnumerable<string> pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync(cancellationToken);
-                            List<string> migrations = pendingMigrations.ToList();
+                            var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync(cancellationToken);
+                            var migrations = pendingMigrations.ToList();
                             if (migrations.Count > 0)
                             {
                                 _logger.LogInformation("Pending {Count} changes to apply to: {TenantCode}", migrations.Count, tenant.TenantCode);
@@ -74,7 +74,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations.HostedServices
                                 _logger.LogInformation("Database {Count} changes applied to: {TenantCode}", migrations.Count, tenant.TenantCode);
                             }
 
-                            string lastAppliedMigration = (await dbContext.Database.GetAppliedMigrationsAsync(cancellationToken)).LastOrDefault();
+                            var lastAppliedMigration = (await dbContext.Database.GetAppliedMigrationsAsync(cancellationToken)).LastOrDefault();
 
                             if (!string.IsNullOrEmpty(lastAppliedMigration))
                                 _logger.LogInformation("Migration schema version: {LastAppliedMigration} for tenant: {TenantCode}", lastAppliedMigration, tenant.TenantCode);
@@ -94,8 +94,8 @@ namespace DigitNow.Domain.DocumentManagement.configurations.HostedServices
                     var dbContext = serviceProvider.GetRequiredService<DocumentManagementDbContext>();
                     if (dbContext.Database.GetMigrations().Any())
                     {
-                        IEnumerable<string> pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync(cancellationToken);
-                        List<string> migrations = pendingMigrations.ToList();
+                        var pendingMigrations = await dbContext.Database.GetPendingMigrationsAsync(cancellationToken);
+                        var migrations = pendingMigrations.ToList();
                         if (migrations.Count > 0)
                         {
                             _logger.LogInformation("Pending {Count} changes to apply", migrations.Count);
@@ -103,7 +103,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations.HostedServices
                             _logger.LogInformation("Database {Count} changes applied", migrations.Count);
                         }
 
-                        string lastAppliedMigration = (await dbContext.Database.GetAppliedMigrationsAsync(cancellationToken)).LastOrDefault();
+                        var lastAppliedMigration = (await dbContext.Database.GetAppliedMigrationsAsync(cancellationToken)).LastOrDefault();
 
                         if (!string.IsNullOrEmpty(lastAppliedMigration))
                             _logger.LogInformation("Migration schema version: {LastAppliedMigration}", lastAppliedMigration);

@@ -32,7 +32,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations
                 {
                     var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
                     if (loggerFactory == null) return;
-                    ILogger<IServiceCollection> logger = loggerFactory.CreateLogger<IServiceCollection>();
+                    var logger = loggerFactory.CreateLogger<IServiceCollection>();
 
                     var efTenantService = serviceProvider.GetService<IEfTenantService>();
                     logger.LogDebug("Trying to identity the tenant...");
