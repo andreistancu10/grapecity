@@ -35,14 +35,14 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
 
         await AttachConnectedDocuments(request, incomingDocumentForCreation, cancellationToken);
 
-        incomingDocumentForCreation.WorkflowHistory.Add(
-            new WorkflowHistory
-            {
-                RecipientType = (int)RecipientType.HeadOfDepartment,
-                RecipientId = request.RecipientId,
-                Status = (int)Status.in_work_unallocated,
-                CreationDate = DateTime.Now
-            });
+            incomingDocumentForCreation.WorkflowHistory.Add(
+                new WorkflowHistory() 
+                { 
+                    RecipientType   = (int)UserRole.HeadOfDepartment,
+                    RecipientId     = request.RecipientId, 
+                    Status          = (int)Status.in_work_unallocated,
+                    CreationDate    = DateTime.Now  
+                });
 
         await _service.AssignRegNumberAndSaveDocument(incomingDocumentForCreation);
 
