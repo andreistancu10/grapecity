@@ -5,7 +5,7 @@ variables:
     ${{ if eq(variables['Build.SourceBranchName'], 'main') }}:
       value: main
   - name: projectName
-    value: TenantNotification
+    value: DocumentManagement
   - name: domainSettingsFilename
     value: domain.$(projectName)Settings.json
   - name: appSettingsFilename
@@ -22,7 +22,7 @@ variables:
   - name: dockerContainerRegistry
     value: htssn
   - name: kubernetesServiceConnection
-    value: SHIFTIN-AKS-DEV
+    value: digitnow-htss-aks-dev
   - name: kubernetesNamespace
     value: default
   - name: helmValues
@@ -49,7 +49,7 @@ variables:
   - name: domainProjectPath
     value: HTSS.DataKlas.$(projectService).$(projectName)/ShiftIn.Domain.$(projectName)/ShiftIn.Domain.$(projectName).csproj
   - name: projectContext
-    value: TenantNotificationDbContext  
+    value: DocumentManagementDbContext  
   # ef check using htss-aks-dev env
   - group: htss-aks-dev.${{variables.projectService}}.${{variables.projectName}}
   - group: htss-aks-dev.${{variables.projectService}}.Common    

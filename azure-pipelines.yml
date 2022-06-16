@@ -100,17 +100,18 @@ parameters:
   - name: envsMain
     type: object
     default:
-      - name: 'drmax-uat'
-        pool: 'SHIFTIN UAT'
-
-      - name: 'htss-prod'
-        pool: 'Azure Pipelines'
-        poolImage: 'ubuntu-latest'
+       - name: 'htss-aks-demo'
+         pool: 'Azure Pipelines'
+         poolImage: 'ubuntu-latest'
+      
 
   - name: envsDevelop
     type: object
     default: 
       - name: 'htss-aks-dev'
+        pool: 'Azure Pipelines'
+        poolImage: 'ubuntu-latest'
+      - name: 'htss-aks-test'
         pool: 'Azure Pipelines'
         poolImage: 'ubuntu-latest'
     
@@ -209,29 +210,29 @@ stages:
             dockerContainerRegistry: ${{ variables.dockerContainerRegistry}}
             dockerRepository: ${{ variables.dockerRepository}}
             kubernetesServiceConnection: $(kubernetesServiceConnection) #workaround bug azure devops - replace var at runtime
-            kubernetesNamespace: ${{ variables.kubernetesNamespace}}
+            kubernetesNamespace: $(kubernetesNamespace)
             helmValues: ${{ variables.helmValues }}
   # Enable after fix k8s
-  #- ${{if and(eq(parameters.k8sBuild, 'true'), ne(variables['Build.SourceBranchName'], 'main'))}}:  
-  #  - ${{ each env in parameters.envsDevelop }}:
-  #    - stage: deploy_stage_${{ replace(env.name, '-', '_') }}
-  #      displayName: 'Deploy - ${{ env.name }}'  
-  #      variables:
-  #        - group: ${{ env.name }}.${{variables.projectService}}.${{variables.projectName}}
-  #        - group: ${{ env.name }}.${{variables.projectService}}.Common
-  #        - name: environment
-  #          value: ${{ env.name }}
-  #      jobs:          
-  #      - template: deploy-dotnet-k8s.yml@Devops
-  #        parameters:
-  #          environment: ${{ env.name }}
-  #          pool:
-  #            name: ${{ env.pool }}
-  #            ${{ if eq(env.pool, 'Azure Pipelines') }}: 
-  #              vmImage: ${{ env.poolImage }}
-  #          projectName: ${{ variables.projectName}}
-  #          dockerContainerRegistry: ${{ variables.dockerContainerRegistry}}
-  #          dockerRepository: ${{ variables.dockerRepository}}
-  #          kubernetesServiceConnection: $(kubernetesServiceConnection) #workaround bug azure devops - replace var at runtime
-  #          kubernetesNamespace: ${{ variables.kubernetesNamespace}}
-  #          helmValues: ${{ variables.helmValues }}
+  - ${{if and(eq(parameters.k8sBuild, 'true'), ne(variables['Build.SourceBranchName'], 'main'))}}:  
+    - ${{ each env in parameters.envsDevelop }}:
+      - stage: deploy_stage_${{ replace(env.name, '-', '_') }}
+        displayName: 'Deploy - ${{ env.name }}'  
+        variables:
+          - group: ${{ env.name }}.${{variables.projectService}}.${{variables.projectName}}
+          - group: ${{ env.name }}.${{variables.projectService}}.Common
+          - name: environment
+            value: ${{ env.name }}
+        jobs:          
+        - template: deploy-dotnet-k8s.yml@Devops
+          parameters:
+            environment: ${{ env.name }}
+            pool:
+              name: ${{ env.pool }}
+              ${{ if eq(env.pool, 'Azure Pipelines') }}: 
+                vmImage: ${{ env.poolImage }}
+            projectName: ${{ variables.projectName}}
+            dockerContainerRegistry: ${{ variables.dockerContainerRegistry}}
+            dockerRepository: ${{ variables.dockerRepository}}
+            kubernetesServiceConnection: $(kubernetesServiceConnection) #workaround bug azure devops - replace var at runtime
+            kubernetesNamespace: $(kubernetesNamespace)
+            helmValues: ${{ variables.helmValues }}
