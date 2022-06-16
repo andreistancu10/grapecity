@@ -20,9 +20,9 @@ namespace DigitNow.Domain.DocumentManagement.extensions.Autocorrect
         {
             return role switch
             {
-                UserRole.HeadOfDepartment => user.LastName + user.FirstName + " Sef Departament",
-                UserRole.Functionary => user.LastName + user.FirstName + " Functionar",
-                UserRole.Mayor => user.LastName + user.FirstName + " Primar",
+                UserRole.HeadOfDepartment => user.LastName + " " + user.FirstName + " Sef Departament",
+                UserRole.Functionary => user.LastName + " " + user.FirstName + " Functionar",
+                UserRole.Mayor => user.LastName + " " + user.FirstName + " Primar",
                 _ => string.Empty,
             };
         }
