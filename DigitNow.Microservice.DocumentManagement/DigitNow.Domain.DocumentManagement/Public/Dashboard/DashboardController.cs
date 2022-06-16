@@ -32,7 +32,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard
             return CreateResponse(await _mediator.Send(updateDepartmentForDocumentCommand, cancellationToken));
         }
 
-        [HttpPut("update-recipient-id")]
+        [HttpPut("update-user-recipient")]
         public async Task<IActionResult> UpdateDocumentRecipientByUserId([FromBody] UpdateDocumentUserRecipientRequest request, CancellationToken cancellationToken)
         {
             var updateUserRecipientForDocumentCommand = _mapper.Map<UpdateDocumentUserRecipientCommand>(request);
