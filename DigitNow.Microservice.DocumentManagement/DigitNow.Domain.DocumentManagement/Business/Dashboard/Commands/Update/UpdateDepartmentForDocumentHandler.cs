@@ -30,7 +30,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
         {
 
             var users = await _client.GetUsersByDepartmentIdAsync(request.DepartmentId);
-            _headOfDepartment = users.Users.First(x => x.TenantRoles.Contains((long)UserRole.HeadOfDepartment));
+            _headOfDepartment = users.Users.FirstOrDefault(x => x.TenantRoles.Contains((long)UserRole.HeadOfDepartment));
             
             var incomingDocIds = request.DocumentInfo
                                         .Where(doc => doc.DocType == (int)DocumentType.Incoming)
@@ -61,7 +61,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                 var internalDoc = await _dbContext.InternalDocuments.FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
 
                 if (internalDoc != null)
-                    internalDoc.ReceiverDepartmentId = (int)_headOfDepartment.Id;
+                    internalDoc.ReceiverDepartmentId = _headOfDepartment == null ? 
+                            internalDoc.ReceiverDepartmentId : (int)_headOfDepartment.Id;
             }
         }
 
@@ -72,7 +73,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                 var doc = await _dbContext.IncomingDocuments.FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
                 if (doc != null)
                 {
-                    doc.RecipientId = (int)_headOfDepartment.Id;
+                    doc.RecipientId = _headOfDepartment == null ? doc.RecipientId : (int)_headOfDepartment.Id;
                     CreateWorkflowRecord(doc);
                 }
             }
@@ -80,6 +81,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
 
         private void CreateWorkflowRecord(IncomingDocument doc)
         {
+            if (_headOfDepartment == null) return;
+
             doc.WorkflowHistory.Add(
                 new WorkflowHistory()
                 {
