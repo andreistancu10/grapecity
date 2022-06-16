@@ -43,7 +43,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations.HostedServices
             {
                 if (_configuration.GetValue<bool>(MultiTenantOptions.EnableMultiTenant))
                 {
-                    TenantInfoLoader tenantInfoLoader = _serviceProvider.GetRequiredService<TenantInfoLoader>();
+                    var tenantInfoLoader = _serviceProvider.GetRequiredService<TenantInfoLoader>();
 
                     var tenants = tenantInfoLoader.GetTenants();
                     foreach (var tenant in tenants)

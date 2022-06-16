@@ -20,7 +20,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.NotificationStatuses.Comma
             CancellationToken cancellationToken,
             RequestHandlerDelegate<ResultObject> next)
         {
-            BusinessValidationResult validationResult = await _businessValidator.Validate(request, cancellationToken);
+            var validationResult = await _businessValidator.Validate(request, cancellationToken);
 
             return validationResult.IsValid ? await next() : ResultObject.Error(validationResult.Errors);
         }

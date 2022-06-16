@@ -38,7 +38,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Notifications.Services
 
         public async Task BuildAndSendNotificationToSyncAsync(long notificationId, CancellationToken cancellationToken)
         {
-            Notification entity = await _dbContext.Notifications.AsNoTracking()
+            var entity = await _dbContext.Notifications.AsNoTracking()
                 .FirstOrDefaultAsync(x => x.Id == notificationId, cancellationToken);
 
             if (entity != null)

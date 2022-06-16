@@ -56,7 +56,7 @@ namespace DigitNow.Microservice.DocumentManagement.configurations.Swagger
             IWebHostEnvironment env)
         {
             IOptions<SwaggerOptions> options = app.ApplicationServices.GetService<IOptions<SwaggerOptions>>();
-            ILoggerFactory loggerFactory = app.ApplicationServices.GetService<ILoggerFactory>();
+            var loggerFactory = app.ApplicationServices.GetService<ILoggerFactory>();
             ILogger<IApplicationBuilder> logger = loggerFactory.CreateLogger<IApplicationBuilder>();
 
             app.UseSwagger(SwaggerSetup.SwaggerConfigFactory(options.Value));

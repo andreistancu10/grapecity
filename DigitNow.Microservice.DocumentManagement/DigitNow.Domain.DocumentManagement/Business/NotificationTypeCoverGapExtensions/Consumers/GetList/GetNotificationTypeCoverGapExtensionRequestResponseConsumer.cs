@@ -49,7 +49,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.NotificationTypeCoverGapEx
 
         private async Task<GetNotificationTypeCoverGapExtensionsResponse> GetNotificationTypeCoverGapExtensions(string notificationTypeStatus, CancellationToken cancellationToken)
         {
-            GetNotificationTypeCoverGapExtensionsResponse result = new GetNotificationTypeCoverGapExtensionsResponse();
+            var result = new GetNotificationTypeCoverGapExtensionsResponse();
 
             var filterDescriptor =
                     new List<Func<QueryContainerDescriptor<NotificationTypeCoverGapExtensionElastic>, QueryContainer>>

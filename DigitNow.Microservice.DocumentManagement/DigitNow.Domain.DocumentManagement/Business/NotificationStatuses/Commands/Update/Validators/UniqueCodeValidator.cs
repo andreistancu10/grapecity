@@ -26,7 +26,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.NotificationStatuses.Comma
         public override async Task<BusinessValidationResult> Validate(UpdateNotificationStatusCommand model,
             CancellationToken cancellationToken)
         {
-            BusinessValidationResult validationResult = new BusinessValidationResult(true);
+            var validationResult = new BusinessValidationResult(true);
 
             List<NotificationStatus> notificationStatusesInDb = await _dbContext.NotificationStatuses
                 .Where(x => x.Id != model.Id && x.Code == model.Code).ToListAsync(cancellationToken);

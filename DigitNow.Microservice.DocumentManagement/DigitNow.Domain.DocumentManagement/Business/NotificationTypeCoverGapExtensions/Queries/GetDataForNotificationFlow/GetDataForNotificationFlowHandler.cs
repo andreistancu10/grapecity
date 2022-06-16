@@ -44,7 +44,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.NotificationTypeCoverGapEx
                     return searchDescriptor.Sort(request).Paginate(request);
                 }, cancellationToken);
 
-            GetDataForNotificationFlowResponse response = new GetDataForNotificationFlowResponse();
+            var response = new GetDataForNotificationFlowResponse();
             response.Columns = new List<NotificationTypeCoverGapExtensionGridColumn>();
             response.Rows = new List<NotificationTypeCoverGapExtensionGridRow>();
             response.Columns.Add(BuildNotificationTypeCoverGapExtensionGridColumn("tenant-notification.notification-type-cover-gap-extension.backend.get-data-for-notification-flow-response.statusColumn", 0));

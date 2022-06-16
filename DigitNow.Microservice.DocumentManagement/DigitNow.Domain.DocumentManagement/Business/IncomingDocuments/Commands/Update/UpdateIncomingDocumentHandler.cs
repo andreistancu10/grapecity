@@ -24,7 +24,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
         }
         public async Task<ResultObject> Handle(UpdateIncomingDocumentCommand request, CancellationToken cancellationToken)
         {
-            IncomingDocument incomingDocFromDb = await _dbContext.IncomingDocuments.Include(cd => cd.ConnectedDocuments)
+            var incomingDocFromDb = await _dbContext.IncomingDocuments.Include(cd => cd.ConnectedDocuments)
                                                     .FirstOrDefaultAsync(doc => doc.Id == request.Id, cancellationToken: cancellationToken);
 
             if (incomingDocFromDb is null)
@@ -57,7 +57,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
                                                    .Contains(doc.RegistrationNumber))
                                                    .ToList();
 
-                foreach (IncomingDocument doc in connectedDocuments)
+                foreach (var doc in connectedDocuments)
                 {
                     incomingDocFromDb.ConnectedDocuments
                         .Add(new IncomingConnectedDocument() { ChildIncomingDocumentId = doc.Id, RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });

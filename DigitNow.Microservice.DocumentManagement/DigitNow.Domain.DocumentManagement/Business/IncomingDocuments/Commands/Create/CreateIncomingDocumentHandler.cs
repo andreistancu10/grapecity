@@ -30,7 +30,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
 
         public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
         {
-            IncomingDocument incomingDocumentForCreation = _mapper.Map<IncomingDocument>(request);
+            var incomingDocumentForCreation = _mapper.Map<IncomingDocument>(request);
             incomingDocumentForCreation.CreationDate = DateTime.Now;
 
             await AttachConnectedDocuments(request, incomingDocumentForCreation, cancellationToken);
@@ -56,7 +56,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
                 List<IncomingDocument> connectedDocuments = await _dbContext.IncomingDocuments
                     .Where(doc => request.ConnectedDocumentIds.Contains(doc.RegistrationNumber)).ToListAsync(cancellationToken: cancellationToken);
 
-                foreach (IncomingDocument doc in connectedDocuments)
+                foreach (var doc in connectedDocuments)
                 {
                     incomingDocumentForCreation.ConnectedDocuments
                         .Add(new IncomingConnectedDocument { RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });

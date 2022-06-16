@@ -17,10 +17,10 @@ namespace DigitNow.Microservice.DocumentManagement.configurations.Auth
         public static IServiceCollection AddAuthentication(this IServiceCollection services,
             IConfiguration configuration)
         {
-            IConfigurationSection section = configuration.GetSection(Authorization);
+            var section = configuration.GetSection(Authorization);
             if (!section.Exists())
                 throw new ApplicationException($"Configurations not found: {Authorization}");
-            AuthorizationOptions options = section.Get<AuthorizationOptions>();
+            var options = section.Get<AuthorizationOptions>();
 
             services.AddAuthentication(x =>
             {
@@ -46,7 +46,7 @@ namespace DigitNow.Microservice.DocumentManagement.configurations.Auth
 
         private static TokenValidationParameters CreateTokenValidationParameters(AuthorizationOptions options)
         {
-            SymmetricSecurityKey signingKey =
+            var signingKey =
                 new SymmetricSecurityKey(Encoding.Default.GetBytes(options.AccessTokenSecretKey));
             return new TokenValidationParameters
             {

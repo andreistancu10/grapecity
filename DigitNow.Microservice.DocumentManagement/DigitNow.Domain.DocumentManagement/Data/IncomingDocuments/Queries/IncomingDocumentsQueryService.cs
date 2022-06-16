@@ -21,21 +21,21 @@ namespace DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries
         }
         public async Task<IncomingConnectedDocument> GetDocsByRegistrationNumberAndYear(int registrationNumber, int year, CancellationToken cancellationToken)
         {
-            IncomingConnectedDocument incomingDoc = await CheckIncomingDocumentsByRegistrationNumber(registrationNumber, year);
+            var incomingDoc = await CheckIncomingDocumentsByRegistrationNumber(registrationNumber, year);
             
             if (incomingDoc != null)
             {
                 return incomingDoc;
             }
 
-            IncomingConnectedDocument internalDoc = await CheckInternalDocumentsByRegistrationNumber(registrationNumber, year);
+            var internalDoc = await CheckInternalDocumentsByRegistrationNumber(registrationNumber, year);
 
             return internalDoc;
         }
 
         private async Task<IncomingConnectedDocument> CheckInternalDocumentsByRegistrationNumber(int registrationNumber, int year)
         {
-            InternalDocument internalDoc = await _dbContext.InternalDocuments
+            var internalDoc = await _dbContext.InternalDocuments
                 .FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNumber && doc.RegistrationDate.Year == year);
 
             if (internalDoc != null)
@@ -48,7 +48,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries
 
         private async Task<IncomingConnectedDocument> CheckIncomingDocumentsByRegistrationNumber(int registrationNumber, int year)
         {
-            IncomingDocument incomingDoc = await _dbContext.IncomingDocuments
+            var incomingDoc = await _dbContext.IncomingDocuments
                 .FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNumber && doc.CreationDate.Year == year);
 
             if (incomingDoc != null)

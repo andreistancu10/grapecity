@@ -32,13 +32,13 @@ namespace DigitNow.Domain.DocumentManagement.configurations.HostedServices
         public async Task StartAsync(CancellationToken cancellationToken)
         {
             // check for multi tenant setting
-            IConfiguration configuration = _serviceProvider.GetRequiredService<IConfiguration>();
+            var configuration = _serviceProvider.GetRequiredService<IConfiguration>();
 
             try
             {
                 if (configuration.GetValue<bool>(MultiTenantOptions.EnableMultiTenant))
                 {
-                    TenantInfoLoader tenantInfoLoader = _serviceProvider.GetRequiredService<TenantInfoLoader>();
+                    var tenantInfoLoader = _serviceProvider.GetRequiredService<TenantInfoLoader>();
 
                     var tenants = tenantInfoLoader.GetTenants();
 

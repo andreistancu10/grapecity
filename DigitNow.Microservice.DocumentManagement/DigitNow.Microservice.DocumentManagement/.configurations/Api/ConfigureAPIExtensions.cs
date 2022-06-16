@@ -25,7 +25,7 @@ namespace DigitNow.Microservice.DocumentManagement.configurations.Api
 
             services.Configure<ApiBehaviorOptions>(cfg => cfg.SuppressModelStateInvalidFilter = true);
 
-            IMvcBuilder mvcBuilder = services.AddControllers(config => config.Filters.Add<ModelValidationFilter>());
+            var mvcBuilder = services.AddControllers(config => config.Filters.Add<ModelValidationFilter>());
             mvcBuilder.AddFluentValidation(cfg => cfg.RegisterValidatorsFromAssemblies(assemblies));
 
             return services;

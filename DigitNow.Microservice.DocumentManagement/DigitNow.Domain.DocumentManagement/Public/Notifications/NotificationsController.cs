@@ -77,7 +77,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Notifications
         [HttpGet("currentuser/filter")]
         public async Task<IActionResult> GetCurrentUserFiltered([FromQuery] FilterNotificationsRequest model, CancellationToken cancellationToken)
         {
-            IAuthenticatedUser currentUser = _identityService.AuthenticatedUser;
+            var currentUser = _identityService.AuthenticatedUser;
             model.UserId = currentUser.UserId;
 
             if (model.NotificationTypeCategoryIds != null && model.NotificationTypeCategoryIds.Count > 0 &&

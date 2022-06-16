@@ -23,7 +23,7 @@ namespace DigitNow.Microservice.DocumentManagement.configurations.Masstransit
         public static IServiceCollection AddMassTransitConfigurations(this IServiceCollection services,
             IConfiguration configuration)
         {
-            MassTransitOptions massTransitOptions =
+            var massTransitOptions =
                 configuration.GetSection(MassTransitSection).Get<MassTransitOptions>();
 
             void AddOptions(MassTransitOptions options)
