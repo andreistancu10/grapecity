@@ -14,6 +14,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.WorkflowHistories
         public string Resolution { get; set; }
         public DateTime? OpinionRequestedUntil { get; set; }
         public int Status { get; set; }
+        public int RegistrationNumber { get; set; }
         public DateTime CreationDate { get; set; }
     }
 }
