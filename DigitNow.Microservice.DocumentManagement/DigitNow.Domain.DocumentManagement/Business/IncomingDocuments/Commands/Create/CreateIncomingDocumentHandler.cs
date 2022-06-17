@@ -39,7 +39,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
                 { 
                     RecipientType   = (int)UserRole.HeadOfDepartment,
                     RecipientId     = request.RecipientId, 
-                    Status          = (int)Status.in_work_unallocated,
+                    Status          = (int)Status.inWorkUnallocated,
                     CreationDate    = DateTime.Now  
                 });
 

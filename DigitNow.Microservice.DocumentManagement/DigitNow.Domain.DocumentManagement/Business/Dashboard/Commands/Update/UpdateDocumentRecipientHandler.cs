@@ -94,7 +94,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                     RecipientType = (int)UserRole.HeadOfDepartment,
                     RecipientId = (int)_headOfDepartment.Id,
                     RecipientName = _headOfDepartment.FormatUserNameByRole(UserRole.HeadOfDepartment),
-                    Status = (int)Status.in_work_unallocated,
+                    Status = (int)Status.inWorkUnallocated,
                     CreationDate = DateTime.Now
                 });
         }
