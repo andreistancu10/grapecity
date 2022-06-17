@@ -6,4 +6,4 @@ EXPOSE 80
 FROM base AS final
 WORKDIR /dist
 COPY . .
-ENTRYPOINT ["dotnet", "Microservice.TenantNotification.dll", "host=0.0.0.0", "port=80"]
+ENTRYPOINT ["dotnet", "DigitNow.Microservice.DocumentManagement.dll", "host=0.0.0.0", "port=80"]

@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DigitNow.Domain.DocumentManagement.Data.IncomingConnectedDocuments;
+using HTSS.Platform.Core.Errors;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
 
@@ -44,7 +45,17 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
                     CreationDate    = DateTime.Now  
                 });
 
-        await _service.AssignRegNumberAndSaveDocument(incomingDocumentForCreation);
+            try
+            {
+                await _service.AssignRegNumberAndSaveDocument(incomingDocumentForCreation);
+            }
+            catch (Exception ex)
+            {
+                return ResultObject.Error(new ErrorMessage()
+                {
+                    Message = ex.InnerException.Message
+                });
+            }
 
         return ResultObject.Created(incomingDocumentForCreation.Id);
     }
