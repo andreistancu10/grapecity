@@ -48,12 +48,12 @@ public class UpdateOutgoingDocumentHandler : ICommandHandler<UpdateOutgoingDocum
 
     private void AddConnectedDocs(UpdateOutgoingDocumentCommand request, OutgoingDocument outgoingDocFromDb)
     {
-        List<int> outgoingDocIds = outgoingDocFromDb.ConnectedDocuments.Select(cd => cd.RegistrationNumber).ToList();
-        IEnumerable<int> idsToAdd = request.ConnectedDocumentIds.Except(outgoingDocIds);
+        var outgoingDocIds = outgoingDocFromDb.ConnectedDocuments.Select(cd => cd.RegistrationNumber).ToList();
+        var idsToAdd = request.ConnectedDocumentIds.Except(outgoingDocIds);
 
         if (idsToAdd.Any())
         {
-            List<OutgoingDocument> connectedDocuments = _dbContext.OutgoingDocuments
+            var connectedDocuments = _dbContext.OutgoingDocuments
                 .Where(doc => idsToAdd
                     .Contains(doc.RegistrationNumber))
                 .ToList();
@@ -68,8 +68,8 @@ public class UpdateOutgoingDocumentHandler : ICommandHandler<UpdateOutgoingDocum
 
     private void RemoveConnectedDocs(UpdateOutgoingDocumentCommand request, OutgoingDocument outgoingDocFromDb)
     {
-        List<int> outgoingDocIds = outgoingDocFromDb.ConnectedDocuments.Select(cd => cd.RegistrationNumber).ToList();
-        IEnumerable<int> idsToRemove = outgoingDocIds.Except(request.ConnectedDocumentIds);
+        var outgoingDocIds = outgoingDocFromDb.ConnectedDocuments.Select(cd => cd.RegistrationNumber).ToList();
+        var idsToRemove = outgoingDocIds.Except(request.ConnectedDocumentIds);
 
         if (idsToRemove.Any())
         {

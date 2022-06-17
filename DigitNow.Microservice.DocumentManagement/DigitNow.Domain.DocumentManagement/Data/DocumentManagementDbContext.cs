@@ -39,7 +39,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
         {
             public DocumentManagementDbContext CreateDbContext(string[] args)
             {
-                DbContextOptionsBuilder<DocumentManagementDbContext> optionsBuilder = new();
+                var optionsBuilder = new DbContextOptionsBuilder<DocumentManagementDbContext>();
 
                 optionsBuilder.UseSqlServer("Server=localhost,1433;Database=DigitNow-dev-DocumentManagement;User Id=sa;Password=admin123!;", builder =>
                 {

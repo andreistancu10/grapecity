@@ -3,7 +3,6 @@ using DigitNow.Domain.DocumentManagement.Business._Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.configurations.HostedServices;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents;
 using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries;
-using DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments.Queries;
 using Domain.Localization.Client.configurations;
 using HTSS.Platform.Core.Files.MicrosoftExtensions;
 using HTSS.Platform.Infrastructure.Api.Tools;
@@ -67,7 +66,6 @@ namespace DigitNow.Domain.DocumentManagement.configurations
         {
             services.AddScoped<IDocumentService, DocumentService>();
             services.AddScoped<IDocumentsQueryService, DocumentsQueryService>();
-            services.AddScoped<IOutgoingDocumentsQueryService, OutgoingDocumentsQueryService>();
 
             return services;
         }

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Create;
-using DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries;
 using DigitNow.Domain.DocumentManagement.Public.OutgoingDocuments.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
@@ -10,9 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
-using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Update;
-using DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
+using DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries.GetByRegistrationNumberAndYear;
 
 namespace DigitNow.Domain.DocumentManagement.Public.OutgoingDocuments;
 
@@ -45,14 +43,13 @@ public class OutgoingDocumentsController : ApiController
     [HttpGet]
     public async Task<IActionResult> GetByRegistrationNumber([FromQuery] int registrationNumber, [FromQuery] int year)
     {
-        return await _mediator.Send(new GetOutgoingByRegistrationNumberAndYearQuery { RegistrationNumber = registrationNumber, Year = year })
+        return await _mediator.Send(new GetOutgoingDocumentsByRegistrationNumberAndYearQuery { RegistrationNumber = registrationNumber, Year = year })
             switch
         {
             null => NotFound(),
             var result => Ok(result)
         };
     }
-
 
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateOutgoingDocument([FromRoute] int id, [FromBody] UpdateOutgoingDocumentRequest request, CancellationToken cancellationToken)

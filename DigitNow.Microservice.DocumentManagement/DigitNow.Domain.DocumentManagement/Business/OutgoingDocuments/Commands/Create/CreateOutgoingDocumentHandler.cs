@@ -53,8 +53,8 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
     {
         if (request.ConnectedDocumentIds.Any())
         {
-            List<OutgoingDocument> connectedDocuments = await _dbContext.OutgoingDocuments
-                .Where(doc => request.ConnectedDocumentIds.Contains(doc.RegistrationNumber)).ToListAsync(cancellationToken: cancellationToken);
+            var connectedDocuments = await _dbContext.OutgoingDocuments
+                .Where(doc => request.ConnectedDocumentIds.Contains(doc.RegistrationNumber)).ToListAsync(cancellationToken);
 
             foreach (var doc in connectedDocuments)
             {

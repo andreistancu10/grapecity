@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace DigitNow.Domain.DocumentManagement.Public.OutgoingDocuments.Validators;
 
-public class CreateOutgoingDocumentRequestValidator : AbstractValidator<CreateOutgoingDocumentRequest>
+public class UpdateOutgoingDocumentRequestValidator : AbstractValidator<UpdateOutgoingDocumentRequest>
 {
-    public CreateOutgoingDocumentRequestValidator()
+    public UpdateOutgoingDocumentRequestValidator()
     {
         RuleFor(item => item.RecipientId).NotNull().NotEmpty();
         RuleFor(item => item.RecipientName).NotNull().NotEmpty();

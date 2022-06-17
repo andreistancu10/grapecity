@@ -2,30 +2,26 @@
 using System.Collections.Generic;
 using DigitNow.Domain.DocumentManagement.Data.ContactDetails;
 using DigitNow.Domain.DocumentManagement.Data.OutgoingConnectedDocuments;
+using DigitNow.Domain.DocumentManagement.Data.WorkflowHistories;
 using HTSS.Platform.Core.Domain;
 
 namespace DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments;
 
 public class OutgoingDocument : Entity
 {
-    public DateTime? RegistrationDate { get; set; }
+    public DateTime RegistrationDate { get; set; }
     public int RegistrationNumber { get; set; }
     public string User { get; set; }
     public int RecipientTypeId { get; set; }
     public string RecipientName { get; set; }
-    public string IdentificationNumber { get; set; }
-    public int ExternalNumber { get; set; }
-    public DateTime? ExternalNumberDate { get; set; }
-    public ContactDetail ContactDetail { get; set; }
+    public long? IdentificationNumber { get; set; }
+   public ContactDetail ContactDetail { get; set; }
     public string ContentSummary { get; set; }
     public int NumberOfPages { get; set; }
     public int RecipientId { get; set; }
     public int DocumentTypeId { get; set; }
-    public string Detail { get; set; }
-    public double ResolutionPeriod { get; set; }
-    public bool IsUrgent { get; set; }
-    public bool IsGDPRAgreed { get; set; }
+    public int Detail { get; set; }
     public DateTime CreationDate { get; set; }
-    public List<WorkflowHistories.WorkflowHistory> WorkflowHistory { get; set; } = new();
+    public List<WorkflowHistory> WorkflowHistory { get; set; } = new();
     public List<OutgoingConnectedDocument> ConnectedDocuments { get; set; } = new();
 }
