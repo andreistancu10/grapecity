@@ -13,7 +13,7 @@ public class UpdateOutgoingDocumentRequest
     public int NumberOfPages { get; set; }
     public int RecipientId { get; set; }
     public int DocumentTypeId { get; set; }
-    public string Detail { get; set; }
+    public string DocumentTypeDetail { get; set; }
     public UpdateContactDetailsRequest ContactDetail { get; set; }
     public List<int> ConnectedDocumentIds { get; set; }
 }

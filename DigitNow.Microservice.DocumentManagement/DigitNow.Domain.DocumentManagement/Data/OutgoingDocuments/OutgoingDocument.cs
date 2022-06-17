@@ -20,7 +20,7 @@ public class OutgoingDocument : Entity
     public int NumberOfPages { get; set; }
     public int RecipientId { get; set; }
     public int DocumentTypeId { get; set; }
-    public int Detail { get; set; }
+    public string DocumentTypeDetail { get; set; }
     public DateTime CreationDate { get; set; }
     public List<WorkflowHistory> WorkflowHistory { get; set; } = new();
     public List<OutgoingConnectedDocument> ConnectedDocuments { get; set; } = new();

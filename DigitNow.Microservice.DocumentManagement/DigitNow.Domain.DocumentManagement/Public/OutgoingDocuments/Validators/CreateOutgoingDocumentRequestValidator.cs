@@ -17,7 +17,7 @@ public class CreateOutgoingDocumentRequestValidator : AbstractValidator<CreateOu
         RuleFor(item => item.ContactDetail.CityId).NotNull().NotEmpty();
         RuleFor(item => item.ContentSummary).NotNull().NotEmpty();
         RuleFor(item => item.DocumentTypeId).NotNull().NotEmpty();
-        RuleFor(item => item.Detail).NotNull().NotEmpty().When(item => item.DocumentTypeId == 10);
+        RuleFor(item => item.DocumentTypeDetail).NotNull().NotEmpty().When(item => item.DocumentTypeId == 10);
         RuleFor(item => item.NumberOfPages).NotNull().NotEmpty();
         RuleFor(item => item.User).NotNull().NotEmpty();
     }
