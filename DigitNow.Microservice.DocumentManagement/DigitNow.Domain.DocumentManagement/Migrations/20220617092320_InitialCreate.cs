@@ -114,7 +114,39 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ConnectedDocument",
+                name: "OutgoingDocuments",
+                schema: "DocumentMangement",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RegistrationNumber = table.Column<int>(type: "int", nullable: false),
+                    User = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RecipientTypeId = table.Column<int>(type: "int", nullable: false),
+                    RecipientName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IdentificationNumber = table.Column<long>(type: "bigint", nullable: true),
+                    ContactDetailId = table.Column<int>(type: "int", nullable: true),
+                    ContentSummary = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    NumberOfPages = table.Column<int>(type: "int", nullable: false),
+                    RecipientId = table.Column<int>(type: "int", nullable: false),
+                    DocumentTypeId = table.Column<int>(type: "int", nullable: false),
+                    DocumentTypeDetail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OutgoingDocuments", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OutgoingDocuments_ContactDetail_ContactDetailId",
+                        column: x => x.ContactDetailId,
+                        principalSchema: "DocumentMangement",
+                        principalTable: "ContactDetail",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "IncomingConnectedDocument",
                 schema: "DocumentMangement",
                 columns: table => new
                 {
@@ -127,12 +159,35 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ConnectedDocument", x => x.Id);
+                    table.PrimaryKey("PK_IncomingConnectedDocument", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ConnectedDocument_IncomingDocument_IncomingDocumentId",
+                        name: "FK_IncomingConnectedDocument_IncomingDocument_IncomingDocumentId",
                         column: x => x.IncomingDocumentId,
                         principalSchema: "DocumentMangement",
                         principalTable: "IncomingDocument",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OutgoingConnectedDocument",
+                schema: "DocumentMangement",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ChildOutgoingDocumentId = table.Column<long>(type: "bigint", nullable: false),
+                    RegistrationNumber = table.Column<int>(type: "int", nullable: false),
+                    DocumentType = table.Column<int>(type: "int", nullable: false),
+                    OutgoingDocumentId = table.Column<long>(type: "bigint", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OutgoingConnectedDocument", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OutgoingConnectedDocument_OutgoingDocuments_OutgoingDocumentId",
+                        column: x => x.OutgoingDocumentId,
+                        principalSchema: "DocumentMangement",
+                        principalTable: "OutgoingDocuments",
                         principalColumn: "Id");
                 });
 
@@ -152,8 +207,10 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     Resolution = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     OpinionRequestedUntil = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Status = table.Column<int>(type: "int", nullable: false),
+                    RegistrationNumber = table.Column<int>(type: "int", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IncomingDocumentId = table.Column<int>(type: "int", nullable: true)
+                    IncomingDocumentId = table.Column<int>(type: "int", nullable: true),
+                    OutgoingDocumentId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -164,12 +221,18 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         principalSchema: "DocumentMangement",
                         principalTable: "IncomingDocument",
                         principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_WorkflowHistory_OutgoingDocuments_OutgoingDocumentId",
+                        column: x => x.OutgoingDocumentId,
+                        principalSchema: "DocumentMangement",
+                        principalTable: "OutgoingDocuments",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ConnectedDocument_IncomingDocumentId",
+                name: "IX_IncomingConnectedDocument_IncomingDocumentId",
                 schema: "DocumentMangement",
-                table: "ConnectedDocument",
+                table: "IncomingConnectedDocument",
                 column: "IncomingDocumentId");
 
             migrationBuilder.CreateIndex(
@@ -179,20 +242,42 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 column: "ContactDetailId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_OutgoingConnectedDocument_OutgoingDocumentId",
+                schema: "DocumentMangement",
+                table: "OutgoingConnectedDocument",
+                column: "OutgoingDocumentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OutgoingDocuments_ContactDetailId",
+                schema: "DocumentMangement",
+                table: "OutgoingDocuments",
+                column: "ContactDetailId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_WorkflowHistory_IncomingDocumentId",
                 schema: "DocumentMangement",
                 table: "WorkflowHistory",
                 column: "IncomingDocumentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkflowHistory_OutgoingDocumentId",
+                schema: "DocumentMangement",
+                table: "WorkflowHistory",
+                column: "OutgoingDocumentId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ConnectedDocument",
+                name: "IncomingConnectedDocument",
                 schema: "DocumentMangement");
 
             migrationBuilder.DropTable(
                 name: "InternalDocument",
+                schema: "DocumentMangement");
+
+            migrationBuilder.DropTable(
+                name: "OutgoingConnectedDocument",
                 schema: "DocumentMangement");
 
             migrationBuilder.DropTable(
@@ -205,6 +290,10 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             migrationBuilder.DropTable(
                 name: "IncomingDocument",
+                schema: "DocumentMangement");
+
+            migrationBuilder.DropTable(
+                name: "OutgoingDocuments",
                 schema: "DocumentMangement");
 
             migrationBuilder.DropTable(

@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.InternalDocument.Commands.Create;
+using DigitNow.Domain.DocumentManagement.Business.InternalDocuments.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Public.InternalDocuments.Models;
 
 namespace DigitNow.Domain.DocumentManagement.Public.InternalDocuments.Mappings;

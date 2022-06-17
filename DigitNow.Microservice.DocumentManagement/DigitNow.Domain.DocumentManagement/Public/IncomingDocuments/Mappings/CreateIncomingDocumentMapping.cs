@@ -2,14 +2,13 @@
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
 
-namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Mappings
+namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Mappings;
+
+public class CreateIncomingDocumentMapping : Profile
 {
-    public class CreateIncomingDocumentMapping : Profile
+    public CreateIncomingDocumentMapping()
     {
-        public CreateIncomingDocumentMapping()
-        {
-            CreateMap<CreateIncomingDocumentRequest, CreateIncomingDocumentCommand>();
-            CreateMap<CreateContactDetailsRequest, CreateContactDetailCommand>();
-        }
+        CreateMap<CreateIncomingDocumentRequest, CreateIncomingDocumentCommand>();
+        CreateMap<CreateContactDetailsRequest, CreateContactDetailCommand>();
     }
 }

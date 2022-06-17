@@ -1,17 +1,16 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DigitNow.Domain.DocumentManagement.Data.RegistrationNumberCounter.Configurations
+namespace DigitNow.Domain.DocumentManagement.Data.RegistrationNumberCounter.Configurations;
+
+public class RegistrationNumberCounterConfiguration
 {
-    public class RegistrationNumberCounterConfiguration
+    public void Configure(EntityTypeBuilder<RegistrationNumberCounter> builder)
     {
-        public void Configure(EntityTypeBuilder<RegistrationNoCounter.RegistrationNumberCounter> builder)
-        {
-            builder.ToTable(nameof(RegistrationNumberCounter), DocumentManagementDbContext.Schema);
+        builder.ToTable(nameof(RegistrationNumberCounter), DocumentManagementDbContext.Schema);
 
-            builder.HasKey(p => p.Id);
+        builder.HasKey(p => p.Id);
 
-            builder.HasData(Seed.Data.GetRegistrationNumberInitialValue());
-        }
+        builder.HasData(Seed.Data.GetRegistrationNumberInitialValue());
     }
 }

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace DigitNow.Domain.DocumentManagement.Public.InternalDocuments.Models;
+﻿namespace DigitNow.Domain.DocumentManagement.Public.InternalDocuments.Models;
 
 public record CreateInternalDocumentRequest(
     int DepartmentId,

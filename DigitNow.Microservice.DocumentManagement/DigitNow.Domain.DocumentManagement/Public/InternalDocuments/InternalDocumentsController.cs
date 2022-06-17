@@ -1,8 +1,8 @@
 ﻿using System.Security.Claims;
 using System.Threading.Tasks;
 using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.InternalDocument.Commands.Create;
-using DigitNow.Domain.DocumentManagement.Business.InternalDocument.Queries.GetByRegistrationNumber;
+using DigitNow.Domain.DocumentManagement.Business.InternalDocuments.Commands.Create;
+using DigitNow.Domain.DocumentManagement.Business.InternalDocuments.Queries.GetByRegistrationNumber;
 using DigitNow.Domain.DocumentManagement.Public.InternalDocuments.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
