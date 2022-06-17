@@ -33,10 +33,12 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
     {
         var incomingDocumentForCreation = _mapper.Map<IncomingDocument>(request);
         incomingDocumentForCreation.CreationDate = DateTime.Now;
+        try
+        {
+            await AttachConnectedDocuments(request, incomingDocumentForCreation, cancellationToken);
+            await _service.AssignRegNumberAndSaveDocument(incomingDocumentForCreation);
 
-        await AttachConnectedDocuments(request, incomingDocumentForCreation, cancellationToken);
-
-        incomingDocumentForCreation.WorkflowHistory.Add(
+            incomingDocumentForCreation.WorkflowHistory.Add(
             new WorkflowHistory()
             {
                 RecipientType = (int)UserRole.HeadOfDepartment,
@@ -45,10 +47,6 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
                 CreationDate = DateTime.Now,
                 RegistrationNumber = incomingDocumentForCreation.RegistrationNumber
             });
-
-        try
-        {
-            await _service.AssignRegNumberAndSaveDocument(incomingDocumentForCreation);
         }
         catch (Exception ex)
         {
@@ -65,7 +63,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
     {
         if (request.ConnectedDocumentIds.Any())
         {
-            List<IncomingDocument> connectedDocuments = await _dbContext.IncomingDocuments
+            var connectedDocuments = await _dbContext.IncomingDocuments
                 .Where(doc => request.ConnectedDocumentIds.Contains(doc.RegistrationNumber)).ToListAsync(cancellationToken: cancellationToken);
 
             foreach (var doc in connectedDocuments)

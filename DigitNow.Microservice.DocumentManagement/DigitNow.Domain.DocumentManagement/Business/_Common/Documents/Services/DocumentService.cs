@@ -15,6 +15,7 @@ namespace DigitNow.Domain.DocumentManagement.Business._Common.Documents.Services
         {
             _dbContext = dbContext;
         }
+
         public async Task AssignRegNumberAndSaveDocument<T>(T document) where T : class
         {
             await using var dbContextTransaction = await _dbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
