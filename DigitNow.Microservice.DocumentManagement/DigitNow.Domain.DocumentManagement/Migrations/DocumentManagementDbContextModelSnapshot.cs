@@ -263,26 +263,14 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Detail")
+                    b.Property<string>("DocumentTypeDetail")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DocumentTypeId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ExternalNumber")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("ExternalNumberDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("IdentificationNumber")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsGDPRAgreed")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsUrgent")
-                        .HasColumnType("bit");
+                    b.Property<long?>("IdentificationNumber")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("NumberOfPages")
                         .HasColumnType("int");
@@ -296,14 +284,11 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<int>("RecipientTypeId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("RegistrationDate")
+                    b.Property<DateTime>("RegistrationDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("RegistrationNumber")
                         .HasColumnType("int");
-
-                    b.Property<double>("ResolutionPeriod")
-                        .HasColumnType("float");
 
                     b.Property<string>("User")
                         .HasColumnType("nvarchar(max)");
@@ -367,6 +352,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("RecipientType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RegistrationNumber")
                         .HasColumnType("int");
 
                     b.Property<string>("Remarks")
