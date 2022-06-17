@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update;
+using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateUserRecipient;
 using DigitNow.Domain.DocumentManagement.Public.Dashboard.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
@@ -29,6 +30,13 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard
             var updateDepartmentForDocumentCommand = _mapper.Map<UpdateDocumentRecipientCommand>(request);
 
             return CreateResponse(await _mediator.Send(updateDepartmentForDocumentCommand, cancellationToken));
+        }
+
+        [HttpPut("update-user-recipient")]
+        public async Task<IActionResult> UpdateDocumentRecipientByUserId([FromBody] UpdateDocumentUserRecipientRequest request, CancellationToken cancellationToken)
+        {
+            var updateUserRecipientForDocumentCommand = _mapper.Map<UpdateDocumentUserRecipientCommand>(request);
+            return CreateResponse(await _mediator.Send(updateUserRecipientForDocumentCommand, cancellationToken));
         }
     }
 }

@@ -14,33 +14,32 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
+namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateUserRecipient
 {
-    public class UpdateDocumentRecipientHandler : ICommandHandler<UpdateDocumentRecipientCommand, ResultObject>
+    public class UpdateDocumentUserRecipientHandler: ICommandHandler<UpdateDocumentUserRecipientCommand, ResultObject>
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IIdentityAdapterClient _identityAdapterClient;
-        private User _headOfDepartment;
+        private User _user;
 
-        public UpdateDocumentRecipientHandler(DocumentManagementDbContext dbContext, IIdentityAdapterClient identityAdapterClient)
+        public UpdateDocumentUserRecipientHandler(DocumentManagementDbContext dbContext, IIdentityAdapterClient identityAdapterClient)
         {
             _dbContext = dbContext;
             _identityAdapterClient = identityAdapterClient;
         }
-        public async Task<ResultObject> Handle(UpdateDocumentRecipientCommand request, CancellationToken cancellationToken)
+        public async Task<ResultObject> Handle(UpdateDocumentUserRecipientCommand request, CancellationToken cancellationToken)
         {
-            var users = await _identityAdapterClient.GetUsersByDepartmentIdAsync(request.DepartmentId);
-            _headOfDepartment = users.Users.FirstOrDefault(x => x.Roles.Contains((long)UserRole.HeadOfDepartment));
+            _user = await _identityAdapterClient.GetUserByIdAsync(request.UserId);
 
-            if (_headOfDepartment == null)
+            if (_user == null)
                 return ResultObject.Error(new ErrorMessage
                 {
-                    Message = $"No responsible for department with id {request.DepartmentId} was found.",
-                    TranslationCode = "catalog.headOfdepartment.backend.update.validation.entityNotFound",
-                    Parameters = new object[] { request.DepartmentId }
+                    Message = $"No responsible with id {request.UserId} was found.",
+                    TranslationCode = "catalog.user.backend.update.validation.entityNotFound",
+                    Parameters = new object[] { request.UserId }
                 });
 
-            var incomingDocIds  =  request.DocumentInfo
+            var incomingDocIds = request.DocumentInfo
                                           .Where(doc => doc.DocType == (int)DocumentType.Incoming)
                                           .Select(doc => doc.RegistrationNumber)
                                           .ToList();
@@ -69,7 +68,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                 var internalDoc = await _dbContext.InternalDocuments.FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
 
                 if (internalDoc != null)
-                    internalDoc.ReceiverDepartmentId = (int)_headOfDepartment.Id;
+                    internalDoc.ReceiverDepartmentId = (int)_user.Id;     
             }
         }
 
@@ -80,7 +79,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                 var doc = await _dbContext.IncomingDocuments.FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
                 if (doc != null)
                 {
-                    doc.RecipientId = (int)_headOfDepartment.Id;
+                    doc.RecipientId = (int)_user.Id;
                     CreateWorkflowRecord(doc);
                 }
             }
@@ -88,13 +87,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
 
         private void CreateWorkflowRecord(IncomingDocument doc)
         {
+            var isHeadOfDepartment = _user.Roles.Contains((long)UserRole.HeadOfDepartment);
+
             doc.WorkflowHistory.Add(
                 new WorkflowHistory()
                 {
-                    RecipientType = (int)UserRole.HeadOfDepartment,
-                    RecipientId = (int)_headOfDepartment.Id,
-                    RecipientName = _headOfDepartment.FormatUserNameByRole(UserRole.HeadOfDepartment),
-                    Status = (int)Status.inWorkUnallocated,
+                    RecipientType = isHeadOfDepartment ? (int)UserRole.HeadOfDepartment : (int)UserRole.Functionary,
+                    RecipientId = (int)_user.Id,
+                    RecipientName =_user.FormatUserNameByRole( isHeadOfDepartment ? UserRole.HeadOfDepartment : UserRole.Functionary),
+                    Status = isHeadOfDepartment ? (int)Status.inWorkDelegatedUnallocated : (int)Status.inWorkDelegated,
                     CreationDate = DateTime.Now
                 });
         }

@@ -1,16 +1,19 @@
 ﻿
-namespace DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-
-public enum Status
+namespace DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums
 {
-    in_work_unallocated = 1,
-    new_declined_competence = 2,
-    in_work_allocated = 3,
-    opinion_requested_unallocated = 4,
-    opinition_requested_allocated = 5,
-    in_work_approval_requested = 6,
-    in_work_declined = 7,
-    in_work_approved = 8,
-    in_work_countersignature = 9,
-    finalized = 10
+    public enum Status
+    {
+        inWorkUnallocated = 1,
+        newDeclinedCompetence = 2,
+        inWorkAllocated = 3,
+        opinionRequestedUnallocated = 4,
+        opinitionRequestedAllocated = 5,
+        inWorkApprovalRequested = 6,
+        inWorkDeclined = 7,
+        inWorkApproved = 8,
+        inWorkCountersignature = 9,
+        finalized = 10,
+        inWorkDelegated = 11,
+        inWorkDelegatedUnallocated = 12
+    }
 }
