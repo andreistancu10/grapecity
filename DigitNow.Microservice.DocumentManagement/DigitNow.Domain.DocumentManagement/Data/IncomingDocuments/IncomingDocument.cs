@@ -27,6 +27,6 @@ public class IncomingDocument
     public bool? IsUrgent { get; set; }
     public bool? IsGDPRAgreed { get; set; }
     public DateTime CreationDate { get; set; }
-    public List<WorkflowHistories.WorkflowHistory> WorkflowHistory { get; set; } = new();
+    public List<Data.WorkflowHistories.WorkflowHistory> WorkflowHistory { get; set; } = new();
     public List<IncomingConnectedDocument> ConnectedDocuments { get; set; } = new();
 }

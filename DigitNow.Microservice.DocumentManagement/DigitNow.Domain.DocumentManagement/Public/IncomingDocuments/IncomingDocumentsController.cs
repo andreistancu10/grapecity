@@ -45,10 +45,10 @@ public class IncomingDocumentsController : ApiController
     {
         return await _mediator.Send(new GetDocsByRegistrationNumberQuery { RegistrationNumber = registrationNumber, Year = year })
             switch
-            {
-                null => NotFound(),
-                var result => Ok(result)
-            };
+        {
+            null => NotFound(),
+            var result => Ok(result)
+        };
     }
 
     [HttpPut("{id}")]
@@ -57,17 +57,14 @@ public class IncomingDocumentsController : ApiController
         var updateIncomingDocumentCommand = _mapper.Map<UpdateIncomingDocumentCommand>(request);
         updateIncomingDocumentCommand.Id = id;
 
-            return CreateResponse(await _mediator.Send(updateIncomingDocumentCommand, cancellationToken));
-        }
+        return CreateResponse(await _mediator.Send(updateIncomingDocumentCommand, cancellationToken));
+    }
 
-        [HttpPost("{id}/submit-workflow")]
-        public async Task<IActionResult> SubmitWorkflowDecision([FromRoute] int id, [FromBody] CreateWorkflowDecisionRequest request)
-        {
-            var command = _mapper.Map<CreateWorkflowDecisionCommand>(request);
-            command.InitiatorName = GetUserId() ?? "";
-            command.DocumentId = id;
+    [HttpPost("{id}/submit-workflow")]
+    public async Task<IActionResult> SubmitWorkflowDecision([FromRoute] int id, [FromBody] CreateWorkflowDecisionRequest request)
+    {
+        var command = _mapper.Map<CreateWorkflowDecisionCommand>(request);
 
-            return CreateResponse(await _mediator.Send(command));
-        }
+        return CreateResponse(await _mediator.Send(command));
     }
 }

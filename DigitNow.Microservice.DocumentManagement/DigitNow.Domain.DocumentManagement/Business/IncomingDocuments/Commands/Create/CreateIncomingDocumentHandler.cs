@@ -39,7 +39,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             await _service.AssignRegNumberAndSaveDocument(incomingDocumentForCreation);
 
             incomingDocumentForCreation.WorkflowHistory.Add(
-            new WorkflowHistory()
+            new Data.WorkflowHistories.WorkflowHistory()
             {
                 RecipientType = (int)UserRole.HeadOfDepartment,
                 RecipientId = request.RecipientId,

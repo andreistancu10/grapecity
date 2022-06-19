@@ -89,7 +89,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
         private void CreateWorkflowRecord(IncomingDocument doc)
         {
             doc.WorkflowHistory.Add(
-                new WorkflowHistory()
+                new Data.WorkflowHistories.WorkflowHistory()
                 {
                     RecipientType = (int)UserRole.HeadOfDepartment,
                     RecipientId = (int)_headOfDepartment.Id,
