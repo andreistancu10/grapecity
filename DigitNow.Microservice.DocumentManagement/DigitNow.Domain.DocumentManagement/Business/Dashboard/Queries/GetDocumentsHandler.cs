@@ -1,0 +1,102 @@
+﻿using System;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using AutoMapper;
+using DigitNow.Adapters.MS.Identity;
+using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+using DigitNow.Domain.DocumentManagement.Data;
+using HTSS.Platform.Core.CQRS;
+using HTSS.Platform.Core.Errors;
+using Microsoft.EntityFrameworkCore;
+
+namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
+
+public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultObject>
+{
+    private readonly DocumentManagementDbContext _dbContext;
+    private readonly IIdentityAdapterClient _identityAdapterClient;
+    private readonly IMapper _mapper;
+
+    public GetDocumentsHandler(DocumentManagementDbContext dbContext, IIdentityAdapterClient identityAdapterClient, IMapper mapper)
+    {
+        _dbContext = dbContext;
+        _identityAdapterClient = identityAdapterClient;
+        _mapper = mapper;
+    }
+
+    public async Task<ResultObject> Handle(GetDocumentsQuery request, CancellationToken cancellationToken)
+    {
+        var previousYear = DateTime.UtcNow.Year - 1;
+        var user = await _identityAdapterClient.GetUserByIdAsync(request.UserId);
+        UserRole? userRole = null;
+
+        if (user.Roles.Contains((long)UserRole.Mayor))
+        {
+            userRole = UserRole.Mayor;
+        }
+        else if (user.Roles.Contains((long)UserRole.HeadOfDepartment))
+        {
+            userRole = UserRole.Mayor;
+        }
+        else if (user.Roles.Contains((long)UserRole.Functionary))
+        {
+            userRole = UserRole.Mayor;
+        }
+
+        if (userRole is null)
+        {
+            ResultObject.Error(new ErrorMessage
+            {
+                Message = $"Could not determine Role of user {request.UserId}.",
+                Parameters = new[] { nameof(request.UserId) },
+                TranslationCode = "document-management.backend.get.validation.userRoleInvalid"
+            });
+        }
+
+        var departmentId = user.Departments.FirstOrDefault();
+        var documentsQuery = userRole switch
+        {
+            UserRole.Functionary => GetDocumentsAsFunctionary(request.UserId, previousYear),
+            UserRole.HeadOfDepartment => await GetDocumentsAsHeadOfDepartmentAsync((int)departmentId, previousYear),
+            UserRole.Mayor => GetAllDocuments(previousYear)
+        };
+
+        var documents = await documentsQuery.ToListAsync(cancellationToken);
+
+        return ResultObject.Ok(documents);
+    }
+
+    private IQueryable<GetDocumentResponse> GetAllDocuments(int previousYear)
+    {
+        var outgoingDocumentsQuery = _dbContext.OutgoingDocuments
+            .Where(c => c.RegistrationDate.Year >= previousYear)
+            .Select(c => _mapper.Map<GetDocumentResponse>(c))
+            .OrderBy(c => c.RegistrationNumber);
+
+        var incomingDocumentsQuery = _dbContext.OutgoingDocuments
+            .Where(c => c.RegistrationDate.Year >= previousYear)
+            .Select(c => _mapper.Map<GetDocumentResponse>(c))
+            .OrderBy(c => c.RegistrationNumber);
+
+        var internalDocumentsQuery = _dbContext.OutgoingDocuments
+            .Where(c => c.RegistrationDate.Year >= previousYear)
+            .Select(c => _mapper.Map<GetDocumentResponse>(c))
+            .OrderBy(c => c.RegistrationNumber);
+
+        return outgoingDocumentsQuery.Union(incomingDocumentsQuery).Union(internalDocumentsQuery);
+    }
+
+    private async Task<IQueryable<GetDocumentResponse>> GetDocumentsAsHeadOfDepartmentAsync(int departmentId, int previousYear)
+    {
+        var users = await _identityAdapterClient.GetUsersByDepartmentIdAsync(departmentId);
+        var userIds = users.Users.Select(c => c.Id.ToString());
+
+        return GetAllDocuments(previousYear).Where(c => userIds.Contains(c.User)); //TODO Is property user of Documents string or int?
+    }
+
+    private IQueryable<GetDocumentResponse> GetDocumentsAsFunctionary(int userId, int previousYear)
+    {
+        return GetAllDocuments(previousYear).Where(c => c.User == userId.ToString()); //TODO Is property user of Documents string or int?
+    }
+}

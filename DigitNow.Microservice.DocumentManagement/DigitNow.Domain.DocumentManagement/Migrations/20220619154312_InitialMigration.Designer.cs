@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    [Migration("20220617092320_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20220619154312_InitialMigration")]
+    partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -273,6 +273,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.Property<long?>("IdentificationNumber")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("IssuerName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("NumberOfPages")
                         .HasColumnType("int");

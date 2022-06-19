@@ -19,6 +19,7 @@ public class OutgoingDocument : Entity
     public string ContentSummary { get; set; }
     public int NumberOfPages { get; set; }
     public int RecipientId { get; set; }
+    public string IssuerName { get; set; }
     public int DocumentTypeId { get; set; }
     public string DocumentTypeDetail { get; set; }
     public DateTime CreationDate { get; set; }
