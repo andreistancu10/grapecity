@@ -20,6 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\DigitNow.Domain.DocumentManagement.Contracts\DigitNow.Domain.DocumentManagement.Contracts.csproj" />
 		<ProjectReference Include="..\DigitNow.Domain.DocumentManagement\DigitNow.Domain.DocumentManagement.csproj" />
 	</ItemGroup>
 

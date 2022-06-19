@@ -5,35 +5,34 @@ using MassTransit;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace DigitNow.Microservice.DocumentManagement.configurations.HostedServices
+namespace DigitNow.Microservice.DocumentManagement.configurations.HostedServices;
+
+public class ConfigureApiBusHostedService : IHostedService
 {
-    public class ConfigureApiBusHostedService : IHostedService
+    private readonly IBusControl _busControl;
+    private readonly ILogger<ConfigureApiBusHostedService> _logger;
+
+    public ConfigureApiBusHostedService(ILogger<ConfigureApiBusHostedService> logger, IBusControl busControl)
     {
-        private readonly IBusControl _busControl;
-        private readonly ILogger<ConfigureApiBusHostedService> _logger;
+        _logger = logger;
+        _busControl = busControl;
+    }
 
-        public ConfigureApiBusHostedService(ILogger<ConfigureApiBusHostedService> logger, IBusControl busControl)
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        try
         {
-            _logger = logger;
-            _busControl = busControl;
+            await _busControl.StartAsync(cancellationToken);
         }
+        catch (Exception e)
+        {
+            _logger.LogError(e, e.Message);
+            throw;
+        }
+    }
 
-        public async Task StartAsync(CancellationToken cancellationToken)
-        {
-            try
-            {
-                await _busControl.StartAsync(cancellationToken);
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, e.Message);
-                throw;
-            }
-        }
-
-        public async Task StopAsync(CancellationToken cancellationToken)
-        {
-            await _busControl.StopAsync(cancellationToken);
-        }
+    public async Task StopAsync(CancellationToken cancellationToken)
+    {
+        await _busControl.StopAsync(cancellationToken);
     }
 }

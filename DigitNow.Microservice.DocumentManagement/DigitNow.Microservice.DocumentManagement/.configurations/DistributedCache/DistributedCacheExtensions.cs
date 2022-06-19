@@ -8,47 +8,46 @@ using Microsoft.Extensions.Caching.StackExchangeRedis;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DigitNow.Microservice.DocumentManagement.configurations.DistributedCache
+namespace DigitNow.Microservice.DocumentManagement.configurations.DistributedCache;
+
+public static class DistributedCacheExtensions
 {
-    public static class DistributedCacheExtensions
+    private const string DistributedCache = "DistributedCache";
+
+    public static IServiceCollection AddDistributedCacheConfigurations(this IServiceCollection services,
+        IConfiguration configuration)
     {
-        private const string DistributedCache = "DistributedCache";
+        var options = configuration.GetSection(DistributedCache).Get<DistributedCacheOptions>();
 
-        public static IServiceCollection AddDistributedCacheConfigurations(this IServiceCollection services,
-            IConfiguration configuration)
+        void SetupRedis(RedisCacheOptions cacheOptions)
         {
-            DistributedCacheOptions options = configuration.GetSection(DistributedCache).Get<DistributedCacheOptions>();
-
-            void SetupRedis(RedisCacheOptions cacheOptions)
-            {
-                cacheOptions.Configuration = options.Configuration;
-                cacheOptions.InstanceName = options.InstanceName;
-            }
-
-            void SetupInMemory(MemoryDistributedCacheOptions cacheOptions)
-            {
-            }
-
-            void SetupCosmos(CosmosCacheOptions cacheOptions)
-            {
-                cacheOptions.CreateIfNotExists = true;
-                cacheOptions.ContainerName = options.ContainerName;
-                cacheOptions.DatabaseName = options.DatabaseName;
-                cacheOptions.ClientBuilder = new CosmosClientBuilder(options.Configuration);
-            }
-
-            bool multiTenantEnabled = configuration.GetValue<bool>(MultiTenantOptions.EnableMultiTenant);
-
-            if (multiTenantEnabled)
-            {
-                services.AddMultiTenantDistributedCache(options.Provider, SetupRedis, SetupInMemory, SetupCosmos);
-            }
-            else
-            {
-                services.AddDistributedCache(options.Provider, SetupRedis, SetupInMemory, SetupCosmos);
-            }
-
-            return services;
+            cacheOptions.Configuration = options.Configuration;
+            cacheOptions.InstanceName = options.InstanceName;
         }
+
+        void SetupInMemory(MemoryDistributedCacheOptions cacheOptions)
+        {
+        }
+
+        void SetupCosmos(CosmosCacheOptions cacheOptions)
+        {
+            cacheOptions.CreateIfNotExists = true;
+            cacheOptions.ContainerName = options.ContainerName;
+            cacheOptions.DatabaseName = options.DatabaseName;
+            cacheOptions.ClientBuilder = new CosmosClientBuilder(options.Configuration);
+        }
+
+        bool multiTenantEnabled = configuration.GetValue<bool>(MultiTenantOptions.EnableMultiTenant);
+
+        if (multiTenantEnabled)
+        {
+            services.AddMultiTenantDistributedCache(options.Provider, SetupRedis, SetupInMemory, SetupCosmos);
+        }
+        else
+        {
+            services.AddDistributedCache(options.Provider, SetupRedis, SetupInMemory, SetupCosmos);
+        }
+
+        return services;
     }
 }

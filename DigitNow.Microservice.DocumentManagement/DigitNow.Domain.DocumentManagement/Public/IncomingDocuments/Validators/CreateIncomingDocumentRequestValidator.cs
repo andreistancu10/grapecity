@@ -1,24 +1,23 @@
 ﻿using DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
 using FluentValidation;
 
-namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Validators
+namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Validators;
+
+public class CreateIncomingDocumentRequestValidator : AbstractValidator<CreateIncomingDocumentRequest>
 {
-    public class CreateIncomingDocumentRequestValidator : AbstractValidator<CreateIncomingDocumentRequest>
+    public CreateIncomingDocumentRequestValidator()
     {
-        public CreateIncomingDocumentRequestValidator()
-        {
-            RuleFor(item => item.InputChannelId).NotNull().NotEmpty();
-            RuleFor(item => item.IssuerTypeId).NotNull().NotEmpty();
-            RuleFor(item => item.IssuerName).NotNull().NotEmpty();
-            RuleFor(item => item.ExternalNumber).NotNull().NotEmpty();
-            RuleFor(item => item.ContentSummary).NotNull().NotEmpty();
-            RuleFor(item => item.NumberOfPages).NotNull().NotEmpty();
-            RuleFor(item => item.RecipientId).NotNull().NotEmpty();
-            RuleFor(item => item.DocumentTypeId).NotNull().NotEmpty();
-            RuleFor(item => item.ResolutionPeriod).NotNull().NotEmpty();
-            RuleFor(item => item.ContactDetail.CountryId).NotNull().NotEmpty();
-            RuleFor(item => item.ContactDetail.CountyId).NotNull().NotEmpty();
-            RuleFor(item => item.ContactDetail.CityId).NotNull().NotEmpty();
-        }
+        RuleFor(item => item.InputChannelId).NotNull().NotEmpty();
+        RuleFor(item => item.IssuerTypeId).NotNull().NotEmpty();
+        RuleFor(item => item.IssuerName).NotNull().NotEmpty();
+        RuleFor(item => item.ExternalNumber).NotNull().NotEmpty();
+        RuleFor(item => item.ContentSummary).NotNull().NotEmpty();
+        RuleFor(item => item.NumberOfPages).NotNull().NotEmpty();
+        RuleFor(item => item.RecipientId).NotNull().NotEmpty();
+        RuleFor(item => item.DocumentTypeId).NotNull().NotEmpty();
+        RuleFor(item => item.ResolutionPeriod).NotNull().NotEmpty();
+        RuleFor(item => item.ContactDetail.CountryId).NotNull().NotEmpty();
+        RuleFor(item => item.ContactDetail.CountyId).NotNull().NotEmpty();
+        RuleFor(item => item.ContactDetail.CityId).NotNull().NotEmpty();
     }
 }
