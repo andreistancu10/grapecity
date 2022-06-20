@@ -1,5 +1,4 @@
-﻿
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Models
+﻿namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Models
 {
     using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
     using DigitNow.Domain.DocumentManagement.Contracts.WorkflowHistory;
@@ -12,17 +11,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Models
     {
         private readonly IDocumentsQueryService _documentService;
         private IncomingDocument _incomingDocument;
-        public enum ActionType { Decline, AskForOpinion, Finalize, SendForApproval, SendOpinion };
-        public int ActionId { get; set; } = 1;
+        private enum ActionType { Decline, AskForOpinion, Finalize, SendForApproval, SendOpinion };
 
-        public Functionary(IDocumentsQueryService documentService)
+        public Functionary(IDocumentsQueryService documentQueryService)
         {
-            _documentService = documentService;
+            _documentService = documentQueryService;
         }
 
         public async Task<ICreateWorkflowHistoryCommand> UpdateStatusBasedOnWorkflowDecision(ICreateWorkflowHistoryCommand command)
         {
             _incomingDocument = await _documentService.GetIncomingDocumentByRegistrationNumber(command.RegistrationNumber);
+
+            
 
             var actionType = (ActionType)command.ActionType;
 

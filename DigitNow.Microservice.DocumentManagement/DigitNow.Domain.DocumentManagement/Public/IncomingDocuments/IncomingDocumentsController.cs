@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments;
 
-[Authorize]
+//[Authorize]
 [Route("api/incoming-documents")]
 public class IncomingDocumentsController : ApiController
 {
