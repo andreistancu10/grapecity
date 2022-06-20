@@ -18,5 +18,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Commands.C
         public DateTime? OpionionRequestedUntil { get; set; }
         public int Status { get; set; }
         public DateTime CreationDate { get; set; }
+        public object Response { get; set; }
+        public bool RecipientHasChanged { get; set; }
     }
 }

@@ -29,7 +29,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Commands.C
                                                     .Include(doc => doc.WorkflowHistory)
                                                     .FirstOrDefaultAsync(doc => doc.Id == request.RegistrationNumber);
 
-            var createWorkflowHistoryCommand = recipientType.UpdateStatusBasedOnWorkflowDecision(request);
+            var createWorkflowHistoryCommand = await recipientType.UpdateStatusBasedOnWorkflowDecision(request);
+
+            if ((ResultObject)createWorkflowHistoryCommand.Response != null)
+                return (ResultObject)createWorkflowHistoryCommand.Response;
+
             var workflowHistoryEntry = _mapper.Map<WorkflowHistory>(createWorkflowHistoryCommand);
 
             incomingDocFromDb.WorkflowHistory.Add(workflowHistoryEntry);

@@ -4,25 +4,25 @@
     using DigitNow.Domain.DocumentManagement.Contracts.WorkflowHistory;
     using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
     using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries;
+    using HTSS.Platform.Core.CQRS;
+    using HTSS.Platform.Core.Errors;
     using System.Linq;
     using System.Threading.Tasks;
 
     public class Functionary : IWorkflowHandler
     {
-        private readonly IDocumentsQueryService _documentService;
+        private readonly IDocumentsQueryService _documentQueryService;
         private IncomingDocument _incomingDocument;
         private enum ActionType { Decline, AskForOpinion, Finalize, SendForApproval, SendOpinion };
 
         public Functionary(IDocumentsQueryService documentQueryService)
         {
-            _documentService = documentQueryService;
+            _documentQueryService = documentQueryService;
         }
 
         public async Task<ICreateWorkflowHistoryCommand> UpdateStatusBasedOnWorkflowDecision(ICreateWorkflowHistoryCommand command)
         {
-            _incomingDocument = await _documentService.GetIncomingDocumentByRegistrationNumber(command.RegistrationNumber);
-
-            
+            _incomingDocument = await _documentQueryService.GetIncomingDocumentByRegistrationNumber(command.RegistrationNumber);
 
             var actionType = (ActionType)command.ActionType;
 
@@ -39,14 +39,30 @@
                 case ActionType.SendOpinion:
                     return FunctonarySendsOpinion(command);
                 default:
-                    break;
+                    command.Response = ResultObject.Error(new ErrorMessage
+                    {
+                        Message = $"No Action with id {command.ActionType} is possible for a Functionary.",
+                        TranslationCode = "catalog.actionNotAllowed.backend.update.validation.actionNotAllowed",
+                        Parameters = new object[] { command.Resolution }
+                    });
+                    return command;
             }
-
-            return command;
         }
 
         private ICreateWorkflowHistoryCommand FunctonarySendsOpinion(ICreateWorkflowHistoryCommand command)
         {
+            if (command.RecipientId <= 0)
+            {
+                command.Response = ResultObject.Error(new ErrorMessage
+                {
+                    Message = $"Department was not specified!",
+                    TranslationCode = "catalog.departmentNotSpecified.backend.update.validation.entityNotFound",
+                    Parameters = new object[] { command.RegistrationNumber }
+                });
+
+                return command;
+            }
+
             command.RecipientType = (int)UserRole.HeadOfDepartment;
             command.Status = (int)Status.inWorkAllocated;
             return command;
