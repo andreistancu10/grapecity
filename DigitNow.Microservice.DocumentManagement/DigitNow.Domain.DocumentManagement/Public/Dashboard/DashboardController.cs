@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using System.Threading.Tasks;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
+using HTSS.Platform.Core.Files;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Dashboard;
 
@@ -18,11 +19,13 @@ public class DashboardController : ApiController
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
+    private readonly IExportService<GetDocumentResponse> _exportService;
 
-    public DashboardController(IMediator mediator, IMapper mapper)
+    public DashboardController(IMediator mediator, IMapper mapper, IExportService<GetDocumentResponse> exportService)
     {
         _mediator = mediator;
         _mapper = mapper;
+        _exportService = exportService;
     }
 
     [HttpPut("update-department")]
@@ -40,10 +43,21 @@ public class DashboardController : ApiController
         return CreateResponse(await _mediator.Send(updateUserRecipientForDocumentCommand, cancellationToken));
     }
 
-    [HttpPut("get-documents")]
-    public async Task<IActionResult> GetDocuments([FromBody] GetDocumentsRequest request, CancellationToken cancellationToken)
+    [HttpGet("get-documents")]
+    public async Task<IActionResult> GetDocuments([FromQuery] GetDocumentsRequest request, CancellationToken cancellationToken)
     {
         var command = _mapper.Map<GetDocumentsQuery>(request);
-        return CreateResponse(await _mediator.Send(command, cancellationToken));
+        return Ok(await _mediator.Send(command, cancellationToken));
+    }
+
+
+    [HttpGet("export-excel")]
+    public async Task<IActionResult> ExportExcel([FromQuery] GetDocumentsRequest request, CancellationToken cancellationToken)
+    {
+        var command = _mapper.Map<GetDocumentsQuery>(request);
+        var result = await _mediator.Send(command, cancellationToken);
+        var fileResult = await _exportService.CreateExcelFile("Permissions", "Permissions", result.Items);
+
+        return File(fileResult.Content, fileResult.ContentType, fileResult.Name);
     }
 }
