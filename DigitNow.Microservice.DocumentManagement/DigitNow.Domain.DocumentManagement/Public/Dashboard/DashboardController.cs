@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Collections.Generic;
+using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateUserRecipient;
 using DigitNow.Domain.DocumentManagement.Public.Dashboard.Models;
@@ -44,7 +45,7 @@ public class DashboardController : ApiController
     }
 
     [HttpGet("get-documents")]
-    public async Task<IActionResult> GetDocuments([FromQuery] GetDocumentsRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult<List<GetDocumentResponse>>> GetDocuments([FromQuery] GetDocumentsRequest request, CancellationToken cancellationToken)
     {
         var command = _mapper.Map<GetDocumentsQuery>(request);
         return Ok(await _mediator.Send(command, cancellationToken));
@@ -52,7 +53,7 @@ public class DashboardController : ApiController
 
 
     [HttpGet("export-excel")]
-    public async Task<IActionResult> ExportExcel([FromQuery] GetDocumentsRequest request, CancellationToken cancellationToken)
+    public async Task<ActionResult<FileContentResult>> ExportExcel([FromQuery] GetDocumentsRequest request, CancellationToken cancellationToken)
     {
         var command = _mapper.Map<GetDocumentsQuery>(request);
         var result = await _mediator.Send(command, cancellationToken);
