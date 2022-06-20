@@ -9,7 +9,7 @@ public class IncomingDocument
 {
     public int Id { get; set; }
     public int RegistrationNumber { get; set; }
-    public DateTime? RegistrationDate { get; set; }
+    public DateTime RegistrationDate { get; set; }
     public string User { get; set; }
     public int InputChannelId { get; set; }
     public int IssuerTypeId { get; set; }
@@ -26,7 +26,6 @@ public class IncomingDocument
     public double ResolutionPeriod { get; set; }
     public bool? IsUrgent { get; set; }
     public bool? IsGDPRAgreed { get; set; }
-    public DateTime CreationDate { get; set; }
     public List<WorkflowHistories.WorkflowHistory> WorkflowHistory { get; set; } = new();
     public List<IncomingConnectedDocument> ConnectedDocuments { get; set; } = new();
 }

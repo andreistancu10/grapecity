@@ -31,7 +31,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
     public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
     {
         var incomingDocumentForCreation = _mapper.Map<IncomingDocument>(request);
-        incomingDocumentForCreation.CreationDate = DateTime.Now;
+        incomingDocumentForCreation.RegistrationDate = DateTime.Now;
         try
         {
             await AttachConnectedDocuments(request, incomingDocumentForCreation, cancellationToken);

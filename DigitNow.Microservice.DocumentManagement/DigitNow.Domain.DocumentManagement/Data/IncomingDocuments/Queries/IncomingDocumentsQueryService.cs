@@ -49,7 +49,7 @@ public class DocumentsQueryService : IDocumentsQueryService
     private async Task<IncomingConnectedDocument> CheckIncomingDocumentsByRegistrationNumber(int registrationNumber, int year)
     {
         var incomingDoc = await _dbContext.IncomingDocuments
-            .FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNumber && doc.CreationDate.Year == year);
+            .FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNumber && doc.RegistrationDate.Year == year);
 
         if (incomingDoc != null)
         {
