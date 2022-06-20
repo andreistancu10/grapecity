@@ -39,11 +39,11 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
         }
         else if (user.Roles.Contains((long)UserRole.HeadOfDepartment))
         {
-            userRole = UserRole.Mayor;
+            userRole = UserRole.HeadOfDepartment;
         }
         else if (user.Roles.Contains((long)UserRole.Functionary))
         {
-            userRole = UserRole.Mayor;
+            userRole = UserRole.Functionary;
         }
 
         if (userRole is null)
