@@ -1,53 +1,91 @@
 ﻿
-
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Models
 {
-    using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Commands.Create;
+    using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
     using DigitNow.Domain.DocumentManagement.Contracts.WorkflowHistory;
-    using DigitNow.Domain.DocumentManagement.Data;
-    using Microsoft.EntityFrameworkCore;
+    using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
+    using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries;
     using System.Linq;
+    using System.Threading.Tasks;
 
     public class Functionary : IWorkflowHandler
     {
-        private readonly DocumentManagementDbContext _context;
-
-        public enum ActionType { Approve, Decline, AskForOpinion, Finalize, SendForApproval, SendOpinion };
+        private readonly IDocumentsQueryService _documentService;
+        private IncomingDocument _incomingDocument;
+        public enum ActionType { Decline, AskForOpinion, Finalize, SendForApproval, SendOpinion };
         public int ActionId { get; set; } = 1;
 
-        public Functionary()
+        public Functionary(IDocumentsQueryService documentService)
         {
-        }
-        public Functionary(DocumentManagementDbContext context)
-        {
-            _context = context;
+            _documentService = documentService;
         }
 
-        public ICreateWorkflowHistoryCommand UpdateStatusBasedOnWorkflowDecision(ICreateWorkflowHistoryCommand command)
+        public async Task<ICreateWorkflowHistoryCommand> UpdateStatusBasedOnWorkflowDecision(ICreateWorkflowHistoryCommand command)
         {
-            var incomingDocument = _context.IncomingDocuments.Include(x => x.WorkflowHistory).Where(x => x.RegistrationNumber == command.RegistrationNumber).ToListAsync();
-            var actionType = (ActionType)ActionId;
+            _incomingDocument = await _documentService.GetIncomingDocumentByRegistrationNumber(command.RegistrationNumber);
+
+            var actionType = (ActionType)command.ActionType;
 
             switch (actionType)
             {
-                case ActionType.Approve:
-                    break;
                 case ActionType.Decline:
-                    command.Status = 2;
-                    break;
+                    return FunctionaryDeclined(command);
                 case ActionType.AskForOpinion:
-                    break;
+                    return FunctionaryAsksForOpinion(command);
                 case ActionType.Finalize:
-                    break;
+                    return FunctionaryFinalized(command);
                 case ActionType.SendForApproval:
-                    break;
+                    return FunctionarySendsForApproval(command);
                 case ActionType.SendOpinion:
-                    break;
+                    return FunctonarySendsOpinion(command);
                 default:
                     break;
             }
 
-            return new CreateWorkflowDecisionCommand();
+            return command;
+        }
+
+        private ICreateWorkflowHistoryCommand FunctonarySendsOpinion(ICreateWorkflowHistoryCommand command)
+        {
+            command.RecipientType = (int)UserRole.HeadOfDepartment;
+            command.Status = (int)Status.inWorkAllocated;
+            return command;
+        }
+
+        private ICreateWorkflowHistoryCommand FunctionarySendsForApproval(ICreateWorkflowHistoryCommand command)
+        {
+            command.RecipientType = (int)UserRole.HeadOfDepartment;
+            command.Status = (int)Status.inWorkApprovalRequested;
+            return command;
+        }
+
+        private ICreateWorkflowHistoryCommand FunctionaryFinalized(ICreateWorkflowHistoryCommand command)
+        {
+            var x = _incomingDocument.WorkflowHistory.LastOrDefault();
+
+            command.RecipientName = x.RecipientName;
+            command.RecipientId = x.RecipientId;
+            command.Status = (int)Status.finalized;
+
+            return command;
+        }
+
+        private ICreateWorkflowHistoryCommand FunctionaryAsksForOpinion(ICreateWorkflowHistoryCommand command)
+        {
+            command.RecipientType = (int)UserRole.HeadOfDepartment;
+            command.Status = (int)Status.opinionRequestedUnallocated;
+            return command;
+        }
+
+        private ICreateWorkflowHistoryCommand FunctionaryDeclined(ICreateWorkflowHistoryCommand command)
+        {
+            var x = _incomingDocument.WorkflowHistory.FirstOrDefault();
+
+            command.RecipientName = x.RecipientName;
+            command.RecipientId = x.RecipientId;
+            command.Status = (int)Status.newDeclinedCompetence;
+
+            return command;
         }
     }
 }

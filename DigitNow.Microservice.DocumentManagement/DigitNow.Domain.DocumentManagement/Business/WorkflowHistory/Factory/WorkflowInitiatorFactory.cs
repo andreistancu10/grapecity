@@ -1,5 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Models;
 using DigitNow.Domain.DocumentManagement.Contracts.WorkflowHistory;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 
@@ -11,8 +12,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Factory
 
         static WorkflowInitiatorFactory()
         {
+            var serviceCollection = new ServiceCollection();
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+            
             factory.Add(1, () => new HeadOfDepartment());
-            factory.Add(2, () => new Functionary());
+            factory.Add(2, () => ActivatorUtilities.CreateInstance<Functionary>(serviceProvider));
             factory.Add(3, () => new Mayor());
         }
 

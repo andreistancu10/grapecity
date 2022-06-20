@@ -60,10 +60,11 @@ public class IncomingDocumentsController : ApiController
         return CreateResponse(await _mediator.Send(updateIncomingDocumentCommand, cancellationToken));
     }
 
-    [HttpPost("{id}/submit-workflow")]
-    public async Task<IActionResult> SubmitWorkflowDecision([FromRoute] int id, [FromBody] CreateWorkflowDecisionRequest request)
+    [HttpPost("{registrationNumber}/submit-workflow")]
+    public async Task<IActionResult> SubmitWorkflowDecision([FromRoute] int registrationNumber, [FromBody] CreateWorkflowDecisionRequest request)
     {
         var command = _mapper.Map<CreateWorkflowDecisionCommand>(request);
+        command.RegistrationNumber = registrationNumber;
 
         return CreateResponse(await _mediator.Send(command));
     }

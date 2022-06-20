@@ -1,9 +1,11 @@
 ﻿
+using System.Threading.Tasks;
+
 namespace DigitNow.Domain.DocumentManagement.Contracts.WorkflowHistory
 {
     public interface IWorkflowHandler
     {
-        public ICreateWorkflowHistoryCommand UpdateStatusBasedOnWorkflowDecision(ICreateWorkflowHistoryCommand command);
+        public Task<ICreateWorkflowHistoryCommand> UpdateStatusBasedOnWorkflowDecision(ICreateWorkflowHistoryCommand command);
     }
 }
 

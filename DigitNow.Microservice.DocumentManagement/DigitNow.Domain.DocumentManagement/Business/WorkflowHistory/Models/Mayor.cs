@@ -1,10 +1,11 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.WorkflowHistory;
+using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Models
 {
     public class Mayor : IWorkflowHandler
     {
-        public ICreateWorkflowHistoryCommand UpdateStatusBasedOnWorkflowDecision(ICreateWorkflowHistoryCommand command)
+        public Task<ICreateWorkflowHistoryCommand> UpdateStatusBasedOnWorkflowDecision(ICreateWorkflowHistoryCommand command)
         {
             throw new System.NotImplementedException();
         }

@@ -1,14 +1,14 @@
-﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents;
-using DigitNow.Domain.DocumentManagement.Contracts.WorkflowHistory;
+﻿using DigitNow.Domain.DocumentManagement.Contracts.WorkflowHistory;
 using HTSS.Platform.Core.CQRS;
 using System;
-using System.Collections.Generic;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Commands.Create
 {
     public class CreateWorkflowDecisionCommand : ICreateWorkflowHistoryCommand, ICommand<ResultObject>
     {
         public int RegistrationNumber { get; set; }
+        public int InitiatorType { get; set; }
+        public int ActionType { get; set; }
         public int RecipientType { get; set; }
         public int RecipientId { get; set; }
         public string RecipientName { get; set; }

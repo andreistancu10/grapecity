@@ -23,7 +23,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Commands.C
         }
         public async Task<ResultObject> Handle(CreateWorkflowDecisionCommand request, CancellationToken cancellationToken)
         {
-            var recipientType = WorkflowInitiatorFactory.Create(request.RecipientType);
+            var recipientType = WorkflowInitiatorFactory.Create(request.InitiatorType);
 
             var incomingDocFromDb = await _dbContext.IncomingDocuments
                                                     .Include(doc => doc.WorkflowHistory)

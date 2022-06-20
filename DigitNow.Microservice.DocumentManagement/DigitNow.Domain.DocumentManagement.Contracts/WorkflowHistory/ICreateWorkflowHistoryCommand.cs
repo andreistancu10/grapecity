@@ -1,13 +1,12 @@
-﻿
-using DigitNow.Domain.DocumentManagement.Contracts.Documents;
-using System;
-using System.Collections.Generic;
+﻿using System;
 
 namespace DigitNow.Domain.DocumentManagement.Contracts.WorkflowHistory
 {
     public interface ICreateWorkflowHistoryCommand
     {
         public int RegistrationNumber { get; set; }
+        public int InitiatorType { get; set; }
+        public int ActionType { get; set; }
         public int RecipientType { get; set; }
         public int RecipientId { get; set; }
         public string RecipientName { get; set; }

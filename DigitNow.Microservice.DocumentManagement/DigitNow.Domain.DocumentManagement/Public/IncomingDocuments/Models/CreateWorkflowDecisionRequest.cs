@@ -8,7 +8,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models
         public int ActionType { get; set; }
         public string Remarks { get; set; }
         public string DeclineReason { get; set; }
-        public string TargetRecipientId { get; set; }
+        public int RecipientId { get; set; }
         public string Resolution { get; set; }
         public DateTime? OpionionRequestedUntil { get; set; }
     }

@@ -8,6 +8,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries;
 public interface IDocumentsQueryService
 {
     Task<IncomingConnectedDocument> GetDocsByRegistrationNumberAndYear(int registrationNumber, int year, CancellationToken cancellationToken);
+    Task<IncomingDocument> GetIncomingDocumentByRegistrationNumber(int registrationNumber);
 }
 
 public class DocumentsQueryService : IDocumentsQueryService
@@ -17,6 +18,13 @@ public class DocumentsQueryService : IDocumentsQueryService
     public DocumentsQueryService(DocumentManagementDbContext dbContext)
     {
         _dbContext = dbContext;
+    }
+
+    public async Task<IncomingDocument> GetIncomingDocumentByRegistrationNumber(int registrationNumber)
+    {
+        return await _dbContext.IncomingDocuments
+                               .Include(doc => doc.WorkflowHistory)
+                               .FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNumber);
     }
 
     public async Task<IncomingConnectedDocument> GetDocsByRegistrationNumberAndYear(int registrationNumber, int year, CancellationToken cancellationToken)
@@ -45,7 +53,7 @@ public class DocumentsQueryService : IDocumentsQueryService
 
         return null;
     }
-
+    
     private async Task<IncomingConnectedDocument> CheckIncomingDocumentsByRegistrationNumber(int registrationNumber, int year)
     {
         var incomingDoc = await _dbContext.IncomingDocuments
