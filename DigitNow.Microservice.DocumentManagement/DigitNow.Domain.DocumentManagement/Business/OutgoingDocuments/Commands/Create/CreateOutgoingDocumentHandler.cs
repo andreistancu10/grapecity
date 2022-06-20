@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Data;
@@ -40,7 +39,7 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
             {
                 RecipientType = (int)UserRole.HeadOfDepartment,
                 RecipientId = request.RecipientId,
-                Status = (int)Status.in_work_unallocated,
+                Status = (int)Status.inWorkUnallocated,
                 CreationDate = DateTime.Now,
                 RegistrationNumber = outgoingDocumentForCreation.RegistrationNumber
             });
@@ -63,8 +62,5 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
                     .Add(new OutgoingConnectedDocument { RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });
             }
         }
-
-        await _dbContext.OutgoingDocuments.AddAsync(outgoingDocumentForCreation, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

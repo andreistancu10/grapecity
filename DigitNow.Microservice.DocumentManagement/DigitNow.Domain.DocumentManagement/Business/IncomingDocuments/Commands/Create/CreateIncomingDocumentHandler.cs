@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using AutoMapper;
+﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
@@ -69,11 +68,8 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             foreach (var doc in connectedDocuments)
             {
                 incomingDocumentForCreation.ConnectedDocuments
-                    .Add(new IncomingConnectedDocument { RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });
+                    .Add(new IncomingConnectedDocument { RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId, ChildIncomingDocumentId = doc.Id });
             }
         }
-
-        await _dbContext.IncomingDocuments.AddAsync(incomingDocumentForCreation, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }
