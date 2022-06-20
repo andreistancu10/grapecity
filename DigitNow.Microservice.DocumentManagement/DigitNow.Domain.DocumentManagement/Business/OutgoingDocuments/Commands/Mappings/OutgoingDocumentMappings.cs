@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Create;
+using DigitNow.Domain.DocumentManagement.Data.ContactDetails;
 using DigitNow.Domain.DocumentManagement.Data.OutgoingConnectedDocuments;
 using DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments;
 
@@ -11,5 +12,6 @@ public class OutgoingDocumentMappings : Profile
     {
         CreateMap<CreateOutgoingDocumentCommand, OutgoingDocument>();
         CreateMap<OutgoingDocument, OutgoingConnectedDocument>();
+        CreateMap<CreateContactDetailCommand, ContactDetail>();
     }
 }

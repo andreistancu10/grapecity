@@ -26,7 +26,7 @@ public class CreateInternalDocumentHandler : ICommandHandler<CreateInternalDocum
     {
         var internalDocumentForCreation =
             _mapper.Map<InternalDocument>(request);
-        internalDocumentForCreation.RegistrationDate = DateTime.Now;
+        internalDocumentForCreation.CreationDate = DateTime.Now;
 
         await _service.AssignRegNumberAndSaveDocument(internalDocumentForCreation);
 

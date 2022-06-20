@@ -6,7 +6,7 @@ public class InternalDocument
 {
     public int Id { get; set; }
     public int RegistrationNumber { get; set; }
-    public DateTime RegistrationDate { get; set; }
+    public DateTime CreationDate { get; set; }
     public int DepartmentId { get; set; }
     public int InternalDocumentTypeId { get; set; }
     public int DeadlineDaysNumber { get; set; }

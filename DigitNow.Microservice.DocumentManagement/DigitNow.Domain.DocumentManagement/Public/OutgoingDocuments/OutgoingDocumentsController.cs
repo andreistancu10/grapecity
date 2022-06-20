@@ -14,7 +14,7 @@ using DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries.GetB
 
 namespace DigitNow.Domain.DocumentManagement.Public.OutgoingDocuments;
 
-[Authorize]
+//[Authorize]
 [Route("api/outgoing-documents")]
 public class OutgoingDocumentsController : ApiController
 {

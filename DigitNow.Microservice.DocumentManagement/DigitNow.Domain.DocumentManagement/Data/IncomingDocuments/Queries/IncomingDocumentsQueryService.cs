@@ -36,7 +36,7 @@ public class DocumentsQueryService : IDocumentsQueryService
     private async Task<IncomingConnectedDocument> CheckInternalDocumentsByRegistrationNumber(int registrationNumber, int year)
     {
         var internalDoc = await _dbContext.InternalDocuments
-            .FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNumber && doc.RegistrationDate.Year == year);
+            .FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNumber && doc.CreationDate.Year == year);
 
         if (internalDoc != null)
         {
