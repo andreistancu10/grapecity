@@ -247,6 +247,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<long?>("IdentificationNumber")
                         .HasColumnType("bigint");
 
+                    b.Property<string>("IssuerName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("NumberOfPages")
                         .HasColumnType("int");
 
