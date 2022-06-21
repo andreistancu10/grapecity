@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 using DigitNow.Domain.DocumentManagement.Data.ContactDetails;
-using DigitNow.Domain.DocumentManagement.Data.OutgoingConnectedDocuments;
 using DigitNow.Domain.DocumentManagement.Data.WorkflowHistories;
 using HTSS.Platform.Core.Domain;
 
@@ -22,5 +22,5 @@ public class OutgoingDocument : Entity
     public string? DocumentTypeDetail { get; set; }
     public DateTime CreationDate { get; set; }
     public List<WorkflowHistory> WorkflowHistory { get; set; } = new();
-    public List<OutgoingConnectedDocument> ConnectedDocuments { get; set; } = new();
+    public List<ConnectedDocument> ConnectedDocuments { get; set; } = new();
 }

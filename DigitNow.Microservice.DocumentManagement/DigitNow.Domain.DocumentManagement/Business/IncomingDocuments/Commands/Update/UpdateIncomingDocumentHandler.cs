@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DigitNow.Domain.DocumentManagement.Data.IncomingConnectedDocuments;
+using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update;
 
@@ -60,7 +60,7 @@ public class UpdateIncomingDocumentHandler : ICommandHandler<UpdateIncomingDocum
             foreach (var doc in connectedDocuments)
             {
                 incomingDocFromDb.ConnectedDocuments
-                    .Add(new IncomingConnectedDocument() { ChildIncomingDocumentId = doc.Id, RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });
+                    .Add(new ConnectedDocument() { ChildDocumentId = doc.Id, RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });
             }
         }
     }
@@ -73,7 +73,7 @@ public class UpdateIncomingDocumentHandler : ICommandHandler<UpdateIncomingDocum
         if (idsToRemove.Any())
         {
 
-            _dbContext.IncomingConnectedDocuments
+            _dbContext.ConnectedDocuments
                 .RemoveRange(incomingDocFromDb.ConnectedDocuments
                     .Where(cd => idsToRemove
                         .Contains(cd.RegistrationNumber))

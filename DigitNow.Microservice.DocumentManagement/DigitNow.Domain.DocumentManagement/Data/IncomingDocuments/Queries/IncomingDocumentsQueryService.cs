@@ -1,4 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.IncomingConnectedDocuments;
+﻿using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,7 +7,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries;
 
 public interface IDocumentsQueryService
 {
-    Task<IncomingConnectedDocument> GetDocsByRegistrationNumberAndYear(int registrationNumber, int year, CancellationToken cancellationToken);
+    Task<ConnectedDocument> GetDocsByRegistrationNumberAndYear(int registrationNumber, int year, CancellationToken cancellationToken);
 }
 
 public class DocumentsQueryService : IDocumentsQueryService
@@ -19,7 +19,7 @@ public class DocumentsQueryService : IDocumentsQueryService
         _dbContext = dbContext;
     }
 
-    public async Task<IncomingConnectedDocument> GetDocsByRegistrationNumberAndYear(int registrationNumber, int year, CancellationToken cancellationToken)
+    public async Task<ConnectedDocument> GetDocsByRegistrationNumberAndYear(int registrationNumber, int year, CancellationToken cancellationToken)
     {
         var incomingDoc = await CheckIncomingDocumentsByRegistrationNumber(registrationNumber, year);
             
@@ -33,27 +33,27 @@ public class DocumentsQueryService : IDocumentsQueryService
         return internalDoc;
     }
 
-    private async Task<IncomingConnectedDocument> CheckInternalDocumentsByRegistrationNumber(int registrationNumber, int year)
+    private async Task<ConnectedDocument> CheckInternalDocumentsByRegistrationNumber(int registrationNumber, int year)
     {
         var internalDoc = await _dbContext.InternalDocuments
             .FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNumber && doc.CreationDate.Year == year);
 
         if (internalDoc != null)
         {
-            return new IncomingConnectedDocument { RegistrationNumber = internalDoc.RegistrationNumber, Id = internalDoc.Id, DocumentType = internalDoc.InternalDocumentTypeId };
+            return new ConnectedDocument { RegistrationNumber = internalDoc.RegistrationNumber, Id = internalDoc.Id, DocumentType = internalDoc.InternalDocumentTypeId };
         }
 
         return null;
     }
 
-    private async Task<IncomingConnectedDocument> CheckIncomingDocumentsByRegistrationNumber(int registrationNumber, int year)
+    private async Task<ConnectedDocument> CheckIncomingDocumentsByRegistrationNumber(int registrationNumber, int year)
     {
         var incomingDoc = await _dbContext.IncomingDocuments
-            .FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNumber && doc.CreationDate.Year == year);
+            .FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNumber && doc.RegistrationDate.Year == year);
 
         if (incomingDoc != null)
         {
-            return new IncomingConnectedDocument() { RegistrationNumber = incomingDoc.RegistrationNumber, Id = incomingDoc.Id, DocumentType = incomingDoc.DocumentTypeId };
+            return new ConnectedDocument() { RegistrationNumber = incomingDoc.RegistrationNumber, Id = incomingDoc.Id, DocumentType = incomingDoc.DocumentTypeId };
         }
 
         return null;

@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DigitNow.Domain.DocumentManagement.Data.OutgoingConnectedDocuments;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments.Configurations;
 
-public class OutgoingDocumentConfiguration : IEntityTypeConfiguration<OutgoingDocument>
+public class OutgoingConnectedDocumentConfiguration : IEntityTypeConfiguration<OutgoingDocument>
 {
     public void Configure(EntityTypeBuilder<OutgoingDocument> builder)
     {
@@ -12,10 +13,5 @@ public class OutgoingDocumentConfiguration : IEntityTypeConfiguration<OutgoingDo
         builder.HasKey(p => p.Id);
 
         builder.Property(p => p.RegistrationNumber).IsRequired();
-        builder.Property(p => p.RecipientId).IsRequired();
-        builder.Property(p => p.ContentSummary).IsRequired();
-        builder.Property(p => p.DocumentTypeId).IsRequired();
-        builder.Property(p => p.NumberOfPages).IsRequired();
-        builder.Property(p => p.User).IsRequired();
     }
 }

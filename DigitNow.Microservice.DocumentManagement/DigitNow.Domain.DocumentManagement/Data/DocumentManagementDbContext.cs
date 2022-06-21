@@ -1,11 +1,10 @@
 ﻿using System;
 using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
 using Microsoft.EntityFrameworkCore;
-using DigitNow.Domain.DocumentManagement.Data.IncomingConnectedDocuments;
 using DigitNow.Domain.DocumentManagement.Data.InternalDocuments;
-using DigitNow.Domain.DocumentManagement.Data.OutgoingConnectedDocuments;
 using DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments;
 using Microsoft.EntityFrameworkCore.Design;
+using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 
 namespace DigitNow.Domain.DocumentManagement.Data
 {
@@ -21,10 +20,8 @@ namespace DigitNow.Domain.DocumentManagement.Data
 
         public DbSet<OutgoingDocument> OutgoingDocuments { get; set; }
 
-        public DbSet<IncomingConnectedDocument> IncomingConnectedDocuments { get; set; }
+        public DbSet<ConnectedDocument> ConnectedDocuments { get; set; }
 
-        public DbSet<OutgoingConnectedDocument> OutgoingConnectedDocuments { get; set; }
-        
         public DbSet<InternalDocument> InternalDocuments { get; set; }
         
         public DbSet<RegistrationNumberCounter.RegistrationNumberCounter> RegistrationNumberCounter { get; set; }
