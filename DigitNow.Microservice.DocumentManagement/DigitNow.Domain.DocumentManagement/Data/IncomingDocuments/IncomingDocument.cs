@@ -1,7 +1,7 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data.ContactDetails;
 using System;
 using System.Collections.Generic;
-using DigitNow.Domain.DocumentManagement.Data.IncomingConnectedDocuments;
+using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 
 namespace DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
 
@@ -27,5 +27,5 @@ public class IncomingDocument
     public bool? IsUrgent { get; set; }
     public bool? IsGDPRAgreed { get; set; }
     public List<WorkflowHistories.WorkflowHistory> WorkflowHistory { get; set; } = new();
-    public List<IncomingConnectedDocument> ConnectedDocuments { get; set; } = new();
+    public List<ConnectedDocument> ConnectedDocuments { get; set; } = new();
 }

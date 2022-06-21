@@ -10,8 +10,8 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DigitNow.Domain.DocumentManagement.Data.IncomingConnectedDocuments;
 using HTSS.Platform.Core.Errors;
+using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
 
@@ -46,6 +46,8 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
                 CreationDate = DateTime.Now,
                 RegistrationNumber = incomingDocumentForCreation.RegistrationNumber
             });
+
+            await _dbContext.SaveChangesAsync();
         }
         catch (Exception ex)
         {
@@ -68,7 +70,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             foreach (var doc in connectedDocuments)
             {
                 incomingDocumentForCreation.ConnectedDocuments
-                    .Add(new IncomingConnectedDocument { RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId, ChildIncomingDocumentId = doc.Id });
+                    .Add(new ConnectedDocument { RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId, ChildDocumentId = doc.Id });
             }
         }
     }

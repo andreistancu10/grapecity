@@ -8,9 +8,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using DigitNow.Domain.DocumentManagement.Data.OutgoingConnectedDocuments;
 using DigitNow.Domain.DocumentManagement.Data.WorkflowHistories;
 using Microsoft.EntityFrameworkCore;
+using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 
 namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Create;
 
@@ -33,6 +33,7 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
         outgoingDocumentForCreation.CreationDate = DateTime.Now;
 
         await AttachConnectedDocuments(request, outgoingDocumentForCreation, cancellationToken);
+        await _service.AssignRegNumberAndSaveDocument(outgoingDocumentForCreation);
 
         outgoingDocumentForCreation.WorkflowHistory.Add(
             new WorkflowHistory
@@ -44,7 +45,7 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
                 RegistrationNumber = outgoingDocumentForCreation.RegistrationNumber
             });
 
-        await _service.AssignRegNumberAndSaveDocument(outgoingDocumentForCreation);
+        await _dbContext.SaveChangesAsync();
 
         return ResultObject.Created(outgoingDocumentForCreation.Id);
     }
@@ -59,7 +60,7 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
             foreach (var doc in connectedDocuments)
             {
                 outgoingDocumentForCreation.ConnectedDocuments
-                    .Add(new OutgoingConnectedDocument { RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });
+                    .Add(new ConnectedDocument { RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });
             }
         }
     }
