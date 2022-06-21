@@ -1,5 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.OutgoingConnectedDocuments;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments.Configurations;
