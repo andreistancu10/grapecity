@@ -1,9 +1,20 @@
-﻿namespace DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
+﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+using DigitNow.Domain.DocumentManagement.Data.Documents;
+using HTSS.Platform.Core.Domain;
+using System;
 
-public class ConnectedDocument
+namespace DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
+
+public class ConnectedDocument : Entity
 {
-    public int Id { get; set; }
-    public int ChildDocumentId { get; set; }
-    public int RegistrationNumber { get; set; }
-    public int DocumentType { get; set; }
+    public long ChildDocumentId { get; set; }
+    public long RegistrationNumber { get; set; }
+    public DocumentType DocumentType { get; set; }
+
+    #region [ Relationships ]
+
+    public IncomingDocument IncomingDocument { get; set; }
+    public OutgoingDocument OutgoingDocument { get; set; }
+
+    #endregion
 }

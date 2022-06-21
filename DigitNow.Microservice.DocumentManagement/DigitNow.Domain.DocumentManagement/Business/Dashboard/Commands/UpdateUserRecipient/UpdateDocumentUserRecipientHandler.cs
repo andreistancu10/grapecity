@@ -2,7 +2,7 @@
 using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
+using DigitNow.Domain.DocumentManagement.Data.Documents;
 using DigitNow.Domain.DocumentManagement.Data.WorkflowHistories;
 using DigitNow.Domain.DocumentManagement.extensions.Autocorrect;
 using HTSS.Platform.Core.CQRS;

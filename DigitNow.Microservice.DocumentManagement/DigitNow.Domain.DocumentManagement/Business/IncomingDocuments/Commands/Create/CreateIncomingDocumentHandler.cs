@@ -2,7 +2,6 @@
 using DigitNow.Domain.DocumentManagement.Contracts.Documents;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
 using DigitNow.Domain.DocumentManagement.Data.WorkflowHistories;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +11,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using HTSS.Platform.Core.Errors;
 using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
+using DigitNow.Domain.DocumentManagement.Data.Documents;
+using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
 
@@ -30,21 +31,22 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
 
     public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
     {
-        var incomingDocumentForCreation = _mapper.Map<IncomingDocument>(request);
-        incomingDocumentForCreation.RegistrationDate = DateTime.Now;
+        var newIncomingDocument = _mapper.Map<IncomingDocument>(request);
+        newIncomingDocument.RegistrationDate = DateTime.Now;
+        newIncomingDocument.CreatedAt = DateTime.Now;        
         try
         {
-            await AttachConnectedDocuments(request, incomingDocumentForCreation, cancellationToken);
-            await _service.AssignRegNumberAndSaveDocument(incomingDocumentForCreation);
+            await AttachConnectedDocuments(request, newIncomingDocument, cancellationToken);
+            await _service.AssignRegistrationNumberAsync(newIncomingDocument);
 
-            incomingDocumentForCreation.WorkflowHistory.Add(
+            newIncomingDocument.WorkflowHistory.Add(
             new WorkflowHistory()
             {
                 RecipientType = (int)UserRole.HeadOfDepartment,
                 RecipientId = request.RecipientId,
                 Status = (int)Status.inWorkUnallocated,
                 CreationDate = DateTime.Now,
-                RegistrationNumber = incomingDocumentForCreation.RegistrationNumber
+                RegistrationNumber = newIncomingDocument.RegistrationNumber
             });
 
             await _dbContext.SaveChangesAsync();
@@ -57,7 +59,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             });
         }
 
-        return ResultObject.Created(incomingDocumentForCreation.Id);
+        return ResultObject.Created(newIncomingDocument.Id);
     }
 
     private async Task AttachConnectedDocuments(CreateIncomingDocumentCommand request, IncomingDocument incomingDocumentForCreation, CancellationToken cancellationToken)
@@ -70,7 +72,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             foreach (var doc in connectedDocuments)
             {
                 incomingDocumentForCreation.ConnectedDocuments
-                    .Add(new ConnectedDocument { RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId, ChildDocumentId = doc.Id });
+                    .Add(new ConnectedDocument { RegistrationNumber = doc.RegistrationNumber, DocumentType = DocumentType.Incoming, ChildDocumentId = doc.Id });
             }
         }
     }

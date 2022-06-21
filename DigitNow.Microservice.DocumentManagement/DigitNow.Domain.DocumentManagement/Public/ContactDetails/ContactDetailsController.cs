@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 namespace DigitNow.Domain.DocumentManagement.Public.ContactDetails;
 
 [Authorize]
+[ApiController]
 [Route("api/contact-details")]
 public class ContactDetailsController : ApiController
 {

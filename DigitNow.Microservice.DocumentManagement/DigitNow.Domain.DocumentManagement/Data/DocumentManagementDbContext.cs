@@ -1,10 +1,9 @@
 ﻿using System;
-using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
 using Microsoft.EntityFrameworkCore;
-using DigitNow.Domain.DocumentManagement.Data.InternalDocuments;
-using DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments;
 using Microsoft.EntityFrameworkCore.Design;
 using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
+using DigitNow.Domain.DocumentManagement.Data.Documents;
+using DigitNow.Domain.DocumentManagement.Data.RegistrationNumberCounters;
 
 namespace DigitNow.Domain.DocumentManagement.Data
 {
@@ -16,15 +15,19 @@ namespace DigitNow.Domain.DocumentManagement.Data
         {
         }
 
+        public DbSet<Document> Documents { get; set; }
+
         public DbSet<IncomingDocument> IncomingDocuments { get; set; }
 
-        public DbSet<OutgoingDocument> OutgoingDocuments { get; set; }
+        public DbSet<OutgoingDocument> OutgoingDocuments { get; set; }        
+        
+        public DbSet<InternalDocument> InternalDocuments { get; set; }
+
+        public DbSet<DocumentResolution> DocumentResolutions { get; set; }
 
         public DbSet<ConnectedDocument> ConnectedDocuments { get; set; }
 
-        public DbSet<InternalDocument> InternalDocuments { get; set; }
-        
-        public DbSet<RegistrationNumberCounter.RegistrationNumberCounter> RegistrationNumberCounter { get; set; }
+        public DbSet<RegistrationNumberCounter> RegistrationNumberCounters { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

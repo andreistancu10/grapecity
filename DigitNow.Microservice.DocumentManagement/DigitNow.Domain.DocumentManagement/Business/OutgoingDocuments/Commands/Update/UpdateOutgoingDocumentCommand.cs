@@ -19,5 +19,5 @@ public class UpdateOutgoingDocumentCommand : ICommand<ResultObject>
     public int NumberOfPages { get; set; }
     public int RecipientId { get; set; }
     public int DocumentTypeId { get; set; }
-    public List<int> ConnectedDocumentIds { get; set; }
+    public List<long> ConnectedDocumentIds { get; set; }
 }

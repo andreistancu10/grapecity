@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
-using DigitNow.Domain.DocumentManagement.Data.InternalDocuments;
-using DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments;
+using DigitNow.Domain.DocumentManagement.Data.Documents;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
 

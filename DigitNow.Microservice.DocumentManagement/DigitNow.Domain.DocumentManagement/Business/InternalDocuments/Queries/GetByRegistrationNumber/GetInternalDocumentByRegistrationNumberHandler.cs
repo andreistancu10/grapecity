@@ -24,7 +24,7 @@ public class GetInternalDocumentByRegistrationNumberHandler
     public async Task<List<GetInternalDocumentByRegistrationNumberResponse>> Handle(GetInternalDocumentByRegistrationNumberQuery request, CancellationToken cancellationToken)
     {
         var result = await _dbContext.InternalDocuments
-            .Where(doc => doc.RegistrationNumber == request.RegistrationNumber && doc.CreationDate.Year == DateTime.Now.Year).ToListAsync(cancellationToken);
+            .Where(doc => doc.RegistrationNumber == request.RegistrationNumber && doc.CreatedAt.Year == DateTime.Now.Year).ToListAsync(cancellationToken);
         return _mapper.Map<List<GetInternalDocumentByRegistrationNumberResponse>>(result);
     }
 }

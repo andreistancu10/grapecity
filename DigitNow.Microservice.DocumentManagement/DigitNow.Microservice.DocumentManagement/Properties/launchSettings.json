@@ -12,7 +12,7 @@
     "Microservice.DocumentManagement": {
       "commandName": "Project",
       "workingDirectory": ".\\bin\\Debug\\net6.0",
-      "launchBrowser": true,
+      "launchBrowser": false,
       "environmentVariables": {
         "DISCOVERY_ADDRESS": "http://localhost:7021",
         "ASPNETCORE_ENVIRONMENT": "Development",

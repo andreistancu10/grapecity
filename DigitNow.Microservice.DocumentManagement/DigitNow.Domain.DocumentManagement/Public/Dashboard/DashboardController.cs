@@ -16,6 +16,7 @@ using HTSS.Platform.Core.Files;
 namespace DigitNow.Domain.DocumentManagement.Public.Dashboard;
 
 [Authorize]
+[ApiController]
 [Route("api/dashboard")]
 public class DashboardController : ApiController
 {

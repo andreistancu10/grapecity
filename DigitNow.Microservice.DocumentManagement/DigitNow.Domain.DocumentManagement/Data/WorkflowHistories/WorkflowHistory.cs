@@ -1,10 +1,10 @@
-﻿using System;
+﻿using HTSS.Platform.Core.Domain;
+using System;
 
 namespace DigitNow.Domain.DocumentManagement.Data.WorkflowHistories
 {
-    public class WorkflowHistory
+    public class WorkflowHistory : Entity
     {
-        public int Id { get; set; }
         public int RecipientType { get; set; }
         public int RecipientId { get; set; }
         public string RecipientName { get; set; }

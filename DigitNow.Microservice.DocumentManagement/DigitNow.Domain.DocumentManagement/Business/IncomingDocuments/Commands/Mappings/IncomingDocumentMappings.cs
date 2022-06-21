@@ -3,7 +3,7 @@ using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Cre
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 using DigitNow.Domain.DocumentManagement.Data.ContactDetails;
-using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
+using DigitNow.Domain.DocumentManagement.Data.Documents;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Mappings;
 

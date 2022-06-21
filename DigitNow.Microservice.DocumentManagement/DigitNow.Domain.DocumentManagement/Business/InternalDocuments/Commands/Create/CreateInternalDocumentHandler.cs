@@ -2,9 +2,10 @@
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.InternalDocuments;
+using DigitNow.Domain.DocumentManagement.Data.Documents;
 using HTSS.Platform.Core.CQRS;
 
 namespace DigitNow.Domain.DocumentManagement.Business.InternalDocuments.Commands.Create;
@@ -26,9 +27,9 @@ public class CreateInternalDocumentHandler : ICommandHandler<CreateInternalDocum
     {
         var internalDocumentForCreation =
             _mapper.Map<InternalDocument>(request);
-        internalDocumentForCreation.CreationDate = DateTime.Now;
+        internalDocumentForCreation.CreatedAt = DateTime.Now;
 
-        await _service.AssignRegNumberAndSaveDocument(internalDocumentForCreation);
+        await _service.AssignRegistrationNumberAsync(internalDocumentForCreation);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 

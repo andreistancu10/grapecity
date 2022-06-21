@@ -2,7 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 using DigitNow.Domain.DocumentManagement.Data.ContactDetails;
-using DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments;
+using DigitNow.Domain.DocumentManagement.Data.Documents;
 
 namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Mappings;
 
