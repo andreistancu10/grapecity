@@ -20,7 +20,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
         public long GetCurrentUserId()
         {
-            var nameIdentifier = _httpContextAccesor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var nameIdentifier = _httpContextAccesor.HttpContext.User.FindFirstValue("htss_uid");;
 
             if (string.IsNullOrEmpty(nameIdentifier) || string.IsNullOrEmpty(nameIdentifier))
                 throw new UnauthorizedAccessException("UserId is not attached on the request!");

@@ -39,7 +39,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
         public async Task SetResolutionAsync(IList<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken)
         {
-            var dbInternalDocuments = _dbContext.InternalDocuments.Where(x => documentIds.Contains(x.Id));
+            var dbInternalDocuments = await _dbContext.InternalDocuments
+                .Where(x => documentIds.Contains(x.Id))
+                .ToListAsync(cancellationToken);
 
             foreach (var dbInternalDocument in dbInternalDocuments)
             {

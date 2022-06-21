@@ -28,12 +28,6 @@ public class DocumentsController : ApiController
         _httpContextAccessor = httpContextAccessor;
     }
 
-    [HttpGet("test")]
-    public void Test()
-    {
-
-    }
-
     [HttpGet("resolution/{id}/{documentType}")]
     public async Task<IActionResult> GetDocumentResolution([FromRoute] int identifier, [FromRoute] int documentType)
     {

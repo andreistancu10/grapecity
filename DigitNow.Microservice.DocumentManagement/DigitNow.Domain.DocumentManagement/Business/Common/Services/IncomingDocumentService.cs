@@ -14,6 +14,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 {
     public interface IIncomingDocumentService
     {
+        Task<IncomingDocument> AddAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken);
         Task<IList<IncomingDocument>> FindAsync(Expression<Func<IncomingDocument, bool>> query, CancellationToken cancellationToken);
         Task SetResolutionAsync(IList<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken);
     }
@@ -22,11 +23,27 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IDocumentService _documentService;
+        private readonly IIdentityService _identityService;
 
-        public IncomingDocumentService(DocumentManagementDbContext dbContext, IDocumentService documentService)
+        public IncomingDocumentService(DocumentManagementDbContext dbContext, IDocumentService documentService, IIdentityService identityService)
         {
             _dbContext = dbContext;
             _documentService = documentService;
+            _identityService = identityService;
+        }
+
+        public async Task<IncomingDocument> AddAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken)
+        {
+            incomingDocument.Document = new Document
+            {
+                CreatedAt = DateTime.Now,
+                CreatedBy = _identityService.GetCurrentUserId(),
+                DocumentType = DocumentType.Incoming
+            };
+
+            await _dbContext.IncomingDocuments.AddAsync(incomingDocument, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            return incomingDocument;
         }
 
         public async Task<IList<IncomingDocument>> FindAsync(Expression<Func<IncomingDocument, bool>> query, CancellationToken cancellationToken)
@@ -38,7 +55,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
         public async Task SetResolutionAsync(IList<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken)
         {
-            var dbIncomingDocuments = _dbContext.IncomingDocuments.Where(x => documentIds.Contains(x.Id));
+            var dbIncomingDocuments = await _dbContext.IncomingDocuments
+                .Where(x => documentIds.Contains(x.Id))
+                .ToListAsync(cancellationToken);
 
             foreach (var dbIncomingDocument in dbIncomingDocuments)
             {

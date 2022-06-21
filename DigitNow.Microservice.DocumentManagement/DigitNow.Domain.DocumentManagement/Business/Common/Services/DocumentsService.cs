@@ -14,6 +14,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 
 public interface IDocumentService
 {
+    Task<Document> AddAsync(Document newDocument, CancellationToken cancellationToken);
     Task<IList<Document>> FindAsync(Expression<Func<Document, bool>> query, CancellationToken cancellationToken);
     Task AssignRegistrationNumberAsync(Document document);
 }
@@ -27,6 +28,13 @@ public class DocumentService : IDocumentService
     {
         _dbContext = dbContext;
         _identityService = identityService;
+    }
+
+    public async Task<Document> AddAsync(Document newDocument, CancellationToken cancellationToken)
+    {
+        await _dbContext.AddAsync(newDocument, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return newDocument;
     }
 
     public async Task<IList<Document>> FindAsync(Expression<Func<Document, bool>> query, CancellationToken cancellationToken)

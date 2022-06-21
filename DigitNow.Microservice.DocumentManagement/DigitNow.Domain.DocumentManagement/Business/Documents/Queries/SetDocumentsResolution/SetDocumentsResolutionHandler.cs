@@ -56,6 +56,15 @@ public class SetDocumentsResolutionHandler
 
     private async Task<bool> ProcessIncomingDocumentsAsync(DocumentBatch documentBatch, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken)
     {
+        var x = new IncomingDocument
+        {
+            IsUrgent = true,
+            ContentSummary = "test",
+            IssuerName = "test"
+        };
+
+        await _incomingDocumentService.AddAsync(x, cancellationToken);
+
         var incomingDocumentIds = documentBatch.Documents
             .Where(x => x.DocumentType == DocumentType.Incoming)
             .Select(x => x.Id)
