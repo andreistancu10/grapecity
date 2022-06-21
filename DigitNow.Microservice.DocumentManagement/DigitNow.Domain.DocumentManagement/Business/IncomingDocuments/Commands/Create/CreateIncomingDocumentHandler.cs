@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using AutoMapper;
+﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
@@ -11,8 +10,8 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DigitNow.Domain.DocumentManagement.Data.IncomingConnectedDocuments;
 using HTSS.Platform.Core.Errors;
+using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
 
@@ -32,7 +31,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
     public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
     {
         var incomingDocumentForCreation = _mapper.Map<IncomingDocument>(request);
-        incomingDocumentForCreation.CreationDate = DateTime.Now;
+        incomingDocumentForCreation.RegistrationDate = DateTime.Now;
         try
         {
             await AttachConnectedDocuments(request, incomingDocumentForCreation, cancellationToken);
@@ -47,6 +46,8 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
                 CreationDate = DateTime.Now,
                 RegistrationNumber = incomingDocumentForCreation.RegistrationNumber
             });
+
+            await _dbContext.SaveChangesAsync();
         }
         catch (Exception ex)
         {
@@ -69,11 +70,8 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             foreach (var doc in connectedDocuments)
             {
                 incomingDocumentForCreation.ConnectedDocuments
-                    .Add(new IncomingConnectedDocument { RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });
+                    .Add(new ConnectedDocument { RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId, ChildDocumentId = doc.Id });
             }
         }
-
-        await _dbContext.IncomingDocuments.AddAsync(incomingDocumentForCreation, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }
