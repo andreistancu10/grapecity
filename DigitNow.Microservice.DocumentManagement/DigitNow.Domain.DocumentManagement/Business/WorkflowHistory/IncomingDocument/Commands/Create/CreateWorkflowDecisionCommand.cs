@@ -1,8 +1,8 @@
-﻿using DigitNow.Domain.DocumentManagement.Contracts.WorkflowHistory;
+﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers._Interfaces;
 using HTSS.Platform.Core.CQRS;
 using System;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Commands.Create
+namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Commands.Create
 {
     public class CreateWorkflowDecisionCommand : ICreateWorkflowHistoryCommand, ICommand<ResultObject>
     {
@@ -15,10 +15,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Commands.C
         public string Remarks { get; set; }
         public string DeclineReason { get; set; }
         public string Resolution { get; set; }
-        public DateTime? OpionionRequestedUntil { get; set; }
+        public DateTime? OpinionRequestedUntil { get; set; }
         public int Status { get; set; }
         public DateTime CreationDate { get; set; }
-        public object Response { get; set; }
+        public ResultObject Result { get; set; }
         public bool RecipientHasChanged { get; set; }
     }
 }

@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Factory;
 using DigitNow.Domain.DocumentManagement.Data;
 using HTSS.Platform.Core.CQRS;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Commands.Create
+namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Commands.Create
 {
+    using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Factory;
     using DigitNow.Domain.DocumentManagement.Data.WorkflowHistories;
     using Microsoft.EntityFrameworkCore;
     using System;
@@ -27,12 +27,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Commands.C
 
             var incomingDocFromDb = await _dbContext.IncomingDocuments
                                                     .Include(doc => doc.WorkflowHistory)
-                                                    .FirstOrDefaultAsync(doc => doc.Id == request.RegistrationNumber);
+                                                    .FirstOrDefaultAsync(doc => doc.RegistrationNumber == request.RegistrationNumber);
 
-            var createWorkflowHistoryCommand = await recipientType.UpdateStatusBasedOnWorkflowDecision(request);
+            var createWorkflowHistoryCommand = await recipientType.UpdateStatusBasedOnWorkflowDecision(request, incomingDocFromDb);
 
-            if ((ResultObject)createWorkflowHistoryCommand.Response != null)
-                return (ResultObject)createWorkflowHistoryCommand.Response;
+            if (createWorkflowHistoryCommand.Result != null)
+                return createWorkflowHistoryCommand.Result;
 
             var workflowHistoryEntry = _mapper.Map<WorkflowHistory>(createWorkflowHistoryCommand);
 

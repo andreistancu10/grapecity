@@ -1,10 +1,10 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Models;
-using DigitNow.Domain.DocumentManagement.Contracts.WorkflowHistory;
+﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers._Interfaces;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Models;
 using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries;
 using System;
 using System.Collections.Generic;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Factory
+namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Factory
 {
     public static class WorkflowInitiatorFactory
     {
@@ -13,9 +13,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Factory
 
         static WorkflowInitiatorFactory()
         {
-            factory.Add(1, () => new HeadOfDepartment(DocumentQueryService));
-            factory.Add(2, () => new Functionary(DocumentQueryService));
-            factory.Add(3, () => new Mayor(DocumentQueryService));
+            //factory.Add(1, () => new HeadOfDepartment());
+            factory.Add(2, () => new Functionary());
+            //factory.Add(3, () => new Mayor());
         }
 
         public static IWorkflowHandler Create(int typeId)

@@ -2,7 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.Commands.Create;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
@@ -35,7 +35,7 @@ public class IncomingDocumentsController : ApiController
     public async Task<IActionResult> CreateIncomingDocument([FromBody] CreateIncomingDocumentRequest request)
     {
         var command = _mapper.Map<CreateIncomingDocumentCommand>(request);
-        command.User = GetUserId();
+        command.User = GetUserId() ?? "";
 
         return CreateResponse(await _mediator.Send(command));
     }
