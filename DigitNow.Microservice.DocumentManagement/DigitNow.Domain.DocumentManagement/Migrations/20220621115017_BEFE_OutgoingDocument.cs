@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
-    public partial class BEFE_outgoing_document : Migration
+    public partial class BEFE_OutgoingDocument : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -127,6 +127,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     ContentSummary = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     NumberOfPages = table.Column<int>(type: "int", nullable: false),
                     RecipientId = table.Column<int>(type: "int", nullable: false),
+                    IssuerName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DocumentTypeId = table.Column<int>(type: "int", nullable: false),
                     DocumentTypeDetail = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false)

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    [Migration("20220621113501_BEFE_outgoing_document")]
-    partial class BEFE_outgoing_document
+    [Migration("20220621115017_BEFE_OutgoingDocument")]
+    partial class BEFE_OutgoingDocument
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -248,6 +248,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.Property<long?>("IdentificationNumber")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("IssuerName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("NumberOfPages")
                         .HasColumnType("int");
