@@ -88,6 +88,8 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
 
     private IQueryable<GetDocumentResponse> GetAllDocuments(int previousYear, int page, int count)
     {
+        //TODO refactor the queries after OutgoingDocuments, IncomingDocuments and InternalDocuments inherit a common base class
+
         var outgoingDocumentsQuery = _dbContext.OutgoingDocuments
             .Skip((page - 1) * count)
             .Take(count)
