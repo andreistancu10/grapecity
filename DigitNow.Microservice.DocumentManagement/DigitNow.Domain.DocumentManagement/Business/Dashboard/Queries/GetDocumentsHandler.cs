@@ -30,7 +30,18 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
     public async Task<ResultPagedList<GetDocumentResponse>> Handle(GetDocumentsQuery request, CancellationToken cancellationToken)
     {
         var previousYear = DateTime.UtcNow.Year - 1;
-        var user = await _identityAdapterClient.GetUserByIdAsync(request.UserId);
+
+        if (!int.TryParse(request.UserId, out var userId))
+        {
+            ResultObject.Error(new ErrorMessage
+            {
+                Message = $"User {userId} invalid.",
+                Parameters = new[] { nameof(request.UserId) },
+                TranslationCode = "document-management.backend.get.validation.userInvalid"
+            });
+        }
+
+        var user = await _identityAdapterClient.GetUserByIdAsync(userId);
         UserRole? userRole = null;
 
         if (user.Roles.Contains((long)UserRole.Mayor))
@@ -50,7 +61,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
         {
             ResultObject.Error(new ErrorMessage
             {
-                Message = $"Could not determine Role of user {request.UserId}.",
+                Message = $"Could not determine Role of user {userId}.",
                 Parameters = new[] { nameof(request.UserId) },
                 TranslationCode = "document-management.backend.get.validation.userRoleInvalid"
             });
@@ -59,7 +70,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
         var departmentId = user.Departments.FirstOrDefault();
         var documentsQuery = userRole switch
         {
-            UserRole.Functionary => GetDocumentsAsFunctionary(request.UserId, previousYear, request.Page, request.Count),
+            UserRole.Functionary => GetDocumentsAsFunctionary(userId, previousYear, request.Page, request.Count),
             UserRole.HeadOfDepartment => await GetDocumentsAsHeadOfDepartmentAsync((int)departmentId, previousYear, request.Page, request.Count),
             UserRole.Mayor => GetAllDocuments(previousYear, request.Page, request.Count)
         };

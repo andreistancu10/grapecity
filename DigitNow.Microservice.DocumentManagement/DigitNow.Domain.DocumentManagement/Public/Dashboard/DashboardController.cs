@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Security.Claims;
 using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateUserRecipient;
@@ -21,6 +22,8 @@ public class DashboardController : ApiController
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
     private readonly IExportService<GetDocumentResponse> _exportService;
+
+    private string GetUserId() => HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
     public DashboardController(IMediator mediator, IMapper mapper, IExportService<GetDocumentResponse> exportService)
     {
@@ -47,8 +50,9 @@ public class DashboardController : ApiController
     [HttpGet("get-documents")]
     public async Task<ActionResult<List<GetDocumentResponse>>> GetDocuments([FromQuery] GetDocumentsRequest request, CancellationToken cancellationToken)
     {
-        var command = _mapper.Map<GetDocumentsQuery>(request);
-        return Ok(await _mediator.Send(command, cancellationToken));
+        var query = _mapper.Map<GetDocumentsQuery>(request);
+        query.UserId = GetUserId();
+        return Ok(await _mediator.Send(query, cancellationToken));
     }
 
 
