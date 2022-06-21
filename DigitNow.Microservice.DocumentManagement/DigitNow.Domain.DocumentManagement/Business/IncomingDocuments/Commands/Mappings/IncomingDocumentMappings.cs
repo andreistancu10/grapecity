@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update;
+using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 using DigitNow.Domain.DocumentManagement.Data.ContactDetails;
-using DigitNow.Domain.DocumentManagement.Data.IncomingConnectedDocuments;
 using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Mappings;
@@ -18,6 +18,6 @@ public class IncomingDocumentMappings : Profile
             .ForMember(x => x.RegistrationDate, opt => opt.Ignore());
 
         CreateMap<UpdateContactDetailCommand, ContactDetail>();
-        CreateMap<IncomingDocument, IncomingConnectedDocument>();
+        CreateMap<IncomingDocument, ConnectedDocument>();
     }
 }

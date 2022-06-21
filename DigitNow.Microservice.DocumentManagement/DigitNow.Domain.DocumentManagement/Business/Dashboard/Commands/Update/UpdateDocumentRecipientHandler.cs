@@ -9,7 +9,6 @@ using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -40,31 +39,43 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                     Parameters = new object[] { request.DepartmentId }
                 });
 
-            var incomingDocIds  =  request.DocumentInfo
-                                          .Where(doc => doc.DocType == (int)DocumentType.Incoming)
-                                          .Select(doc => doc.RegistrationNumber)
-                                          .ToList();
-
-            if (incomingDocIds.Any())
-                await UpdateRecipientForIncomingDocuments(incomingDocIds);
-
-            var internalDocIds = request.DocumentInfo
-                                        .Where(doc => doc.DocType == (int)DocumentType.Internal)
-                                        .Select(doc => doc.RegistrationNumber)
-                                        .ToList();
-
-            if (internalDocIds.Any())
-                await UpdateRecipientForInternalDocuments(incomingDocIds);
-
-
+            await UpdateDocumentRecipients(request);
             await _dbContext.SaveChangesAsync();
 
             return new ResultObject(ResultStatusCode.Ok);
         }
 
-        private async Task UpdateRecipientForInternalDocuments(List<int> incomingDocIds)
+        private async Task UpdateDocumentRecipients(UpdateDocumentRecipientCommand request)
         {
-            foreach (var registrationNo in incomingDocIds)
+            await UpdateRecipientForIncomingDocuments(request);
+            await UpdateRecipientForInternalDocuments(request);
+            await UpdateRecipientForOutgoingDocuments(request);
+        }
+
+        private async Task UpdateRecipientForOutgoingDocuments(UpdateDocumentRecipientCommand request)
+        {
+            var outgoingDocIds = request.DocumentInfo
+                                        .Where(doc => doc.DocType == (int)DocumentType.Internal)
+                                        .Select(doc => doc.RegistrationNumber)
+                                        .ToList();
+
+            foreach (var registrationNo in outgoingDocIds)
+            {
+                var outgoingDoc = await _dbContext.OutgoingDocuments.FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
+
+                if (outgoingDoc != null)
+                    outgoingDoc.RecipientId = (int)_headOfDepartment.Id;
+            }
+        }
+
+        private async Task UpdateRecipientForInternalDocuments(UpdateDocumentRecipientCommand request)
+        {
+            var internalDocIds = request.DocumentInfo
+                                        .Where(doc => doc.DocType == (int)DocumentType.Internal)
+                                        .Select(doc => doc.RegistrationNumber)
+                                        .ToList();
+
+            foreach (var registrationNo in internalDocIds)
             {
                 var internalDoc = await _dbContext.InternalDocuments.FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
 
@@ -73,8 +84,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
             }
         }
 
-        private async Task UpdateRecipientForIncomingDocuments(List<int> incomingDocIds)
+        private async Task UpdateRecipientForIncomingDocuments(UpdateDocumentRecipientCommand request)
         {
+            var incomingDocIds = request.DocumentInfo
+                                        .Where(doc => doc.DocType == (int)DocumentType.Incoming)
+                                        .Select(doc => doc.RegistrationNumber)
+                                        .ToList();
+
             foreach (var registrationNo in incomingDocIds)
             {
                 var doc = await _dbContext.IncomingDocuments.FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
@@ -95,7 +111,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                     RecipientId = (int)_headOfDepartment.Id,
                     RecipientName = _headOfDepartment.FormatUserNameByRole(UserRole.HeadOfDepartment),
                     Status = (int)Status.inWorkUnallocated,
-                    CreationDate = DateTime.Now
+                    CreationDate = DateTime.Now,
+                    RegistrationNumber = doc.RegistrationNumber
                 });
         }
     }

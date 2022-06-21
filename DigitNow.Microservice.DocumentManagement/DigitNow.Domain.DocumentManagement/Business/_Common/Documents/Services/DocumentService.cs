@@ -44,6 +44,7 @@ namespace DigitNow.Domain.DocumentManagement.Business._Common.Documents.Services
             catch
             {
                 await dbContextTransaction.RollbackAsync();
+                throw;
             }
         }
     }
