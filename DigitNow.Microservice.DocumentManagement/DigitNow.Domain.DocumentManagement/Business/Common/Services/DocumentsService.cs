@@ -1,4 +1,5 @@
-﻿using DigitNow.Domain.DocumentManagement.Data;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Repositories;
+using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Documents;
 using DigitNow.Domain.DocumentManagement.Data.RegistrationNumberCounters;
 using Microsoft.EntityFrameworkCore;
@@ -15,35 +16,35 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 public interface IDocumentService
 {
     Task<Document> AddAsync(Document newDocument, CancellationToken cancellationToken);
-    Task<IList<Document>> FindAsync(Expression<Func<Document, bool>> query, CancellationToken cancellationToken);
+    Task<List<Document>> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken);
     Task AssignRegistrationNumberAsync(Document document);
 }
 
 public class DocumentService : IDocumentService
 {
     protected readonly DocumentManagementDbContext _dbContext;
+    private readonly IDocumentRepository _documentRepository;
     private readonly IIdentityService _identityService;
 
-    public DocumentService(DocumentManagementDbContext dbContext, IIdentityService identityService)
+    public DocumentService(DocumentManagementDbContext dbContext, 
+        IDocumentRepository documentRepository,
+        IIdentityService identityService)
     {
         _dbContext = dbContext;
+        _documentRepository = documentRepository;
         _identityService = identityService;
     }
 
     public async Task<Document> AddAsync(Document newDocument, CancellationToken cancellationToken)
     {
-        await _dbContext.AddAsync(newDocument, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
+        await _documentRepository.InsertAsync(newDocument, cancellationToken);
+        await _documentRepository.CommitAsync(cancellationToken);
         return newDocument;
     }
 
-    public async Task<IList<Document>> FindAsync(Expression<Func<Document, bool>> query, CancellationToken cancellationToken)
-    {
-        return await _dbContext.Documents
-            .Where(query)
-            .ToListAsync(cancellationToken);
-    }
-
+    public Task<List<Document>> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken) => 
+        _documentRepository.FindByAsync(predicate, cancellationToken);
+    
     public async Task AssignRegistrationNumberAsync(Document document)
     {
         var dbContextTransaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable);

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
-    public partial class InitialMigration : Migration
+    public partial class Initial_Migration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -67,7 +67,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     DocumentId = table.Column<long>(type: "bigint", nullable: false),
                     DocumentType = table.Column<int>(type: "int", nullable: false),
                     ResolutionType = table.Column<int>(type: "int", nullable: false),
-                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<long>(type: "bigint", nullable: false),
                     ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),

@@ -7,6 +7,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
     public interface IIdentityService
     {
         long GetCurrentUserId();
+        bool TryGetCurrentUserId(out int userId);
     }
 
     public class IdentityService : IIdentityService
@@ -20,12 +21,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
         public long GetCurrentUserId()
         {
-            var nameIdentifier = _httpContextAccesor.HttpContext.User.FindFirstValue("htss_uid");;
-
-            if (string.IsNullOrEmpty(nameIdentifier) || string.IsNullOrEmpty(nameIdentifier))
+            if (!TryGetCurrentUserId(out int userId))
+            {
                 throw new UnauthorizedAccessException("UserId is not attached on the request!");
+            }
+            return userId;            
+        }
 
-            return Convert.ToInt64(nameIdentifier);
+        public bool TryGetCurrentUserId(out int userId)
+        {
+            var userIdClaim = _httpContextAccesor.HttpContext.User.FindFirstValue("htss_uid"); ;
+
+            return int.TryParse(userIdClaim, out userId);
         }
     }
 }

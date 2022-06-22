@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    [Migration("20220621192548_InitialMigration")]
-    partial class InitialMigration
+    [Migration("20220622081915_Initial_Migration")]
+    partial class Initial_Migration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -154,7 +154,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("Remarks")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ResolutionType")

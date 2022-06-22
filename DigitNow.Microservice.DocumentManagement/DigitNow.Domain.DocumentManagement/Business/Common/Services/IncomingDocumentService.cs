@@ -1,4 +1,5 @@
-﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Repositories;
+using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Documents;
 using DigitNow.Domain.DocumentManagement.Domain.Business.Common.Factories;
@@ -14,8 +15,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 {
     public interface IIncomingDocumentService
     {
-        Task<IncomingDocument> AddAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken);
-        Task<IList<IncomingDocument>> FindAsync(Expression<Func<IncomingDocument, bool>> query, CancellationToken cancellationToken);
+        Task<IncomingDocument> CreateAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken);
+        Task<List<IncomingDocument>> FindAsync(Expression<Func<IncomingDocument, bool>> predicate, CancellationToken cancellationToken);
         Task SetResolutionAsync(IList<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken);
     }
 
@@ -23,16 +24,21 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IDocumentService _documentService;
+        private readonly IIncomingDocumentRepository _incomingDocumentRepository;
         private readonly IIdentityService _identityService;
 
-        public IncomingDocumentService(DocumentManagementDbContext dbContext, IDocumentService documentService, IIdentityService identityService)
+        public IncomingDocumentService(DocumentManagementDbContext dbContext, 
+            IDocumentService documentService, 
+            IIncomingDocumentRepository incomingDocumentRepository,
+            IIdentityService identityService)
         {
             _dbContext = dbContext;
             _documentService = documentService;
+            _incomingDocumentRepository = incomingDocumentRepository;
             _identityService = identityService;
         }
 
-        public async Task<IncomingDocument> AddAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken)
+        public async Task<IncomingDocument> CreateAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken)
         {
             incomingDocument.Document = new Document
             {
@@ -41,21 +47,22 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
                 DocumentType = DocumentType.Incoming
             };
 
-            await _dbContext.IncomingDocuments.AddAsync(incomingDocument, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            if (_identityService.TryGetCurrentUserId(out int userId))
+            {
+                incomingDocument.CreatedBy = userId;
+            }
+
+            await _incomingDocumentRepository.InsertAsync(incomingDocument, cancellationToken);
             return incomingDocument;
         }
 
-        public async Task<IList<IncomingDocument>> FindAsync(Expression<Func<IncomingDocument, bool>> query, CancellationToken cancellationToken)
-        {
-            return await _dbContext.IncomingDocuments
-                .Where(query)
-                .ToListAsync(cancellationToken);
-        }
+        public Task<List<IncomingDocument>> FindAsync(Expression<Func<IncomingDocument, bool>> predicate, CancellationToken cancellationToken) =>
+            _incomingDocumentRepository.FindByAsync(predicate, cancellationToken);
 
         public async Task SetResolutionAsync(IList<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken)
         {
             var dbIncomingDocuments = await _dbContext.IncomingDocuments
+                .Include(x => x.Document)
                 .Where(x => documentIds.Contains(x.Id))
                 .ToListAsync(cancellationToken);
 

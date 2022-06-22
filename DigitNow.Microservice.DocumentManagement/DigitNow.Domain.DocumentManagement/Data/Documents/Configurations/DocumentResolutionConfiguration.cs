@@ -13,7 +13,6 @@ public class DocumentResolutionConfiguration : IEntityTypeConfiguration<Document
 
         builder.Property(p => p.DocumentId).IsRequired();
         builder.Property(p => p.DocumentType).IsRequired();
-        builder.Property(p => p.ResolutionType).IsRequired();
-        builder.Property(p => p.Remarks).IsRequired();
+        builder.Property(p => p.ResolutionType).IsRequired();        
     }
 }

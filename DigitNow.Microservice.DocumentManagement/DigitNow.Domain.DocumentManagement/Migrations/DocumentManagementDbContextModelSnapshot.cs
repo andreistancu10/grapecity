@@ -152,7 +152,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<string>("Remarks")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ResolutionType")

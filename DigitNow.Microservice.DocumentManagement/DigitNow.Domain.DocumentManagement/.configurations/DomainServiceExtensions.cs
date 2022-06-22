@@ -1,6 +1,8 @@
 ﻿using System.Reflection;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Repositories;
 using DigitNow.Domain.DocumentManagement.configurations.HostedServices;
+using DigitNow.Domain.DocumentManagement.Data.Documents;
 using Domain.Localization.Client.configurations;
 using HTSS.Platform.Core.Files.MicrosoftExtensions;
 using HTSS.Platform.Infrastructure.Api.Tools;
@@ -62,6 +64,16 @@ namespace DigitNow.Domain.DocumentManagement.configurations
         
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
+            services.AddTransient<IEntityRepository<Document>, EntityRepository<Document>>();
+            services.AddTransient<IEntityRepository<IncomingDocument>, EntityRepository<IncomingDocument>>();
+            services.AddTransient<IEntityRepository<InternalDocument>, EntityRepository<InternalDocument>>();
+            services.AddTransient<IEntityRepository<OutgoingDocument>, EntityRepository<OutgoingDocument>>();
+
+            services.AddTransient<IDocumentRepository, DocumentRepository>();
+            services.AddTransient<IIncomingDocumentRepository, IncomingDocumentRepository>();
+            services.AddTransient<IInternalDocumentRepository, InternalDocumentRepository>();
+            services.AddTransient<IOutgoingDocumentRepository, OutgoingDocumentRepository>();
+
             services.AddTransient<IIdentityService, IdentityService>();
             services.AddTransient<IDocumentService, DocumentService>();
             services.AddTransient<IIncomingDocumentService, IncomingDocumentService>();

@@ -1,4 +1,5 @@
-﻿using DigitNow.Domain.DocumentManagement.Data;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Repositories;
+using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Documents;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -13,25 +14,23 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 {
     public interface IOutgoingDocumentService
     {
-        Task<IList<OutgoingDocument>> FindAsync(Expression<Func<OutgoingDocument, bool>> query, CancellationToken cancellationToken);
+        Task<List<OutgoingDocument>> FindAsync(Expression<Func<OutgoingDocument, bool>> predicate, CancellationToken cancellationToken);
     }
 
     public class OutgoingDocumentService : IOutgoingDocumentService
     {
-        private readonly DocumentManagementDbContext _dbContext;
         private readonly IDocumentService _documentService;
+        private readonly IOutgoingDocumentRepository _outgoingDocumentRepository;
 
-        public OutgoingDocumentService(DocumentManagementDbContext dbContext, IDocumentService documentService)
+        public OutgoingDocumentService(
+            IDocumentService documentService,
+            IOutgoingDocumentRepository outgoingDocumentRepository)
         {
-            _dbContext = dbContext;
             _documentService = documentService;
+            _outgoingDocumentRepository = outgoingDocumentRepository;
         }
 
-        public async Task<IList<OutgoingDocument>> FindAsync(Expression<Func<OutgoingDocument, bool>> query, CancellationToken cancellationToken)
-        {
-            return await _dbContext.OutgoingDocuments
-                .Where(query)
-                .ToListAsync(cancellationToken);
-        }
+        public Task<List<OutgoingDocument>> FindAsync(Expression<Func<OutgoingDocument, bool>> predicate, CancellationToken cancellationToken) =>
+            _outgoingDocumentRepository.FindByAsync(predicate, cancellationToken);
     }
 }

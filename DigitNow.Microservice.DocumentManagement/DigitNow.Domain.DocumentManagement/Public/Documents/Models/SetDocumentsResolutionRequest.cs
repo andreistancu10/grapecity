@@ -1,10 +1,5 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Documents;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Documents.Models
 {
@@ -14,6 +9,6 @@ namespace DigitNow.Domain.DocumentManagement.Public.Documents.Models
 
         public DocumentResolutionType Resolution { get; set; }
 
-        public string Remark { get; set; }
+        public string Remarks { get; set; } = null;
     }
 }
