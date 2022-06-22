@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
@@ -11,55 +9,97 @@ namespace DigitNow.Domain.DocumentManagement.Business._Common.Documents.Services
 
 public class FileUploadService
 {
-    private readonly int _depth;
     private readonly int _filesPerDirectory;
-    private readonly string _filename;
-    private readonly int _chunkSize;
     private readonly string _completeRootPath;
     private readonly string _partition;
 
-    public FileUploadService(int depth,
-        int filesPerDirectory,
-        string filename,
-        string rootPath,
-        int chunkSize,
+    public FileUploadService(
+        string rootPath = "DigitNow_Documents",
+        int filesPerDirectory = 1000,
         string partition = "C")
     {
-        _depth = depth;
         _filesPerDirectory = filesPerDirectory;
-        _filename = filename;
-        _chunkSize = chunkSize;
         _completeRootPath = $"{partition}:\\{rootPath}";
         _partition = partition;
     }
 
     public async Task UploadFileAsync(IFormFile formFileStream, string filename)
     {
-        var hash = HashString(filename);
-        filename = $"{hash}_{filename}";
-
-        var chunks = SplitIntoChunks(hash);
-        var fullPath = GenerateFullPath(chunks);
-
+        var fullPath = GenerateFullPath();
+        fullPath = EnsureEligibilityOfPath(fullPath: fullPath);
+        filename = EnsureEligibilityOfFilename(filename: filename, fullPath: fullPath);
+        
         CheckOrCreateDirectoryTree(fullPath);
-
-        //TODO: make sure there aren't 1000 files in that path already
-        //TODO: check if a file with same name already exists
 
         await SaveFileOnDiskAsync(fullPath, filename, formFileStream);
     }
 
-    private static string HashString(string filename)
+    private static string EnsureEligibilityOfFilename(string filename, string fullPath)
     {
-        using var md5 = MD5.Create();
-        var inputBytes = Encoding.ASCII.GetBytes(filename);
-        var hashBytes = md5.ComputeHash(inputBytes);
-        return Convert.ToHexString(hashBytes);
+        var isFilenameEligible = false;
+        var newFilename = filename;
+
+        for (var i = 1; !isFilenameEligible; i++)
+        {
+            if (DoesFileAlreadyExist(fullPath, newFilename))
+            {
+                var bits = filename.Split(".");
+                newFilename = $"{bits[0]}_{i}.{bits[1]}";
+            }
+            else
+            {
+                isFilenameEligible = true;
+            }
+        }
+
+        return newFilename;
+    }
+
+    private string EnsureEligibilityOfPath(string fullPath)
+    {
+        var isDirectoryEligible = false;
+        var newFullPath = fullPath;
+
+
+        for (var i = 1; !isDirectoryEligible; i++)
+        {
+            if (!IsRoomLeftInDirectory(newFullPath))
+            {
+                newFullPath = $"{fullPath}_{i}";
+            }
+            else
+            {
+                isDirectoryEligible = true;
+            }
+        }
+
+        return newFullPath;
+    }
+
+    private static bool DoesFileAlreadyExist(string path, string filename)
+    {
+        if (!Directory.Exists(path))
+        {
+            return false;
+        }
+
+        var filenameWithPath = $"{path}\\{filename}";
+        return Directory.EnumerateFiles(path).Any(c => c == filenameWithPath);
+    }
+
+    private bool IsRoomLeftInDirectory(string path)
+    {
+        if (!Directory.Exists(path))
+        {
+            return true;
+        }
+
+        return Directory.EnumerateFiles(path).Count() < _filesPerDirectory;
     }
 
     private static async Task SaveFileOnDiskAsync(string fullPath, string filename, IFormFile formFileStream)
     {
-        if (formFileStream.Length <=0)
+        if (formFileStream.Length <= 0)
         {
             return;
         }
@@ -68,10 +108,13 @@ public class FileUploadService
         await formFileStream.CopyToAsync(fileStream);
     }
 
-    private string GenerateFullPath(IEnumerable<string> chunks)
+    private string GenerateFullPath()
     {
-        var stringBuilder = new StringBuilder(_completeRootPath).AppendJoin("\\", chunks);
-        return stringBuilder.ToString();
+        var year = DateTime.UtcNow.Year;
+        var month = DateTime.UtcNow.Month;
+        var day = DateTime.UtcNow.Day;
+
+        return $"{_completeRootPath}\\{year}\\{month}\\{day}";
     }
 
     private static void CheckOrCreateDirectoryTree(string path)
@@ -80,27 +123,5 @@ public class FileUploadService
         {
             Directory.CreateDirectory(path);
         }
-    }
-
-    private IEnumerable<string> SplitIntoChunks(string str)
-    {
-        if (string.IsNullOrWhiteSpace(str))
-        {
-            return Array.Empty<string>();
-        }
-
-        if (str.Length < _depth * _chunkSize)
-        {
-            throw new Exception("String is shorter than expected.");
-        }
-
-        var chunks = new List<string>();
-
-        for (var i = 0; i < _depth; i++)
-        {
-            chunks.Add(str.Substring(i * _chunkSize, _chunkSize));
-        }
-
-        return chunks;
     }
 }
