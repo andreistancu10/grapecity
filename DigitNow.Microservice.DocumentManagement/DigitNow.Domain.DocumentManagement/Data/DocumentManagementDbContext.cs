@@ -1,9 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
-using DigitNow.Domain.DocumentManagement.Data.Documents;
-using DigitNow.Domain.DocumentManagement.Data.RegistrationNumberCounters;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Data
 {
@@ -19,8 +17,8 @@ namespace DigitNow.Domain.DocumentManagement.Data
 
         public DbSet<IncomingDocument> IncomingDocuments { get; set; }
 
-        public DbSet<OutgoingDocument> OutgoingDocuments { get; set; }        
-        
+        public DbSet<OutgoingDocument> OutgoingDocuments { get; set; }
+
         public DbSet<InternalDocument> InternalDocuments { get; set; }
 
         public DbSet<DocumentResolution> DocumentResolutions { get; set; }
@@ -34,7 +32,14 @@ namespace DigitNow.Domain.DocumentManagement.Data
             modelBuilder.HasDefaultSchema(Schema);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(DocumentManagementDbContext).Assembly);
         }
-        
+
+        public override int SaveChanges()
+        {
+            // TODO: Add telemetry data
+
+            return base.SaveChanges();
+        }
+
         public class DbContextFactory : IDesignTimeDbContextFactory<DocumentManagementDbContext>
         {
             public DocumentManagementDbContext CreateDbContext(string[] args)
@@ -45,7 +50,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
                 {
                     builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
                 });
-                
+
                 return new DocumentManagementDbContext(optionsBuilder.Options);
             }
         }

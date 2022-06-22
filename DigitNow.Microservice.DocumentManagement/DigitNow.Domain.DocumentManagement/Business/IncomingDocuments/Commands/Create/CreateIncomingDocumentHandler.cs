@@ -1,8 +1,5 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Contracts.Documents;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.WorkflowHistories;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -10,9 +7,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using HTSS.Platform.Core.Errors;
-using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
-using DigitNow.Domain.DocumentManagement.Data.Documents;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Data;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
 

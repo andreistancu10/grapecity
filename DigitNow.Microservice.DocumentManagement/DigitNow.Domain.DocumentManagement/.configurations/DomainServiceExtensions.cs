@@ -1,8 +1,9 @@
 ﻿using System.Reflection;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-using DigitNow.Domain.DocumentManagement.Business.Common.Repositories;
 using DigitNow.Domain.DocumentManagement.configurations.HostedServices;
-using DigitNow.Domain.DocumentManagement.Data.Documents;
+using DigitNow.Domain.DocumentManagement.Data.Abstractions;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Repositories;
 using Domain.Localization.Client.configurations;
 using HTSS.Platform.Core.Files.MicrosoftExtensions;
 using HTSS.Platform.Infrastructure.Api.Tools;
@@ -68,17 +69,20 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<IEntityRepository<IncomingDocument>, EntityRepository<IncomingDocument>>();
             services.AddTransient<IEntityRepository<InternalDocument>, EntityRepository<InternalDocument>>();
             services.AddTransient<IEntityRepository<OutgoingDocument>, EntityRepository<OutgoingDocument>>();
+            services.AddTransient<IEntityRepository<DocumentResolution>, EntityRepository<DocumentResolution>>();
 
             services.AddTransient<IDocumentRepository, DocumentRepository>();
             services.AddTransient<IIncomingDocumentRepository, IncomingDocumentRepository>();
             services.AddTransient<IInternalDocumentRepository, InternalDocumentRepository>();
             services.AddTransient<IOutgoingDocumentRepository, OutgoingDocumentRepository>();
+            services.AddTransient<IDocumentResolutionRepository, DocumentResolutionRepository>();
 
             services.AddTransient<IIdentityService, IdentityService>();
             services.AddTransient<IDocumentService, DocumentService>();
             services.AddTransient<IIncomingDocumentService, IncomingDocumentService>();
             services.AddTransient<IInternalDocumentService, InternalDocumentService>();
             services.AddTransient<IOutgoingDocumentService, OutgoingDocumentService>();
+            services.AddTransient<IDocumentResolutionService, DocumentResolutionService>();
 
             return services;
         }

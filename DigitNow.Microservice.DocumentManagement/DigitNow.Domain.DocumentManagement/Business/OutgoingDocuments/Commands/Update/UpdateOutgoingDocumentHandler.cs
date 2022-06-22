@@ -1,14 +1,13 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Data;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
-using DigitNow.Domain.DocumentManagement.Data.Documents;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+using DigitNow.Domain.DocumentManagement.Data;
 
 namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Update;
 

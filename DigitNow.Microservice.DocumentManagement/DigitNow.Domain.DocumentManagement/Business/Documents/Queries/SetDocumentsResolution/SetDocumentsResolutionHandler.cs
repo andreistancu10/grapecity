@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using DigitNow.Domain.DocumentManagement.Data.Documents;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Documents.Queries.SetDocumentsResolution;
@@ -42,6 +42,13 @@ public class SetDocumentsResolutionHandler
 
     private async Task<bool> ProcessInternalDocumentsAsync(DocumentBatch documentBatch, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken)
     {
+        var x = new InternalDocument
+        {
+            IsUrgent = true
+        };
+
+        await _internalDocumentService.CreateAsync(x, cancellationToken);
+
         var internalDocumentIds = documentBatch.Documents
             .Where(x => x.DocumentType == DocumentType.Internal)
             .Select(x => x.Id)
@@ -61,7 +68,7 @@ public class SetDocumentsResolutionHandler
         //    IssuerName = "test"
         //};
 
-        //await _incomingDocumentService.AddAsync(x, cancellationToken);
+        //await _incomingDocumentService.CreateAsync(x, cancellationToken);
 
         var incomingDocumentIds = documentBatch.Documents
             .Where(x => x.DocumentType == DocumentType.Incoming)

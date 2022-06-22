@@ -1,7 +1,7 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Repositories;
-using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.Documents;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Repositories;
 using DigitNow.Domain.DocumentManagement.Domain.Business.Common.Factories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -15,7 +15,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 {
     public interface IIncomingDocumentService
     {
-        Task<IncomingDocument> CreateAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken);
+        Task<IncomingDocument> AddAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken);
         Task<List<IncomingDocument>> FindAsync(Expression<Func<IncomingDocument, bool>> predicate, CancellationToken cancellationToken);
         Task SetResolutionAsync(IList<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken);
     }
@@ -26,24 +26,26 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
         private readonly IDocumentService _documentService;
         private readonly IIncomingDocumentRepository _incomingDocumentRepository;
         private readonly IIdentityService _identityService;
+        private readonly IDocumentResolutionRepository _documentResolutionRepository;
 
         public IncomingDocumentService(DocumentManagementDbContext dbContext, 
             IDocumentService documentService, 
             IIncomingDocumentRepository incomingDocumentRepository,
-            IIdentityService identityService)
+            IIdentityService identityService,
+            IDocumentResolutionRepository documentResolutionRepository)
         {
             _dbContext = dbContext;
             _documentService = documentService;
             _incomingDocumentRepository = incomingDocumentRepository;
             _identityService = identityService;
+            _documentResolutionRepository = documentResolutionRepository;
         }
 
-        public async Task<IncomingDocument> CreateAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken)
+        public async Task<IncomingDocument> AddAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken)
         {
             incomingDocument.Document = new Document
             {
                 CreatedAt = DateTime.Now,
-                CreatedBy = _identityService.GetCurrentUserId(),
                 DocumentType = DocumentType.Incoming
             };
 
@@ -61,15 +63,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
         public async Task SetResolutionAsync(IList<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken)
         {
-            var dbIncomingDocuments = await _dbContext.IncomingDocuments
-                .Include(x => x.Document)
-                .Where(x => documentIds.Contains(x.Id))
-                .ToListAsync(cancellationToken);
+            var dbIncomingDocuments = await _incomingDocumentRepository.FindByAsync(x => documentIds.Contains(x.Id), cancellationToken, x => x.Document);
 
             foreach (var dbIncomingDocument in dbIncomingDocuments)
             {
-                await _dbContext.DocumentResolutions
-                    .AddAsync(DocumentResolutionFactory.Create(dbIncomingDocument, resolutionType, remarks));
+                await _documentResolutionRepository.InsertAsync(DocumentResolutionFactory.Create(dbIncomingDocument, resolutionType, remarks), cancellationToken);
             }
 
             await _dbContext.SaveChangesAsync(cancellationToken);

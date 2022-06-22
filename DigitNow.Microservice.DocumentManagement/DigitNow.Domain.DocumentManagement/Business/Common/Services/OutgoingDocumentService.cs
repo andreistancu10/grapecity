@@ -1,12 +1,8 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Repositories;
-using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.Documents;
-using Microsoft.EntityFrameworkCore;
+﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Repositories;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 

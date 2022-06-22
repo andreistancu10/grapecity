@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Data.ContactDetails;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.ContactDetails.Queries;
 
