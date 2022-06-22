@@ -4,7 +4,7 @@ namespace DigitNow.Adapters.MS.Identity.Poco
     public class ContactDetailDto
     {
         public int Id { get; set; }
-        public string IdentificationNumber { get; set; }
+        public string? IdentificationNumber { get; set; }
         public int CountryId { get; set; }
         public int CountyId { get; set; }
         public int CityId { get; set; }

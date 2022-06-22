@@ -10,7 +10,6 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Update;
-using DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries.GetByRegistrationNumberAndYear;
 
 namespace DigitNow.Domain.DocumentManagement.Public.OutgoingDocuments;
 
@@ -39,17 +38,6 @@ public class OutgoingDocumentsController : ApiController
         command.User = GetUserId();
 
         return CreateResponse(await _mediator.Send(command));
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> GetByRegistrationNumber([FromQuery] int registrationNumber, [FromQuery] int year)
-    {
-        return await _mediator.Send(new GetOutgoingDocumentsByRegistrationNumberAndYearQuery { RegistrationNumber = registrationNumber, Year = year })
-            switch
-        {
-            null => NotFound(),
-            var result => Ok(result)
-        };
     }
 
     [HttpPut("{id}")]
