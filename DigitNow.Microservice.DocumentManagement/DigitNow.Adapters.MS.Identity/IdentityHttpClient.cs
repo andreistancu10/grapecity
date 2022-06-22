@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication;
 using System.Net.Http.Headers;
+using System.Text;
 
 namespace DigitNow.Adapters.MS.Identity
 {
@@ -37,6 +38,19 @@ namespace DigitNow.Adapters.MS.Identity
             }
 
             return result;
+        }
+
+        public async Task PostAsync(string requestUri, object content)
+        {
+            await SetAuthorizationTokenAsync();
+
+            var jsonObject = JsonConvert.SerializeObject(content);
+            var response = await _httpClient.PostAsync(requestUri, new StringContent(jsonObject, Encoding.UTF8, "application/json"));
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new HttpRequestException();
+            }
         }
 
         private async Task SetAuthorizationTokenAsync()

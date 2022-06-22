@@ -6,7 +6,7 @@ namespace DigitNow.Adapters.MS.Identity
     {
         Task<UserList> GetUsersByDepartmentIdAsync(int id);
         Task<User> GetUserByIdAsync(int id);
-
+        Task CreateContactDetails(ContactDetailDto contactDetail);
     }
 
     public class IdentityAdapterClient : IIdentityAdapterClient
@@ -16,6 +16,11 @@ namespace DigitNow.Adapters.MS.Identity
         public IdentityAdapterClient(IdentityHttpClient identityHttpClient)
         {
             _identityHttpClient = identityHttpClient;
+        }
+
+        public Task CreateContactDetails(ContactDetailDto contactDetail)
+        {
+            return _identityHttpClient.PostAsync($"api/contact-details/", contactDetail);
         }
 
         public Task<User> GetUserByIdAsync(int id) => 
