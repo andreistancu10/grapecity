@@ -1,9 +1,8 @@
 ﻿using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
+using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.extensions.Autocorrect;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
@@ -46,12 +45,19 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
 
         private async Task UpdateDocumentRecipients(UpdateDocumentRecipientCommand request)
         {
-            await UpdateRecipientForIncomingDocuments(request);
-            await UpdateRecipientForInternalDocuments(request);
-            await UpdateRecipientForOutgoingDocuments(request);
+            var parallelResult = await Task.WhenAll(
+                UpdateRecipientForIncomingDocuments(request),
+                UpdateRecipientForInternalDocuments(request),
+                UpdateRecipientForOutgoingDocuments(request)
+            );
+
+            if (parallelResult.Any(x => !x))
+            {
+                throw new InvalidOperationException("Cannot set department for requested documents!");
+            }
         }
 
-        private async Task UpdateRecipientForOutgoingDocuments(UpdateDocumentRecipientCommand request)
+        private async Task<bool> UpdateRecipientForOutgoingDocuments(UpdateDocumentRecipientCommand request)
         {
             var outgoingDocIds = request.DocumentInfo
                                         .Where(doc => doc.DocType == (int)DocumentType.Internal)
@@ -63,11 +69,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                 var outgoingDoc = await _dbContext.OutgoingDocuments.FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
 
                 if (outgoingDoc != null)
+                {
                     outgoingDoc.RecipientId = (int)_headOfDepartment.Id;
+                    WorkflowHistoryFactory.Create(outgoingDoc, UserRole.HeadOfDepartment, _headOfDepartment, Status.inWorkUnallocated);
+                }
             }
+
+            return true;
         }
 
-        private async Task UpdateRecipientForInternalDocuments(UpdateDocumentRecipientCommand request)
+        private async Task<bool> UpdateRecipientForInternalDocuments(UpdateDocumentRecipientCommand request)
         {
             var internalDocIds = request.DocumentInfo
                                         .Where(doc => doc.DocType == (int)DocumentType.Internal)
@@ -79,11 +90,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                 var internalDoc = await _dbContext.InternalDocuments.FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
 
                 if (internalDoc != null)
+                {
                     internalDoc.ReceiverDepartmentId = (int)_headOfDepartment.Id;
+                    WorkflowHistoryFactory.Create(internalDoc, UserRole.HeadOfDepartment, _headOfDepartment, Status.inWorkUnallocated);
+                }
             }
+
+            return true;
         }
 
-        private async Task UpdateRecipientForIncomingDocuments(UpdateDocumentRecipientCommand request)
+        private async Task<bool> UpdateRecipientForIncomingDocuments(UpdateDocumentRecipientCommand request)
         {
             var incomingDocIds = request.DocumentInfo
                                         .Where(doc => doc.DocType == (int)DocumentType.Incoming)
@@ -96,23 +112,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                 if (doc != null)
                 {
                     doc.RecipientId = (int)_headOfDepartment.Id;
-                    CreateWorkflowRecord(doc);
+                    WorkflowHistoryFactory.Create(doc, UserRole.HeadOfDepartment, _headOfDepartment, Status.inWorkUnallocated);
                 }
             }
-        }
 
-        private void CreateWorkflowRecord(IncomingDocument doc)
-        {
-            doc.WorkflowHistory.Add(
-                new WorkflowHistory()
-                {
-                    RecipientType = (int)UserRole.HeadOfDepartment,
-                    RecipientId = (int)_headOfDepartment.Id,
-                    RecipientName = _headOfDepartment.FormatUserNameByRole(UserRole.HeadOfDepartment),
-                    Status = (int)Status.inWorkUnallocated,
-                    CreationDate = DateTime.Now,
-                    RegistrationNumber = doc.RegistrationNumber
-                });
+            return true;
         }
     }
 }
