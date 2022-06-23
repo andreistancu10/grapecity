@@ -26,7 +26,7 @@ public class GetOutgoingDocumentByRegistrationNumberAndYearHandler
         var result = await _dbContext.OutgoingDocuments
             .Where(doc =>
                 doc.RegistrationNumber == request.RegistrationNumber &&
-                doc.RegistrationDate.Year == DateTime.Now.Year)
+                doc.CreationDate.Year == DateTime.Now.Year)
             .ToListAsync(cancellationToken);
 
         return _mapper.Map<List<GetDocumentsByRegistrationNumberAndYearResponse>>(result);

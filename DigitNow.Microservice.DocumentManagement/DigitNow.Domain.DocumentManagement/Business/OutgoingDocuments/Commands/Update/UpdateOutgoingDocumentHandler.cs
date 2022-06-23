@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using AutoMapper;
+﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments;
 using HTSS.Platform.Core.CQRS;
@@ -8,8 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update;
-using DigitNow.Domain.DocumentManagement.Data.OutgoingConnectedDocuments;
+using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 
 namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Update;
 
@@ -61,7 +59,7 @@ public class UpdateOutgoingDocumentHandler : ICommandHandler<UpdateOutgoingDocum
             foreach (var doc in connectedDocuments)
             {
                 outgoingDocFromDb.ConnectedDocuments
-                    .Add(new OutgoingConnectedDocument { ChildOutgoingDocumentId = doc.Id, RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });
+                    .Add(new ConnectedDocument {  RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });
             }
         }
     }
@@ -73,8 +71,7 @@ public class UpdateOutgoingDocumentHandler : ICommandHandler<UpdateOutgoingDocum
 
         if (idsToRemove.Any())
         {
-
-            _dbContext.OutgoingConnectedDocuments
+            _dbContext.ConnectedDocuments
                 .RemoveRange(outgoingDocFromDb.ConnectedDocuments
                     .Where(cd => idsToRemove
                         .Contains(cd.RegistrationNumber))
