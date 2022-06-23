@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
@@ -17,5 +18,6 @@ public class IncomingDocumentMappings : Profile
 
         CreateMap<UpdateContactDetailCommand, ContactDetail>();
         CreateMap<IncomingDocument, ConnectedDocument>();
+        CreateMap<CreateContactDetailCommand, ContactDetailDto>();
     }
 }

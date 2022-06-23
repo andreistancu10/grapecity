@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.InternalDocuments.Commands.Create;
-using DigitNow.Domain.DocumentManagement.Business.InternalDocuments.Queries.GetByRegistrationNumber;
 using DigitNow.Domain.DocumentManagement.Public.InternalDocuments.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
@@ -37,16 +36,5 @@ public class InternalDocumentsController : ApiController
         command.User = GetUserId();
 
         return CreateResponse(await _mediator.Send(command));
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> GetByRegistrationNumber([FromQuery] int registrationNumber)
-    {
-        return await _mediator.Send(new GetInternalDocumentByRegistrationNumberQuery { RegistrationNumber = registrationNumber})
-            switch
-            {
-                null => NotFound(),
-                var result => Ok(result)
-            };
     }
 }
