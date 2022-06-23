@@ -13,7 +13,6 @@ using System.Threading.Tasks;
 namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments;
 
 [Authorize]
-[AllowAnonymous]
 [ApiController]
 [Route("api/documents")]
 public class DocumentsController : ApiController
