@@ -5,6 +5,7 @@ namespace DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums
     {
         Incoming = 1,
         Internal = 2,
-        Outgoing = 3
+        Outgoing = 3,
+        IncomingToOutgoing = 4
     }
 }

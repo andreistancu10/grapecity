@@ -15,4 +15,6 @@ public class GetDocumentResponse
     public int Status { get; set; }
     public string DispatchBy { get; set; }
     public string User { get; set; }
+
+    public bool IsDispatched { get; set; }
 }

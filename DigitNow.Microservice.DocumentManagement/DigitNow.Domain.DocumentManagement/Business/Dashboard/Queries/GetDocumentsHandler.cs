@@ -100,7 +100,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
         var incomingDocumentsQuery = _dbContext.IncomingDocuments
             .Skip((page - 1) * count)
             .Take(count)
-            .Where(c => c.RegistrationDate != null && ((DateTime)c.RegistrationDate).Year >= previousYear)
+            .Where(c => c.RegistrationDate.Year >= previousYear)
             .Select(c => _mapper.Map<GetDocumentResponse>(c))
             .OrderBy(c => c.RegistrationNumber);
 

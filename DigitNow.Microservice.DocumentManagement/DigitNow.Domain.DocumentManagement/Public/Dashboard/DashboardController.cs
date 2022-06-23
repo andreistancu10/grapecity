@@ -55,7 +55,6 @@ public class DashboardController : ApiController
         return Ok(await _mediator.Send(query, cancellationToken));
     }
 
-
     [HttpGet("export-excel")]
     public async Task<ActionResult<FileContentResult>> ExportExcel([FromQuery] GetDocumentsRequest request, CancellationToken cancellationToken)
     {
