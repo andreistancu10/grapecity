@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Documents.Queries.SetDocumentsResolution;
+using DigitNow.Domain.DocumentManagement.Business.Documents.Commands.SetDocumentsResolution;
+using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries;
 using DigitNow.Domain.DocumentManagement.Public.Documents.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
@@ -28,14 +29,19 @@ public class DocumentsController : ApiController
         _httpContextAccessor = httpContextAccessor;
     }
 
-    [HttpGet("resolution/{id}/{documentType}")]
-    public async Task<IActionResult> GetDocumentResolution([FromRoute] int identifier, [FromRoute] int documentType)
+    [HttpGet("resolution/{documentId}")]
+    public async Task<IActionResult> GetDocumentResolutionAsync([FromRoute] int documentId)
     {
-        throw new System.NotImplementedException();
+        return await _mediator.Send(new GetDocumentResolutionByDocumentIdQuery { DocumentId = documentId })
+            switch
+        {
+            null => NotFound(),
+            var result => Ok(result)
+        };
     }
 
     [HttpPost("resolution")]
-    public async Task<IActionResult> SetDocumentsResolution([FromBody] SetDocumentsResolutionRequest request)
+    public async Task<IActionResult> SetDocumentsResolutionAsync([FromBody] SetDocumentsResolutionRequest request)
     {
         var query = _mapper.Map<SetDocumentsResolutionQuery>(request);
 

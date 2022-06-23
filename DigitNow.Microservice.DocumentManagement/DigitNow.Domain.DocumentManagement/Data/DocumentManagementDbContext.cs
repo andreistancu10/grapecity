@@ -2,6 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using System.Threading.Tasks;
+using System.Threading;
+using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 
 namespace DigitNow.Domain.DocumentManagement.Data
 {
@@ -9,8 +12,16 @@ namespace DigitNow.Domain.DocumentManagement.Data
     {
         internal const string Schema = "DocumentMangement";
 
-        public DocumentManagementDbContext(DbContextOptions<DocumentManagementDbContext> options) : base(options)
+        private readonly IIdentityService _identityService;
+
+        public DocumentManagementDbContext(DbContextOptions<DocumentManagementDbContext> options)
+            : base(options) { }
+
+        public DocumentManagementDbContext(DbContextOptions<DocumentManagementDbContext> options,
+            IIdentityService identityService) 
+            : base(options)
         {
+            _identityService = identityService;
         }
 
         public DbSet<Document> Documents { get; set; }
@@ -33,11 +44,24 @@ namespace DigitNow.Domain.DocumentManagement.Data
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(DocumentManagementDbContext).Assembly);
         }
 
-        public override int SaveChanges()
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
-            // TODO: Add telemetry data
+            foreach (var entry in ChangeTracker.Entries<ExtendedEntity>())
+            {
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        entry.Entity.CreatedAt = DateTime.Now;
+                        entry.Entity.CreatedBy = _identityService.GetCurrentUserId();
+                        break;
+                    case EntityState.Modified:
+                        entry.Entity.ModifiedAt = DateTime.Now;
+                        entry.Entity.ModifiedBy = _identityService.GetCurrentUserId();
+                        break;
+                }
+            }
 
-            return base.SaveChanges();
+            return base.SaveChangesAsync(cancellationToken);
         }
 
         public class DbContextFactory : IDesignTimeDbContextFactory<DocumentManagementDbContext>

@@ -1,6 +1,5 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -21,28 +20,29 @@ public interface IDocumentService
 
 public class DocumentService : IDocumentService
 {
-    protected readonly DocumentManagementDbContext _dbContext;
-    private readonly IDocumentRepository _documentRepository;
+    protected readonly DocumentManagementDbContext _dbContext;    
     private readonly IIdentityService _identityService;
 
-    public DocumentService(DocumentManagementDbContext dbContext, 
-        IDocumentRepository documentRepository,
+    public DocumentService(DocumentManagementDbContext dbContext,         
         IIdentityService identityService)
     {
         _dbContext = dbContext;
-        _documentRepository = documentRepository;
         _identityService = identityService;
     }
 
     public async Task<Document> AddAsync(Document newDocument, CancellationToken cancellationToken)
     {
-        await _documentRepository.InsertAsync(newDocument, cancellationToken);
-        await _documentRepository.CommitAsync(cancellationToken);
+        await _dbContext.AddAsync(newDocument, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
         return newDocument;
     }
 
-    public Task<List<Document>> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken) => 
-        _documentRepository.FindByAsync(predicate, cancellationToken);
+    public Task<List<Document>> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken)
+    {
+        return _dbContext.Documents
+            .Where(predicate)
+            .ToListAsync(cancellationToken);
+    }
     
     // TODO: Use RegistrationNumberCounterService
     public async Task AssignRegistrationNumberAsync(Document document)
