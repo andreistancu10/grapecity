@@ -5,8 +5,6 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities;
 
 public class OutgoingDocument : VirtualDocument
 {
-    public long DocumentId { get; set; }
-
     public long? IdentificationNumber { get; set; }
     public int ContactDetailId { get; set; }
     public string ContentSummary { get; set; }

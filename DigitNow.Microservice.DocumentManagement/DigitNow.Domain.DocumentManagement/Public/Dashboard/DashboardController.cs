@@ -54,7 +54,6 @@ public class DashboardController : ApiController
     public async Task<ActionResult<List<GetDocumentResponse>>> GetDocuments([FromQuery] GetDocumentsRequest request, CancellationToken cancellationToken)
     {
         var query = _mapper.Map<GetDocumentsQuery>(request);
-        query.UserId = _identityService.GetCurrentUserId().ToString(); //TODO: fix this
         return Ok(await _mediator.Send(query, cancellationToken));
     }
 
