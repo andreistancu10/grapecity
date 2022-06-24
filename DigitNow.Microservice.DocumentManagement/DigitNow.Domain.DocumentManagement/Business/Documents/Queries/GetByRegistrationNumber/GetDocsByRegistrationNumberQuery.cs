@@ -6,5 +6,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetByReg
     {
         public int RegistrationNumber { get; set; }
         public int Year { get; set; }
+        public int DocumentType { get; set; }
     }
 }

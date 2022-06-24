@@ -14,7 +14,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 public interface IDocumentService
 {
     Task<Document> AddAsync(Document newDocument, CancellationToken cancellationToken);
-    Task<List<Document>> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken);
+    Task<Document> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken);
+    Task<List<Document>> FindAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken);
     Task AssignRegistrationNumberAsync(Document document);
 }
 
@@ -37,13 +38,19 @@ public class DocumentService : IDocumentService
         return newDocument;
     }
 
-    public Task<List<Document>> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken)
+    public Task<Document> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken)
     {
         return _dbContext.Documents
-            .Where(predicate)
-            .ToListAsync(cancellationToken);
+            .FirstOrDefaultAsync(predicate);
     }
-    
+
+    public Task<List<Document>> FindAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken)
+    {
+        return _dbContext.Documents
+                .Where(predicate)
+                .ToListAsync(cancellationToken);
+    }
+
     // TODO: Use RegistrationNumberCounterService
     public async Task AssignRegistrationNumberAsync(Document document) 
     {

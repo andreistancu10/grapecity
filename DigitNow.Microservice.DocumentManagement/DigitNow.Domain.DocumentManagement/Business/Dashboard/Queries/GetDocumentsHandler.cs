@@ -61,13 +61,13 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
 
         if (user.Roles.ToList().Contains((long)UserRole.Mayor))
         {
-            documents = await _documentService.FindAsync(x => x.CreatedAt.Year >= PreviousYear, cancellationToken);
+            documents = await _documentService.FindAllAsync(x => x.CreatedAt.Year >= PreviousYear, cancellationToken);
         }
         else
         {
             var relatedUserIds = await GetRelatedUserIdsASync(user);
 
-            documents = await _documentService.FindAsync(x =>
+            documents = await _documentService.FindAllAsync(x =>
                 x.CreatedAt.Year >= PreviousYear
                 &&
                 relatedUserIds.Contains(x.CreatedBy)
