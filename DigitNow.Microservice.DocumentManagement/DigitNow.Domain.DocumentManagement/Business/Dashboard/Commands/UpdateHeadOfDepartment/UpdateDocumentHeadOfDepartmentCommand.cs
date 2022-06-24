@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
 {
-    public class UpdateDocumentRecipientCommand : ICommand<ResultObject>
+    public class UpdateDocumentHeadOfDepartmentCommand : ICommand<ResultObject>
     {
         public int DepartmentId { get; set; }
         public List<DocumentInfoRequest> DocumentInfo { get; set; }

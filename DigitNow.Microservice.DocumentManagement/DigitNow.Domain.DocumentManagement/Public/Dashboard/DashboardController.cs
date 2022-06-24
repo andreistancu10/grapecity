@@ -1,23 +1,21 @@
-﻿using System.Collections.Generic;
-using System.Security.Claims;
-using AutoMapper;
+﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateUserRecipient;
+using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
 using DigitNow.Domain.DocumentManagement.Public.Dashboard.Models;
+using HTSS.Platform.Core.Files;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
-using HTSS.Platform.Core.Files;
-using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Dashboard;
 
 [Authorize]
-//[AllowAnonymous]
 [ApiController]
 [Route("api/dashboard")]
 public class DashboardController : ApiController
@@ -36,11 +34,11 @@ public class DashboardController : ApiController
     }
 
     [HttpPut("update-department")]
-    public async Task<IActionResult> UpdateDocumentRecipientByDepartmentId([FromBody] UpdateDocumentRecipientRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateDocumentHeadOfDepartmentByDepartmentId([FromBody] UpdateDocumentHeadofDepartmentRequest request, CancellationToken cancellationToken)
     {
-        var updateDepartmentForDocumentCommand = _mapper.Map<UpdateDocumentRecipientCommand>(request);
+        var updateHeadOfDepartmentForDocumentCommand = _mapper.Map<UpdateDocumentHeadOfDepartmentCommand>(request);
 
-        return CreateResponse(await _mediator.Send(updateDepartmentForDocumentCommand, cancellationToken));
+        return CreateResponse(await _mediator.Send(updateHeadOfDepartmentForDocumentCommand, cancellationToken));
     }
 
     [HttpPut("update-user-recipient")]

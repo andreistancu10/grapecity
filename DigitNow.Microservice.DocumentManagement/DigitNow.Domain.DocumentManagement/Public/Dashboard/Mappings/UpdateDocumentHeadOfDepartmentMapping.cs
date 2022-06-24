@@ -4,11 +4,11 @@ using DigitNow.Domain.DocumentManagement.Public.Dashboard.Models;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Mappings
 {
-    public class UpdateDocumentRecipientMapping : Profile
+    public class UpdateDocumentHeadOfDepartmentMapping : Profile
     {
-        public UpdateDocumentRecipientMapping()
+        public UpdateDocumentHeadOfDepartmentMapping()
         {
-            CreateMap<UpdateDocumentRecipientRequest, UpdateDocumentRecipientCommand>();
+            CreateMap<UpdateDocumentHeadofDepartmentRequest, UpdateDocumentHeadOfDepartmentCommand>();
         }
     }
 }

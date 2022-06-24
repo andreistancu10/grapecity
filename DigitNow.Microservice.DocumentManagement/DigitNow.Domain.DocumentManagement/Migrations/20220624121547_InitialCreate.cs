@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
-    public partial class Initial_Migration : Migration
+    public partial class InitialCreate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -218,23 +218,26 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 schema: "DocumentMangement",
                 columns: table => new
                 {
-                    Id = table.Column<long>(type: "bigint", nullable: false),
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     ChildDocumentId = table.Column<long>(type: "bigint", nullable: false),
                     RegistrationNumber = table.Column<long>(type: "bigint", nullable: false),
-                    DocumentType = table.Column<int>(type: "int", nullable: false)
+                    DocumentType = table.Column<int>(type: "int", nullable: false),
+                    IncomingDocumentId = table.Column<long>(type: "bigint", nullable: true),
+                    OutgoingDocumentId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ConnectedDocument", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ConnectedDocument_IncomingDocument_Id",
-                        column: x => x.Id,
+                        name: "FK_ConnectedDocument_IncomingDocument_IncomingDocumentId",
+                        column: x => x.IncomingDocumentId,
                         principalSchema: "DocumentMangement",
                         principalTable: "IncomingDocument",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_ConnectedDocument_OutgoingDocument_Id",
-                        column: x => x.Id,
+                        name: "FK_ConnectedDocument_OutgoingDocument_OutgoingDocumentId",
+                        column: x => x.OutgoingDocumentId,
                         principalSchema: "DocumentMangement",
                         principalTable: "OutgoingDocument",
                         principalColumn: "Id");
@@ -277,6 +280,18 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         principalTable: "OutgoingDocument",
                         principalColumn: "Id");
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ConnectedDocument_IncomingDocumentId",
+                schema: "DocumentMangement",
+                table: "ConnectedDocument",
+                column: "IncomingDocumentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ConnectedDocument_OutgoingDocumentId",
+                schema: "DocumentMangement",
+                table: "ConnectedDocument",
+                column: "OutgoingDocumentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_IncomingDocument_ContactDetailId",

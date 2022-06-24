@@ -13,21 +13,23 @@ using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
 {
-    public class UpdateDocumentRecipientHandler : ICommandHandler<UpdateDocumentRecipientCommand, ResultObject>
+    public class UpdateDocumentHeadOfDepartmentHandler : ICommandHandler<UpdateDocumentHeadOfDepartmentCommand, ResultObject>
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IIdentityAdapterClient _identityAdapterClient;
         private User _headOfDepartment;
 
-        public UpdateDocumentRecipientHandler(DocumentManagementDbContext dbContext, IIdentityAdapterClient identityAdapterClient)
+        public UpdateDocumentHeadOfDepartmentHandler(DocumentManagementDbContext dbContext, IIdentityAdapterClient identityAdapterClient)
         {
             _dbContext = dbContext;
             _identityAdapterClient = identityAdapterClient;
         }
-        public async Task<ResultObject> Handle(UpdateDocumentRecipientCommand request, CancellationToken cancellationToken)
+        public async Task<ResultObject> Handle(UpdateDocumentHeadOfDepartmentCommand request, CancellationToken cancellationToken)
         {
-            var users = await _identityAdapterClient.GetUsersByDepartmentIdAsync(request.DepartmentId);
-            _headOfDepartment = users.Users.FirstOrDefault(x => x.Roles.Contains((long)UserRole.HeadOfDepartment));
+            //var users = await _identityAdapterClient.GetUsersByDepartmentIdAsync(request.DepartmentId);
+            //_headOfDepartment = users.Users.FirstOrDefault(x => x.Roles.Contains((long)UserRole.HeadOfDepartment));
+
+            _headOfDepartment = new User();
 
             if (_headOfDepartment == null)
                 return ResultObject.Error(new ErrorMessage
@@ -37,30 +39,23 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                     Parameters = new object[] { request.DepartmentId }
                 });
 
-            await UpdateDocumentRecipients(request);
+            await UpdateDocumentHeadOfDepartment(request);
             await _dbContext.SaveChangesAsync();
 
             return new ResultObject(ResultStatusCode.Ok);
         }
 
-        private async Task UpdateDocumentRecipients(UpdateDocumentRecipientCommand request)
+        private async Task UpdateDocumentHeadOfDepartment(UpdateDocumentHeadOfDepartmentCommand request)
         {
-            var parallelResult = await Task.WhenAll(
-                UpdateRecipientForIncomingDocuments(request),
-                UpdateRecipientForInternalDocuments(request),
-                UpdateRecipientForOutgoingDocuments(request)
-            );
-
-            if (parallelResult.Any(x => !x))
-            {
-                throw new InvalidOperationException("Cannot set department for requested documents!");
-            }
+            await UpdateHeadOfDepartmentForIncomingDocuments(request);
+            await UpdateHeadOfDepartmentForInternalDocuments(request);
+            await UpdateHeadOfDepartmentForOutgoingDocuments(request);
         }
 
-        private async Task<bool> UpdateRecipientForOutgoingDocuments(UpdateDocumentRecipientCommand request)
+        private async Task UpdateHeadOfDepartmentForOutgoingDocuments(UpdateDocumentHeadOfDepartmentCommand request)
         {
             var outgoingDocIds = request.DocumentInfo
-                                        .Where(doc => doc.DocType == (int)DocumentType.Internal)
+                                        .Where(doc => doc.DocType == (int)DocumentType.Outgoing)
                                         .Select(doc => doc.RegistrationNumber)
                                         .ToList();
 
@@ -76,11 +71,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                     WorkflowHistoryFactory.Create(outgoingDoc.Document, UserRole.HeadOfDepartment, _headOfDepartment, Status.inWorkUnallocated);
                 }
             }
-
-            return true;
         }
 
-        private async Task<bool> UpdateRecipientForInternalDocuments(UpdateDocumentRecipientCommand request)
+        private async Task UpdateHeadOfDepartmentForInternalDocuments(UpdateDocumentHeadOfDepartmentCommand request)
         {
             var internalDocIds = request.DocumentInfo
                                         .Where(doc => doc.DocType == (int)DocumentType.Internal)
@@ -99,11 +92,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                     WorkflowHistoryFactory.Create(internalDoc.Document, UserRole.HeadOfDepartment, _headOfDepartment, Status.inWorkUnallocated);
                 }
             }
-
-            return true;
         }
 
-        private async Task<bool> UpdateRecipientForIncomingDocuments(UpdateDocumentRecipientCommand request)
+        private async Task UpdateHeadOfDepartmentForIncomingDocuments(UpdateDocumentHeadOfDepartmentCommand request)
         {
             var incomingDocIds = request.DocumentInfo
                                         .Where(doc => doc.DocType == (int)DocumentType.Incoming)
@@ -122,8 +113,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                     WorkflowHistoryFactory.Create(foundIncomingDocument.Document, UserRole.HeadOfDepartment, _headOfDepartment, Status.inWorkUnallocated);
                 }
             }
-
-            return true;
         }
     }
 }

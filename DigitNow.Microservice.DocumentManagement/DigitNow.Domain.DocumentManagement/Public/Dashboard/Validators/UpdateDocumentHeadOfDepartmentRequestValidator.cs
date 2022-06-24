@@ -3,9 +3,9 @@ using FluentValidation;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Validators
 {
-    public class UpdateDocumentRecipientRequestValidator : AbstractValidator<UpdateDocumentRecipientRequest>
+    public class UpdateDocumentHeadOfDepartmentRequestValidator : AbstractValidator<UpdateDocumentHeadofDepartmentRequest>
     {
-        public UpdateDocumentRecipientRequestValidator()
+        public UpdateDocumentHeadOfDepartmentRequestValidator()
         {
             RuleFor(item => item.DepartmentId).NotNull().NotEmpty().WithMessage("Deptartment not specified!");
 
