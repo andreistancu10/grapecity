@@ -17,9 +17,5 @@ public class IncomingDocumentConfiguration : IEntityTypeConfiguration<IncomingDo
             .WithOne(item => item.IncomingDocument)
             .HasForeignKey<IncomingDocument>(item => item.DocumentId);
 
-        builder.HasMany(item => item.ConnectedDocuments)
-            .WithOne(item => item.IncomingDocument)
-            .HasForeignKey(item => item.Id)
-            .OnDelete(DeleteBehavior.NoAction);
     }
 }

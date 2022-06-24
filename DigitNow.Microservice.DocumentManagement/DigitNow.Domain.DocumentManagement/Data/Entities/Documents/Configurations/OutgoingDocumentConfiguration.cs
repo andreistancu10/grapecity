@@ -23,10 +23,6 @@ public class OutgoingDocumentConfiguration : IEntityTypeConfiguration<OutgoingDo
         builder.HasOne(item => item.Document)
             .WithOne(item => item.OutgoingDocument)
             .HasForeignKey<OutgoingDocument>(item => item.DocumentId);
-
-        builder.HasMany(item => item.ConnectedDocuments)
-            .WithOne(item => item.OutgoingDocument)
-            .HasForeignKey(item => item.Id)
-            .OnDelete(DeleteBehavior.NoAction);        
+     
     }
 }

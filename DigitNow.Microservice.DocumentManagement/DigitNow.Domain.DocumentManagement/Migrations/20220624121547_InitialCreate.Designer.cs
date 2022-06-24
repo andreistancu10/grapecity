@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    [Migration("20220624092226_Initial_Migration")]
-    partial class Initial_Migration
+    [Migration("20220624121547_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -28,7 +28,10 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.ConnectedDocument", b =>
                 {
                     b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
                     b.Property<long>("ChildDocumentId")
                         .HasColumnType("bigint");
@@ -36,10 +39,20 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<int>("DocumentType")
                         .HasColumnType("int");
 
+                    b.Property<long?>("IncomingDocumentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("OutgoingDocumentId")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("RegistrationNumber")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("IncomingDocumentId");
+
+                    b.HasIndex("OutgoingDocumentId");
 
                     b.ToTable("ConnectedDocument", "DocumentMangement");
                 });
@@ -444,21 +457,13 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.ConnectedDocument", b =>
                 {
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", "IncomingDocument")
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", null)
                         .WithMany("ConnectedDocuments")
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .HasForeignKey("IncomingDocumentId");
 
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.OutgoingDocument", "OutgoingDocument")
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.OutgoingDocument", null)
                         .WithMany("ConnectedDocuments")
-                        .HasForeignKey("Id")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("IncomingDocument");
-
-                    b.Navigation("OutgoingDocument");
+                        .HasForeignKey("OutgoingDocumentId");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", b =>
