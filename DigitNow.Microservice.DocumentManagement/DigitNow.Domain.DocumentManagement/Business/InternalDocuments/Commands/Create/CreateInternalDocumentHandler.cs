@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
@@ -26,7 +27,11 @@ public class CreateInternalDocumentHandler : ICommandHandler<CreateInternalDocum
     {
         var internalDocumentForCreation = _mapper.Map<InternalDocument>(request);        
 
-        await _service.AssignRegistrationNumberAsync(internalDocumentForCreation.DocumentId);
+        await _service.AssignRegistrationNumberAsync(new Document
+        {
+            DocumentType = DocumentType.Internal,
+            InternalDocument = internalDocumentForCreation
+        });
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 

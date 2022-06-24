@@ -46,7 +46,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
 
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {
-            foreach (var entry in ChangeTracker.Entries<ExtendedEntity>())
+            foreach (var entry in ChangeTracker.Entries<IExtendedEntity>())
             {
                 switch (entry.State)
                 {

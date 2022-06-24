@@ -15,7 +15,7 @@ public interface IDocumentService
 {
     Task<Document> AddAsync(Document newDocument, CancellationToken cancellationToken);
     Task<List<Document>> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken);
-    Task AssignRegistrationNumberAsync(long documentId);
+    Task AssignRegistrationNumberAsync(Document document);
 }
 
 public class DocumentService : IDocumentService
@@ -45,7 +45,7 @@ public class DocumentService : IDocumentService
     }
     
     // TODO: Use RegistrationNumberCounterService
-    public async Task AssignRegistrationNumberAsync(long documentId)
+    public async Task AssignRegistrationNumberAsync(Document document) 
     {
         var dbContextTransaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable);
         try
@@ -58,10 +58,10 @@ public class DocumentService : IDocumentService
 
             var newRegNumber = ++maxRegNumber;
 
-            var document = await _dbContext.Documents.FirstAsync(x => x.Id == documentId);
             document.RegistrationNumber = newRegNumber;
-            document.CreatedAt = DateTime.Now;
-            document.CreatedBy = _identityService.GetCurrentUserId();
+
+            if (document.InternalDocument == null && document.IncomingDocument == null && document.OutgoingDocument == null)
+                throw new InvalidOperationException(); //TODO: Add descriptive error
 
             await _dbContext.AddAsync(document);
             await _dbContext.RegistrationNumberCounters.AddAsync(new RegistrationNumberCounter 

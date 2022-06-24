@@ -43,12 +43,14 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
 
         var newIncomingDocument = _mapper.Map<IncomingDocument>(request);
 
-        newIncomingDocument = await _incomingDocumentService.AddAsync(newIncomingDocument, cancellationToken);
-
         try
         {
             await AttachConnectedDocuments(request, newIncomingDocument, cancellationToken);
-            await _service.AssignRegistrationNumberAsync(newIncomingDocument.DocumentId);
+            await _service.AssignRegistrationNumberAsync(new Document 
+            { 
+                DocumentType = DocumentType.Incoming,
+                IncomingDocument = newIncomingDocument 
+            });
 
             newIncomingDocument.WorkflowHistory.Add(
             new WorkflowHistory()
@@ -79,7 +81,8 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
         {
             var connectedDocuments = await _dbContext.IncomingDocuments
                 .Include(x => x.Document)
-                .Where(x => request.ConnectedDocumentIds.Contains(x.Document.RegistrationNumber)).ToListAsync(cancellationToken: cancellationToken);
+                .Where(x => request.ConnectedDocumentIds.Contains(x.Document.RegistrationNumber))
+                .ToListAsync(cancellationToken: cancellationToken);
 
             foreach (var connectedDocument in connectedDocuments)
             {
