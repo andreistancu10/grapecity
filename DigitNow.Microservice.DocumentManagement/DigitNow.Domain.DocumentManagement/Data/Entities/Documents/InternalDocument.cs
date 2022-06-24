@@ -4,7 +4,6 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities;
 
 public class InternalDocument : VirtualDocument
 {
-    public long DocumentId { get; set; }
     public int DepartmentId { get; set; }
     public int InternalDocumentTypeId { get; set; }
     public int DeadlineDaysNumber { get; set; }

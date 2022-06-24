@@ -19,5 +19,11 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public long ModifiedBy { get; set; }
 
         #endregion
+
+        #region [ Parent Relationship ]
+
+        public long DocumentId { get; set; }
+
+        #endregion
     }
 }
