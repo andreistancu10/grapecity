@@ -77,7 +77,6 @@
 	<ItemGroup>
 		<Folder Include="Business\Consumers\" />
 		<Folder Include="Business\Dashboard\Commands\GetDocuments\" />
-		<Folder Include="Migrations\" />
 		<Folder Include="Public\Maintenance\" />
 	</ItemGroup>
 </Project>

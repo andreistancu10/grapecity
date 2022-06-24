@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
-    public partial class BEFE_OutgoingDocument : Migration
+    public partial class InitDb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -73,6 +73,23 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_RegistrationNumberCounter", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SpecialRegister",
+                schema: "DocumentMangement",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Observations = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentType = table.Column<int>(type: "int", nullable: false),
+                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SpecialRegister", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -260,6 +277,10 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             migrationBuilder.DropTable(
                 name: "RegistrationNumberCounter",
+                schema: "DocumentMangement");
+
+            migrationBuilder.DropTable(
+                name: "SpecialRegister",
                 schema: "DocumentMangement");
 
             migrationBuilder.DropTable(
