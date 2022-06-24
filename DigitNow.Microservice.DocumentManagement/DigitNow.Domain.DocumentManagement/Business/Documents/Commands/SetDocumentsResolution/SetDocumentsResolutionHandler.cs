@@ -47,7 +47,10 @@ public class SetDocumentsResolutionHandler
             .Select(x => x.Id)
             .ToList();
 
-        await _internalDocumentService.SetResolutionAsync(internalDocumentIds, resolutionType, remarks, cancellationToken);
+        if (internalDocumentIds.Any())
+        {
+            await _internalDocumentService.SetResolutionAsync(internalDocumentIds, resolutionType, remarks, cancellationToken);
+        }
 
         return true;
     }
@@ -59,8 +62,11 @@ public class SetDocumentsResolutionHandler
             .Select(x => x.Id)
             .ToList();
 
-        await _incomingDocumentService.SetResolutionAsync(incomingDocumentIds, resolutionType, remarks, cancellationToken);
-        
+        if (incomingDocumentIds.Any())
+        {
+            await _incomingDocumentService.SetResolutionAsync(incomingDocumentIds, resolutionType, remarks, cancellationToken);
+        }
+
         return true;
     }
 }
