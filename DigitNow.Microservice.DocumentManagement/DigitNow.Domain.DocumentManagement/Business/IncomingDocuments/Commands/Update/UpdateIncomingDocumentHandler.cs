@@ -61,7 +61,8 @@ public class UpdateIncomingDocumentHandler : ICommandHandler<UpdateIncomingDocum
             return true;
 
         var connectedDocuments = await _dbContext.IncomingDocuments
-            .Where(doc => linksToAdd.Contains(doc.RegistrationNumber))
+            .Include(x => x.Document)
+            .Where(doc => linksToAdd.Contains(doc.Document.RegistrationNumber))
             .ToListAsync(cancellationToken);
 
         foreach (var connectedDocument in connectedDocuments)
@@ -69,7 +70,7 @@ public class UpdateIncomingDocumentHandler : ICommandHandler<UpdateIncomingDocum
             var incomingConnectedDocument = new ConnectedDocument()
             {
                 ChildDocumentId = connectedDocument.Id,
-                RegistrationNumber = connectedDocument.RegistrationNumber,
+                RegistrationNumber = connectedDocument.Document.RegistrationNumber,
                 DocumentType = DocumentType.Incoming
             };
 

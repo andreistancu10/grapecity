@@ -64,7 +64,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
         {
             foreach (var registrationNo in incomingDocIds)
             {
-                var internalDoc = await _dbContext.InternalDocuments.FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
+                var internalDoc = await _dbContext.InternalDocuments
+                    .Include(x => x.Document)
+                    .FirstOrDefaultAsync(x => x.Document.RegistrationNumber == registrationNo);
 
                 if (internalDoc != null)
                     internalDoc.ReceiverDepartmentId = (int)_user.Id;     
@@ -75,7 +77,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
         {
             foreach (var registrationNo in incomingDocIds)
             {
-                var doc = await _dbContext.IncomingDocuments.FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
+                var doc = await _dbContext.IncomingDocuments
+                    .Include(x => x.Document)
+                    .FirstOrDefaultAsync(x => x.Document.RegistrationNumber == registrationNo);
+
                 if (doc != null)
                 {
                     doc.RecipientId = (int)_user.Id;
@@ -96,7 +101,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                     RecipientName =_user.FormatUserNameByRole( isHeadOfDepartment ? UserRole.HeadOfDepartment : UserRole.Functionary),
                     Status = isHeadOfDepartment ? (int)Status.inWorkDelegatedUnallocated : (int)Status.inWorkDelegated,
                     CreationDate = DateTime.Now,
-                    RegistrationNumber = doc.RegistrationNumber
+                    RegistrationNumber = doc.Document.RegistrationNumber
                 });
         }
     }

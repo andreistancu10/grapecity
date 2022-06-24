@@ -17,18 +17,25 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
     private readonly DocumentManagementDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly IDocumentService _service;
+    private readonly IOutgoingDocumentService _outgoingDocumentService;
 
-    public CreateOutgoingDocumentHandler(DocumentManagementDbContext dbContext, IMapper mapper, IDocumentService service)
+    public CreateOutgoingDocumentHandler(DocumentManagementDbContext dbContext, 
+        IMapper mapper, 
+        IDocumentService service,
+        IOutgoingDocumentService outgoingDocumentService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _service = service;
+        _outgoingDocumentService = outgoingDocumentService;
     }
 
     public async Task<ResultObject> Handle(CreateOutgoingDocumentCommand request, CancellationToken cancellationToken)
     {
         var newOutgoingDocument = _mapper.Map<OutgoingDocument>(request);
         newOutgoingDocument.CreationDate = DateTime.Now;
+
+        newOutgoingDocument = await _outgoingDocumentService.CreateAsync(newOutgoingDocument, cancellationToken);
 
         await AttachConnectedDocuments(request, newOutgoingDocument, cancellationToken);
         
@@ -39,7 +46,7 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
                 RecipientId = request.RecipientId,
                 Status = (int)Status.inWorkUnallocated,
                 CreationDate = DateTime.Now,
-                RegistrationNumber = newOutgoingDocument.RegistrationNumber
+                RegistrationNumber = newOutgoingDocument.Document.RegistrationNumber
             });
 
         await _dbContext.SaveChangesAsync();
@@ -54,12 +61,13 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
         if (request.ConnectedDocumentIds.Any())
         {
             var connectedDocuments = await _dbContext.OutgoingDocuments
-                .Where(doc => request.ConnectedDocumentIds.Contains(doc.RegistrationNumber)).ToListAsync(cancellationToken);
+                .Include(x => x.Document)
+                .Where(x => request.ConnectedDocumentIds.Contains(x.Document.RegistrationNumber)).ToListAsync(cancellationToken);
 
-            foreach (var doc in connectedDocuments)
+            foreach (var connectedDocument in connectedDocuments)
             {
                 outgoingDocumentForCreation.ConnectedDocuments
-                    .Add(new ConnectedDocument { RegistrationNumber = doc.RegistrationNumber, DocumentType = DocumentType.Outgoing });
+                    .Add(new ConnectedDocument { RegistrationNumber = connectedDocument.Document.RegistrationNumber, DocumentType = DocumentType.Outgoing });
             }
         }
     }

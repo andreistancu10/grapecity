@@ -39,7 +39,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             incomingDocument.Document = new Document
             {
                 CreatedAt = DateTime.Now,
-                DocumentType = DocumentType.Incoming
+                DocumentType = DocumentType.Incoming,
+                RegistrationDate = DateTime.Now
             };
 
             await _dbContext.AddAsync(incomingDocument, cancellationToken);

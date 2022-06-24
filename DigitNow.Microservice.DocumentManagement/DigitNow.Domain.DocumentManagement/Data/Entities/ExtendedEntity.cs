@@ -15,4 +15,5 @@ public class ExtendedEntity : Entity, IExtendedEntity
 public class SoftExtendedEntity : ExtendedEntity, ISoftExtendedEntity
 {
     public bool IsDeleted { get; set; }
+    public long DeletedBy { get; set; }
 }

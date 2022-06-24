@@ -41,7 +41,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
         public async Task<InternalDocument> CreateAsync(InternalDocument internalDocument, CancellationToken cancellationToken)
         {
-            internalDocument.Document = new Document { DocumentType = DocumentType.Incoming };
+            internalDocument.Document = new Document 
+            { 
+                DocumentType = DocumentType.Incoming,
+                RegistrationDate = DateTime.Now
+            };
 
             await _dbContext.AddAsync(internalDocument, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);

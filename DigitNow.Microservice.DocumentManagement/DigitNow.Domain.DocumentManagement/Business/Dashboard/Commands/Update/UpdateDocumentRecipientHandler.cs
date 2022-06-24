@@ -68,7 +68,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
             {
                 var outgoingDoc = await _dbContext.OutgoingDocuments
                     .Include(x => x.Document)
-                    .FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
+                    .FirstOrDefaultAsync(x => x.Document.RegistrationNumber == registrationNo);
 
                 if (outgoingDoc != null)
                 {
@@ -91,7 +91,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
             {
                 var internalDoc = await _dbContext.InternalDocuments
                     .Include(x => x.Document)
-                    .FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
+                    .FirstOrDefaultAsync(x => x.Document.RegistrationNumber == registrationNo);
 
                 if (internalDoc != null)
                 {
@@ -114,7 +114,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
             {
                 var foundIncomingDocument = await _dbContext.IncomingDocuments
                     .Include(x => x.Document)
-                    .FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
+                    .FirstOrDefaultAsync(x => x.Document.RegistrationNumber == registrationNo);
 
                 if (foundIncomingDocument != null)
                 {

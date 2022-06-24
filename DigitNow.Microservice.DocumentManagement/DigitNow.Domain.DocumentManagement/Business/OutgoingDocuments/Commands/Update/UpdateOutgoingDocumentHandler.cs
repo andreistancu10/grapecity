@@ -52,14 +52,14 @@ public class UpdateOutgoingDocumentHandler : ICommandHandler<UpdateOutgoingDocum
         if (idsToAdd.Any())
         {
             var connectedDocuments = _dbContext.OutgoingDocuments
-                .Where(doc => idsToAdd
-                    .Contains(doc.RegistrationNumber))
+                .Include(x => x.Document)
+                .Where(oDocument => idsToAdd.Contains(oDocument.Document.RegistrationNumber))
                 .ToList();
 
-            foreach (var doc in connectedDocuments)
+            foreach (var connectedDocument in connectedDocuments)
             {
                 outgoingDocFromDb.ConnectedDocuments
-                    .Add(new ConnectedDocument {  RegistrationNumber = doc.RegistrationNumber, DocumentType = DocumentType.Outgoing });
+                    .Add(new ConnectedDocument {  RegistrationNumber = connectedDocument.Document.RegistrationNumber, DocumentType = DocumentType.Outgoing });
             }
         }
     }

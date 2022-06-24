@@ -9,8 +9,7 @@ public class IncomingDocumentConfiguration : IEntityTypeConfiguration<IncomingDo
     {
         builder.ToTable(nameof(IncomingDocument), DocumentManagementDbContext.Schema);
 
-        builder.Property(p => p.IssuerName).IsRequired();
-        builder.Property(p => p.RegistrationNumber).IsRequired();
+        builder.Property(p => p.IssuerName).IsRequired();        
         builder.Property(p => p.NumberOfPages).IsRequired();
         builder.Property(p => p.ContentSummary).IsRequired();
 

@@ -119,10 +119,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<long>(type: "bigint", nullable: false),
                     ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
-                    DocumentType = table.Column<int>(type: "int", nullable: false),
-                    RegistrationNumber = table.Column<int>(type: "int", nullable: false),
-                    RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -160,10 +157,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<long>(type: "bigint", nullable: false),
                     ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
-                    DocumentType = table.Column<int>(type: "int", nullable: false),
-                    RegistrationNumber = table.Column<int>(type: "int", nullable: false),
-                    RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -199,10 +193,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<long>(type: "bigint", nullable: false),
                     ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
-                    DocumentType = table.Column<int>(type: "int", nullable: false),
-                    RegistrationNumber = table.Column<int>(type: "int", nullable: false),
-                    RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {

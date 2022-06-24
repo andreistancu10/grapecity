@@ -12,9 +12,7 @@ public class IncomingDocumentMappings : Profile
     {
         CreateMap<CreateIncomingDocumentCommand, IncomingDocument>();
         CreateMap<CreateContactDetailCommand, ContactDetail>();
-        CreateMap<UpdateIncomingDocumentCommand, IncomingDocument>()
-            .ForMember(x => x.RegistrationNumber, opt => opt.Ignore())
-            .ForMember(x => x.RegistrationDate, opt => opt.Ignore());
+        CreateMap<UpdateIncomingDocumentCommand, IncomingDocument>();
 
         CreateMap<UpdateContactDetailCommand, ContactDetail>();
         CreateMap<IncomingDocument, ConnectedDocument>();

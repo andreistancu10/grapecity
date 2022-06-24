@@ -86,6 +86,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
         return new ResultPagedList<GetDocumentResponse>(header, documents);
     }
 
+    [Obsolete("Retrieve data from Document table directly", error: false)]
     private IQueryable<GetDocumentResponse> GetAllDocuments(int previousYear, int page, int count)
     {
         //TODO refactor the queries after OutgoingDocuments, IncomingDocuments and InternalDocuments inherit a common base class
@@ -102,7 +103,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
             .Include(x => x.Document)
             .Skip((page - 1) * count)
             .Take(count)
-            .Where(c => c.RegistrationDate != null && ((DateTime)c.RegistrationDate).Year >= previousYear)
+            .Where(c => c.Document.RegistrationDate.Year >= previousYear)
             .Select(c => _mapper.Map<GetDocumentResponse>(c))
             .OrderBy(c => c.RegistrationNumber);
 

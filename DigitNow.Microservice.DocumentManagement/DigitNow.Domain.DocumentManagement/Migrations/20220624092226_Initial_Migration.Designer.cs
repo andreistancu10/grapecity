@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    [Migration("20220624080349_Initial_Migration")]
+    [Migration("20220624092226_Initial_Migration")]
     partial class Initial_Migration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -191,9 +191,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<long>("DocumentId")
                         .HasColumnType("bigint");
 
-                    b.Property<int>("DocumentType")
-                        .HasColumnType("int");
-
                     b.Property<int>("DocumentTypeId")
                         .HasColumnType("int");
 
@@ -232,12 +229,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnType("int");
 
                     b.Property<int>("RecipientId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("RegistrationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("RegistrationNumber")
                         .HasColumnType("int");
 
                     b.Property<double>("ResolutionPeriod")
@@ -280,9 +271,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<long>("DocumentId")
                         .HasColumnType("bigint");
 
-                    b.Property<int>("DocumentType")
-                        .HasColumnType("int");
-
                     b.Property<int>("InternalDocumentTypeId")
                         .HasColumnType("int");
 
@@ -299,12 +287,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("ReceiverDepartmentId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("RegistrationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("RegistrationNumber")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -345,9 +327,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<long>("DocumentId")
                         .HasColumnType("bigint");
 
-                    b.Property<int>("DocumentType")
-                        .HasColumnType("int");
-
                     b.Property<string>("DocumentTypeDetail")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -376,12 +355,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("RecipientTypeId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("RegistrationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("RegistrationNumber")
                         .HasColumnType("int");
 
                     b.HasKey("Id");

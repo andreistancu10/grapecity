@@ -9,7 +9,6 @@ public class InternalDocumentConfiguration : IEntityTypeConfiguration<InternalDo
     {
         builder.ToTable(nameof(InternalDocument), DocumentManagementDbContext.Schema);
 
-        builder.Property(p => p.RegistrationNumber).IsRequired();
         builder.Property(p => p.DepartmentId).IsRequired();
         builder.Property(p => p.InternalDocumentTypeId).IsRequired();
         builder.Property(p => p.DeadlineDaysNumber).IsRequired();

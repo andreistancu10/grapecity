@@ -3,7 +3,7 @@ using System;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
-    public class VirtualDocument : IDocument
+    public class VirtualDocument : IExtendedEntity
     {
         #region [ Entity ]
 
@@ -17,14 +17,6 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public long CreatedBy { get; set; }
         public DateTime ModifiedAt { get; set; }
         public long ModifiedBy { get; set; }
-
-        #endregion
-
-        #region [ IDocument ]
-
-        public DocumentType DocumentType { get; set; }
-        public int RegistrationNumber { get; set; }
-        public DateTime RegistrationDate { get; set; }
 
         #endregion
     }

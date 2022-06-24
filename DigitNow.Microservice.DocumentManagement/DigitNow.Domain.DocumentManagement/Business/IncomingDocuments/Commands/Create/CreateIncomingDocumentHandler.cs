@@ -21,25 +21,29 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
     private readonly IMapper _mapper;
     private readonly IDocumentService _service;
     private readonly IIdentityAdapterClient _identityAdapterClient;
+    private readonly IIncomingDocumentService _incomingDocumentService;
 
-    public CreateIncomingDocumentHandler(DocumentManagementDbContext dbContext, IMapper mapper, IDocumentService service, IIdentityAdapterClient identityAdapterClient)
+    public CreateIncomingDocumentHandler(DocumentManagementDbContext dbContext, 
+        IMapper mapper, 
+        IDocumentService service, 
+        IIdentityAdapterClient identityAdapterClient,
+        IIncomingDocumentService incomingDocumentService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _service = service;
         _identityAdapterClient = identityAdapterClient;
+        _incomingDocumentService = incomingDocumentService;
     }
 
     public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
     {
-        var newIncomingDocument = _mapper.Map<IncomingDocument>(request);
-        newIncomingDocument.RegistrationDate = DateTime.Now;
-
         if (!string.IsNullOrWhiteSpace(request.IdentificationNumber))
             CreateContactDetails(request);
 
-        var incomingDocumentForCreation = _mapper.Map<IncomingDocument>(request);
-        incomingDocumentForCreation.RegistrationDate = DateTime.Now;
+        var newIncomingDocument = _mapper.Map<IncomingDocument>(request);
+
+        newIncomingDocument = await _incomingDocumentService.AddAsync(newIncomingDocument, cancellationToken);
 
         try
         {
@@ -53,7 +57,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
                 RecipientId = request.RecipientId,
                 Status = (int)Status.inWorkUnallocated,
                 CreationDate = DateTime.Now,
-                RegistrationNumber = newIncomingDocument.RegistrationNumber
+                RegistrationNumber = newIncomingDocument.Document.RegistrationNumber
             });
 
             await _dbContext.SaveChangesAsync();
@@ -74,12 +78,13 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
         if (request.ConnectedDocumentIds.Any())
         {
             var connectedDocuments = await _dbContext.IncomingDocuments
-                .Where(doc => request.ConnectedDocumentIds.Contains(doc.RegistrationNumber)).ToListAsync(cancellationToken: cancellationToken);
+                .Include(x => x.Document)
+                .Where(x => request.ConnectedDocumentIds.Contains(x.Document.RegistrationNumber)).ToListAsync(cancellationToken: cancellationToken);
 
-            foreach (var doc in connectedDocuments)
+            foreach (var connectedDocument in connectedDocuments)
             {
                 incomingDocumentForCreation.ConnectedDocuments
-                    .Add(new ConnectedDocument { RegistrationNumber = doc.RegistrationNumber, DocumentType = DocumentType.Incoming, ChildDocumentId = doc.Id });
+                    .Add(new ConnectedDocument { RegistrationNumber = connectedDocument.Document.RegistrationNumber, DocumentType = DocumentType.Incoming, ChildDocumentId = connectedDocument.Id });
             }
         }
     }
