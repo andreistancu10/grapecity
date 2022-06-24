@@ -44,7 +44,7 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
 
         await _dbContext.SaveChangesAsync();
 
-        await _service.AssignRegistrationNumberAsync(newOutgoingDocument);
+        await _service.AssignRegistrationNumberAsync(newOutgoingDocument.DocumentId);
 
         return ResultObject.Created(newOutgoingDocument.Id);
     }

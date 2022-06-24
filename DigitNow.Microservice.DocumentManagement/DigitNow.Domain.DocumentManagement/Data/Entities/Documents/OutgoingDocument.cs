@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities;
 
-public class OutgoingDocument : Document
+public class OutgoingDocument : VirtualDocument
 {
     public long DocumentId { get; set; }
 

@@ -24,11 +24,9 @@ public class CreateInternalDocumentHandler : ICommandHandler<CreateInternalDocum
 
     public async Task<ResultObject> Handle(CreateInternalDocumentCommand request, CancellationToken cancellationToken)
     {
-        var internalDocumentForCreation =
-            _mapper.Map<InternalDocument>(request);
-        internalDocumentForCreation.CreatedAt = DateTime.Now;
+        var internalDocumentForCreation = _mapper.Map<InternalDocument>(request);        
 
-        await _service.AssignRegistrationNumberAsync(internalDocumentForCreation);
+        await _service.AssignRegistrationNumberAsync(internalDocumentForCreation.DocumentId);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 

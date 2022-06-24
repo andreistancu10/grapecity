@@ -3,7 +3,7 @@ using System;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities;
 
-public class ExtendedEntity : Entity
+public class ExtendedEntity : Entity, IExtendedEntity
 {
     public DateTime CreatedAt { get; set; }
     public long CreatedBy { get; set; }
@@ -12,7 +12,7 @@ public class ExtendedEntity : Entity
     public long ModifiedBy { get; set; }
 }
 
-public class SoftExtendedEntity : ExtendedEntity
+public class SoftExtendedEntity : ExtendedEntity, ISoftExtendedEntity
 {
     public bool IsDeleted { get; set; }
 }

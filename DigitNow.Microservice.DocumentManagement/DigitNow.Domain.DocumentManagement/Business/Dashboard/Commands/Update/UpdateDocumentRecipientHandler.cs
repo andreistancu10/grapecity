@@ -66,12 +66,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
 
             foreach (var registrationNo in outgoingDocIds)
             {
-                var outgoingDoc = await _dbContext.OutgoingDocuments.FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
+                var outgoingDoc = await _dbContext.OutgoingDocuments
+                    .Include(x => x.Document)
+                    .FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
 
                 if (outgoingDoc != null)
                 {
                     outgoingDoc.RecipientId = (int)_headOfDepartment.Id;
-                    WorkflowHistoryFactory.Create(outgoingDoc, UserRole.HeadOfDepartment, _headOfDepartment, Status.inWorkUnallocated);
+                    WorkflowHistoryFactory.Create(outgoingDoc.Document, UserRole.HeadOfDepartment, _headOfDepartment, Status.inWorkUnallocated);
                 }
             }
 
@@ -87,12 +89,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
 
             foreach (var registrationNo in internalDocIds)
             {
-                var internalDoc = await _dbContext.InternalDocuments.FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
+                var internalDoc = await _dbContext.InternalDocuments
+                    .Include(x => x.Document)
+                    .FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
 
                 if (internalDoc != null)
                 {
                     internalDoc.ReceiverDepartmentId = (int)_headOfDepartment.Id;
-                    WorkflowHistoryFactory.Create(internalDoc, UserRole.HeadOfDepartment, _headOfDepartment, Status.inWorkUnallocated);
+                    WorkflowHistoryFactory.Create(internalDoc.Document, UserRole.HeadOfDepartment, _headOfDepartment, Status.inWorkUnallocated);
                 }
             }
 
@@ -108,11 +112,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
 
             foreach (var registrationNo in incomingDocIds)
             {
-                var doc = await _dbContext.IncomingDocuments.FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
-                if (doc != null)
+                var foundIncomingDocument = await _dbContext.IncomingDocuments
+                    .Include(x => x.Document)
+                    .FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
+
+                if (foundIncomingDocument != null)
                 {
-                    doc.RecipientId = (int)_headOfDepartment.Id;
-                    WorkflowHistoryFactory.Create(doc, UserRole.HeadOfDepartment, _headOfDepartment, Status.inWorkUnallocated);
+                    foundIncomingDocument.RecipientId = (int)_headOfDepartment.Id;
+                    WorkflowHistoryFactory.Create(foundIncomingDocument.Document, UserRole.HeadOfDepartment, _headOfDepartment, Status.inWorkUnallocated);
                 }
             }
 

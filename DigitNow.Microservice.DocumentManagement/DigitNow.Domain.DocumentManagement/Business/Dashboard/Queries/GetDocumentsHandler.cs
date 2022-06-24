@@ -91,6 +91,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
         //TODO refactor the queries after OutgoingDocuments, IncomingDocuments and InternalDocuments inherit a common base class
 
         var outgoingDocumentsQuery = _dbContext.OutgoingDocuments
+            .Include(x => x.Document)
             .Skip((page - 1) * count)
             .Take(count)
             .Where(c => c.CreationDate.Year >= previousYear)
@@ -98,6 +99,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
             .OrderBy(c => c.RegistrationNumber);
 
         var incomingDocumentsQuery = _dbContext.IncomingDocuments
+            .Include(x => x.Document)
             .Skip((page - 1) * count)
             .Take(count)
             .Where(c => c.RegistrationDate != null && ((DateTime)c.RegistrationDate).Year >= previousYear)
@@ -105,6 +107,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
             .OrderBy(c => c.RegistrationNumber);
 
         var internalDocumentsQuery = _dbContext.InternalDocuments
+            .Include(x => x.Document)
             .Skip((page - 1) * count)
             .Take(count)
             .Where(c => c.CreatedAt.Year >= previousYear)

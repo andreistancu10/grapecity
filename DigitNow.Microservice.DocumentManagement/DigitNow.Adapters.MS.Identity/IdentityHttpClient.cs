@@ -26,7 +26,7 @@ namespace DigitNow.Adapters.MS.Identity
             var response = await _httpClient.GetAsync(requestUri);
             if (!response.IsSuccessStatusCode)
             {
-                throw new HttpRequestException();
+                throw new HttpRequestException(); //TODO: Throw a descriptive error
             }
 
             var responseContent = await response.Content.ReadAsStringAsync();
@@ -49,7 +49,7 @@ namespace DigitNow.Adapters.MS.Identity
             
             if (!response.IsSuccessStatusCode)
             {
-                throw new HttpRequestException();
+                throw new HttpRequestException(); //TODO: Throw a descriptive error
             }
         }
 

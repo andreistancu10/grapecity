@@ -12,24 +12,26 @@ using System.Threading;
 using System.Threading.Tasks;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
 using HTSS.Platform.Core.Files;
+using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Dashboard;
 
 [Authorize]
+//[AllowAnonymous]
 [ApiController]
 [Route("api/dashboard")]
 public class DashboardController : ApiController
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
+    private readonly IIdentityService _identityService;
     private readonly IExportService<GetDocumentResponse> _exportService;
 
-    private string GetUserId() => HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-    public DashboardController(IMediator mediator, IMapper mapper, IExportService<GetDocumentResponse> exportService)
+    public DashboardController(IMediator mediator, IMapper mapper, IIdentityService identityService, IExportService<GetDocumentResponse> exportService)
     {
-        _mediator = mediator;
+        _mediator = mediator;        
         _mapper = mapper;
+        _identityService = identityService;
         _exportService = exportService;
     }
 
@@ -52,7 +54,7 @@ public class DashboardController : ApiController
     public async Task<ActionResult<List<GetDocumentResponse>>> GetDocuments([FromQuery] GetDocumentsRequest request, CancellationToken cancellationToken)
     {
         var query = _mapper.Map<GetDocumentsQuery>(request);
-        query.UserId = GetUserId();
+        query.UserId = _identityService.GetCurrentUserId().ToString(); //TODO: fix this
         return Ok(await _mediator.Send(query, cancellationToken));
     }
 

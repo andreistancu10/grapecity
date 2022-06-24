@@ -44,7 +44,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
         try
         {
             await AttachConnectedDocuments(request, newIncomingDocument, cancellationToken);
-            await _service.AssignRegistrationNumberAsync(newIncomingDocument);
+            await _service.AssignRegistrationNumberAsync(newIncomingDocument.DocumentId);
 
             newIncomingDocument.WorkflowHistory.Add(
             new WorkflowHistory()
@@ -62,7 +62,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
         {
             return ResultObject.Error(new ErrorMessage()
             {
-                Message = ex.InnerException.Message
+                Message = ex.InnerException?.Message
             });
         }
 

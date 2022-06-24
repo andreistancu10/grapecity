@@ -3,8 +3,10 @@ using System;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
-    public class Document : ExtendedEntity
+    public class Document : ExtendedEntity, IDocument
     {
+        // Note: Document Unique reference accross system
+        public new long Id { get; protected set; }
         public DocumentType DocumentType { get; set; }
         public int RegistrationNumber { get; set; }
         public DateTime RegistrationDate { get; set; }

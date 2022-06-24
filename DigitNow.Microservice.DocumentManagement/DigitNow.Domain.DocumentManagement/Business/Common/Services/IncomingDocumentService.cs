@@ -42,11 +42,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
                 DocumentType = DocumentType.Incoming
             };
 
-            if (_identityService.TryGetCurrentUserId(out int userId))
-            {
-                incomingDocument.CreatedBy = userId;
-            }
-
             await _dbContext.AddAsync(incomingDocument, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
             return incomingDocument;
