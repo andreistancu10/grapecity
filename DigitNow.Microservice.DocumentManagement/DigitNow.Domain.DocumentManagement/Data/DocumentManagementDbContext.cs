@@ -5,6 +5,7 @@ using DigitNow.Domain.DocumentManagement.Data.InternalDocuments;
 using DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments;
 using Microsoft.EntityFrameworkCore.Design;
 using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
+using DigitNow.Domain.DocumentManagement.Data.DocumentSpecialRegisters;
 using DigitNow.Domain.DocumentManagement.Data.SpecialRegisters;
 
 namespace DigitNow.Domain.DocumentManagement.Data
@@ -25,6 +26,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
 
         public DbSet<InternalDocument> InternalDocuments { get; set; }
         public DbSet<SpecialRegister> SpecialRegisters { get; set; }
+        public DbSet<DocumentSpecialRegister> DocumentSpecialRegisterAssociations { get; set; }
         
         public DbSet<RegistrationNumberCounter.RegistrationNumberCounter> RegistrationNumberCounter { get; set; }
 
