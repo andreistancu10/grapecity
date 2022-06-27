@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    [Migration("20220627175141_AssociateDocumentToRegister")]
+    [Migration("20220627182351_AssociateDocumentToRegister")]
     partial class AssociateDocumentToRegister
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -114,18 +114,20 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
-                    b.Property<long>("AssociationId")
+                    b.Property<long?>("AssociationId")
                         .HasColumnType("bigint");
 
-                    b.Property<int?>("DocumentId")
+                    b.Property<int>("DocumentId")
                         .HasColumnType("int");
 
-                    b.Property<long?>("SpecialRegisterId")
+                    b.Property<long>("SpecialRegisterId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
                     b.HasIndex("DocumentId");
+
+                    b.HasIndex("Id");
 
                     b.HasIndex("SpecialRegisterId");
 
@@ -415,11 +417,15 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 {
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.IncomingDocument", "Document")
                         .WithMany()
-                        .HasForeignKey("DocumentId");
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.SpecialRegisters.SpecialRegister", "SpecialRegister")
                         .WithMany()
-                        .HasForeignKey("SpecialRegisterId");
+                        .HasForeignKey("SpecialRegisterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Document");
 

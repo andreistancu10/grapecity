@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using DigitNow.Domain.DocumentManagement.Business._Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.configurations.HostedServices;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents;
 using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries;
@@ -65,6 +66,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddScoped<IDocumentService, DocumentService>();
+            services.AddScoped<ISpecialRegisterAssociationService, SpecialRegisterAssociationService>();
             services.AddScoped<IDocumentsQueryService, DocumentsQueryService>();
 
             return services;

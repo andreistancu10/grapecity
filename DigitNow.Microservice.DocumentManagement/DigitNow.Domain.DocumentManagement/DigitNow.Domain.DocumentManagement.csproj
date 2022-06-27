@@ -75,6 +75,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Business\Common\Services\" />
 		<Folder Include="Business\Consumers\" />
 		<Folder Include="Business\Dashboard\Commands\GetDocuments\" />
 		<Folder Include="Public\Maintenance\" />

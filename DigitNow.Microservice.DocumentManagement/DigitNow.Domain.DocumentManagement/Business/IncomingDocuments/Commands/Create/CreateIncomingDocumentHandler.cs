@@ -10,6 +10,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using HTSS.Platform.Core.Errors;
 using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
 
@@ -20,12 +21,18 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
     private readonly DocumentManagementDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly IDocumentService _service;
+    private readonly ISpecialRegisterAssociationService _specialRegisterAssociationService;
 
-    public CreateIncomingDocumentHandler(DocumentManagementDbContext dbContext, IMapper mapper, IDocumentService service)
+    public CreateIncomingDocumentHandler(
+        DocumentManagementDbContext dbContext,
+        IMapper mapper,
+        IDocumentService service,
+        ISpecialRegisterAssociationService specialRegisterAssociationService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _service = service;
+        _specialRegisterAssociationService = specialRegisterAssociationService;
     }
 
     public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
@@ -38,7 +45,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             await _service.AssignRegNumberAndSaveDocument(incomingDocumentForCreation);
 
             incomingDocumentForCreation.WorkflowHistory.Add(
-            new WorkflowHistory()
+            new WorkflowHistory
             {
                 RecipientType = (int)UserRole.HeadOfDepartment,
                 RecipientId = request.RecipientId,
@@ -47,11 +54,12 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
                 RegistrationNumber = incomingDocumentForCreation.RegistrationNumber
             });
 
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
+            await _specialRegisterAssociationService.AssociateDocumentAsync(incomingDocumentForCreation);
         }
         catch (Exception ex)
         {
-            return ResultObject.Error(new ErrorMessage()
+            return ResultObject.Error(new ErrorMessage
             {
                 Message = ex.InnerException.Message
             });
