@@ -22,7 +22,7 @@ public class GetSpecialRegistersHandler : IQueryHandler<SpecialRegisterQuery, Li
     public async Task<List<SpecialRegisterResponse>> Handle(SpecialRegisterQuery request, CancellationToken cancellationToken)
     {
         var registers = await _dbContext.SpecialRegisters.ToListAsync(cancellationToken);
-        ;
+        
         return _mapper.Map<List<SpecialRegisterResponse>>(registers);
     }
 }

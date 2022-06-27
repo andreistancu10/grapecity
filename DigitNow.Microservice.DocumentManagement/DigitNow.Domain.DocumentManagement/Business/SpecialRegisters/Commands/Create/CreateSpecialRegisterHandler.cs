@@ -38,7 +38,7 @@ public class CreateSpecialRegisterHandler : ICommandHandler<CreateSpecialRegiste
 
             var isDuplicate = await _dbContext.SpecialRegisters
                 .AnyAsync(c =>
-                        c.Name.ToLower() == request.Name.ToLower(),
+                        c.Name.ToLower() == request.Name.ToLower() || c.DocumentType == request.DocumentType,
                     cancellationToken);
 
             if (isDuplicate)
