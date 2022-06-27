@@ -25,7 +25,7 @@ public class SpecialRegistersController : ApiController
         _mapper = mapper;
     }
 
-    [HttpPost]
+    [HttpPost("create-register")]
     public async Task<IActionResult> CreateSpecialRegister([FromBody] CreateSpecialRegisterRequest request)
     {
         return await _mediator.Send(_mapper.Map<CreateSpecialRegisterCommand>(request))
@@ -36,7 +36,7 @@ public class SpecialRegistersController : ApiController
             };
     }
 
-    [HttpPut]
+    [HttpPut("update-register")]
     public async Task<IActionResult> UpdateSpecialRegister([FromBody] UpdateSpecialRegisterRequest request)
     {
         return await _mediator.Send(_mapper.Map<UpdateSpecialRegisterCommand>(request))
@@ -47,7 +47,7 @@ public class SpecialRegistersController : ApiController
             };
     }
 
-    [HttpGet]
+    [HttpGet("get-registers")]
     public async Task<IActionResult> GetSpecialRegisters()
     {
         return await _mediator.Send(new SpecialRegisterQuery())
