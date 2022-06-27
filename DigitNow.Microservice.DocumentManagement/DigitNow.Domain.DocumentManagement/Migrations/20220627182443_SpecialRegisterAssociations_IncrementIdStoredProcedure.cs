@@ -38,9 +38,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 				GO  
 				use msdb;
 				EXEC dbo.sp_add_schedule  
-					@schedule_name = N'RunOnce',  
+					@schedule_name = N'RunEvery15s',  
 					@freq_type = 4,  
-					@freq_subday_type = " + "0x1"+@",   
+					@freq_subday_type = " + "0x1" + @",   
 					@freq_subday_interval = 20,  
 					@active_start_time = 233000;
 				GO
