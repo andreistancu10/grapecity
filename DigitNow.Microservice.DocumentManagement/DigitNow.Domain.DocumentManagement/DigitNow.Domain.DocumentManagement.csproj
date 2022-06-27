@@ -78,5 +78,6 @@
 		<Folder Include="Business\Consumers\" />
 		<Folder Include="Business\Dashboard\Commands\GetDocuments\" />
 		<Folder Include="Public\Maintenance\" />
+		<Folder Include="Migrations\" />
 	</ItemGroup>
 </Project>
