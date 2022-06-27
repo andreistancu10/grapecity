@@ -46,11 +46,11 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
         try
         {
             await AttachConnectedDocuments(request, newIncomingDocument, cancellationToken);
-            await _service.AssignRegistrationNumberAsync(new Document 
+            await _service.AddDocument(new Document 
             { 
                 DocumentType = DocumentType.Incoming,
                 IncomingDocument = newIncomingDocument 
-            });
+            }, cancellationToken);
 
             newIncomingDocument.WorkflowHistory.Add(
             new WorkflowHistory()

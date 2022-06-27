@@ -3,6 +3,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands
 
 public class CreateContactDetailCommand
 {
+    public string IdentificationNumber { get; set; }
     public int CountryId { get; set; }
     public int CountyId { get; set; }
     public int CityId { get; set; }

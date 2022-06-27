@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+using DigitNow.Domain.DocumentManagement.Data;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using DigitNow.Domain.DocumentManagement.Data;
 
 namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Update;
 
@@ -34,8 +35,13 @@ public class UpdateOutgoingDocumentHandler : ICommandHandler<UpdateOutgoingDocum
                 Parameters = new object[] { request.Id }
             });
 
-        RemoveConnectedDocs(request, outgoingDocFromDb);
-        AddConnectedDocs(request, outgoingDocFromDb);
+        var outcomingDocumentIds = outgoingDocFromDb.ConnectedDocuments
+           .Where(x => x.DocumentType == DocumentType.Outgoing)
+           .Select(cd => cd.RegistrationNumber)
+           .ToList();
+
+        RemoveConnectedDocumentsAsync(request, outcomingDocumentIds, outgoingDocFromDb);
+        await AddConnectedDocsAsync(request, outcomingDocumentIds, outgoingDocFromDb, cancellationToken);
 
         _mapper.Map(request, outgoingDocFromDb);
 
@@ -44,38 +50,44 @@ public class UpdateOutgoingDocumentHandler : ICommandHandler<UpdateOutgoingDocum
         return ResultObject.Ok(outgoingDocFromDb.Id);
     }
 
-    private void AddConnectedDocs(UpdateOutgoingDocumentCommand request, OutgoingDocument outgoingDocFromDb)
+    private async Task AddConnectedDocsAsync(UpdateOutgoingDocumentCommand request, IList<long> outcomingDocumentIds, OutgoingDocument dbOutcomingDocuments, CancellationToken cancellationToken)
     {
-        var outgoingDocIds = outgoingDocFromDb.ConnectedDocuments.Select(cd => cd.RegistrationNumber).ToList();
-        var idsToAdd = request.ConnectedDocumentIds.Except(outgoingDocIds);
+        var linksToAdd = request.ConnectedDocumentIds
+            .Except(outcomingDocumentIds);
 
-        if (idsToAdd.Any())
+        if (!linksToAdd.Any())
+            return;
+
+        var connectedDocuments = await _dbContext.OutgoingDocuments
+            .Include(x => x.Document)
+            .Where(doc => linksToAdd.Contains(doc.Document.RegistrationNumber))
+            .ToListAsync(cancellationToken);
+
+        foreach (var connectedDocument in connectedDocuments)
         {
-            var connectedDocuments = _dbContext.OutgoingDocuments
-                .Include(x => x.Document)
-                .Where(oDocument => idsToAdd.Contains(oDocument.Document.RegistrationNumber))
-                .ToList();
-
-            foreach (var connectedDocument in connectedDocuments)
+            var outcomingConnectedDocument = new ConnectedDocument()
             {
-                outgoingDocFromDb.ConnectedDocuments
-                    .Add(new ConnectedDocument {  RegistrationNumber = connectedDocument.Document.RegistrationNumber, DocumentType = DocumentType.Outgoing });
-            }
+                ChildDocumentId = connectedDocument.Id,
+                RegistrationNumber = connectedDocument.Document.RegistrationNumber,
+                DocumentType = DocumentType.Outgoing
+            };
+
+            dbOutcomingDocuments.ConnectedDocuments.Add(outcomingConnectedDocument);
         }
+        return;
     }
 
-    private void RemoveConnectedDocs(UpdateOutgoingDocumentCommand request, OutgoingDocument outgoingDocFromDb)
+    private void RemoveConnectedDocumentsAsync(UpdateOutgoingDocumentCommand request, IList<long> outcommingDocumentIds, OutgoingDocument dbOutcomingDocuments)
     {
-        var outgoingDocIds = outgoingDocFromDb.ConnectedDocuments.Select(cd => cd.RegistrationNumber).ToList();
-        var idsToRemove = outgoingDocIds.Except(request.ConnectedDocumentIds);
+        var linksToRemove = outcommingDocumentIds.Except(request.ConnectedDocumentIds);
 
-        if (idsToRemove.Any())
-        {
-            _dbContext.ConnectedDocuments
-                .RemoveRange(outgoingDocFromDb.ConnectedDocuments
-                    .Where(cd => idsToRemove
-                        .Contains(cd.RegistrationNumber))
-                    .ToList());
-        }
+        if (!linksToRemove.Any())
+            return;
+
+        _dbContext.ConnectedDocuments
+            .RemoveRange(dbOutcomingDocuments.ConnectedDocuments.Where(cd => linksToRemove.Contains(cd.RegistrationNumber))
+            .ToList());
+
+        return;
     }
 }

@@ -7,7 +7,7 @@ public class CreateOutgoingDocumentCommand : ICommand<ResultObject>
 {
     public string User { get; set; }
     public string RecipientName { get; set; }
-    public long? IdentificationNumber { get; set; }
+    public string? IdentificationNumber { get; set; }
     public CreateContactDetailCommand ContactDetail { get; set; }
     public string ContentSummary { get; set; }
     public int NumberOfPages { get; set; }
