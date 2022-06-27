@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    [Migration("20220624121525_InitDb")]
-    partial class InitDb
+    [Migration("20220627171751_SpecialRegister")]
+    partial class SpecialRegister
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

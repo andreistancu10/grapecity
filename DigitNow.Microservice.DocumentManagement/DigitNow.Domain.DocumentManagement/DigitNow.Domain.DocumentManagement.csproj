@@ -48,8 +48,8 @@
 		<PackageReference Include="HTSS.Platform.Infrastructure.Security" Version="6.0.2" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.5" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.5">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="ShiftIn.Domain.Authentication.Client" Version="6.0.1" />
 		<PackageReference Include="ShiftIn.Utils" Version="6.0.2" />
@@ -65,7 +65,7 @@
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="domain.DocumentManagementSettings.tokenized.json">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 
