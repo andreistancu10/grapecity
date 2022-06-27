@@ -49,7 +49,7 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
             {
                 RecipientType = (int)UserRole.HeadOfDepartment,
                 RecipientId = newOutgoingDocument.RecipientId,
-                Status = (int)Status.inWorkUnallocated,
+                Status = (int)DocumentStatus.InWorkUnallocated,
                 CreationDate = DateTime.Now,
                 RegistrationNumber = newOutgoingDocument.Document.RegistrationNumber
             });

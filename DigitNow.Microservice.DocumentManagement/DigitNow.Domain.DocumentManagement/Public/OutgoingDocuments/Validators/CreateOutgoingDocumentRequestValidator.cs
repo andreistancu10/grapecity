@@ -7,7 +7,7 @@ public class CreateOutgoingDocumentRequestValidator : AbstractValidator<CreateOu
 {
     public CreateOutgoingDocumentRequestValidator()
     {
-        RuleFor(item => item.RecipientId).NotNull().NotEmpty();
+        RuleFor(item => item.RecipientIdentifier).NotNull().NotEmpty();
         RuleFor(item => item.RecipientName).NotNull().NotEmpty();
         RuleFor(item => item.ContactDetail).NotNull().NotEmpty();
         RuleFor(item => item.ContactDetail.CountryId).NotNull().NotEmpty();

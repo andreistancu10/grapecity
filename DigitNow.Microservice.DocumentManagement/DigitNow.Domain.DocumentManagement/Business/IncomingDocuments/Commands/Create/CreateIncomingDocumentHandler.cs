@@ -57,7 +57,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             {
                 RecipientType = (int)UserRole.HeadOfDepartment,
                 RecipientId = request.RecipientId,
-                Status = (int)Status.inWorkUnallocated,
+                Status = (int)DocumentStatus.InWorkUnallocated,
                 CreationDate = DateTime.Now,
                 RegistrationNumber = newIncomingDocument.Document.RegistrationNumber
             });
