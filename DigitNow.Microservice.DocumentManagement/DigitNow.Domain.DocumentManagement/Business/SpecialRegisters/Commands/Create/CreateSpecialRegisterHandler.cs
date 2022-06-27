@@ -36,12 +36,12 @@ public class CreateSpecialRegisterHandler : ICommandHandler<CreateSpecialRegiste
                 });
             }
 
-            var isDuplicate = await _dbContext.SpecialRegisters
+            var isNameDuplicate = await _dbContext.SpecialRegisters
                 .AnyAsync(c =>
-                        c.Name.ToLower() == request.Name.ToLower() || c.DocumentType == request.DocumentType,
+                        c.Name.ToLower() == request.Name.ToLower(),
                     cancellationToken);
 
-            if (isDuplicate)
+            if (isNameDuplicate)
             {
                 return ResultObject.Error(new ErrorMessage
                 {
@@ -49,10 +49,10 @@ public class CreateSpecialRegisterHandler : ICommandHandler<CreateSpecialRegiste
                 });
             }
 
-            var documentTypeAlreadyHasRegister =
+            var isTypeDuplicate =
                 await _dbContext.SpecialRegisters.AnyAsync(c => c.DocumentType == request.DocumentType, cancellationToken);
 
-            if (documentTypeAlreadyHasRegister)
+            if (isTypeDuplicate)
             {
                 return ResultObject.Error(new ErrorMessage
                 {
