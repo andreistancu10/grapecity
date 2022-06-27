@@ -13,9 +13,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
 
         static WorkflowInitiatorFactory()
         {
-            //factory.Add(1, () => new HeadOfDepartment());
+            factory.Add(1, () => new HeadOfDepartment());
             factory.Add(2, () => new Functionary());
-            //factory.Add(3, () => new Mayor());
+            factory.Add(3, () => new Mayor());
         }
 
         public static IWorkflowHandler Create(int typeId)

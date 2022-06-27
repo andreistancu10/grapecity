@@ -76,8 +76,6 @@
 
 	<ItemGroup>
 		<Folder Include="Business\Consumers\" />
-		<Folder Include="Business\WorkflowHistory\IncomingDocument\Handlers\Mayor\" />
-		<Folder Include="Business\WorkflowHistory\IncomingDocument\Handlers\HeadOfDepartment\" />
 		<Folder Include="Migrations\" />
 		<Folder Include="Public\Maintenance\" />
 	</ItemGroup>

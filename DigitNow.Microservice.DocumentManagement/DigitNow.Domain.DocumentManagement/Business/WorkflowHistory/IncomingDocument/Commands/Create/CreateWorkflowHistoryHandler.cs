@@ -9,7 +9,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
     using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Factory;
     using DigitNow.Domain.DocumentManagement.Data.WorkflowHistories;
     using Microsoft.EntityFrameworkCore;
-    using System;
 
     public class CreateWorkflowHistoryHandler : ICommandHandler<CreateWorkflowDecisionCommand, ResultObject>
     {
@@ -29,7 +28,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
                                                     .Include(doc => doc.WorkflowHistory)
                                                     .FirstOrDefaultAsync(doc => doc.RegistrationNumber == request.RegistrationNumber);
 
-            var createWorkflowHistoryCommand = await recipientType.UpdateStatusBasedOnWorkflowDecision(request, incomingDocFromDb);
+            var createWorkflowHistoryCommand = await recipientType.CreateWorkflowRecord(request);
 
             if (createWorkflowHistoryCommand.Result != null)
                 return createWorkflowHistoryCommand.Result;

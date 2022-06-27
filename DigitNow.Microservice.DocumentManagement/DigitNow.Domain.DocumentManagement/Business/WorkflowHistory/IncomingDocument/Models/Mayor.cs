@@ -1,7 +1,8 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers._Interfaces;
-using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
-using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries;
-using System;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers.Mayor;
+using HTSS.Platform.Core.CQRS;
+using HTSS.Platform.Core.Errors;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Models
@@ -10,33 +11,28 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
     {
         private enum ActionType { MakeDecision };
 
+        private Dictionary<ActionType, IWorkflowHandler> actionStrategy
+            = new Dictionary<ActionType, IWorkflowHandler>();
+
         public Mayor()
         {
-
+            actionStrategy.Add(ActionType.MakeDecision, new MayorMakesDecision());
         }
-        public async Task<ICreateWorkflowHistoryCommand> UpdateStatusBasedOnWorkflowDecision(ICreateWorkflowHistoryCommand command)
+        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command)
         {
-            var actionType = (ActionType)command.ActionType;
-
-            switch (actionType)
+            var actionKey = (ActionType)command.ActionType;
+            if (!actionStrategy.ContainsKey(actionKey))
             {
-                case ActionType.MakeDecision:
-                    return MayorMakesDecision(command);
-                default:
-                    break;
+                command.Result = ResultObject.Error(new ErrorMessage
+                {
+                    Message = $"No Action with id {command.ActionType} is possible for a Mayor.",
+                    TranslationCode = "dms.actionNotAllowed.backend.update.validation.actionNotAllowed",
+                    Parameters = new object[] { command.ActionType }
+                });
+                return command;
             }
 
-            return command;
-        }
-
-        private ICreateWorkflowHistoryCommand MayorMakesDecision(ICreateWorkflowHistoryCommand command)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ICreateWorkflowHistoryCommand> UpdateStatusBasedOnWorkflowDecision(ICreateWorkflowHistoryCommand command, Data.IncomingDocuments.IncomingDocument document)
-        {
-            throw new NotImplementedException();
+            return await actionStrategy[actionKey].CreateWorkflowRecord(command);
         }
     }
 }

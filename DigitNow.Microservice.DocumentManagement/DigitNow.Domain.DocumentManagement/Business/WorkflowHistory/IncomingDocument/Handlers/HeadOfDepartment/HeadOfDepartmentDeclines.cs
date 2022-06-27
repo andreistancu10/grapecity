@@ -1,16 +1,16 @@
-﻿
-using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers._Interfaces;
+﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers._Interfaces;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
+using System;
 using System.Threading.Tasks;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers.Functionary
+namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers.HeadOfDepartment
 {
-    public class FunctionaryDeclines : IWorkflowHandler
+    public class HeadOfDepartmentDeclines : IWorkflowHandler
     {
-        private int[] allowedTransitionStatuses = { (int)Status.inWorkAllocated, (int)Status.inWorkDelegated, (int)Status.opinionRequestedAllocated };
-
+        private int[] allowedTransitionStatuses = { (int)Status.inWorkUnallocated, (int)Status.opinionRequestedUnallocated, (int)Status.inWorkDelegatedUnallocated };
+        
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command)
         {
             if (!Validate(command))
@@ -18,13 +18,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
                 return command;
             }
 
-            //Daca status = Solicitat_Opinie_Alocat => statusul devine lucru_Alocat
-            // Daca  Status curent In lucru_Alocat => Nou_Declinat_competenta
+            // Solicitat_Opinie_Nerepatizat => In lucru_Alocat
+            //In_lucru_Nereprtizat => Nou_Declina_Competenta
 
-            command.Status = Status.newDeclinedCompetence;
+            command.Status = Status.inWorkAllocated;
             command.RecipientHasChanged = true;
             command.RecipientType = UserRole.Functionary;
-            
+
             return command;
         }
 

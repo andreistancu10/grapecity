@@ -1,5 +1,4 @@
-﻿
-using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers._Interfaces;
+﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers._Interfaces;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
@@ -7,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers.Functionary
 {
-    public class FunctionaryDeclines : IWorkflowHandler
+    public class FunctionaryAsksForApproval : IWorkflowHandler
     {
         private int[] allowedTransitionStatuses = { (int)Status.inWorkAllocated, (int)Status.inWorkDelegated, (int)Status.opinionRequestedAllocated };
 
@@ -18,28 +17,24 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
                 return command;
             }
 
-            //Daca status = Solicitat_Opinie_Alocat => statusul devine lucru_Alocat
-            // Daca  Status curent In lucru_Alocat => Nou_Declinat_competenta
-
-            command.Status = Status.newDeclinedCompetence;
+            command.Status = Status.inWorkApprovalRequested;
             command.RecipientHasChanged = true;
-            command.RecipientType = UserRole.Functionary;
-            
+            command.RecipientType = UserRole.HeadOfDepartment;
+
             return command;
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command)
         {
-            if (string.IsNullOrWhiteSpace(command.DeclineReason))
+            if (command.Resolution <= 0)
             {
                 command.Result = ResultObject.Error(new ErrorMessage
                 {
-                    Message = $"The reason of decline was not specified.",
-                    TranslationCode = "dms.declineReason.backend.update.validation.notSpecified",
-                    Parameters = new object[] { command.DeclineReason }
+                    Message = $"Selected resolution is invalid!",
+                    TranslationCode = "dms.resolution.backend.update.validation.resolutionInvalid",
+                    Parameters = new object[] { command.Resolution }
                 });
                 return false;
-
             }
 
             return true;

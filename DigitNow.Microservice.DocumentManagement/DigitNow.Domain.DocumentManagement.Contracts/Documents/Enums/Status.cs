@@ -7,13 +7,15 @@ namespace DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums
         newDeclinedCompetence = 2,
         inWorkAllocated = 3,
         opinionRequestedUnallocated = 4,
-        opinitionRequestedAllocated = 5,
+        opinionRequestedAllocated = 5,
         inWorkApprovalRequested = 6,
         inWorkDeclined = 7,
         inWorkApproved = 8,
         inWorkCountersignature = 9,
         finalized = 10,
         inWorkDelegated = 11,
-        inWorkDelegatedUnallocated = 12
+        inWorkDelegatedUnallocated = 12,
+        inWorkMayorReview = 13,
+        inWorkMayorDeclined = 14
     }
 }
