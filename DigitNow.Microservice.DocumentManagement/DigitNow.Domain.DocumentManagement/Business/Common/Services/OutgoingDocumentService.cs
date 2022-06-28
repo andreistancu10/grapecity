@@ -36,7 +36,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             await _documentService.AddDocument(new Document
             {
                 DocumentType = DocumentType.Outgoing,
-                RegistrationDate = DateTime.Now,
                 OutgoingDocument = outgoingDocument
             }, cancellationToken);
 

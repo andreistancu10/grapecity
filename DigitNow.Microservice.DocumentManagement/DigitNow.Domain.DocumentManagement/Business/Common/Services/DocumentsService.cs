@@ -76,6 +76,7 @@ public class DocumentService : IDocumentService
             var newRegNumber = ++maxRegNumber;
 
             document.RegistrationNumber = newRegNumber;
+            document.RegistrationDate = DateTime.Now;
 
             if (document.InternalDocument == null && document.IncomingDocument == null && document.OutgoingDocument == null)
                 throw new InvalidOperationException(); //TODO: Add descriptive error

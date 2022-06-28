@@ -19,7 +19,7 @@ public class CreateIncomingDocumentRequestValidator : AbstractValidator<CreateIn
         RuleFor(item => item.ContactDetail.CountyId).NotNull().NotEmpty();
         RuleFor(item => item.ContactDetail.CityId).NotNull().NotEmpty();
 
-        RuleFor(item => item.ExternalNumberDate).NotNull().NotEmpty().When(item => item.ExternalNumber >= 0);
+        RuleFor(item => item.ExternalNumberDate).NotNull().NotEmpty().When(item => item.ExternalNumber > 0);
         RuleFor(item => item.IsGDPRAgreed).Equal(true).When(item => item.InputChannelId == (int)InputChannel.Window && item.IssuerTypeId == (int)IssuerType.Company);
         RuleFor(item => item.Detail).NotNull().NotEmpty().When(item => item.DocumentTypeId == 12);
     }
