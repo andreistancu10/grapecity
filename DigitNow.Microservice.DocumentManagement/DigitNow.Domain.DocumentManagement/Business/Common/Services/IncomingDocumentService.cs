@@ -15,7 +15,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
     public interface IIncomingDocumentService
     {
         Task<IncomingDocument> AddAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken);
-        Task<List<IncomingDocument>> FindAsync(Expression<Func<IncomingDocument, bool>> predicate, CancellationToken cancellationToken);
+        Task<List<IncomingDocument>> FindAllAsync(Expression<Func<IncomingDocument, bool>> predicate, CancellationToken cancellationToken);
         Task SetResolutionAsync(IList<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken);
     }
 
@@ -38,7 +38,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
         {
             incomingDocument.Document = new Document
             {
-                CreatedAt = DateTime.Now,
                 DocumentType = DocumentType.Incoming,
                 RegistrationDate = DateTime.Now
             };
@@ -48,9 +47,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             return incomingDocument;
         }
 
-        public Task<List<IncomingDocument>> FindAsync(Expression<Func<IncomingDocument, bool>> predicate, CancellationToken cancellationToken)
+        public Task<List<IncomingDocument>> FindAllAsync(Expression<Func<IncomingDocument, bool>> predicate, CancellationToken cancellationToken)
         {
             return _dbContext.IncomingDocuments
+                .Include(x => x.Document)
                 .Where(predicate)
                 .ToListAsync(cancellationToken);
         }

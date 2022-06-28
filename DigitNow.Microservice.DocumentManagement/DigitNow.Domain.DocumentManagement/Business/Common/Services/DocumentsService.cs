@@ -16,6 +16,8 @@ public interface IDocumentService
     Task<Document> AddAsync(Document newDocument, CancellationToken cancellationToken);
     Task<Document> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken);
     Task<List<Document>> FindAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken);
+    
+    [Obsolete("This will be refactored in future sprints", error: false)]
     Task AddDocument(Document document, CancellationToken cancellationToken);
 }
 
@@ -47,8 +49,8 @@ public class DocumentService : IDocumentService
     public Task<List<Document>> FindAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken)
     {
         return _dbContext.Documents
-                .Where(predicate)
-                .ToListAsync(cancellationToken);
+            .Where(predicate)
+            .ToListAsync(cancellationToken);
     }
 
     // TODO: Use RegistrationNumberCounterService

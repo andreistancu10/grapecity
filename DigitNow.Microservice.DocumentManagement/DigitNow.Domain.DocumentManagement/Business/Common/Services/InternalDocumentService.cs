@@ -16,7 +16,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
     public interface IInternalDocumentService
     {
         Task<InternalDocument> CreateAsync(InternalDocument internalDocument, CancellationToken cancellationToken);
-        Task<List<InternalDocument>> FindAsync(Expression<Func<InternalDocument, bool>> predicate, CancellationToken cancellationToken);
+        Task<List<InternalDocument>> FindAllAsync(Expression<Func<InternalDocument, bool>> predicate, CancellationToken cancellationToken);
         Task SetResolutionAsync(IList<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken);
     }
 
@@ -52,7 +52,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             return internalDocument;
         }
 
-        public Task<List<InternalDocument>> FindAsync(Expression<Func<InternalDocument, bool>> predicate, CancellationToken cancellationToken)
+        public Task<List<InternalDocument>> FindAllAsync(Expression<Func<InternalDocument, bool>> predicate, CancellationToken cancellationToken)
         {
             return _dbContext.InternalDocuments
                 .Include(x => x.Document)

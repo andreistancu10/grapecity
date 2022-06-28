@@ -10,19 +10,19 @@ namespace DigitNow.Domain.DocumentManagement.Business.InternalDocuments.Commands
 public class CreateInternalDocumentHandler : ICommandHandler<CreateInternalDocumentCommand, ResultObject>
 {
     private readonly IMapper _mapper;
-    private readonly IInternalDocumentService _service;
+    private readonly IInternalDocumentService _internalDocumentService;
 
-    public CreateInternalDocumentHandler(IMapper mapper, IInternalDocumentService service)
+    public CreateInternalDocumentHandler(IMapper mapper, IInternalDocumentService internalDocumentService)
     {
         _mapper = mapper;
-        _service = service;
+        _internalDocumentService = internalDocumentService;
     }
 
     public async Task<ResultObject> Handle(CreateInternalDocumentCommand request, CancellationToken cancellationToken)
     {
         var internalDocumentForCreation = _mapper.Map<InternalDocument>(request);
 
-        await _service.CreateAsync(internalDocumentForCreation, cancellationToken).ConfigureAwait(false);
+        await _internalDocumentService.CreateAsync(internalDocumentForCreation, cancellationToken).ConfigureAwait(false);
 
         return ResultObject.Created(internalDocumentForCreation.Id);
     }
