@@ -11,5 +11,4 @@ public class CreateInternalDocumentCommand : ICommand<ResultObject>
     public string Observation { get; set; }
     public int ReceiverDepartmentId { get; set; }
     public bool? IsUrgent { get; set; }
-    public string User { get; set; }
 }
