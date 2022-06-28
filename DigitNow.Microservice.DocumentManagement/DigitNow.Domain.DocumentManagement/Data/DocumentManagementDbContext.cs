@@ -61,6 +61,16 @@ namespace DigitNow.Domain.DocumentManagement.Data
                 }
             }
 
+            foreach (var entry in ChangeTracker.Entries<ISoftExtendedEntity>())
+            {
+                if(entry.State == EntityState.Deleted)
+                {
+                    entry.Entity.IsDeleted = true;
+                    entry.Entity.DeletedAt = DateTime.Now;
+                    entry.Entity.DeletedBy = _identityService.GetCurrentUserId();
+                }
+            }
+
             return base.SaveChangesAsync(cancellationToken);
         }
 

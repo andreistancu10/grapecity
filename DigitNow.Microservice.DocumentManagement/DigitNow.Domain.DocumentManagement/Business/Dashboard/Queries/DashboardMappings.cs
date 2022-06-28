@@ -51,19 +51,10 @@ public class GetDocumentsMappings : Profile
     {
         public int Resolve(OutgoingDocument source, GetDocumentResponse destination, int destMember, ResolutionContext context)
         {
-            var workflowStatus = source.WorkflowHistory
-                .OrderByDescending(c => c.CreationDate)
-                .FirstDynamic()
-                .Status;
-
-            if ((DocumentStatus)destination.Status == DocumentStatus.Finalized || (DocumentStatus)workflowStatus == DocumentStatus.Finalized)
-            {
-                return (int)DocumentType.IncomingToOutgoing;
-            }
-
-            return (int) DocumentType.Outgoing;
+            return (int)DocumentType.Outgoing;
         }
     }
+
     private class GetDocumentResponseIncomingStatusValueResolver : IValueResolver<IncomingDocument, GetDocumentResponse, int>
     {
         public int Resolve(IncomingDocument source, GetDocumentResponse destination, int destMember, ResolutionContext context)
@@ -80,17 +71,7 @@ public class GetDocumentsMappings : Profile
     {
         public int Resolve(IncomingDocument source, GetDocumentResponse destination, int destMember, ResolutionContext context)
         {
-            var workflowStatus = source.WorkflowHistory
-                .OrderByDescending(c => c.CreationDate)
-                .FirstDynamic()
-                .Status;
-
-            if ((DocumentStatus)destination.Status == DocumentStatus.Finalized || (DocumentStatus)workflowStatus == DocumentStatus.Finalized)
-            {
-                return (int)DocumentType.IncomingToOutgoing;
-            }
-
-            return (int) DocumentType.Incoming;
+            return (int)DocumentType.Incoming;
         }
     }
 }

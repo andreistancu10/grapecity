@@ -14,7 +14,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
     public interface IOutgoingDocumentService
     {
         Task<OutgoingDocument> CreateAsync(OutgoingDocument outgoingDocument, CancellationToken cancellationToken);
-        Task<List<OutgoingDocument>> FindAsync(Expression<Func<OutgoingDocument, bool>> predicate, CancellationToken cancellationToken);
+        Task<List<OutgoingDocument>> FindAllAsync(Expression<Func<OutgoingDocument, bool>> predicate, CancellationToken cancellationToken);        
     }
 
     public class OutgoingDocumentService : IOutgoingDocumentService
@@ -43,7 +43,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             return outgoingDocument;
         }
 
-        public Task<List<OutgoingDocument>> FindAsync(Expression<Func<OutgoingDocument, bool>> predicate, CancellationToken cancellationToken)
+        public Task<List<OutgoingDocument>> FindAllAsync(Expression<Func<OutgoingDocument, bool>> predicate, CancellationToken cancellationToken)
         {
             return _dbContext.OutgoingDocuments
                 .Include(x => x.Document)

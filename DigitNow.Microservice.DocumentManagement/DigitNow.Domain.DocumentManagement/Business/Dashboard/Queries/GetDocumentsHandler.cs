@@ -11,7 +11,7 @@ using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.QueryableExtensions;
+using DigitNow.Domain.DocumentManagement.Data.Extensions;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Infrastructure.Data.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -43,10 +43,11 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
 
     public async Task<ResultPagedList<GetDocumentResponse>> Handle(GetDocumentsQuery request, CancellationToken cancellationToken)
     {
+        var allDocumentsCount = await CountAllDocumentsAsync(cancellationToken);
+
         var getDocumentsResponses = await GetAllDocumentsAsync(request.Page, request.Count, cancellationToken);
 
-        var pageCount = getDocumentsResponses.Count / request.Count;
-
+        var pageCount = allDocumentsCount / request.Count;
 
         if (getDocumentsResponses.Count % request.Count > 0)
         {
@@ -54,12 +55,31 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
         }
         
         var header = new PagingHeader(
-            getDocumentsResponses.Count,
+            allDocumentsCount,
             request.Page,
             request.Count,
             pageCount);
 
         return new ResultPagedList<GetDocumentResponse>(header, getDocumentsResponses);
+    }
+
+    private async Task<int> CountAllDocumentsAsync(CancellationToken cancellationToken)
+    {
+        var user = await GetCurrentUserAsync();
+
+        if (user.Roles.ToList().Contains((long)UserRole.Mayor))
+        {
+            return await _documentService.CountAllAsync(x => x.CreatedAt.Year >= PreviousYear, cancellationToken);
+        }
+
+        var relatedUserIds = await GetRelatedUserIdsASync(user);
+
+        return await _documentService.CountAllAsync(x =>
+            x.CreatedAt.Year >= PreviousYear
+            &&
+            relatedUserIds.Contains(x.CreatedBy)
+        , cancellationToken);
+        
     }
 
     private async Task<List<GetDocumentResponse>> GetAllDocumentsAsync(int page, int count, CancellationToken cancellationToken)
@@ -145,5 +165,14 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
         }
 
         throw new InvalidOperationException(); //TODO: Add descriptive error
+    }
+
+    private async Task<User> GetCurrentUserAsync()
+    {
+        var currentUserId = _identityService.GetCurrentUserId();
+        var user = await _identityAdapterClient.GetUserByIdAsync(currentUserId);
+        if (user == null) throw new InvalidOperationException($"User with identifier '{currentUserId}' cannot be retrieved!");
+
+        return user;
     }
 }
