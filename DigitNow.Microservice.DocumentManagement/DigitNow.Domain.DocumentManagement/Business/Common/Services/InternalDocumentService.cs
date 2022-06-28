@@ -43,7 +43,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
         {
             internalDocument.Document = new Document 
             { 
-                DocumentType = DocumentType.Incoming,
+                DocumentType = DocumentType.Internal,
                 RegistrationDate = DateTime.Now,
                 InternalDocument = internalDocument
             };
