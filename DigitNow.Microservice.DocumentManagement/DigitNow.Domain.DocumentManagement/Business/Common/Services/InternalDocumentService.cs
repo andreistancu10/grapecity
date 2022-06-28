@@ -44,11 +44,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             internalDocument.Document = new Document 
             { 
                 DocumentType = DocumentType.Incoming,
-                RegistrationDate = DateTime.Now
+                RegistrationDate = DateTime.Now,
+                InternalDocument = internalDocument
             };
 
-            await _dbContext.AddAsync(internalDocument, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await _documentService.AddDocument(internalDocument.Document, cancellationToken);
             return internalDocument;
         }
 

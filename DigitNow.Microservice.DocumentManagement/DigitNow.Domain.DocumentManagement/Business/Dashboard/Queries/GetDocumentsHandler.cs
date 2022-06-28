@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -10,6 +11,7 @@ using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.QueryableExtensions;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Infrastructure.Data.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -43,11 +45,19 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
     {
         var getDocumentsResponses = await GetAllDocumentsAsync(request.Page, request.Count, cancellationToken);
 
+        var pageCount = getDocumentsResponses.Count / request.Count;
+
+
+        if (getDocumentsResponses.Count % request.Count > 0)
+        {
+            pageCount += 1;
+        }
+        
         var header = new PagingHeader(
             getDocumentsResponses.Count,
             request.Page,
             request.Count,
-            getDocumentsResponses.Count / request.Count);
+            pageCount);
 
         return new ResultPagedList<GetDocumentResponse>(header, getDocumentsResponses);
     }
@@ -84,38 +94,35 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
         var incomingDocuments = documents
             .Where(x => x.DocumentType == DocumentType.Incoming)
             .ToList();
-        result.AddRange(await MapChildDocumentAsync<IncomingDocument>(incomingDocuments, cancellationToken));
+        result.AddRange(await MapChildDocumentAsync<IncomingDocument>(incomingDocuments, cancellationToken, c => c.WorkflowHistory));
 
         var internalDocuments = documents
             .Where(x => x.DocumentType == DocumentType.Internal)
             .ToList();
         result.AddRange(await MapChildDocumentAsync<InternalDocument>(internalDocuments, cancellationToken));
 
-        var outogingDocuments = documents
-            .Where(x => x.DocumentType == DocumentType.Outgoing)            
+        var outgoingDocuments = documents
+            .Where(x => x.DocumentType == DocumentType.Outgoing)
             .ToList();
-        result.AddRange(await MapChildDocumentAsync<OutgoingDocument>(outogingDocuments, cancellationToken));
+        result.AddRange(await MapChildDocumentAsync<OutgoingDocument>(outgoingDocuments, cancellationToken, c => c.WorkflowHistory));
 
         return result;
     }
 
-    private async Task<List<GetDocumentResponse>> MapChildDocumentAsync<T>(List<Document> documents, CancellationToken cancellationToken)
+    private async Task<List<GetDocumentResponse>> MapChildDocumentAsync<T>(List<Document> documents, CancellationToken cancellationToken, params Expression<Func<T, object>>[] includes)
         where T : VirtualDocument
     {
         var documentIds = documents.Select(x => x.Id).ToList();
-
         var virtualDocuments = await _dbContext.Set<T>()
+            .Includes(includes)
             .Where(x => documentIds.Contains(x.Id))
             .ToListAsync(cancellationToken);
-
         var documentRegistry = documents.ToDictionary(x => x, y => virtualDocuments.Where(x => x.DocumentId == y.Id));
-
         var result = new List<GetDocumentResponse>();
-        foreach (var registryEntry in documentRegistry)
-        {
-            var document = registryEntry.Value;
 
-            foreach (var virtualDocument in registryEntry.Value)
+        foreach (var (_, document) in documentRegistry)
+        {
+            foreach (var virtualDocument in document)
             {
                 result.Add(_mapper.Map<T, GetDocumentResponse>(virtualDocument));
             }

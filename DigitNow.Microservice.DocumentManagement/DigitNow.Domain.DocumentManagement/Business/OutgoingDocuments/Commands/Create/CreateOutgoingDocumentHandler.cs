@@ -1,14 +1,16 @@
-﻿using System;
-using System.Linq;
-using AutoMapper;
+﻿using AutoMapper;
+using DigitNow.Adapters.MS.Identity;
+using DigitNow.Adapters.MS.Identity.Poco;
+using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+using DigitNow.Domain.DocumentManagement.Data;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
-using Microsoft.EntityFrameworkCore;
-using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-using DigitNow.Domain.DocumentManagement.Data;
 
 namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Create;
 
@@ -16,51 +18,50 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
 {
     private readonly DocumentManagementDbContext _dbContext;
     private readonly IMapper _mapper;
-    private readonly IDocumentService _service;
     private readonly IOutgoingDocumentService _outgoingDocumentService;
+    private readonly IIdentityAdapterClient _identityAdapterClient;
 
-    public CreateOutgoingDocumentHandler(DocumentManagementDbContext dbContext, 
-        IMapper mapper, 
+    public CreateOutgoingDocumentHandler(DocumentManagementDbContext dbContext,
+        IMapper mapper,
         IDocumentService service,
-        IOutgoingDocumentService outgoingDocumentService)
+        IOutgoingDocumentService outgoingDocumentService,
+        IIdentityAdapterClient identityAdapterClient)
     {
         _dbContext = dbContext;
         _mapper = mapper;
-        _service = service;
         _outgoingDocumentService = outgoingDocumentService;
+        _identityAdapterClient = identityAdapterClient;
     }
 
     public async Task<ResultObject> Handle(CreateOutgoingDocumentCommand request, CancellationToken cancellationToken)
     {
-        var newOutgoingDocument = _mapper.Map<OutgoingDocument>(request);
-        newOutgoingDocument.CreationDate = DateTime.Now;
+        if (!string.IsNullOrWhiteSpace(request.IdentificationNumber))
+            CreateContactDetails(request);
 
-        newOutgoingDocument = await _outgoingDocumentService.CreateAsync(newOutgoingDocument, cancellationToken);
+        var newOutgoingDocument = _mapper.Map<OutgoingDocument>(request);
+
+        await _outgoingDocumentService.CreateAsync(newOutgoingDocument, cancellationToken);
 
         await AttachConnectedDocuments(request, newOutgoingDocument, cancellationToken);
-        
+
         newOutgoingDocument.WorkflowHistory.Add(
             new WorkflowHistory
             {
                 RecipientType = (int)UserRole.HeadOfDepartment,
-                RecipientId = request.RecipientId,
-                Status = (int)Status.inWorkUnallocated,
+                RecipientId = newOutgoingDocument.RecipientId,
+                Status = (int)DocumentStatus.InWorkUnallocated,
                 CreationDate = DateTime.Now,
                 RegistrationNumber = newOutgoingDocument.Document.RegistrationNumber
             });
 
+        await _dbContext.SingleUpdateAsync(newOutgoingDocument);
         await _dbContext.SaveChangesAsync();
-
-        await _service.AssignRegistrationNumberAsync(new Document
-        {
-            DocumentType = DocumentType.Outgoing,
-            OutgoingDocument = newOutgoingDocument
-        });
 
         return ResultObject.Created(newOutgoingDocument.Id);
     }
-    
-    private async Task AttachConnectedDocuments(CreateOutgoingDocumentCommand request, OutgoingDocument outgoingDocumentForCreation, CancellationToken cancellationToken)
+
+    private async Task AttachConnectedDocuments(CreateOutgoingDocumentCommand request, OutgoingDocument
+        outgoingDocumentForCreation, CancellationToken cancellationToken)
     {
         if (request.ConnectedDocumentIds.Any())
         {
@@ -74,5 +75,14 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
                     .Add(new ConnectedDocument { RegistrationNumber = connectedDocument.Document.RegistrationNumber, DocumentType = DocumentType.Outgoing });
             }
         }
+    }
+
+    private async Task CreateContactDetails(CreateOutgoingDocumentCommand request)
+    {
+        var contactDetails = request.ContactDetail;
+        contactDetails.IdentificationNumber = request.IdentificationNumber;
+
+        var contactDetailDto = _mapper.Map<ContactDetailDto>(contactDetails);
+        await _identityAdapterClient.CreateContactDetails(contactDetailDto);
     }
 }

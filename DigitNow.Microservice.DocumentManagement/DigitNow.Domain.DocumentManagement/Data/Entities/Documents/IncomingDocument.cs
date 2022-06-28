@@ -25,7 +25,7 @@ public class IncomingDocument : VirtualDocument
 
     public Document Document { get; set; }
     public List<WorkflowHistory> WorkflowHistory { get; set; } = new();
-    public List<ConnectedDocument> ConnectedDocuments { get; set; } = new();
+    public List<ConnectedDocument>? ConnectedDocuments { get; set; } = new();
 
     #endregion
 }

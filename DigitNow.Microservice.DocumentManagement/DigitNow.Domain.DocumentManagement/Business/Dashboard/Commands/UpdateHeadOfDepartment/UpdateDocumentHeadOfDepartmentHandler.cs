@@ -66,7 +66,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                 if (outgoingDoc != null)
                 {
                     outgoingDoc.RecipientId = (int)_headOfDepartment.Id;
-                    WorkflowHistoryFactory.Create(outgoingDoc.Document, UserRole.HeadOfDepartment, _headOfDepartment, Status.inWorkUnallocated);
+                    WorkflowHistoryFactory.Create(outgoingDoc.Document, UserRole.HeadOfDepartment, _headOfDepartment, DocumentStatus.InWorkUnallocated);
                 }
             }
         }
@@ -87,7 +87,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                 if (internalDoc != null)
                 {
                     internalDoc.ReceiverDepartmentId = (int)_headOfDepartment.Id;
-                    WorkflowHistoryFactory.Create(internalDoc.Document, UserRole.HeadOfDepartment, _headOfDepartment, Status.inWorkUnallocated);
+                    WorkflowHistoryFactory.Create(internalDoc.Document, UserRole.HeadOfDepartment, _headOfDepartment, DocumentStatus.InWorkUnallocated);
                 }
             }
         }
@@ -108,7 +108,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                 if (foundIncomingDocument != null)
                 {
                     foundIncomingDocument.RecipientId = (int)_headOfDepartment.Id;
-                    WorkflowHistoryFactory.Create(foundIncomingDocument.Document, UserRole.HeadOfDepartment, _headOfDepartment, Status.inWorkUnallocated);
+                    WorkflowHistoryFactory.Create(foundIncomingDocument.Document, UserRole.HeadOfDepartment, _headOfDepartment, DocumentStatus.InWorkUnallocated);
                 }
             }
         }

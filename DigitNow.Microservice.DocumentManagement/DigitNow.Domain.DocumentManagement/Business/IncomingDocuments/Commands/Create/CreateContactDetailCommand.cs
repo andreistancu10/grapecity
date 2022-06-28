@@ -1,6 +1,6 @@
 ﻿
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
-
+//TODO: This is not a command and can be deleted
 public class CreateContactDetailCommand
 {
     public string IdentificationNumber { get; set; }

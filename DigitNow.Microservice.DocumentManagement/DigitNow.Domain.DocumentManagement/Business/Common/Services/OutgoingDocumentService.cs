@@ -22,6 +22,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IDocumentService _documentService;
 
+
         public OutgoingDocumentService(
             DocumentManagementDbContext dbContext,
             IDocumentService documentService)
@@ -32,14 +33,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
         public async Task<OutgoingDocument> CreateAsync(OutgoingDocument outgoingDocument, CancellationToken cancellationToken)
         {
-            outgoingDocument.Document = new Document 
-            { 
-                DocumentType = DocumentType.Internal,
-                RegistrationDate = DateTime.Now
-            };
+            await _documentService.AddDocument(new Document
+            {
+                DocumentType = DocumentType.Outgoing,
+                RegistrationDate = DateTime.Now,
+                OutgoingDocument = outgoingDocument
+            }, cancellationToken);
 
-            await _dbContext.AddAsync(outgoingDocument, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
             return outgoingDocument;
         }
 
