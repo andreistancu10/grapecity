@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateUserRecipient;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
@@ -16,16 +17,17 @@ using System.Threading.Tasks;
 namespace DigitNow.Domain.DocumentManagement.Public.Dashboard;
 
 [Authorize]
-[ApiController]
+//[ApiController]
+[AllowAnonymous]
 [Route("api/dashboard")]
 public class DashboardController : ApiController
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
     private readonly IIdentityService _identityService;
-    private readonly IExportService<GetDocumentResponse> _exportService;
+    private readonly IExportService<DashboardDocumentViewModel> _exportService;
 
-    public DashboardController(IMediator mediator, IMapper mapper, IIdentityService identityService, IExportService<GetDocumentResponse> exportService)
+    public DashboardController(IMediator mediator, IMapper mapper, IIdentityService identityService, IExportService<DashboardDocumentViewModel> exportService)
     {
         _mediator = mediator;        
         _mapper = mapper;
@@ -48,20 +50,19 @@ public class DashboardController : ApiController
         return CreateResponse(await _mediator.Send(updateUserRecipientForDocumentCommand, cancellationToken));
     }
 
-    [HttpGet("get-documents")]
-    public async Task<ActionResult<List<GetDocumentResponse>>> GetDocuments([FromQuery] GetDocumentsRequest request, CancellationToken cancellationToken)
+    [HttpPost("get-documents")]
+    public async Task<ActionResult<List<GetDocumentsResponse>>> GetDocuments([FromBody] GetDocumentsRequest request, CancellationToken cancellationToken)
     {
         var query = _mapper.Map<GetDocumentsQuery>(request);
         return Ok(await _mediator.Send(query, cancellationToken));
     }
-
 
     [HttpGet("export-excel")]
     public async Task<ActionResult<FileContentResult>> ExportExcel([FromQuery] GetDocumentsRequest request, CancellationToken cancellationToken)
     {
         var command = _mapper.Map<GetDocumentsQuery>(request);
         var result = await _mediator.Send(command, cancellationToken);
-        var fileResult = await _exportService.CreateExcelFile("Permissions", "Permissions", result.Items);
+        var fileResult = await _exportService.CreateExcelFile("Permissions", "Permissions", result.Documents);
 
         return File(fileResult.Content, fileResult.ContentType, fileResult.Name);
     }

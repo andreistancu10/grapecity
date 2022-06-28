@@ -1,142 +1,170 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using DigitNow.Adapters.MS.Identity;
-using DigitNow.Adapters.MS.Identity.Poco;
-using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Public.Dashboard.Models;
 using HTSS.Platform.Core.CQRS;
-using HTSS.Platform.Infrastructure.Data.Abstractions;
-using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
 
-public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedList<GetDocumentResponse>>
+public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, GetDocumentsResponse>
 {
-    private readonly DocumentManagementDbContext _dbContext;
-    private readonly IDocumentService _documentService;
-    private readonly IIdentityService _identityService;
-    private readonly IIdentityAdapterClient _identityAdapterClient;
     private readonly IMapper _mapper;
+    private readonly IDashboardService _dashboardService;
 
+    private GetDocumentsQuery _query;
     private int PreviousYear => DateTime.UtcNow.Year - 1;
 
-    public GetDocumentsHandler(DocumentManagementDbContext dbContext,
-        IMapper mapper,
-        IDocumentService documentService,
-        IIdentityService identityService,
-        IIdentityAdapterClient identityAdapterClient)
+    public GetDocumentsHandler(IMapper mapper, IDashboardService dashboardService)
     {
-        _dbContext = dbContext;
-        _documentService = documentService;
-        _identityService = identityService;
-        _identityAdapterClient = identityAdapterClient;
         _mapper = mapper;
+        _dashboardService = dashboardService;
     }
 
-    public async Task<ResultPagedList<GetDocumentResponse>> Handle(GetDocumentsQuery request, CancellationToken cancellationToken)
+    public Task<GetDocumentsResponse> Handle(GetDocumentsQuery query, CancellationToken cancellationToken)
     {
-        var getDocumentsResponses = await GetAllDocumentsAsync(request.Page, request.Count, cancellationToken);
+        _query = query;
 
-        var header = new PagingHeader(
-            getDocumentsResponses.Count,
-            request.Page,
-            request.Count,
-            getDocumentsResponses.Count / request.Count);
-
-        return new ResultPagedList<GetDocumentResponse>(header, getDocumentsResponses);
+        if (query.Filter == null)
+        {
+            return GetSimpleResponseAsync(query, cancellationToken);
+        }
+        return GetComplexResponseAsync(query, cancellationToken);
     }
 
-    private async Task<List<GetDocumentResponse>> GetAllDocumentsAsync(int page, int count, CancellationToken cancellationToken)
+    private async Task<GetDocumentsResponse> GetSimpleResponseAsync(GetDocumentsQuery query, CancellationToken cancellationToken)
     {
-        var user = await _identityAdapterClient.GetUserByIdAsync(_identityService.GetCurrentUserId());
-        if (user == null) throw new InvalidOperationException(); //TODO: Add not found exception
+        var predicates = PredicateFactory.CreatePredicatesList<Document>(x => x.CreatedAt.Year >= PreviousYear);
 
-        var documents = default(List<Document>);
+        var totalItems = await _dashboardService.CountAllDocumentsAsync(predicates, cancellationToken);
 
-        if (user.Roles.ToList().Contains((long)UserRole.Mayor))
+        var documentViewModels = await _dashboardService.GetAllDocumentsAsync(
+                x => x.CreatedAt.Year >= PreviousYear,
+                query.Page,
+                query.Count,
+            cancellationToken);
+
+        return new GetDocumentsResponse
         {
-            documents = await _documentService.FindAllAsync(x => x.CreatedAt.Year >= PreviousYear, cancellationToken);
-        }
-        else
-        {
-            var relatedUserIds = await GetRelatedUserIdsASync(user);
-
-            documents = await _documentService.FindAllAsync(x =>
-                x.CreatedAt.Year >= PreviousYear
-                &&
-                relatedUserIds.Contains(x.CreatedBy)
-            , cancellationToken);
-        }
-
-        return await MapDocumentsAsync(documents, cancellationToken);
+            TotalItems = totalItems,
+            PageNumber = query.Page,
+            PageSize = query.Count,
+            TotalPages = totalItems / documentViewModels.Count,
+            Documents = documentViewModels
+        };
     }
 
-    private async Task<List<GetDocumentResponse>> MapDocumentsAsync(IEnumerable<Document> documents, CancellationToken cancellationToken)
+    private async Task<GetDocumentsResponse> GetComplexResponseAsync(GetDocumentsQuery query, CancellationToken cancellationToken)
     {
-        var result = new List<GetDocumentResponse>();
+        var filterModel = query.Filter;
+        
+        //var x1 = await _dashboardService.CountAllDocumentsAsync(PredicateFactory.CreatePredicatesList<Document>(x => t(x)),
+        //    cancellationToken);
 
-        var incomingDocuments = documents
-            .Where(x => x.DocumentType == DocumentType.Incoming)
-            .ToList();
-        result.AddRange(await MapChildDocumentAsync<IncomingDocument>(incomingDocuments, cancellationToken));
+        var predicates = PredicateFactory.CreatePredicatesList<Document>(
+                document => FilterByRegistryType(filterModel, document));
+                //&&
+                //FilterByRegistrationNo(filterModel, document)
+                //&&
+                //FilterByRegistrationDate(filterModel, document)
+                //&&
+                //FilterByDocumentType(filterModel, document)
+                //&&
+                //FilterByDocumentCategory(filterModel, document)
+                //&&
+                //FilterByDocumentState(filterModel, document);
 
-        var internalDocuments = documents
-            .Where(x => x.DocumentType == DocumentType.Internal)
-            .ToList();
-        result.AddRange(await MapChildDocumentAsync<InternalDocument>(internalDocuments, cancellationToken));
+        var totalItems = await _dashboardService.CountAllDocumentsAsync(predicates, cancellationToken);
 
-        var outogingDocuments = documents
-            .Where(x => x.DocumentType == DocumentType.Outgoing)            
-            .ToList();
-        result.AddRange(await MapChildDocumentAsync<OutgoingDocument>(outogingDocuments, cancellationToken));
+        var foundDocuments = await _dashboardService.GetAllDocumentsAsync(
+            predicates[0],
+            query.Page,
+            query.Count,
+            cancellationToken);
 
-        return result;
+        return new GetDocumentsResponse
+        {
+            TotalItems = totalItems,
+            PageNumber = query.Page,
+            PageSize = query.Count,
+            TotalPages = totalItems / foundDocuments.Count,
+            Documents = foundDocuments
+        };
     }
 
-    private async Task<List<GetDocumentResponse>> MapChildDocumentAsync<T>(List<Document> documents, CancellationToken cancellationToken)
-        where T : VirtualDocument
+    private bool t(Document arg)
     {
-        var documentIds = documents.Select(x => x.Id).ToList();
-
-        var virtualDocuments = await _dbContext.Set<T>()
-            .Where(x => documentIds.Contains(x.Id))
-            .ToListAsync(cancellationToken);
-
-        var documentRegistry = documents.ToDictionary(x => x, y => virtualDocuments.Where(x => x.DocumentId == y.Id));
-
-        var result = new List<GetDocumentResponse>();
-        foreach (var registryEntry in documentRegistry)
+        if (string.IsNullOrEmpty(_query.Filter.RegistryType))
         {
-            var document = registryEntry.Value;
-
-            foreach (var virtualDocument in registryEntry.Value)
-            {
-                result.Add(_mapper.Map<T, GetDocumentResponse>(virtualDocument));
-            }
+            return true; //TODO: Ask about this
         }
-        return result;
+        return true;
     }
 
-    private async Task<IEnumerable<long>> GetRelatedUserIdsASync(User user)
+    private bool FilterByRegistryType(DocumentsFilter filterModel, Document document)
     {
-        if (user.Roles.ToList().Contains((long)UserRole.Functionary))
+        if (string.IsNullOrEmpty(filterModel.RegistryType))
         {
-            return new List<long> { user.Id };
+            return true; //TODO: Ask about this
         }
-
-        if (user.Roles.ToList().Contains((long)UserRole.HeadOfDepartment))
-        {
-            var departmentId = user.Departments.FirstOrDefault();
-            var departmentUsers = await _identityAdapterClient.GetUsersByDepartmentIdAsync(departmentId);
-            return departmentUsers.Users.Select(x => x.Id).ToList();
-        }
-
-        throw new InvalidOperationException(); //TODO: Add descriptive error
+        return true;
     }
+
+    private bool FilterByRegistrationNo(DocumentsFilter filterModel, Document document)
+    {
+        var registrationNoFilter = filterModel.RegistrationNoFilter;
+        if (registrationNoFilter != null)
+        {
+            return document.RegistrationNumber >= registrationNoFilter.From && document.RegistrationNumber <= registrationNoFilter.To;
+        }
+        return true;
+    }
+
+    private bool FilterByRegistrationDate(DocumentsFilter filterModel, Document document)
+    {
+        var registrationDateFilter = filterModel.RegistrationDateFilter;
+        if (registrationDateFilter != null)
+        {
+            return document.RegistrationDate >= registrationDateFilter.From && document.RegistrationDate <= registrationDateFilter.To;
+        }
+        return true;
+    }
+
+    private bool FilterByDocumentType(DocumentsFilter filterModel, Document document)
+    {
+        return document.DocumentType == filterModel.DocumentType;
+    }
+
+    private bool FilterByDocumentCategory(DocumentsFilter filterModel, Document document)
+    {
+        if (filterModel.DocumentType == DocumentType.Incoming || filterModel.DocumentType == DocumentType.Outgoing)
+        {
+            // TODO: Ask about this
+            return false;
+        }
+        else if (filterModel.DocumentType != DocumentType.Internal)
+        {
+            // TODO: Ask about this
+            return false;
+        }
+
+        return true;
+    }
+
+    private bool FilterByDocumentState(DocumentsFilter filterModel, Document document)
+    {
+        if (filterModel.DocumentState != null)
+        {
+            // TODO: Ask about this
+            return false;
+        }
+        return true;
+    }
+
 }
