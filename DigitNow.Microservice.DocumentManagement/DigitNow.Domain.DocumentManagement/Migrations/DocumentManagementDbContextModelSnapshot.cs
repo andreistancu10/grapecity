@@ -78,6 +78,12 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<int>("CountyId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
@@ -86,6 +92,12 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.Property<string>("Floor")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("ModifiedBy")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
@@ -401,9 +413,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
-                    b.Property<int?>("ActionType")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
 
@@ -419,8 +428,8 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<long?>("OutgoingDocumentId")
                         .HasColumnType("bigint");
 
-                    b.Property<int>("RecipientId")
-                        .HasColumnType("int");
+                    b.Property<long>("RecipientId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("RecipientName")
                         .HasColumnType("nvarchar(max)");

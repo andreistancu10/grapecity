@@ -65,14 +65,14 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
 
     private async Task<int> CountAllDocumentsAsync(CancellationToken cancellationToken)
     {
-        var user = await GetCurrentUserAsync();
+        var user = await GetCurrentUserAsync(cancellationToken);
 
         if (user.Roles.ToList().Contains((long)UserRole.Mayor))
         {
             return await _documentService.CountAllAsync(x => x.CreatedAt.Year >= PreviousYear, cancellationToken);
         }
 
-        var relatedUserIds = await GetRelatedUserIdsASync(user);
+        var relatedUserIds = await GetRelatedUserIdsASync(user, cancellationToken);
 
         return await _documentService.CountAllAsync(x =>
             x.CreatedAt.Year >= PreviousYear
@@ -167,10 +167,10 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
         throw new InvalidOperationException(); //TODO: Add descriptive error
     }
 
-    private async Task<User> GetCurrentUserAsync()
+    private async Task<User> GetCurrentUserAsync(CancellationToken cancellationToken)
     {
         var currentUserId = _identityService.GetCurrentUserId();
-        var user = await _identityAdapterClient.GetUserByIdAsync(currentUserId);
+        var user = await _identityAdapterClient.GetUserByIdAsync(currentUserId, cancellationToken);
         if (user == null) throw new InvalidOperationException($"User with identifier '{currentUserId}' cannot be retrieved!");
 
         return user;
