@@ -18,6 +18,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
 
+// TODO: Refactor code and move dbContext to service
 public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedList<GetDocumentResponse>>
 {
     private readonly DocumentManagementDbContext _dbContext;
@@ -91,17 +92,23 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
 
         if (user.Roles.ToList().Contains((long)UserRole.Mayor))
         {
-            documents = await _documentService.FindAllAsync(x => x.CreatedAt.Year >= PreviousYear, cancellationToken);
+            documents = await _dbContext.Documents
+                .Where(x => x.CreatedAt.Year >= PreviousYear)
+                .OrderByDescending(x => x.RegistrationDate)
+                .Skip((page - 1) * count)
+                .Take(count)
+                .ToListAsync(cancellationToken);
         }
         else
         {
             var relatedUserIds = await GetRelatedUserIdsASync(user, cancellationToken);
 
-            documents = await _documentService.FindAllAsync(x =>
-                x.CreatedAt.Year >= PreviousYear
-                &&
-                relatedUserIds.Contains(x.CreatedBy)
-            , cancellationToken);
+            documents = await _dbContext.Documents
+                .Where(x => x.CreatedAt.Year >= PreviousYear && relatedUserIds.Contains(x.CreatedBy))
+                .OrderByDescending(x => x.RegistrationDate)
+                .Skip((page - 1) * count)
+                .Take(count)
+                .ToListAsync(cancellationToken);
         }
 
         return await MapDocumentsAsync(documents, cancellationToken);
@@ -135,7 +142,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
         var documentIds = documents.Select(x => x.Id).ToList();
         var virtualDocuments = await _dbContext.Set<T>()
             .Includes(includes)
-            .Where(x => documentIds.Contains(x.Id))
+            .Where(x => documentIds.Contains(x.DocumentId))
             .ToListAsync(cancellationToken);
         var documentRegistry = documents.ToDictionary(x => x, y => virtualDocuments.Where(x => x.DocumentId == y.Id));
         var result = new List<GetDocumentResponse>();
