@@ -26,7 +26,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
         }
         public async Task<ResultObject> Handle(UpdateDocumentHeadOfDepartmentCommand request, CancellationToken cancellationToken)
         {
-            var users = await _identityAdapterClient.GetUsersByDepartmentIdAsync(request.DepartmentId);
+            var users = await _identityAdapterClient.GetUsersByDepartmentIdAsync(request.DepartmentId, cancellationToken);
             _headOfDepartment = users.Users.FirstOrDefault(x => x.Roles.Contains((long)UserRole.HeadOfDepartment));
 
             if (_headOfDepartment == null)
@@ -66,7 +66,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                 if (outgoingDoc != null)
                 {
                     outgoingDoc.RecipientId = (int)_headOfDepartment.Id;
-                    WorkflowHistoryFactory.Create(outgoingDoc.Document, UserRole.HeadOfDepartment, _headOfDepartment, DocumentStatus.InWorkUnallocated);
+                    outgoingDoc.WorkflowHistory.Add(WorkflowHistoryFactory.Create(outgoingDoc.Document, UserRole.HeadOfDepartment, _headOfDepartment, DocumentStatus.InWorkUnallocated));
                 }
             }
         }
@@ -87,7 +87,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                 if (internalDoc != null)
                 {
                     internalDoc.ReceiverDepartmentId = (int)_headOfDepartment.Id;
-                    WorkflowHistoryFactory.Create(internalDoc.Document, UserRole.HeadOfDepartment, _headOfDepartment, DocumentStatus.InWorkUnallocated);
                 }
             }
         }
@@ -108,7 +107,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                 if (foundIncomingDocument != null)
                 {
                     foundIncomingDocument.RecipientId = (int)_headOfDepartment.Id;
-                    WorkflowHistoryFactory.Create(foundIncomingDocument.Document, UserRole.HeadOfDepartment, _headOfDepartment, DocumentStatus.InWorkUnallocated);
+                    foundIncomingDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(foundIncomingDocument.Document, UserRole.HeadOfDepartment, _headOfDepartment, DocumentStatus.InWorkUnallocated));
                 }
             }
         }

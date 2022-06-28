@@ -36,13 +36,13 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
     public async Task<ResultObject> Handle(CreateOutgoingDocumentCommand request, CancellationToken cancellationToken)
     {
         if (!string.IsNullOrWhiteSpace(request.IdentificationNumber))
-            CreateContactDetails(request);
+            await CreateContactDetailsAsync(request, cancellationToken);
 
         var newOutgoingDocument = _mapper.Map<OutgoingDocument>(request);
 
         await _outgoingDocumentService.CreateAsync(newOutgoingDocument, cancellationToken);
 
-        await AttachConnectedDocuments(request, newOutgoingDocument, cancellationToken);
+        await AttachConnectedDocumentsAsync(request, newOutgoingDocument, cancellationToken);
 
         newOutgoingDocument.WorkflowHistory.Add(
             new WorkflowHistory
@@ -60,7 +60,7 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
         return ResultObject.Created(newOutgoingDocument.Id);
     }
 
-    private async Task AttachConnectedDocuments(CreateOutgoingDocumentCommand request, OutgoingDocument
+    private async Task AttachConnectedDocumentsAsync(CreateOutgoingDocumentCommand request, OutgoingDocument
         outgoingDocumentForCreation, CancellationToken cancellationToken)
     {
         if (request.ConnectedDocumentIds.Any())
@@ -77,12 +77,12 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
         }
     }
 
-    private async Task CreateContactDetails(CreateOutgoingDocumentCommand request)
+    private async Task CreateContactDetailsAsync(CreateOutgoingDocumentCommand request, CancellationToken cancellationToken)
     {
         var contactDetails = request.ContactDetail;
         contactDetails.IdentificationNumber = request.IdentificationNumber;
 
         var contactDetailDto = _mapper.Map<ContactDetailDto>(contactDetails);
-        await _identityAdapterClient.CreateContactDetails(contactDetailDto);
+        await _identityAdapterClient.CreateContactDetailsAsync(contactDetailDto, cancellationToken);
     }
 }

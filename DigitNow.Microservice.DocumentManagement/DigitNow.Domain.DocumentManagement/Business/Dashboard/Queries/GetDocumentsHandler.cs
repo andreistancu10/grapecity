@@ -64,7 +64,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
 
     private async Task<List<GetDocumentResponse>> GetAllDocumentsAsync(int page, int count, CancellationToken cancellationToken)
     {
-        var user = await _identityAdapterClient.GetUserByIdAsync(_identityService.GetCurrentUserId());
+        var user = await _identityAdapterClient.GetUserByIdAsync(_identityService.GetCurrentUserId(), cancellationToken);
         if (user == null) throw new InvalidOperationException(); //TODO: Add not found exception
 
         var documents = default(List<Document>);
@@ -75,7 +75,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
         }
         else
         {
-            var relatedUserIds = await GetRelatedUserIdsASync(user);
+            var relatedUserIds = await GetRelatedUserIdsASync(user, cancellationToken);
 
             documents = await _documentService.FindAllAsync(x =>
                 x.CreatedAt.Year >= PreviousYear
@@ -130,7 +130,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
         return result;
     }
 
-    private async Task<IEnumerable<long>> GetRelatedUserIdsASync(User user)
+    private async Task<IEnumerable<long>> GetRelatedUserIdsASync(User user, CancellationToken cancellationToken)
     {
         if (user.Roles.ToList().Contains((long)UserRole.Functionary))
         {
@@ -140,7 +140,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
         if (user.Roles.ToList().Contains((long)UserRole.HeadOfDepartment))
         {
             var departmentId = user.Departments.FirstOrDefault();
-            var departmentUsers = await _identityAdapterClient.GetUsersByDepartmentIdAsync(departmentId);
+            var departmentUsers = await _identityAdapterClient.GetUsersByDepartmentIdAsync(departmentId, cancellationToken);
             return departmentUsers.Users.Select(x => x.Id).ToList();
         }
 

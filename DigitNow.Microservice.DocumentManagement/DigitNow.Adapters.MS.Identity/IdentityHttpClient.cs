@@ -19,11 +19,11 @@ namespace DigitNow.Adapters.MS.Identity
             _serviceProvider = serviceProvider;
         }
 
-        public async Task<T> GetAsync<T>(string requestUri) where T : class
+        public async Task<T> GetAsync<T>(string requestUri, CancellationToken cancellationToken) where T : class
         {
             await SetAuthorizationTokenAsync();
 
-            var response = await _httpClient.GetAsync(requestUri);
+            var response = await _httpClient.GetAsync(requestUri, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
                 throw new HttpRequestException(); //TODO: Throw a descriptive error
@@ -40,12 +40,12 @@ namespace DigitNow.Adapters.MS.Identity
             return result;
         }
 
-        public async Task PostAsync(string requestUri, object content)
+        public async Task PostAsync(string requestUri, object content, CancellationToken cancellationToken)
         {
             await SetAuthorizationTokenAsync();
 
             var jsonObject = JsonConvert.SerializeObject(content);
-            var response = await _httpClient.PostAsync(requestUri, new StringContent(jsonObject, Encoding.UTF8, "application/json"));
+            var response = await _httpClient.PostAsync(requestUri, new StringContent(jsonObject, Encoding.UTF8, "application/json"), cancellationToken);
             
             if (!response.IsSuccessStatusCode)
             {

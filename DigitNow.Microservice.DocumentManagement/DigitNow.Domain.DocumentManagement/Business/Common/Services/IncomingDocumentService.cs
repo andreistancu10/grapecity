@@ -38,7 +38,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
         {
             incomingDocument.Document = new Document
             {
-                CreatedAt = DateTime.Now,
                 DocumentType = DocumentType.Incoming,
                 RegistrationDate = DateTime.Now
             };

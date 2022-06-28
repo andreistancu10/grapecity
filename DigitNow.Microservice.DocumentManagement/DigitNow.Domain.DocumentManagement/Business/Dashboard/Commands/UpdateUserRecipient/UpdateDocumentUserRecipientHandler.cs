@@ -28,7 +28,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
         }
         public async Task<ResultObject> Handle(UpdateDocumentUserRecipientCommand request, CancellationToken cancellationToken)
         {
-            _user = await _identityAdapterClient.GetUserByIdAsync(request.UserId);
+            _user = await _identityAdapterClient.GetUserByIdAsync(request.UserId, cancellationToken);
 
             if (_user == null)
                 return ResultObject.Error(new ErrorMessage

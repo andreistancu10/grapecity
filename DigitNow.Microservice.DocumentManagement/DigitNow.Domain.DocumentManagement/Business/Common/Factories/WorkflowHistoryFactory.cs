@@ -12,7 +12,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
         public static WorkflowHistory Create(Document document, UserRole role, User user, DocumentStatus documentStatus)
             => new WorkflowHistory {
                 RecipientType = (int)role,
-                RecipientId = (int)user.Id,
+                RecipientId = user.Id,
                 RecipientName = user.FormatUserNameByRole(role),
                 Status = (int)documentStatus,
                 CreationDate = DateTime.Now,

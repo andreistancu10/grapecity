@@ -6,9 +6,8 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
     public class WorkflowHistory : Entity
     {
         public int RecipientType { get; set; }
-        public int RecipientId { get; set; }
+        public long RecipientId { get; set; }
         public string RecipientName { get; set; }
-        public int? ActionType { get; set; }
         public string Remarks { get; set; }
         public string DeclineReason { get; set; }
         public string Resolution { get; set; }
