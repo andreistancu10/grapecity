@@ -12,7 +12,7 @@ public class UpdateOutgoingDocumentRequest
     public string ContentSummary { get; set; }
     public int NumberOfPages { get; set; }
     public int RecipientId { get; set; }
-    public int DocumentTypeId { get; set; }
+    public int DocumentTypeId { get; set; }  //TODO: Rename it to DocumentCategoryId
     public string DocumentTypeDetail { get; set; }
     public UpdateContactDetailsRequest ContactDetail { get; set; }
     public List<int> ConnectedDocumentIds { get; set; }
