@@ -2,5 +2,5 @@
 
 public class UpdateSpecialRegisterRequest
 {
-    public int DocumentType { get; set; }
+    public int DocumentCategoryId { get; set; }
 }

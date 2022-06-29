@@ -54,6 +54,6 @@ public class SpecialRegisterService : ISpecialRegisterService
 
     public Task<SpecialRegister> FindAsync(Expression<Func<SpecialRegister, bool>> predicate, CancellationToken cancellationToken)
     {
-        return _dbContext.SpecialRegisters.FirstOrDefaultAsync(predicate, cancellationToken);
+        return _dbContext.SpecialRegisters.FirstAsync(predicate, cancellationToken);
     }
 }

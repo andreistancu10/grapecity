@@ -1,10 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
-    public partial class FixOutgoingDocument : Migration
+    public partial class SpecialRegister : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -32,11 +33,38 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 oldClrType: typeof(int),
                 oldType: "int");
 
+            migrationBuilder.CreateTable(
+                name: "SpecialRegister",
+                schema: "DocumentMangement",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Observations = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentCategoryId = table.Column<int>(type: "int", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<long>(type: "bigint", nullable: false),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SpecialRegister", x => x.Id);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_OutgoingDocument_ContactDetailId",
                 schema: "DocumentMangement",
                 table: "OutgoingDocument",
                 column: "ContactDetailId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SpecialRegister_DocumentCategoryId",
+                schema: "DocumentMangement",
+                table: "SpecialRegister",
+                column: "DocumentCategoryId",
+                unique: true);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_OutgoingDocument_ContactDetail_ContactDetailId",
@@ -55,6 +83,10 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 name: "FK_OutgoingDocument_ContactDetail_ContactDetailId",
                 schema: "DocumentMangement",
                 table: "OutgoingDocument");
+
+            migrationBuilder.DropTable(
+                name: "SpecialRegister",
+                schema: "DocumentMangement");
 
             migrationBuilder.DropIndex(
                 name: "IX_OutgoingDocument_ContactDetailId",

@@ -4,7 +4,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Commands.
 {
     public class CreateSpecialRegisterCommand : ICommand<ResultObject>
     {
-        public int DocumentType { get; set; }
+        public int DocumentCategoryId { get; set; }
         public string  Name { get; set; }
         public string Observations { get; set; }
     }
