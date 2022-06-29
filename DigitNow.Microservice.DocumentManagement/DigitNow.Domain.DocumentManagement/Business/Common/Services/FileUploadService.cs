@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace DigitNow.Domain.DocumentManagement.Business._Common.Documents.Services;
+namespace DigitNow.Domain.DocumentManagement.Business.Common.Services;
 
 public class FileUploadService
 {
