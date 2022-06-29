@@ -2,6 +2,8 @@
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries;
+using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.GetRegistrationProof;
+using DigitNow.Domain.DocumentManagement.Contracts.Documents;
 using DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
@@ -21,12 +23,18 @@ public class IncomingDocumentsController : ApiController
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IDocumentPdfGeneratorService _documentPdfGeneratorService;
 
-    public IncomingDocumentsController(IMediator mediator, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+    public IncomingDocumentsController(
+        IMediator mediator, 
+        IMapper mapper, 
+        IHttpContextAccessor httpContextAccessor, 
+        IDocumentPdfGeneratorService documentPdfGeneratorService)
     {
         _mediator = mediator;
         _mapper = mapper;
         _httpContextAccessor = httpContextAccessor;
+        _documentPdfGeneratorService = documentPdfGeneratorService;
     }
     private string GetUserId() => _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
@@ -57,5 +65,32 @@ public class IncomingDocumentsController : ApiController
         updateIncomingDocumentCommand.Id = id;
 
         return CreateResponse(await _mediator.Send(updateIncomingDocumentCommand, cancellationToken));
+    }
+
+    [HttpGet("generate-registration-proof/{id}")]
+    public async Task<IActionResult> GetPdf([FromRoute] int id, CancellationToken cancellationToken)
+    {
+        
+        var response = await _mediator.Send(new GetRegistrationProofQuery
+        {
+            Id = id
+        }, cancellationToken);
+
+        if(response == null)
+        {
+            return NotFound();
+        }
+
+        var file = await _documentPdfGeneratorService.GenerateIncomingDocRegistrationProofPdfAsync(new DocumentPdfDetails
+        {
+            IssuerName = response.IssuerName,
+            RegistrationDate = response.RegistrationDate,
+            RegistrationNumber = response.RegistrationNumber,
+            ResolutionPeriod = response.ResolutionPeriod,
+            DocumentType = "Cerere",
+            CityHall = "Primaria Bucuresti",
+            InstitutionHeader = "Primaria Bucuresti"
+        });
+        return File(file.Content, file.ContentType, file.Name);
     }
 }

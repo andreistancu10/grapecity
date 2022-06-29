@@ -66,7 +66,8 @@ namespace DigitNow.Domain.DocumentManagement.configurations
         {
             services.AddScoped<IDocumentService, DocumentService>();
             services.AddScoped<IDocumentsQueryService, DocumentsQueryService>();
-
+            services.AddScoped<IPdfGeneratorService, PdfGeneratorService>();
+            services.AddScoped<IDocumentPdfGeneratorService, DocumentPdfGeneratorService>();
             return services;
         }
     }
