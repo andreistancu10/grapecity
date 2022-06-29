@@ -1,43 +1,44 @@
-﻿using System.Collections.Generic;
-using System.Security.Claims;
-using AutoMapper;
+﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateUserRecipient;
+using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
 using DigitNow.Domain.DocumentManagement.Public.Dashboard.Models;
+using HTSS.Platform.Core.Files;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
-using HTSS.Platform.Core.Files;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Dashboard;
 
 [Authorize]
+[ApiController]
 [Route("api/dashboard")]
 public class DashboardController : ApiController
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
+    private readonly IIdentityService _identityService;
     private readonly IExportService<GetDocumentResponse> _exportService;
 
-    private string GetUserId() => HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-    public DashboardController(IMediator mediator, IMapper mapper, IExportService<GetDocumentResponse> exportService)
+    public DashboardController(IMediator mediator, IMapper mapper, IIdentityService identityService, IExportService<GetDocumentResponse> exportService)
     {
-        _mediator = mediator;
+        _mediator = mediator;        
         _mapper = mapper;
+        _identityService = identityService;
         _exportService = exportService;
     }
 
     [HttpPut("update-department")]
-    public async Task<IActionResult> UpdateDocumentRecipientByDepartmentId([FromBody] UpdateDocumentRecipientRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> UpdateDocumentHeadOfDepartmentByDepartmentId([FromBody] UpdateDocumentHeadofDepartmentRequest request, CancellationToken cancellationToken)
     {
-        var updateDepartmentForDocumentCommand = _mapper.Map<UpdateDocumentRecipientCommand>(request);
+        var updateHeadOfDepartmentForDocumentCommand = _mapper.Map<UpdateDocumentHeadOfDepartmentCommand>(request);
 
-        return CreateResponse(await _mediator.Send(updateDepartmentForDocumentCommand, cancellationToken));
+        return CreateResponse(await _mediator.Send(updateHeadOfDepartmentForDocumentCommand, cancellationToken));
     }
 
     [HttpPut("update-user-recipient")]
@@ -51,7 +52,6 @@ public class DashboardController : ApiController
     public async Task<ActionResult<List<GetDocumentResponse>>> GetDocuments([FromQuery] GetDocumentsRequest request, CancellationToken cancellationToken)
     {
         var query = _mapper.Map<GetDocumentsQuery>(request);
-        query.UserId = GetUserId();
         return Ok(await _mediator.Send(query, cancellationToken));
     }
 

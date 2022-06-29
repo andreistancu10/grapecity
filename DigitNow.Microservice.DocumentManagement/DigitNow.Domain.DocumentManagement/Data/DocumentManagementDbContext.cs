@@ -1,10 +1,16 @@
-﻿using System;
-using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
+﻿#define MIGRATION_ONLY
+
+using System;
 using Microsoft.EntityFrameworkCore;
-using DigitNow.Domain.DocumentManagement.Data.InternalDocuments;
-using DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
+using System.Threading.Tasks;
+using System.Threading;
+
+#if  MIGRATION_ONLY
 using Microsoft.EntityFrameworkCore.Design;
-using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
+#endif
+using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
 
 namespace DigitNow.Domain.DocumentManagement.Data
 {
@@ -12,26 +18,63 @@ namespace DigitNow.Domain.DocumentManagement.Data
     {
         internal const string Schema = "DocumentMangement";
 
-        public DocumentManagementDbContext(DbContextOptions<DocumentManagementDbContext> options) : base(options)
+        private readonly IIdentityService _identityService;
+
+        public DocumentManagementDbContext(DbContextOptions<DocumentManagementDbContext> options)
+            : base(options) { }
+
+        public DocumentManagementDbContext(DbContextOptions<DocumentManagementDbContext> options,
+            IIdentityService identityService) 
+            : base(options)
         {
+            _identityService = identityService;
         }
-
+        public DbSet<Document> Documents { get; set; }
         public DbSet<IncomingDocument> IncomingDocuments { get; set; }
-
         public DbSet<OutgoingDocument> OutgoingDocuments { get; set; }
-
+        public DbSet<DocumentResolution> DocumentResolutions { get; set; }
         public DbSet<ConnectedDocument> ConnectedDocuments { get; set; }
-
         public DbSet<InternalDocument> InternalDocuments { get; set; }
+        public DbSet<RegistrationNumberCounter> RegistrationNumberCounters { get; set; }
+        public DbSet<SpecialRegister> SpecialRegisters { get; set; }
         
-        public DbSet<RegistrationNumberCounter.RegistrationNumberCounter> RegistrationNumberCounter { get; set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema(Schema);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(DocumentManagementDbContext).Assembly);
         }
-        
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+        {
+            foreach (var entry in ChangeTracker.Entries<IExtendedEntity>())
+            {
+                switch (entry.State)
+                {
+                    case EntityState.Added:
+                        entry.Entity.CreatedAt = DateTime.Now;
+                        entry.Entity.CreatedBy = _identityService.GetCurrentUserId();
+                        break;
+                    case EntityState.Modified:
+                        entry.Entity.ModifiedAt = DateTime.Now;
+                        entry.Entity.ModifiedBy = _identityService.GetCurrentUserId();
+                        break;
+                }
+            }
+
+            foreach (var entry in ChangeTracker.Entries<ISoftExtendedEntity>())
+            {
+                if(entry.State == EntityState.Deleted)
+                {
+                    entry.Entity.IsDeleted = true;
+                    entry.Entity.DeletedAt = DateTime.Now;
+                    entry.Entity.DeletedBy = _identityService.GetCurrentUserId();
+                }
+            }
+
+            return base.SaveChangesAsync(cancellationToken);
+        }
+
+#if MIGRATION_ONLY
         public class DbContextFactory : IDesignTimeDbContextFactory<DocumentManagementDbContext>
         {
             public DocumentManagementDbContext CreateDbContext(string[] args)
@@ -42,9 +85,10 @@ namespace DigitNow.Domain.DocumentManagement.Data
                 {
                     builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
                 });
-                
+
                 return new DocumentManagementDbContext(optionsBuilder.Options);
             }
         }
+#endif
     }
 }

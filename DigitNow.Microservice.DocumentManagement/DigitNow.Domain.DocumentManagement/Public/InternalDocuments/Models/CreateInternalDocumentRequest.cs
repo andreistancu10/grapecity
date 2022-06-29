@@ -2,7 +2,7 @@
 
 public record CreateInternalDocumentRequest(
     int DepartmentId,
-    int InternalDocumentTypeId,
+    int InternalDocumentTypeId,  //TODO: Rename it to DocumentCategoryId
     int DeadlineDaysNumber,
     string Description,
     string? Observation,
