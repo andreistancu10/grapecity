@@ -1,5 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 public interface IDocumentService
 {
     Task<Document> AddAsync(Document newDocument, CancellationToken cancellationToken);
-    Task<Document> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken);
+    Task<Document> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken, params Expression<Func<Document, object>>[] includes);
     Task<List<Document>> FindAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken);
     Task<int> CountAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken);
     
@@ -41,9 +42,10 @@ public class DocumentService : IDocumentService
         return newDocument;
     }
 
-    public Task<Document> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken)
+    public Task<Document> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken, params Expression<Func<Document, object>>[] includes)
     {
         return _dbContext.Documents
+            .Includes(includes)
             .FirstOrDefaultAsync(predicate);
     }
 

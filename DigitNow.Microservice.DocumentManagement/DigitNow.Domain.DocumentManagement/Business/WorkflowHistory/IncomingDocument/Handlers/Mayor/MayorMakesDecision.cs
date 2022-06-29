@@ -2,6 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers.Mayor
@@ -9,10 +10,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
     public class MayorMakesDecision : IWorkflowHandler
     {
         private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkMayorReview };
-
         private enum Decision { Declined, Approved };
 
-        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command)
+        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
             if (!Validate(command))
             {
@@ -36,16 +36,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
 
         private void MayorApproved(ICreateWorkflowHistoryCommand command)
         {
-            command.Status = DocumentStatus.InWorkCountersignature;
-            command.RecipientHasChanged = true;
-            command.RecipientType = UserRole.Functionary;
+            //command.Status = DocumentStatus.InWorkCountersignature;
+            //command.RecipientHasChanged = true;
+            //command.RecipientType = UserRole.Functionary;
         }
 
         private void MayorDeclined(ICreateWorkflowHistoryCommand command)
         {
-            command.Status = DocumentStatus.InWorkMayorDeclined;
-            command.RecipientHasChanged = true;
-            command.RecipientType = UserRole.HeadOfDepartment;
+            //command.Status = DocumentStatus.InWorkMayorDeclined;
+            //command.RecipientHasChanged = true;
+            //command.RecipientType = UserRole.HeadOfDepartment;
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command)

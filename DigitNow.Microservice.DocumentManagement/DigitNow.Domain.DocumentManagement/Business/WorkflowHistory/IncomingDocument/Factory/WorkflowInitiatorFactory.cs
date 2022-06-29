@@ -1,5 +1,7 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers._Interfaces;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers._Interfaces;
 using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Models;
+using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using System;
 using System.Collections.Generic;
 
@@ -7,18 +9,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
 {
     public static class WorkflowInitiatorFactory
     {
-        private static readonly IDictionary<int, Func<IWorkflowHandler>> factory = new Dictionary<int, Func<IWorkflowHandler>>();
-
+        private static readonly IDictionary<UserRole, Func<IWorkflowHandler>> factory = new Dictionary<UserRole, Func<IWorkflowHandler>>();
         static WorkflowInitiatorFactory()
         {
-            factory.Add(1, () => new HeadOfDepartment());
-            factory.Add(2, () => new Functionary());
-            factory.Add(3, () => new Mayor());
+            factory.Add(UserRole.HeadOfDepartment, () => new HeadOfDepartment());
+            factory.Add(UserRole.Functionary, () => new Functionary());
+            factory.Add(UserRole.Mayor, () => new Mayor());
         }
 
-        public static IWorkflowHandler Create(int typeId)
+        public static IWorkflowHandler Create(UserRole userRole)
         {
-            return factory[typeId]();
+            return factory[userRole]();
         }
     }
 }

@@ -1,10 +1,13 @@
 ﻿namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Models
 {
+    using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
     using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers._Interfaces;
     using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers.Functionary;
+    using DigitNow.Domain.DocumentManagement.Data.Entities;
     using HTSS.Platform.Core.CQRS;
     using HTSS.Platform.Core.Errors;
     using System.Collections.Generic;
+    using System.Threading;
     using System.Threading.Tasks;
 
     public class Functionary : IWorkflowHandler
@@ -23,7 +26,7 @@
             actionStrategy.Add(ActionType.SendOpinion, new FunctionarySendsOpinion());
         }
 
-        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command)
+        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
             var actionKey = (ActionType)command.ActionType;
             if (!actionStrategy.ContainsKey(actionKey))
@@ -37,7 +40,7 @@
                 return command;
             }
 
-            return await actionStrategy[actionKey].CreateWorkflowRecord(command);
+            return await actionStrategy[actionKey].CreateWorkflowRecord(command, token);
         }
     }
 }

@@ -1,5 +1,7 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers._Interfaces;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers._Interfaces;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers.Functionary
@@ -7,10 +9,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
     public class FunctionaryFinalizes : IWorkflowHandler
     {
         private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated };
-
-        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command)
+        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            command.Status = DocumentStatus.Finalized;
+            //command.Status = DocumentStatus.Finalized;
+
+
+
             return command;
         }
     }

@@ -2,22 +2,24 @@
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
-using System;
 using System.Threading.Tasks;
-using System.Linq;
+using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using System.Threading;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers.HeadOfDepartment
 {
     public class HeadOfDepartmentAllocatesRequest : IWorkflowHandler
     {
         private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkUnallocated, (int)DocumentStatus.OpinionRequestedUnallocated, (int)DocumentStatus.InWorkDelegatedUnallocated };
-
-        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowDecision(ICreateWorkflowHistoryCommand command)
+        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
             // sef departament repartizeaza catre un functionar din subordine -> In lucru_Alocat
 
+
             if (!Validate(command))
+            {
                 return command;
+            }
 
             //var lastWorkflowEntry = doc.WorkflowHistory.OrderByDescending(x => x.CreationDate).FirstOrDefault();
 
@@ -44,12 +46,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
             }
 
             return true;
-        }
-
-
-        public Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command)
-        {
-            throw new NotImplementedException();
         }
     }
 }

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments;
 
-[Authorize]
+//[Authorize]
 [ApiController]
 [Route("api/incoming-documents")]
 public class IncomingDocumentsController : ApiController
@@ -43,11 +43,11 @@ public class IncomingDocumentsController : ApiController
         return CreateResponse(await _mediator.Send(updateIncomingDocumentCommand, cancellationToken));
     }
 
-    [HttpPost("{registrationNumber}/submit-workflow")]
-    public async Task<IActionResult> SubmitWorkflowDecision([FromRoute] int registrationNumber, [FromBody] CreateWorkflowDecisionRequest request)
+    [HttpPost("{id}/submit-workflow")]
+    public async Task<IActionResult> SubmitWorkflowDecision([FromRoute] int id, [FromBody] CreateWorkflowDecisionRequest request)
     {
         var command = _mapper.Map<CreateWorkflowDecisionCommand>(request);
-        command.RegistrationNumber = registrationNumber;
+        command.DocumentId = id;
 
         return CreateResponse(await _mediator.Send(command));
     }

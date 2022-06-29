@@ -1,7 +1,9 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers._Interfaces;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers._Interfaces;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers.Functionary
@@ -10,7 +12,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
     {
         private int[] allowedTransitionStatuses = { (int)DocumentStatus.OpinionRequestedAllocated };
 
-        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command)
+        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
             if (!Validate(command))
             {
@@ -18,9 +20,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
             }
 
 
-            command.Status = DocumentStatus.InWorkAllocated;
-            command.RecipientHasChanged = true;
-            command.RecipientType = UserRole.Functionary; // ajunge la functionarul care a solicitat opinia
+            //command.Status = DocumentStatus.InWorkAllocated;
+            //command.RecipientHasChanged = true;
+            //command.RecipientType = UserRole.Functionary; // ajunge la functionarul care a solicitat opinia
 
             return command;
         }

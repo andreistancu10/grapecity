@@ -3,6 +3,7 @@ using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers.HeadOfDepartment
@@ -11,7 +12,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
     {
         private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkUnallocated, (int)DocumentStatus.OpinionRequestedUnallocated, (int)DocumentStatus.InWorkDelegatedUnallocated };
         
-        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command)
+        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
             if (!Validate(command))
             {
@@ -21,9 +22,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
             // Solicitat_Opinie_Nerepatizat => In lucru_Alocat
             //In_lucru_Nereprtizat => Nou_Declina_Competenta
 
-            command.Status = DocumentStatus.InWorkAllocated;
-            command.RecipientHasChanged = true;
-            command.RecipientType = UserRole.Functionary;
+            //command.Status = DocumentStatus.InWorkAllocated;
+            //command.RecipientHasChanged = true;
+            //command.RecipientType = UserRole.Functionary;
 
             return command;
         }
