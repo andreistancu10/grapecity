@@ -4,6 +4,7 @@ using DigitNow.Domain.DocumentManagement.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    partial class DocumentManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220629084317_SpecialRegisters")]
+    partial class SpecialRegisters
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -328,7 +330,10 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
-                    b.Property<long>("ContactDetailId")
+                    b.Property<int>("ContactDetailId")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("ContactDetailId1")
                         .HasColumnType("bigint");
 
                     b.Property<string>("ContentSummary")
@@ -375,7 +380,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ContactDetailId");
+                    b.HasIndex("ContactDetailId1");
 
                     b.HasIndex("DocumentId")
                         .IsUnique();
@@ -535,9 +540,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 {
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.ContactDetail", "ContactDetail")
                         .WithMany()
-                        .HasForeignKey("ContactDetailId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ContactDetailId1");
 
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Document", "Document")
                         .WithOne("OutgoingDocument")

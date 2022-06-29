@@ -5,7 +5,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities;
 public class OutgoingDocument : VirtualDocument
 {
     public string? IdentificationNumber { get; set; }
-    public int ContactDetailId { get; set; }
+    public long ContactDetailId { get; set; }
     public string ContentSummary { get; set; }
     public int NumberOfPages { get; set; }
 
@@ -19,7 +19,7 @@ public class OutgoingDocument : VirtualDocument
     #region [ References ]
 
     public Document Document { get; set; }
-    public ContactDetail ContactDetail { get; set; }
+    public virtual ContactDetail ContactDetail { get; set; }
     public List<WorkflowHistory> WorkflowHistory { get; set; } = new();
     public List<ConnectedDocument>? ConnectedDocuments { get; set; } = new();
 

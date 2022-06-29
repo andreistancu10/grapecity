@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
-    public partial class SpecialRegister : Migration
+    public partial class SpecialRegisters : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
