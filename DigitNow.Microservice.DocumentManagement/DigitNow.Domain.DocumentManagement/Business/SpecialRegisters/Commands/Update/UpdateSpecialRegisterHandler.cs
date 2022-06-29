@@ -3,23 +3,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using DigitNow.Domain.DocumentManagement.Data;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
-using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Commands.Update;
 
 public class UpdateSpecialRegisterHandler : ICommandHandler<UpdateSpecialRegisterCommand, ResultObject>
 {
-    private readonly DocumentManagementDbContext _dbContext;
     private readonly ISpecialRegisterService _specialRegisterService;
 
     public UpdateSpecialRegisterHandler(
-        DocumentManagementDbContext dbContext,
         ISpecialRegisterService specialRegisterService)
     {
-        _dbContext = dbContext;
         _specialRegisterService = specialRegisterService;
     }
 
@@ -37,7 +32,7 @@ public class UpdateSpecialRegisterHandler : ICommandHandler<UpdateSpecialRegiste
             }
 
             var documentTypeAlreadyHasRegister =
-                await _dbContext.SpecialRegisters.AnyAsync(c => c.DocumentType == command.DocumentType, cancellationToken);
+                await _specialRegisterService.AnyAsync(c => c.DocumentType == command.DocumentType, cancellationToken);
 
             if (documentTypeAlreadyHasRegister)
             {
@@ -47,8 +42,8 @@ public class UpdateSpecialRegisterHandler : ICommandHandler<UpdateSpecialRegiste
                 });
             }
 
-            var specialRegister = await _dbContext.SpecialRegisters
-                .FirstOrDefaultAsync(c => c.Id == command.Id,
+            var specialRegister = await _specialRegisterService
+                .FindAsync(c => c.Id == command.Id,
                     cancellationToken);
 
             if (specialRegister == null)

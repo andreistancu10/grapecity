@@ -10,5 +10,6 @@ public class SpecialRegisterConfiguration : IEntityTypeConfiguration<SpecialRegi
         builder.ToTable(nameof(SpecialRegister), DocumentManagementDbContext.Schema);
 
         builder.HasKey(p => p.Id);
+        builder.Property(c => c.DocumentType).IsRequired();
     }
 }

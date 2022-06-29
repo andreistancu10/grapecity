@@ -8,11 +8,11 @@ using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
 
 namespace DigitNow.Domain.DocumentManagement.Public.SpecialRegisters;
 
 [Authorize]
+[ApiController]
 [Route("api/special-registers")]
 public class SpecialRegistersController : ApiController
 {
@@ -36,10 +36,13 @@ public class SpecialRegistersController : ApiController
             };
     }
 
-    [HttpPut("update-register")]
-    public async Task<IActionResult> UpdateSpecialRegister([FromBody] UpdateSpecialRegisterRequest request)
+    [HttpPut("update-register/{id:long}")]
+    public async Task<IActionResult> UpdateSpecialRegister([FromQuery] long id, [FromBody] UpdateSpecialRegisterRequest request)
     {
-        return await _mediator.Send(_mapper.Map<UpdateSpecialRegisterCommand>(request))
+        var command = _mapper.Map<UpdateSpecialRegisterCommand>(request);
+        command.Id = id;
+
+        return await _mediator.Send(command)
             switch
             {
                 null => NotFound(),
