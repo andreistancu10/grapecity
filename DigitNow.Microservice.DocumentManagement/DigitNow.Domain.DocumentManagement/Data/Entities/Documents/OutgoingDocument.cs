@@ -19,7 +19,7 @@ public class OutgoingDocument : VirtualDocument
     #region [ References ]
 
     public Document Document { get; set; }
-    public virtual ContactDetail ContactDetail { get; set; }
+    public ContactDetail ContactDetail { get; set; }
     public List<WorkflowHistory> WorkflowHistory { get; set; } = new();
     public List<ConnectedDocument>? ConnectedDocuments { get; set; } = new();
 

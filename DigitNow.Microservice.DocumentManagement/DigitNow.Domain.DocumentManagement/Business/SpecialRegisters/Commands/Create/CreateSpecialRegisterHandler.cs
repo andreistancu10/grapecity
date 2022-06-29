@@ -15,16 +15,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Commands.
 
 public class CreateSpecialRegisterHandler : ICommandHandler<CreateSpecialRegisterCommand, ResultObject>
 {
-    private readonly DocumentManagementDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly ISpecialRegisterService _specialRegisterService;
 
     public CreateSpecialRegisterHandler(
-        DocumentManagementDbContext dbContext,
         IMapper mapper,
         ISpecialRegisterService specialRegisterService)
     {
-        _dbContext = dbContext;
         _mapper = mapper;
         _specialRegisterService = specialRegisterService;
     }
@@ -42,7 +39,7 @@ public class CreateSpecialRegisterHandler : ICommandHandler<CreateSpecialRegiste
                 });
             }
 
-            var isNameDuplicate = await _dbContext.SpecialRegisters
+            var isNameDuplicate = await _specialRegisterService
                 .AnyAsync(c => c.Name.ToLower() == request.Name.ToLower(),
                     cancellationToken);
 
@@ -55,7 +52,7 @@ public class CreateSpecialRegisterHandler : ICommandHandler<CreateSpecialRegiste
             }
 
             var isTypeDuplicate =
-                await _dbContext.SpecialRegisters.AnyAsync(c => c.DocumentType == request.DocumentType, cancellationToken);
+                await _specialRegisterService.AnyAsync(c => c.DocumentType == request.DocumentType, cancellationToken);
 
             if (isTypeDuplicate)
             {
@@ -66,7 +63,6 @@ public class CreateSpecialRegisterHandler : ICommandHandler<CreateSpecialRegiste
             }
 
             var newRegister = _mapper.Map<SpecialRegister>(request);
-            newRegister.CreationDate = DateTime.UtcNow;
 
             await _specialRegisterService.CreateAsync(newRegister, cancellationToken);
         }
