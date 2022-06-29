@@ -9,7 +9,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
 {
     public class HeadOfDepartmentDeclines : IWorkflowHandler
     {
-        private int[] allowedTransitionStatuses = { (int)Status.inWorkUnallocated, (int)Status.opinionRequestedUnallocated, (int)Status.inWorkDelegatedUnallocated };
+        private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkUnallocated, (int)DocumentStatus.OpinionRequestedUnallocated, (int)DocumentStatus.InWorkDelegatedUnallocated };
         
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command)
         {
@@ -21,7 +21,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
             // Solicitat_Opinie_Nerepatizat => In lucru_Alocat
             //In_lucru_Nereprtizat => Nou_Declina_Competenta
 
-            command.Status = Status.inWorkAllocated;
+            command.Status = DocumentStatus.InWorkAllocated;
             command.RecipientHasChanged = true;
             command.RecipientType = UserRole.Functionary;
 

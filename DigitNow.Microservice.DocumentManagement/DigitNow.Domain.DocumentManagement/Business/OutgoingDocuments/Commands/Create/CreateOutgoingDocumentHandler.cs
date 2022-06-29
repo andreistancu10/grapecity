@@ -45,7 +45,7 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
         await AttachConnectedDocumentsAsync(request, newOutgoingDocument, cancellationToken);
 
         newOutgoingDocument.WorkflowHistory.Add(
-            new WorkflowHistory
+            new Data.Entities.WorkflowHistory
             {
                 RecipientType = (int)UserRole.HeadOfDepartment,
                 RecipientId = newOutgoingDocument.RecipientId,

@@ -9,7 +9,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
 {
     public class FunctionaryDeclines : IWorkflowHandler
     {
-        private int[] allowedTransitionStatuses = { (int)Status.inWorkAllocated, (int)Status.inWorkDelegated, (int)Status.opinionRequestedAllocated };
+        private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.OpinionRequestedAllocated };
 
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command)
         {
@@ -21,7 +21,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
             //Daca status = Solicitat_Opinie_Alocat => statusul devine lucru_Alocat
             // Daca  Status curent In lucru_Alocat => Nou_Declinat_competenta
 
-            command.Status = Status.newDeclinedCompetence;
+            command.Status = DocumentStatus.NewDeclinedCompetence;
             command.RecipientHasChanged = true;
             command.RecipientType = UserRole.Functionary;
             

@@ -8,7 +8,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
 {
     public class FunctionarySendsOpinion : IWorkflowHandler
     {
-        private int[] allowedTransitionStatuses = { (int)Status.opinionRequestedAllocated };
+        private int[] allowedTransitionStatuses = { (int)DocumentStatus.OpinionRequestedAllocated };
 
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command)
         {
@@ -18,7 +18,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
             }
 
 
-            command.Status = Status.inWorkAllocated;
+            command.Status = DocumentStatus.InWorkAllocated;
             command.RecipientHasChanged = true;
             command.RecipientType = UserRole.Functionary; // ajunge la functionarul care a solicitat opinia
 

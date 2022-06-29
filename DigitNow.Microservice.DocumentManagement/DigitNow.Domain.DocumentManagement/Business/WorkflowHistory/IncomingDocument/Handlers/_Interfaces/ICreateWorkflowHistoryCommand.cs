@@ -16,7 +16,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
         public int Resolution { get; set; }
         public int Decision { get; set; }
         public DateTime? OpinionRequestedUntil { get; set; }
-        public Status Status { get; set; }
+        public DocumentStatus Status { get; set; }
         public DateTime CreationDate { get; set; }
         public ResultObject Result { get; set; }
         public bool RecipientHasChanged { get; set; }

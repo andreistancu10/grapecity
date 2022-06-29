@@ -9,7 +9,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
 {
     public class HeadOfDepartmentMakesDecision : IWorkflowHandler
     {
-        private int[] allowedTransitionStatuses = { (int)Status.inWorkApprovalRequested };
+        private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkApprovalRequested };
 
         private enum Decision { Declined, Approved };
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command)
@@ -36,14 +36,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
 
         private void ApplicationApproved(ICreateWorkflowHistoryCommand command)
         {
-            command.Status = Status.inWorkMayorReview;
+            command.Status = DocumentStatus.InWorkMayorReview;
             command.RecipientHasChanged = true;
             command.RecipientType = UserRole.Mayor;
         }
 
         private void ApplicationDeclined(ICreateWorkflowHistoryCommand command)
         {
-            command.Status = Status.inWorkDeclined;
+            command.Status = DocumentStatus.InWorkDeclined;
             command.RecipientHasChanged = true;
             command.RecipientType = UserRole.Functionary;
         }

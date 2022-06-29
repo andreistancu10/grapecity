@@ -94,7 +94,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
             var isHeadOfDepartment = _user.Roles.Contains((long)UserRole.HeadOfDepartment);
 
             doc.WorkflowHistory.Add(
-                new Data.WorkflowHistories.WorkflowHistory()
+                new Data.Entities.WorkflowHistory()
                 {
                     RecipientType = isHeadOfDepartment ? (int)UserRole.HeadOfDepartment : (int)UserRole.Functionary,
                     RecipientId = (int)_user.Id,

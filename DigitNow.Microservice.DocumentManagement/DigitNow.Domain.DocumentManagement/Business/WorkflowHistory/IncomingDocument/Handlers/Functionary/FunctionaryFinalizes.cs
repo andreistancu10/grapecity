@@ -6,11 +6,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
 {
     public class FunctionaryFinalizes : IWorkflowHandler
     {
-        private int[] allowedTransitionStatuses = { (int)Status.inWorkAllocated, (int)Status.inWorkDelegated };
+        private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated };
 
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command)
         {
-            command.Status = Status.finalized;
+            command.Status = DocumentStatus.Finalized;
             return command;
         }
     }

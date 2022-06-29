@@ -53,7 +53,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             }, cancellationToken);
 
             newIncomingDocument.WorkflowHistory.Add(
-            new WorkflowHistory()
+            new Data.Entities.WorkflowHistory()
             {
                 RecipientType = (int)UserRole.HeadOfDepartment,
                 RecipientId = request.RecipientId,

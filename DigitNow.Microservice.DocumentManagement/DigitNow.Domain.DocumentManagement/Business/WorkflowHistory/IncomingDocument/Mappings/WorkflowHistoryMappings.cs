@@ -4,13 +4,11 @@ using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocume
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Mappings
 {
-    using Data.WorkflowHistories;
-
     public class WorkflowHistoryMappings : Profile
     {
         public WorkflowHistoryMappings()
         {
-            CreateMap<CreateWorkflowDecisionCommand, WorkflowHistory>();
+            CreateMap<CreateWorkflowDecisionCommand, Data.Entities.WorkflowHistory>();
         }
     }
 }

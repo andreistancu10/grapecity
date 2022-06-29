@@ -8,7 +8,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
 {
     public class MayorMakesDecision : IWorkflowHandler
     {
-        private int[] allowedTransitionStatuses = { (int)Status.inWorkMayorReview };
+        private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkMayorReview };
 
         private enum Decision { Declined, Approved };
 
@@ -36,14 +36,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
 
         private void MayorApproved(ICreateWorkflowHistoryCommand command)
         {
-            command.Status = Status.inWorkCountersignature;
+            command.Status = DocumentStatus.InWorkCountersignature;
             command.RecipientHasChanged = true;
             command.RecipientType = UserRole.Functionary;
         }
 
         private void MayorDeclined(ICreateWorkflowHistoryCommand command)
         {
-            command.Status = Status.inWorkMayorDeclined;
+            command.Status = DocumentStatus.InWorkMayorDeclined;
             command.RecipientHasChanged = true;
             command.RecipientType = UserRole.HeadOfDepartment;
         }

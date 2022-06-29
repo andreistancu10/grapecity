@@ -10,27 +10,22 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
 {
     public class HeadOfDepartmentAllocatesRequest : IWorkflowHandler
     {
-        private int[] allowedTransitionStatuses = { (int)Status.inWorkUnallocated, (int)Status.opinionRequestedUnallocated, (int)Status.inWorkDelegatedUnallocated };
+        private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkUnallocated, (int)DocumentStatus.OpinionRequestedUnallocated, (int)DocumentStatus.InWorkDelegatedUnallocated };
 
-        private Data.IncomingDocuments.IncomingDocument _doc;
-
-        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowDecision(ICreateWorkflowHistoryCommand command, Data.IncomingDocuments.IncomingDocument doc)
+        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowDecision(ICreateWorkflowHistoryCommand command)
         {
-            _doc = doc;
-
-            var newWorkflowEntry = new Data.WorkflowHistories.WorkflowHistory();
             // sef departament repartizeaza catre un functionar din subordine -> In lucru_Alocat
 
             if (!Validate(command))
                 return command;
 
-            var lastWorkflowEntry = doc.WorkflowHistory.OrderByDescending(x => x.CreationDate).FirstOrDefault();
+            //var lastWorkflowEntry = doc.WorkflowHistory.OrderByDescending(x => x.CreationDate).FirstOrDefault();
 
-            newWorkflowEntry.Status = lastWorkflowEntry.Status == (int)Status.opinionRequestedUnallocated 
-                ? newWorkflowEntry.Status = (int)Status.opinionRequestedAllocated 
-                : (int)Status.inWorkAllocated;
+            //newWorkflowEntry.Status = lastWorkflowEntry.Status == (int)Status.opinionRequestedUnallocated 
+            //    ? newWorkflowEntry.Status = (int)Status.opinionRequestedAllocated 
+            //    : (int)Status.inWorkAllocated;
 
-            newWorkflowEntry.RecipientType = (int)UserRole.Functionary;
+            //newWorkflowEntry.RecipientType = (int)UserRole.Functionary;
 
             return command;
         }

@@ -9,7 +9,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
 {
     public class FunctionaryAsksForOpinion : IWorkflowHandler
     {
-        private int[] allowedTransitionStatuses = { (int)Status.inWorkAllocated, (int)Status.inWorkDelegated };
+        private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated };
 
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command)
         {
@@ -21,7 +21,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
                 return command;
             }
 
-            command.Status = Status.opinionRequestedUnallocated;
+            command.Status = DocumentStatus.OpinionRequestedUnallocated;
             command.RecipientHasChanged = true;
             command.RecipientType = UserRole.HeadOfDepartment;
 

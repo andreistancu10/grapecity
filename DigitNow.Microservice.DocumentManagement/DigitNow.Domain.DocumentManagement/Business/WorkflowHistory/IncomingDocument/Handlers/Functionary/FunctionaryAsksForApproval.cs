@@ -8,7 +8,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
 {
     public class FunctionaryAsksForApproval : IWorkflowHandler
     {
-        private int[] allowedTransitionStatuses = { (int)Status.inWorkAllocated, (int)Status.inWorkDelegated, (int)Status.opinionRequestedAllocated };
+        private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.OpinionRequestedAllocated };
 
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command)
         {
@@ -17,7 +17,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
                 return command;
             }
 
-            command.Status = Status.inWorkApprovalRequested;
+            command.Status = DocumentStatus.InWorkApprovalRequested;
             command.RecipientHasChanged = true;
             command.RecipientType = UserRole.HeadOfDepartment;
 
