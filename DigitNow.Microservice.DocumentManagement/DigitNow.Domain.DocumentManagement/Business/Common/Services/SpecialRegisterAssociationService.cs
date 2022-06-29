@@ -30,13 +30,13 @@ public class SpecialRegisterAssociationService : ISpecialRegisterAssociationServ
 
     private async Task CreateDocumentAssociationAsync(IncomingDocument document, SpecialRegister register)
     {
-        var newAssociation = new DocumentSpecialRegister
+        var newAssociation = new SpecialRegisterAssociation
         {
             Document = document,
             SpecialRegister = register
         };
 
-        await _dbContext.DocumentSpecialRegisterAssociations.AddAsync(newAssociation);
+        await _dbContext.SpecialRegisterAssociations.AddAsync(newAssociation);
         await _dbContext.SaveChangesAsync();
     }
 
