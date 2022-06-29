@@ -1,14 +1,14 @@
 ﻿using System.Collections.Generic;
 using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
+using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+using DigitNow.Domain.DocumentManagement.Data;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update;
 
@@ -22,12 +22,13 @@ public class UpdateIncomingDocumentHandler : ICommandHandler<UpdateIncomingDocum
         _dbContext = dbContext;
         _mapper = mapper;
     }
+
     public async Task<ResultObject> Handle(UpdateIncomingDocumentCommand request, CancellationToken cancellationToken)
     {
-        var incomingDocFromDb = await _dbContext.IncomingDocuments.Include(cd => cd.ConnectedDocuments)
+        var dbIncomingDocuments = await _dbContext.IncomingDocuments.Include(cd => cd.ConnectedDocuments)
             .FirstOrDefaultAsync(doc => doc.Id == request.Id, cancellationToken: cancellationToken);
 
-        if (incomingDocFromDb is null)
+        if (dbIncomingDocuments is null)
             return ResultObject.Error(new ErrorMessage
             {
                 Message = $"Incoming Document with id {request.Id} does not exist.",
@@ -35,49 +36,61 @@ public class UpdateIncomingDocumentHandler : ICommandHandler<UpdateIncomingDocum
                 Parameters = new object[] { request.Id }
             });
 
-        RemoveConnectedDocs(request, incomingDocFromDb);
-        AddConnectedDocs(request, incomingDocFromDb);
+        var incomingDocumentIds = dbIncomingDocuments.ConnectedDocuments
+            .Where(x => x.DocumentType == DocumentType.Incoming)
+            .Select(cd => cd.RegistrationNumber)
+            .ToList();
 
-        _mapper.Map(request, incomingDocFromDb);
+
+        await RemoveConnectedDocumentsAsync(request, incomingDocumentIds, dbIncomingDocuments, cancellationToken);
+        await AddConnectedDocsAsync(request, incomingDocumentIds, dbIncomingDocuments, cancellationToken);        
+
+        _mapper.Map(request, dbIncomingDocuments);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return ResultObject.Ok(incomingDocFromDb.Id);
+        return ResultObject.Ok(dbIncomingDocuments.Id);
     }
 
-    private void AddConnectedDocs(UpdateIncomingDocumentCommand request, IncomingDocument incomingDocFromDb)
+    private async Task<bool> AddConnectedDocsAsync(UpdateIncomingDocumentCommand request, IList<long> incomingDocumentIds, IncomingDocument dbIncomingDocuments, CancellationToken cancellationToken)
     {
-        List<int> incomingDocIds = incomingDocFromDb.ConnectedDocuments.Select(cd => cd.RegistrationNumber).ToList();
-        IEnumerable<int> idsToAdd = request.ConnectedDocumentIds.Except(incomingDocIds);
+        var linksToAdd = request.ConnectedDocumentIds
+            .Except(incomingDocumentIds);
 
-        if (idsToAdd.Any())
+        if (!linksToAdd.Any())
+            return true;
+
+        var connectedDocuments = await _dbContext.IncomingDocuments
+            .Include(x => x.Document)
+            .Where(doc => linksToAdd.Contains(doc.Document.RegistrationNumber))
+            .ToListAsync(cancellationToken);
+
+        foreach (var connectedDocument in connectedDocuments)
         {
-            List<IncomingDocument> connectedDocuments = _dbContext.IncomingDocuments
-                .Where(doc => idsToAdd
-                    .Contains(doc.RegistrationNumber))
-                .ToList();
-
-            foreach (var doc in connectedDocuments)
+            var incomingConnectedDocument = new ConnectedDocument()
             {
-                incomingDocFromDb.ConnectedDocuments
-                    .Add(new ConnectedDocument() { ChildDocumentId = doc.Id, RegistrationNumber = doc.RegistrationNumber, DocumentType = doc.DocumentTypeId });
-            }
+                ChildDocumentId = connectedDocument.Id,
+                RegistrationNumber = connectedDocument.Document.RegistrationNumber,
+                DocumentType = DocumentType.Incoming
+            };
+
+            dbIncomingDocuments.ConnectedDocuments.Add(incomingConnectedDocument);
         }
+
+        return true;
     }
 
-    private void RemoveConnectedDocs(UpdateIncomingDocumentCommand request, IncomingDocument incomingDocFromDb)
+    private Task<bool> RemoveConnectedDocumentsAsync(UpdateIncomingDocumentCommand request, IList<long> incomingDocumentIds, IncomingDocument dbIncomingDocuments, CancellationToken cancellationToken)
     {
-        List<int> incomingDocIds = incomingDocFromDb.ConnectedDocuments.Select(cd => cd.RegistrationNumber).ToList();
-        IEnumerable<int> idsToRemove = incomingDocIds.Except(request.ConnectedDocumentIds);
+        var linksToRemove = incomingDocumentIds.Except(request.ConnectedDocumentIds);
 
-        if (idsToRemove.Any())
-        {
+        if (!linksToRemove.Any())
+            return Task.FromResult(true);
 
-            _dbContext.ConnectedDocuments
-                .RemoveRange(incomingDocFromDb.ConnectedDocuments
-                    .Where(cd => idsToRemove
-                        .Contains(cd.RegistrationNumber))
-                    .ToList());
-        }
-    }
+        _dbContext.ConnectedDocuments
+            .RemoveRange(dbIncomingDocuments.ConnectedDocuments.Where(cd => linksToRemove.Contains(cd.RegistrationNumber))
+            .ToList());
+
+        return Task.FromResult(true);
+}
 }

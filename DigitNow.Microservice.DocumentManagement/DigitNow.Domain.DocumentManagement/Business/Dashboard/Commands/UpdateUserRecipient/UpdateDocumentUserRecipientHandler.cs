@@ -2,8 +2,7 @@
 using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
-using DigitNow.Domain.DocumentManagement.Data.WorkflowHistories;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.extensions.Autocorrect;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
@@ -29,7 +28,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
         }
         public async Task<ResultObject> Handle(UpdateDocumentUserRecipientCommand request, CancellationToken cancellationToken)
         {
-            _user = await _identityAdapterClient.GetUserByIdAsync(request.UserId);
+            _user = await _identityAdapterClient.GetUserByIdAsync(request.UserId, cancellationToken);
 
             if (_user == null)
                 return ResultObject.Error(new ErrorMessage
@@ -65,7 +64,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
         {
             foreach (var registrationNo in incomingDocIds)
             {
-                var internalDoc = await _dbContext.InternalDocuments.FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
+                var internalDoc = await _dbContext.InternalDocuments
+                    .Include(x => x.Document)
+                    .FirstOrDefaultAsync(x => x.Document.RegistrationNumber == registrationNo);
 
                 if (internalDoc != null)
                     internalDoc.ReceiverDepartmentId = (int)_user.Id;     
@@ -76,7 +77,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
         {
             foreach (var registrationNo in incomingDocIds)
             {
-                var doc = await _dbContext.IncomingDocuments.FirstOrDefaultAsync(doc => doc.RegistrationNumber == registrationNo);
+                var doc = await _dbContext.IncomingDocuments
+                    .Include(x => x.Document)
+                    .FirstOrDefaultAsync(x => x.Document.RegistrationNumber == registrationNo);
+
                 if (doc != null)
                 {
                     doc.RecipientId = (int)_user.Id;
@@ -95,9 +99,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                     RecipientType = isHeadOfDepartment ? (int)UserRole.HeadOfDepartment : (int)UserRole.Functionary,
                     RecipientId = (int)_user.Id,
                     RecipientName =_user.FormatUserNameByRole( isHeadOfDepartment ? UserRole.HeadOfDepartment : UserRole.Functionary),
-                    Status = isHeadOfDepartment ? (int)Status.inWorkDelegatedUnallocated : (int)Status.inWorkDelegated,
+                    Status = isHeadOfDepartment ? (int)DocumentStatus.InWorkDelegatedUnallocated : (int)DocumentStatus.InWorkDelegated,
                     CreationDate = DateTime.Now,
-                    RegistrationNumber = doc.RegistrationNumber
+                    RegistrationNumber = doc.Document.RegistrationNumber
                 });
         }
     }
