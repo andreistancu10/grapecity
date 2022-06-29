@@ -3,9 +3,10 @@ using System.Data;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.SpecialRegisters;
+using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
@@ -16,11 +17,16 @@ public class CreateSpecialRegisterHandler : ICommandHandler<CreateSpecialRegiste
 {
     private readonly DocumentManagementDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly ISpecialRegisterService _specialRegisterService;
 
-    public CreateSpecialRegisterHandler(DocumentManagementDbContext dbContext, IMapper mapper)
+    public CreateSpecialRegisterHandler(
+        DocumentManagementDbContext dbContext,
+        IMapper mapper,
+        ISpecialRegisterService specialRegisterService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _specialRegisterService = specialRegisterService;
     }
 
     public async Task<ResultObject> Handle(CreateSpecialRegisterCommand request, CancellationToken cancellationToken)
@@ -37,8 +43,7 @@ public class CreateSpecialRegisterHandler : ICommandHandler<CreateSpecialRegiste
             }
 
             var isNameDuplicate = await _dbContext.SpecialRegisters
-                .AnyAsync(c =>
-                        c.Name.ToLower() == request.Name.ToLower(),
+                .AnyAsync(c => c.Name.ToLower() == request.Name.ToLower(),
                     cancellationToken);
 
             if (isNameDuplicate)
@@ -63,8 +68,7 @@ public class CreateSpecialRegisterHandler : ICommandHandler<CreateSpecialRegiste
             var newRegister = _mapper.Map<SpecialRegister>(request);
             newRegister.CreationDate = DateTime.UtcNow;
 
-            await _dbContext.SpecialRegisters.AddAsync(newRegister, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await _specialRegisterService.CreateAsync(newRegister, cancellationToken);
         }
         catch (Exception e)
         {

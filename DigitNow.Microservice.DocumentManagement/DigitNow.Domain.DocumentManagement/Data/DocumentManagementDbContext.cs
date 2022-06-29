@@ -2,7 +2,6 @@
 
 using System;
 using Microsoft.EntityFrameworkCore;
-using DigitNow.Domain.DocumentManagement.Data.SpecialRegisters;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using System.Threading.Tasks;
 using System.Threading;
@@ -11,6 +10,7 @@ using System.Threading;
 using Microsoft.EntityFrameworkCore.Design;
 #endif
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
 
 namespace DigitNow.Domain.DocumentManagement.Data
 {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DigitNow.Domain.DocumentManagement.Data.SpecialRegisters.Configurations;
+namespace DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters.Configurations;
 
 public class SpecialRegisterConfiguration : IEntityTypeConfiguration<SpecialRegister>
 {

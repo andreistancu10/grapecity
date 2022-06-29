@@ -1,7 +1,7 @@
 ﻿using System;
 using HTSS.Platform.Core.Domain;
 
-namespace DigitNow.Domain.DocumentManagement.Data.SpecialRegisters;
+namespace DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
 
 public class SpecialRegister : Entity
 {

@@ -5,6 +5,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Business\Dashboard\Commands\GetDocuments\**" />
+	  <EmbeddedResource Remove="Business\Dashboard\Commands\GetDocuments\**" />
+	  <None Remove="Business\Dashboard\Commands\GetDocuments\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Remove="Root.vstemplate" />
 	</ItemGroup>
 	<ItemGroup>
@@ -76,7 +82,6 @@
 
 	<ItemGroup>
 		<Folder Include="Business\Consumers\" />
-		<Folder Include="Business\Dashboard\Commands\GetDocuments\" />
 		<Folder Include="Public\Maintenance\" />
 		<Folder Include="Migrations\" />
 	</ItemGroup>
