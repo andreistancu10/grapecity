@@ -29,20 +29,13 @@ namespace DigitNow.Domain.DocumentManagement.Data
         {
             _identityService = identityService;
         }
-
         public DbSet<Document> Documents { get; set; }
-
         public DbSet<IncomingDocument> IncomingDocuments { get; set; }
-
         public DbSet<OutgoingDocument> OutgoingDocuments { get; set; }
-
-
         public DbSet<DocumentResolution> DocumentResolutions { get; set; }
-
         public DbSet<ConnectedDocument> ConnectedDocuments { get; set; }
-
-        public DbSet<RegistrationNumberCounter> RegistrationNumberCounters { get; set; }
         public DbSet<InternalDocument> InternalDocuments { get; set; }
+        public DbSet<RegistrationNumberCounter> RegistrationNumberCounters { get; set; }
         public DbSet<SpecialRegister> SpecialRegisters { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)

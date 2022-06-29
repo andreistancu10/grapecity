@@ -5,6 +5,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Commands.
     public class UpdateSpecialRegisterCommand : ICommand<ResultObject>
     {
         public long Id { get; set; }
-        public int DocumentType{ get; set; }
+        public int DocumentCategoryId{ get; set; }
     }
 }

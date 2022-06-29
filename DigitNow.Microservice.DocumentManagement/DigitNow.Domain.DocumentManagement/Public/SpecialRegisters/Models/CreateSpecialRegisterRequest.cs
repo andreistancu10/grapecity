@@ -2,7 +2,7 @@
 
 public class CreateSpecialRegisterRequest
 {
-    public int DocumentType { get; set; }
+    public int DocumentCategoryId { get; set; }
     public string Name { get; set; }
     public string Observations { get; set; }
 }
