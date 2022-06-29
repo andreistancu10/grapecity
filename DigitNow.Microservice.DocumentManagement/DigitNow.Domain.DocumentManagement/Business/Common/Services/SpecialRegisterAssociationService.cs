@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.DocumentSpecialRegisters;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterAssociations;
 using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,7 +1,6 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
+﻿using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
 
-namespace DigitNow.Domain.DocumentManagement.Data.DocumentSpecialRegisters;
+namespace DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterAssociations;
 
 public class SpecialRegisterAssociation : ExtendedEntity
 {

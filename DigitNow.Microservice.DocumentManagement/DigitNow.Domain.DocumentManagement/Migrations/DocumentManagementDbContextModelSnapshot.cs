@@ -23,44 +23,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.DocumentSpecialRegisters.SpecialRegisterAssociation", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("CreatedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("DocumentId")
-                        .HasColumnType("int");
-
-                    b.Property<long?>("DocumentId1")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("ModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("ModifiedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("SpecialRegisterId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DocumentId1");
-
-                    b.HasIndex("SpecialRegisterId");
-
-                    b.ToTable("DocumentSpecialRegisterAssociations", "DocumentMangement");
-                });
-
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.ConnectedDocument", b =>
                 {
                     b.Property<long>("Id")
@@ -440,6 +402,44 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("RegistrationNumberCounters", "DocumentMangement");
                 });
 
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterAssociations.SpecialRegisterAssociation", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("DocumentId")
+                        .HasColumnType("int");
+
+                    b.Property<long?>("DocumentId1")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("ModifiedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("SpecialRegisterId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentId1");
+
+                    b.HasIndex("SpecialRegisterId");
+
+                    b.ToTable("SpecialRegisterAssociations", "DocumentMangement");
+                });
+
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters.SpecialRegister", b =>
                 {
                     b.Property<long>("Id")
@@ -542,23 +542,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("WorkflowHistory", "DocumentMangement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.DocumentSpecialRegisters.SpecialRegisterAssociation", b =>
-                {
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", "Document")
-                        .WithMany()
-                        .HasForeignKey("DocumentId1");
-
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters.SpecialRegister", "SpecialRegister")
-                        .WithMany()
-                        .HasForeignKey("SpecialRegisterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Document");
-
-                    b.Navigation("SpecialRegister");
-                });
-
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.ConnectedDocument", b =>
                 {
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", null)
@@ -615,6 +598,23 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("ContactDetail");
 
                     b.Navigation("Document");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterAssociations.SpecialRegisterAssociation", b =>
+                {
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", "Document")
+                        .WithMany()
+                        .HasForeignKey("DocumentId1");
+
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters.SpecialRegister", "SpecialRegister")
+                        .WithMany()
+                        .HasForeignKey("SpecialRegisterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Document");
+
+                    b.Navigation("SpecialRegister");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.WorkflowHistory", b =>
