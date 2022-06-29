@@ -14,7 +14,7 @@ public class CreateIncomingDocumentRequest
     public string ContentSummary { get; set; }
     public int NumberOfPages { get; set; }
     public int RecipientId { get; set; }
-    public int DocumentTypeId { get; set; }
+    public int DocumentTypeId { get; set; } //TODO: Rename it to DocumentCategoryId
     public string? Detail { get; set; }
     public double? ResolutionPeriod { get; set; }
     public bool? IsUrgent { get; set; }
