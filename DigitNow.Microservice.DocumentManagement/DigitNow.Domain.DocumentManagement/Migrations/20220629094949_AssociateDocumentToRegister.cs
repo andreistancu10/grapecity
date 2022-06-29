@@ -17,18 +17,18 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DocumentId = table.Column<int>(type: "int", nullable: false),
                     SpecialRegisterId = table.Column<long>(type: "bigint", nullable: false),
-                    AssociationId = table.Column<long>(type: "bigint", nullable: true)
+                    AssociationId = table.Column<long>(type: "bigint", nullable: true),
+                    DocumentId1 = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DocumentSpecialRegisterAssociations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DocumentSpecialRegisterAssociations_IncomingDocument_DocumentId",
-                        column: x => x.DocumentId,
+                        name: "FK_DocumentSpecialRegisterAssociations_IncomingDocument_DocumentId1",
+                        column: x => x.DocumentId1,
                         principalSchema: "DocumentMangement",
                         principalTable: "IncomingDocument",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_DocumentSpecialRegisterAssociations_SpecialRegister_SpecialRegisterId",
                         column: x => x.SpecialRegisterId,
@@ -39,10 +39,10 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_DocumentSpecialRegisterAssociations_DocumentId",
+                name: "IX_DocumentSpecialRegisterAssociations_DocumentId1",
                 schema: "DocumentMangement",
                 table: "DocumentSpecialRegisterAssociations",
-                column: "DocumentId");
+                column: "DocumentId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DocumentSpecialRegisterAssociations_Id",

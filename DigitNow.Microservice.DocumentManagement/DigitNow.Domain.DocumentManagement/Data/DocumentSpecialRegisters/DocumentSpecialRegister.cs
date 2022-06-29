@@ -1,5 +1,5 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
-using DigitNow.Domain.DocumentManagement.Data.SpecialRegisters;
+﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
 using HTSS.Platform.Core.Domain;
 
 namespace DigitNow.Domain.DocumentManagement.Data.DocumentSpecialRegisters;

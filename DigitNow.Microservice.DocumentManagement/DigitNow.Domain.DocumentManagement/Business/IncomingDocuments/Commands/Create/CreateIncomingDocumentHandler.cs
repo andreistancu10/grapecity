@@ -65,7 +65,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             });
 
             await _dbContext.SaveChangesAsync(cancellationToken);
-            await _specialRegisterAssociationService.AssociateDocumentAsync(incomingDocumentForCreation);
+            await _specialRegisterAssociationService.AssociateDocumentAsync(newIncomingDocument);
         }
         catch (Exception ex)
         {
@@ -94,6 +94,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             }
         }
     }
+
     private async Task CreateContactDetailsAsync(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
     {
         var contactDetails = request.ContactDetail;
