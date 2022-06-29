@@ -23,11 +23,11 @@ public class CreateSpecialRegisterHandler : ICommandHandler<CreateSpecialRegiste
 
     public async Task<ResultObject> Handle(CreateSpecialRegisterCommand request, CancellationToken cancellationToken)
     {
-        var isNameDuplicate = _specialRegisterService
-            .AnyAsync(c => c.Name.ToLowerInvariant() == request.Name.ToLowerInvariant(),
-                cancellationToken);
+        var lowerRequestName = request.Name.ToLowerInvariant();
 
-        if (await isNameDuplicate)
+        if (await _specialRegisterService
+                .AnyAsync(c => c.Name.ToLowerInvariant() == lowerRequestName,
+                    cancellationToken))
         {
             return ResultObject.Error(new ErrorMessage
             {

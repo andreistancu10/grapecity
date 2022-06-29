@@ -18,10 +18,7 @@ public class UpdateSpecialRegisterHandler : ICommandHandler<UpdateSpecialRegiste
 
     public async Task<ResultObject> Handle(UpdateSpecialRegisterCommand command, CancellationToken cancellationToken)
     {
-        var documentTypeAlreadyHasRegister =
-             _specialRegisterService.AnyAsync(c => c.DocumentCategoryId == command.DocumentCategoryId, cancellationToken);
-
-        if (await documentTypeAlreadyHasRegister)
+        if (await _specialRegisterService.AnyAsync(c => c.DocumentCategoryId == command.DocumentCategoryId, cancellationToken))
         {
             return ResultObject.Error(new ErrorMessage
             {
