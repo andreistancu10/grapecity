@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.configurations.HostedServices;
 using DigitNow.Domain.DocumentManagement.Data.Repositories;
 using Domain.Localization.Client.configurations;
@@ -69,6 +70,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<IInternalDocumentService, InternalDocumentService>();
             services.AddTransient<IOutgoingDocumentService, OutgoingDocumentService>();
             services.AddTransient<IDocumentResolutionService, DocumentResolutionService>();
+            services.AddTransient<ISpecialRegisterService, SpecialRegisterService>();
 
             return services;
         }
