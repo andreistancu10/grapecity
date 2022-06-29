@@ -13,8 +13,7 @@ public class GetDocumentResponse
     public int DocumentCategory { get; set; }
     public double ResolutionPeriod { get; set; }
     public int Status { get; set; }
-    public string DispatchBy { get; set; }
+    public string DispatchedBy { get; set; }
     public string User { get; set; }
-
     public bool IsDispatched { get; set; }
 }

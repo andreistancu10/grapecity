@@ -30,9 +30,12 @@ public class GetDocumentsMappings : Profile
             .ForMember(c => c.DocumentType, opt => opt.MapFrom<GetDocumentResponseOutgoingDocumentTypeValueResolver>())
             .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.DocumentTypeId));
 
-
         CreateMap<InternalDocument, GetDocumentResponse>()
-            .BeforeMap((s, d) => d.DocumentType = (int)DocumentType.Internal);
+            .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.Document.RegistrationDate))
+            .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.Document.RegistrationNumber))
+            .ForMember(c => c.IssuerName, opt => opt.MapFrom(src => src.CreatedBy))
+            .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.InternalDocumentTypeId))
+            .ForMember(c => c.DocumentType, opt => opt.MapFrom(src => (int)src.Document.DocumentType));
     }
 
     private class GetDocumentResponseOutgoingStatusValueResolver : IValueResolver<OutgoingDocument, GetDocumentResponse, int>
