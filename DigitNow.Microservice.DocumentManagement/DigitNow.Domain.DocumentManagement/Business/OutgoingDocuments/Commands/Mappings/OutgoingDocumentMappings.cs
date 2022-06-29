@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
+using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Create;
-using DigitNow.Domain.DocumentManagement.Data.ConnectedDocuments;
-using DigitNow.Domain.DocumentManagement.Data.ContactDetails;
-using DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Mappings;
 
@@ -13,5 +12,6 @@ public class OutgoingDocumentMappings : Profile
         CreateMap<CreateOutgoingDocumentCommand, OutgoingDocument>();
         CreateMap<OutgoingDocument, ConnectedDocument>();
         CreateMap<CreateContactDetailCommand, ContactDetail>();
+        CreateMap<CreateContactDetailCommand, ContactDetailDto>();
     }
 }

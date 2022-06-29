@@ -7,9 +7,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands
 
 public class UpdateOutgoingDocumentCommand : ICommand<ResultObject>
 {
-    public int Id { get; set; }
-    public DateTime RegistrationDate { get; set; }
-    public int RegistrationNumber { get; set; }
+    public int Id { get; set; }    
     public string User { get; set; }
     public int RecipientTypeId { get; set; }
     public string RecipientName { get; set; }
@@ -19,5 +17,5 @@ public class UpdateOutgoingDocumentCommand : ICommand<ResultObject>
     public int NumberOfPages { get; set; }
     public int RecipientId { get; set; }
     public int DocumentTypeId { get; set; }
-    public List<int> ConnectedDocumentIds { get; set; }
+    public List<long> ConnectedDocumentIds { get; set; }
 }
