@@ -1,4 +1,6 @@
-﻿using System;
+﻿#undef MIGRATION_ONLY
+
+using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
@@ -74,6 +76,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
             return base.SaveChangesAsync(cancellationToken);
         }
 
+#if MIGRATION_ONLY
         public class DbContextFactory : IDesignTimeDbContextFactory<DocumentManagementDbContext>
         {
             public DocumentManagementDbContext CreateDbContext(string[] args)
@@ -88,5 +91,6 @@ namespace DigitNow.Domain.DocumentManagement.Data
                 return new DocumentManagementDbContext(optionsBuilder.Options);
             }
         }
+#endif
     }
 }

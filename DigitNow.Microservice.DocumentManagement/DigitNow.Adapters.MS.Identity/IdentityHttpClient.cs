@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication;
 using System.Net.Http.Headers;
 using System.Text;
+using System.Net;
 
 namespace DigitNow.Adapters.MS.Identity
 {
@@ -26,6 +27,10 @@ namespace DigitNow.Adapters.MS.Identity
             var response = await _httpClient.GetAsync(requestUri, cancellationToken);
             if (!response.IsSuccessStatusCode)
             {
+                if (response.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    throw new UnauthorizedAccessException();
+                }
                 throw new HttpRequestException(); //TODO: Throw a descriptive error
             }
 
@@ -49,6 +54,10 @@ namespace DigitNow.Adapters.MS.Identity
             
             if (!response.IsSuccessStatusCode)
             {
+                if (response.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    throw new UnauthorizedAccessException();
+                }
                 throw new HttpRequestException(); //TODO: Throw a descriptive error
             }
         }

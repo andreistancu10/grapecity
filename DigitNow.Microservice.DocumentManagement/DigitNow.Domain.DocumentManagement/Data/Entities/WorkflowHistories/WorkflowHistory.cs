@@ -3,7 +3,7 @@ using System;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
-    public class WorkflowHistory : Entity
+    public class WorkflowHistory : ExtendedEntity
     {
         public int RecipientType { get; set; }
         public long RecipientId { get; set; }

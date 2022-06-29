@@ -28,6 +28,38 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 oldClrType: typeof(int),
                 oldType: "int");
 
+            migrationBuilder.AddColumn<DateTime>(
+                name: "CreatedAt",
+                schema: "DocumentMangement",
+                table: "WorkflowHistory",
+                type: "datetime2",
+                nullable: false,
+                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+
+            migrationBuilder.AddColumn<long>(
+                name: "CreatedBy",
+                schema: "DocumentMangement",
+                table: "WorkflowHistory",
+                type: "bigint",
+                nullable: false,
+                defaultValue: 0L);
+
+            migrationBuilder.AddColumn<DateTime>(
+                name: "ModifiedAt",
+                schema: "DocumentMangement",
+                table: "WorkflowHistory",
+                type: "datetime2",
+                nullable: false,
+                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+
+            migrationBuilder.AddColumn<long>(
+                name: "ModifiedBy",
+                schema: "DocumentMangement",
+                table: "WorkflowHistory",
+                type: "bigint",
+                nullable: false,
+                defaultValue: 0L);
+
             migrationBuilder.AlterColumn<string>(
                 name: "IdentificationNumber",
                 schema: "DocumentMangement",
@@ -81,6 +113,26 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropColumn(
+                name: "CreatedAt",
+                schema: "DocumentMangement",
+                table: "WorkflowHistory");
+
+            migrationBuilder.DropColumn(
+                name: "CreatedBy",
+                schema: "DocumentMangement",
+                table: "WorkflowHistory");
+
+            migrationBuilder.DropColumn(
+                name: "ModifiedAt",
+                schema: "DocumentMangement",
+                table: "WorkflowHistory");
+
+            migrationBuilder.DropColumn(
+                name: "ModifiedBy",
+                schema: "DocumentMangement",
+                table: "WorkflowHistory");
+
             migrationBuilder.DropColumn(
                 name: "CreatedAt",
                 schema: "DocumentMangement",
