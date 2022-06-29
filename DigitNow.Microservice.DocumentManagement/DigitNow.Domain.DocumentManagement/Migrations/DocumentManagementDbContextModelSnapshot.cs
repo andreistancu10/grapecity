@@ -535,6 +535,23 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("WorkflowHistory", "DocumentMangement");
                 });
 
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.DocumentSpecialRegisters.DocumentSpecialRegister", b =>
+                {
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", "Document")
+                        .WithMany()
+                        .HasForeignKey("DocumentId1");
+
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters.SpecialRegister", "SpecialRegister")
+                        .WithMany()
+                        .HasForeignKey("SpecialRegisterId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Document");
+
+                    b.Navigation("SpecialRegister");
+                });
+
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.ConnectedDocument", b =>
                 {
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", null)

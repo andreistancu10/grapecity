@@ -19,7 +19,7 @@ public class SpecialRegisterAssociationService : ISpecialRegisterAssociationServ
 
     public async Task<bool> AssociateDocumentAsync(IncomingDocument document)
     {
-        if (!CheckDocumentTypeSpecificRegister(document.DocumentTypeId, out var register))
+        if (!CheckIfRegisterExistsForDocument(document.DocumentTypeId, out var register))
         {
             return false;
         }
@@ -40,9 +40,9 @@ public class SpecialRegisterAssociationService : ISpecialRegisterAssociationServ
         await _dbContext.SaveChangesAsync();
     }
 
-    private bool CheckDocumentTypeSpecificRegister(int documentType, out SpecialRegister register)
+    private bool CheckIfRegisterExistsForDocument(int documentType, out SpecialRegister register)
     {
-        register = _dbContext.SpecialRegisters.AsNoTracking().FirstOrDefaultAsync(c => c.DocumentType == documentType).Result;
+        register = _dbContext.SpecialRegisters.AsNoTracking().FirstOrDefaultAsync(c => c.DocumentCategoryId == documentType).Result;
 
         return register is { };
     }

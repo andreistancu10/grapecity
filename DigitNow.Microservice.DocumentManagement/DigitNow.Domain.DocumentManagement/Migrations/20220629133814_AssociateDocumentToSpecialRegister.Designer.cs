@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    [Migration("20220629095012_SpecialRegisterAssociations_IncrementIdStoredProcedure")]
-    partial class SpecialRegisterAssociations_IncrementIdStoredProcedure
+    [Migration("20220629133814_AssociateDocumentToSpecialRegister")]
+    partial class AssociateDocumentToSpecialRegister
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -443,11 +443,20 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
-                    b.Property<DateTime>("CreationDate")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DocumentType")
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("DocumentCategoryId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("ModifiedBy")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -456,6 +465,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DocumentCategoryId")
+                        .IsUnique();
 
                     b.ToTable("SpecialRegister", "DocumentMangement");
                 });

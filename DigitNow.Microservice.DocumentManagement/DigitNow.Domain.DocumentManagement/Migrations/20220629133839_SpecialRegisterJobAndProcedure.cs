@@ -4,7 +4,7 @@
 
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
-    public partial class SpecialRegisterAssociations_IncrementIdStoredProcedure : Migration
+    public partial class SpecialRegisterJobAndProcedure : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -54,7 +54,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     EXEC dbo.sp_add_jobserver
                     @job_name = N'JOB_Set_Association_Ids';
                 GO";
-            
+
             migrationBuilder.Sql(createStoredProcedure);
             migrationBuilder.Sql(createJob);
             migrationBuilder.Sql(createSchedule);

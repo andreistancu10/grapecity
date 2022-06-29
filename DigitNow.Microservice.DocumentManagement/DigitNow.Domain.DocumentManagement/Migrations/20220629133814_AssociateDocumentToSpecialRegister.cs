@@ -4,7 +4,7 @@
 
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
-    public partial class AssociateDocumentToRegister : Migration
+    public partial class AssociateDocumentToSpecialRegister : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
