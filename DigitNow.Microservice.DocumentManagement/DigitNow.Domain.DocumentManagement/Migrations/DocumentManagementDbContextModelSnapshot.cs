@@ -23,13 +23,45 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.ContactDetails.ContactDetail", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.ConnectedDocument", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<long>("ChildDocumentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("DocumentType")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    b.Property<long?>("IncomingDocumentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("OutgoingDocumentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("RegistrationNumber")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IncomingDocumentId");
+
+                    b.HasIndex("OutgoingDocumentId");
+
+                    b.ToTable("ConnectedDocument", "DocumentMangement");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.ContactDetail", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
                     b.Property<string>("ApartmentNumber")
                         .HasColumnType("nvarchar(max)");
@@ -46,6 +78,12 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<int>("CountyId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
@@ -54,6 +92,12 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.Property<string>("Floor")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("ModifiedBy")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
@@ -72,53 +116,103 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("ContactDetail", "DocumentMangement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.IncomingConnectedDocuments.IncomingConnectedDocument", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Document", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
-                    b.Property<int>("ChildIncomingDocumentId")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("DocumentType")
                         .HasColumnType("int");
 
-                    b.Property<int?>("IncomingDocumentId")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("ModifiedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("RegistrationDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("RegistrationNumber")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IncomingDocumentId");
-
-                    b.ToTable("IncomingConnectedDocument", "DocumentMangement");
+                    b.ToTable("Document", "DocumentMangement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.IncomingDocument", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.DocumentResolution", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("DocumentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("DocumentType")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2");
 
-                    b.Property<int?>("ContactDetailId")
+                    b.Property<long>("ModifiedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Remarks")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ResolutionType")
                         .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DocumentResolution", "DocumentMangement");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<long?>("ContactDetailId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("ContentSummary")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreationDate")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Detail")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("DocumentId")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("DocumentTypeId")
                         .HasColumnType("int");
@@ -148,39 +242,44 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<int>("IssuerTypeId")
                         .HasColumnType("int");
 
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("ModifiedBy")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("NumberOfPages")
                         .HasColumnType("int");
 
                     b.Property<int>("RecipientId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("RegistrationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("RegistrationNumber")
-                        .HasColumnType("int");
-
                     b.Property<double>("ResolutionPeriod")
                         .HasColumnType("float");
-
-                    b.Property<string>("User")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ContactDetailId");
 
+                    b.HasIndex("DocumentId")
+                        .IsUnique();
+
                     b.ToTable("IncomingDocument", "DocumentMangement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.InternalDocuments.InternalDocument", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.InternalDocument", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("DeadlineDaysNumber")
                         .HasColumnType("int");
@@ -192,11 +291,20 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<long>("DocumentId")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("InternalDocumentTypeId")
                         .HasColumnType("int");
 
                     b.Property<bool?>("IsUrgent")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("ModifiedBy")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Observation")
                         .HasColumnType("nvarchar(max)");
@@ -204,49 +312,15 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<int>("ReceiverDepartmentId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("RegistrationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("RegistrationNumber")
-                        .HasColumnType("int");
-
-                    b.Property<string>("User")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
+
+                    b.HasIndex("DocumentId")
+                        .IsUnique();
 
                     b.ToTable("InternalDocument", "DocumentMangement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.OutgoingConnectedDocuments.OutgoingConnectedDocument", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<long>("ChildOutgoingDocumentId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("DocumentType")
-                        .HasColumnType("int");
-
-                    b.Property<long?>("OutgoingDocumentId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("RegistrationNumber")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OutgoingDocumentId");
-
-                    b.ToTable("OutgoingConnectedDocument", "DocumentMangement");
-                });
-
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments.OutgoingDocument", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.OutgoingDocument", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -254,14 +328,24 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
-                    b.Property<int?>("ContactDetailId")
+                    b.Property<int>("ContactDetailId")
                         .HasColumnType("int");
 
+                    b.Property<long?>("ContactDetailId1")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("ContentSummary")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreationDate")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("DocumentId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("DocumentTypeDetail")
                         .HasColumnType("nvarchar(max)");
@@ -269,7 +353,14 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<int>("DocumentTypeId")
                         .HasColumnType("int");
 
-                    b.Property<long?>("IdentificationNumber")
+                    b.Property<string>("IdentificationNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("ModifiedBy")
                         .HasColumnType("bigint");
 
                     b.Property<int>("NumberOfPages")
@@ -279,28 +370,23 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("RecipientName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("RecipientTypeId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("RegistrationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("RegistrationNumber")
-                        .HasColumnType("int");
-
-                    b.Property<string>("User")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
-                    b.HasIndex("ContactDetailId");
+                    b.HasIndex("ContactDetailId1");
 
-                    b.ToTable("OutgoingDocuments", "DocumentMangement");
+                    b.HasIndex("DocumentId")
+                        .IsUnique();
+
+                    b.ToTable("OutgoingDocument", "DocumentMangement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.RegistrationNumberCounter.RegistrationNumberCounter", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.RegistrationNumberCounter", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -316,19 +402,22 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RegistrationNumberCounter", "DocumentMangement");
+                    b.ToTable("RegistrationNumberCounters", "DocumentMangement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.WorkflowHistories.WorkflowHistory", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.WorkflowHistory", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("bigint");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
-                    b.Property<int?>("ActionType")
-                        .HasColumnType("int");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("CreationDate")
                         .HasColumnType("datetime2");
@@ -336,8 +425,14 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<string>("DeclineReason")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("IncomingDocumentId")
-                        .HasColumnType("int");
+                    b.Property<long?>("IncomingDocumentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("ModifiedBy")
+                        .HasColumnType("bigint");
 
                     b.Property<DateTime?>("OpinionRequestedUntil")
                         .HasColumnType("datetime2");
@@ -345,8 +440,8 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<long?>("OutgoingDocumentId")
                         .HasColumnType("bigint");
 
-                    b.Property<int>("RecipientId")
-                        .HasColumnType("int");
+                    b.Property<long>("RecipientId")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("RecipientName")
                         .HasColumnType("nvarchar(max)");
@@ -375,57 +470,90 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("WorkflowHistory", "DocumentMangement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.IncomingConnectedDocuments.IncomingConnectedDocument", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.ConnectedDocument", b =>
                 {
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.IncomingDocument", null)
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", null)
                         .WithMany("ConnectedDocuments")
                         .HasForeignKey("IncomingDocumentId");
-                });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.IncomingDocument", b =>
-                {
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.ContactDetails.ContactDetail", "ContactDetail")
-                        .WithMany()
-                        .HasForeignKey("ContactDetailId");
-
-                    b.Navigation("ContactDetail");
-                });
-
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.OutgoingConnectedDocuments.OutgoingConnectedDocument", b =>
-                {
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments.OutgoingDocument", null)
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.OutgoingDocument", null)
                         .WithMany("ConnectedDocuments")
                         .HasForeignKey("OutgoingDocumentId");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments.OutgoingDocument", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", b =>
                 {
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.ContactDetails.ContactDetail", "ContactDetail")
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.ContactDetail", "ContactDetail")
                         .WithMany()
                         .HasForeignKey("ContactDetailId");
 
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Document", "Document")
+                        .WithOne("IncomingDocument")
+                        .HasForeignKey("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", "DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("ContactDetail");
+
+                    b.Navigation("Document");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.WorkflowHistories.WorkflowHistory", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.InternalDocument", b =>
                 {
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.IncomingDocument", null)
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Document", "Document")
+                        .WithOne("InternalDocument")
+                        .HasForeignKey("DigitNow.Domain.DocumentManagement.Data.Entities.InternalDocument", "DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Document");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.OutgoingDocument", b =>
+                {
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.ContactDetail", "ContactDetail")
+                        .WithMany()
+                        .HasForeignKey("ContactDetailId1");
+
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Document", "Document")
+                        .WithOne("OutgoingDocument")
+                        .HasForeignKey("DigitNow.Domain.DocumentManagement.Data.Entities.OutgoingDocument", "DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ContactDetail");
+
+                    b.Navigation("Document");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.WorkflowHistory", b =>
+                {
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", null)
                         .WithMany("WorkflowHistory")
                         .HasForeignKey("IncomingDocumentId");
 
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments.OutgoingDocument", null)
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.OutgoingDocument", null)
                         .WithMany("WorkflowHistory")
                         .HasForeignKey("OutgoingDocumentId");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.IncomingDocument", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Document", b =>
+                {
+                    b.Navigation("IncomingDocument");
+
+                    b.Navigation("InternalDocument");
+
+                    b.Navigation("OutgoingDocument");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", b =>
                 {
                     b.Navigation("ConnectedDocuments");
 
                     b.Navigation("WorkflowHistory");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.OutgoingDocuments.OutgoingDocument", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.OutgoingDocument", b =>
                 {
                     b.Navigation("ConnectedDocuments");
 

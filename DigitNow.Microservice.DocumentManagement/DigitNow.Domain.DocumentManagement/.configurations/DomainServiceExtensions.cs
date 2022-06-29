@@ -1,8 +1,7 @@
 ﻿using System.Reflection;
-using DigitNow.Domain.DocumentManagement.Business._Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.configurations.HostedServices;
-using DigitNow.Domain.DocumentManagement.Contracts.Documents;
-using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries;
+using DigitNow.Domain.DocumentManagement.Data.Repositories;
 using Domain.Localization.Client.configurations;
 using HTSS.Platform.Core.Files.MicrosoftExtensions;
 using HTSS.Platform.Infrastructure.Api.Tools;
@@ -64,8 +63,12 @@ namespace DigitNow.Domain.DocumentManagement.configurations
         
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
-            services.AddScoped<IDocumentService, DocumentService>();
-            services.AddScoped<IDocumentsQueryService, DocumentsQueryService>();
+            services.AddTransient<IIdentityService, IdentityService>();
+            services.AddTransient<IDocumentService, DocumentService>();
+            services.AddTransient<IIncomingDocumentService, IncomingDocumentService>();
+            services.AddTransient<IInternalDocumentService, InternalDocumentService>();
+            services.AddTransient<IOutgoingDocumentService, OutgoingDocumentService>();
+            services.AddTransient<IDocumentResolutionService, DocumentResolutionService>();
 
             return services;
         }

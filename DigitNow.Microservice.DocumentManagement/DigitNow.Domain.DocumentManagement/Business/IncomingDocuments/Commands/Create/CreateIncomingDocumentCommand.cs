@@ -22,6 +22,5 @@ public class CreateIncomingDocumentCommand : ICommand<ResultObject>
     public double ResolutionPeriod { get; set; }
     public bool? IsUrgent { get; set; }
     public bool? IsGDPRAgreed { get; set; }
-    public string User { get; set; }
     public List<int> ConnectedDocumentIds { get; set; }
 }

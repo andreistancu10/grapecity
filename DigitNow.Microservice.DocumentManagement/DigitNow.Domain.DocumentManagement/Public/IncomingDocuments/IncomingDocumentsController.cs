@@ -9,33 +9,30 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments;
 
-//[Authorize]
+[Authorize]
+[ApiController]
 [Route("api/incoming-documents")]
 public class IncomingDocumentsController : ApiController
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
-    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public IncomingDocumentsController(IMediator mediator, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+    public IncomingDocumentsController(IMediator mediator, IMapper mapper)
     {
         _mediator = mediator;
         _mapper = mapper;
-        _httpContextAccessor = httpContextAccessor;
     }
-    private string GetUserId() => _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
     [HttpPost]
     public async Task<IActionResult> CreateIncomingDocument([FromBody] CreateIncomingDocumentRequest request)
     {
         var command = _mapper.Map<CreateIncomingDocumentCommand>(request);
-        command.User = GetUserId() ?? "";
+        command.User = GetUserId();
 
         return CreateResponse(await _mediator.Send(command));
     }
@@ -45,10 +42,10 @@ public class IncomingDocumentsController : ApiController
     {
         return await _mediator.Send(new GetDocsByRegistrationNumberQuery { RegistrationNumber = registrationNumber, Year = year })
             switch
-        {
-            null => NotFound(),
-            var result => Ok(result)
-        };
+            {
+                null => NotFound(),
+                var result => Ok(result)
+            };
     }
 
     [HttpPut("{id}")]

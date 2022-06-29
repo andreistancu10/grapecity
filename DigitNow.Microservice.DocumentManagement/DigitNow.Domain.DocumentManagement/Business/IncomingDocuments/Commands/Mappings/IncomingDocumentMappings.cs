@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
+using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update;
-using DigitNow.Domain.DocumentManagement.Data.ContactDetails;
-using DigitNow.Domain.DocumentManagement.Data.IncomingConnectedDocuments;
-using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Mappings;
 
@@ -13,11 +12,10 @@ public class IncomingDocumentMappings : Profile
     {
         CreateMap<CreateIncomingDocumentCommand, IncomingDocument>();
         CreateMap<CreateContactDetailCommand, ContactDetail>();
-        CreateMap<UpdateIncomingDocumentCommand, IncomingDocument>()
-            .ForMember(x => x.RegistrationNumber, opt => opt.Ignore())
-            .ForMember(x => x.RegistrationDate, opt => opt.Ignore());
+        CreateMap<UpdateIncomingDocumentCommand, IncomingDocument>();
 
         CreateMap<UpdateContactDetailCommand, ContactDetail>();
-        CreateMap<IncomingDocument, IncomingConnectedDocument>();
+        CreateMap<IncomingDocument, ConnectedDocument>();
+        CreateMap<CreateContactDetailCommand, ContactDetailDto>();
     }
 }
