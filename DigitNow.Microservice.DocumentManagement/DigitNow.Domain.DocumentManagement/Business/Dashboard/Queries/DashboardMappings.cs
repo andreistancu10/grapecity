@@ -35,7 +35,7 @@ public class GetDocumentsMappings : Profile
             .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.Document.RegistrationNumber))
             .ForMember(c => c.IssuerName, opt => opt.MapFrom(src => src.CreatedBy))
             .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.InternalDocumentTypeId))
-            .ForMember(c => c.DocumentType, opt => opt.MapFrom(src => (int)src.Document.DocumentType));
+            .ForMember(c => c.DocumentType, opt => opt.MapFrom(src => src.Document.DocumentType.ToString()));
     }
 
     private class GetDocumentResponseOutgoingStatusValueResolver : IValueResolver<OutgoingDocument, GetDocumentResponse, int>
@@ -50,9 +50,9 @@ public class GetDocumentsMappings : Profile
         }
     }
 
-    private class GetDocumentResponseOutgoingDocumentTypeValueResolver : IValueResolver<OutgoingDocument, GetDocumentResponse, int>
+    private class GetDocumentResponseOutgoingDocumentTypeValueResolver : IValueResolver<OutgoingDocument, GetDocumentResponse, string>
     {
-        public int Resolve(OutgoingDocument source, GetDocumentResponse destination, int destMember, ResolutionContext context)
+        public string Resolve(OutgoingDocument source, GetDocumentResponse destination, string destMember, ResolutionContext context)
         {
             var workflowStatus = source.WorkflowHistory
                 .OrderByDescending(c => c.CreationDate)
@@ -62,10 +62,10 @@ public class GetDocumentsMappings : Profile
             if ((DocumentStatus)destination.Status == DocumentStatus.Finalized
                 || (DocumentStatus)workflowStatus == DocumentStatus.Finalized)
             {
-                return (int)DocumentType.IncomingToOutgoing;
+                return "Incoming>Outgoing";
             }
 
-            return (int)DocumentType.Outgoing;
+            return DocumentType.Outgoing.ToString();
         }
     }
 
@@ -81,9 +81,9 @@ public class GetDocumentsMappings : Profile
         }
     }
 
-    private class GetDocumentResponseIncomingDocumentTypeValueResolver : IValueResolver<IncomingDocument, GetDocumentResponse, int>
+    private class GetDocumentResponseIncomingDocumentTypeValueResolver : IValueResolver<IncomingDocument, GetDocumentResponse, string>
     {
-        public int Resolve(IncomingDocument source, GetDocumentResponse destination, int destMember, ResolutionContext context)
+        public string Resolve(IncomingDocument source, GetDocumentResponse destination, string destMember, ResolutionContext context)
         {
             var workflowStatus = source.WorkflowHistory
                 .OrderByDescending(c => c.CreationDate)
@@ -93,10 +93,10 @@ public class GetDocumentsMappings : Profile
             if ((DocumentStatus)destination.Status == DocumentStatus.Finalized
                 || (DocumentStatus)workflowStatus == DocumentStatus.Finalized)
             {
-                return (int)DocumentType.IncomingToOutgoing;
+                return "Incoming>Outgoing";
             }
 
-            return (int)DocumentType.Incoming;
+            return DocumentType.Incoming.ToString();
         }
     }
 }
