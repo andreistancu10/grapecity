@@ -10,7 +10,9 @@ using System.Threading;
 using Microsoft.EntityFrameworkCore.Design;
 #endif
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles;
 using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
+using DigitNow.Domain.DocumentManagement.Data.Entities.UploadedFiles;
 
 namespace DigitNow.Domain.DocumentManagement.Data
 {
@@ -37,6 +39,8 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<InternalDocument> InternalDocuments { get; set; }
         public DbSet<RegistrationNumberCounter> RegistrationNumberCounters { get; set; }
         public DbSet<SpecialRegister> SpecialRegisters { get; set; }
+        public DbSet<UploadedFile> UploadedFiles { get; set; }
+        public DbSet<DocumentUploadedFile> DocumentUploadedFiles { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

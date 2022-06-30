@@ -6,6 +6,11 @@ using Microsoft.AspNetCore.Http;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services;
 
+public interface IFileUploadService
+{
+    Task<string> UploadFileAsync(IFormFile formFileStream, string filename);
+}
+
 public class FileUploadService
 {
     private readonly int _filesPerDirectory;
@@ -22,15 +27,17 @@ public class FileUploadService
         _partition = partition;
     }
 
-    public async Task UploadFileAsync(IFormFile formFileStream, string filename)
+    public async Task<string> UploadFileAsync(IFormFile formFileStream, string filename)
     {
         var fullPath = GenerateFullPath();
         fullPath = EnsureEligibilityOfPath(fullPath: fullPath);
         filename = EnsureEligibilityOfFilename(filename: filename, fullPath: fullPath);
-        
+
         CheckOrCreateDirectoryTree(fullPath);
 
         await SaveFileOnDiskAsync(fullPath, filename, formFileStream);
+
+        return fullPath;
     }
 
     private static string EnsureEligibilityOfFilename(string filename, string fullPath)
@@ -100,7 +107,7 @@ public class FileUploadService
     {
         if (formFileStream.Length <= 0)
         {
-            return;
+            throw new EndOfStreamException();
         }
 
         await using Stream fileStream = new FileStream($"{fullPath}\\{filename}", FileMode.Create, FileAccess.Write);
