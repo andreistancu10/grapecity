@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitNow.Domain.DocumentMan
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Adapters", "Adapters", "{81607CBB-9C6E-4ED4-8132-FB3C329D28C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitNow.Adapters.MS.Identity", "DigitNow.Adapters.MS.Identity\DigitNow.Adapters.MS.Identity.csproj", "{C565CDAB-702D-4C5A-8FBC-7E0D040B7840}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitNow.Adapters.MS.Identity", "DigitNow.Adapters.MS.Identity\DigitNow.Adapters.MS.Identity.csproj", "{C565CDAB-702D-4C5A-8FBC-7E0D040B7840}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitNow.Adapters.MS.Catalog", "DigitNow.Adapters.MS.Catalog\DigitNow.Adapters.MS.Catalog.csproj", "{1FF67AA6-702A-4CB3-9A7C-561F5B86B95E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,12 +61,17 @@ Global
 		{C565CDAB-702D-4C5A-8FBC-7E0D040B7840}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C565CDAB-702D-4C5A-8FBC-7E0D040B7840}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C565CDAB-702D-4C5A-8FBC-7E0D040B7840}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1FF67AA6-702A-4CB3-9A7C-561F5B86B95E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1FF67AA6-702A-4CB3-9A7C-561F5B86B95E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1FF67AA6-702A-4CB3-9A7C-561F5B86B95E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1FF67AA6-702A-4CB3-9A7C-561F5B86B95E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C565CDAB-702D-4C5A-8FBC-7E0D040B7840} = {81607CBB-9C6E-4ED4-8132-FB3C329D28C9}
+		{1FF67AA6-702A-4CB3-9A7C-561F5B86B95E} = {81607CBB-9C6E-4ED4-8132-FB3C329D28C9}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {05830AB0-7D5C-4CF9-B546-2B996C103137}
