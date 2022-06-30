@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update;
-using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.GetRegistrationProof;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents;
 using DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
@@ -10,13 +9,13 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments;
 
 [Authorize]
+[ApiController]
 [Route("api/incoming-documents")]
 public class IncomingDocumentsController : ApiController
 {
@@ -36,26 +35,13 @@ public class IncomingDocumentsController : ApiController
         _httpContextAccessor = httpContextAccessor;
         _documentPdfGeneratorService = documentPdfGeneratorService;
     }
-    private string GetUserId() => _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
     [HttpPost]
     public async Task<IActionResult> CreateIncomingDocument([FromBody] CreateIncomingDocumentRequest request)
     {
         var command = _mapper.Map<CreateIncomingDocumentCommand>(request);
-        command.User = GetUserId();
 
         return CreateResponse(await _mediator.Send(command));
-    }
-
-    [HttpGet]
-    public async Task<IActionResult> GetByRegistrationNumber([FromQuery] int registrationNumber, [FromQuery] int year)
-    {
-        return await _mediator.Send(new GetDocsByRegistrationNumberQuery { RegistrationNumber = registrationNumber, Year = year })
-            switch
-            {
-                null => NotFound(),
-                var result => Ok(result)
-            };
     }
 
     [HttpPut("{id}")]

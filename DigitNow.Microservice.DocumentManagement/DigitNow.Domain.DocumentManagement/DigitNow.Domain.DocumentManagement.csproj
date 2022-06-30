@@ -5,6 +5,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Business\Dashboard\Commands\GetDocuments\**" />
+	  <EmbeddedResource Remove="Business\Dashboard\Commands\GetDocuments\**" />
+	  <None Remove="Business\Dashboard\Commands\GetDocuments\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<None Remove="Root.vstemplate" />
 	</ItemGroup>
 	<ItemGroup>
@@ -48,8 +54,8 @@
 		<PackageReference Include="HTSS.Platform.Infrastructure.Security" Version="6.0.2" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.5" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.5">
-		  <PrivateAssets>all</PrivateAssets>
-		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="OpenHtmlToPdf" Version="1.12.0" />
 		<PackageReference Include="ShiftIn.Domain.Authentication.Client" Version="6.0.1" />
@@ -69,19 +75,19 @@
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="domain.DocumentManagementSettings.tokenized.json">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\DigitNow.Adapters.MS.Catalog\DigitNow.Adapters.MS.Catalog.csproj" />
 		<ProjectReference Include="..\DigitNow.Adapters.MS.Identity\DigitNow.Adapters.MS.Identity.csproj" />
 		<ProjectReference Include="..\DigitNow.Domain.DocumentManagement.Contracts\DigitNow.Domain.DocumentManagement.Contracts.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<Folder Include="Business\Consumers\" />
-		<Folder Include="Business\Dashboard\Commands\GetDocuments\" />
-		<Folder Include="Migrations\" />
 		<Folder Include="Public\Maintenance\" />
+		<Folder Include="Public\SpecialRegisters\Validators\" />
 	</ItemGroup>
 </Project>
