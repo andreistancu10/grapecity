@@ -62,7 +62,7 @@ public class GetDocumentsMappings : Profile
             if ((DocumentStatus)destination.Status == DocumentStatus.Finalized
                 || (DocumentStatus)workflowStatus == DocumentStatus.Finalized)
             {
-                return "Incoming>Outgoing";
+                return "dms.dashboard.incoming-to-outgoing";
             }
 
             return DocumentType.Outgoing.ToString();
@@ -93,7 +93,7 @@ public class GetDocumentsMappings : Profile
             if ((DocumentStatus)destination.Status == DocumentStatus.Finalized
                 || (DocumentStatus)workflowStatus == DocumentStatus.Finalized)
             {
-                return "Incoming>Outgoing";
+                return "dms.dashboard.incoming-to-outgoing";
             }
 
             return DocumentType.Incoming.ToString();
