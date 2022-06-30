@@ -2,22 +2,24 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using HTSS.Platform.Core.Files.Abstractions;
 using Microsoft.AspNetCore.Http;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services;
 
-public interface IFileUploadService
+public interface IFileService
 {
-    Task<string> UploadFileAsync(IFormFile formFileStream, string filename);
+    Task<string> UploadFileAsync(IFormFile formFileStream, string fileGuid);
+    byte[] DownloadFileAsync(string relativePath, string fileGuid);
 }
 
-public class FileUploadService
+public class FileService : IFileService
 {
     private readonly int _filesPerDirectory;
     private readonly string _completeRootPath;
     private readonly string _partition;
 
-    public FileUploadService(
+    public FileService(
         string rootPath = "DigitNow_Documents",
         int filesPerDirectory = 1000,
         string partition = "C")
@@ -27,29 +29,39 @@ public class FileUploadService
         _partition = partition;
     }
 
-    public async Task<string> UploadFileAsync(IFormFile formFileStream, string filename)
+    public async Task<string> UploadFileAsync(IFormFile formFileStream, string fileGuid)
     {
-        var fullPath = GenerateFullPath();
-        fullPath = EnsureEligibilityOfPath(fullPath: fullPath);
-        filename = EnsureEligibilityOfFilename(filename: filename, fullPath: fullPath);
+        var relativePath = GenerateRelativePath();
+        relativePath = EnsureEligibilityOfPath(relativePath);
+        var fullPath = GenerateFullPath(relativePath);
+        fileGuid = EnsureEligibilityOfFilename(fileGuid: fileGuid, fullPath: fullPath);
 
         CheckOrCreateDirectoryTree(fullPath);
+        await SaveFileOnDiskAsync(fullPath, fileGuid, formFileStream);
 
-        await SaveFileOnDiskAsync(fullPath, filename, formFileStream);
-
-        return fullPath;
+        return relativePath;
     }
 
-    private static string EnsureEligibilityOfFilename(string filename, string fullPath)
+    public byte[] DownloadFileAsync(string relativePath, string fileGuid)
+    {
+        if (!DoesFileExist(GenerateFullPath(relativePath), fileGuid))
+        {
+            throw new FileNotFoundException();
+        }
+
+        return File.ReadAllBytes($"{_completeRootPath}\\{relativePath}\\{fileGuid}");
+    }
+
+    private static string EnsureEligibilityOfFilename(string fileGuid, string fullPath)
     {
         var isFilenameEligible = false;
-        var newFilename = filename;
+        var newFilename = fileGuid;
 
         for (var i = 1; !isFilenameEligible; i++)
         {
-            if (DoesFileAlreadyExist(fullPath, newFilename))
+            if (DoesFileExist(fullPath, newFilename))
             {
-                var bits = filename.Split(".");
+                var bits = fileGuid.Split(".");
                 newFilename = $"{bits[0]}_{i}.{bits[1]}";
             }
             else
@@ -61,17 +73,16 @@ public class FileUploadService
         return newFilename;
     }
 
-    private string EnsureEligibilityOfPath(string fullPath)
+    private string EnsureEligibilityOfPath(string relativePath)
     {
         var isDirectoryEligible = false;
-        var newFullPath = fullPath;
-
+        var newRelativePath = relativePath;
 
         for (var i = 1; !isDirectoryEligible; i++)
         {
-            if (!IsRoomLeftInDirectory(newFullPath))
+            if (!IsRoomLeftInDirectory(newRelativePath))
             {
-                newFullPath = $"{fullPath}_{i}";
+                newRelativePath = $"{relativePath}_{i}";
             }
             else
             {
@@ -79,18 +90,18 @@ public class FileUploadService
             }
         }
 
-        return newFullPath;
+        return newRelativePath;
     }
 
-    private static bool DoesFileAlreadyExist(string path, string filename)
+    private static bool DoesFileExist(string path, string fileGuid)
     {
         if (!Directory.Exists(path))
         {
             return false;
         }
 
-        var filenameWithPath = $"{path}\\{filename}";
-        return Directory.EnumerateFiles(path).Any(c => c == filenameWithPath);
+        var fileGuidWithPath = $"{path}\\{fileGuid}";
+        return Directory.EnumerateFiles(path).Any(c => c == fileGuidWithPath);
     }
 
     private bool IsRoomLeftInDirectory(string path)
@@ -103,24 +114,29 @@ public class FileUploadService
         return Directory.EnumerateFiles(path).Count() < _filesPerDirectory;
     }
 
-    private static async Task SaveFileOnDiskAsync(string fullPath, string filename, IFormFile formFileStream)
+    private static async Task SaveFileOnDiskAsync(string fullPath, string fileGuid, IFormFile formFileStream)
     {
         if (formFileStream.Length <= 0)
         {
             throw new EndOfStreamException();
         }
 
-        await using Stream fileStream = new FileStream($"{fullPath}\\{filename}", FileMode.Create, FileAccess.Write);
+        await using Stream fileStream = new FileStream($"{fullPath}\\{fileGuid}", FileMode.Create, FileAccess.Write);
         await formFileStream.CopyToAsync(fileStream);
     }
 
-    private string GenerateFullPath()
+    private string GenerateRelativePath()
     {
         var year = DateTime.UtcNow.Year;
         var month = DateTime.UtcNow.Month;
         var day = DateTime.UtcNow.Day;
 
-        return $"{_completeRootPath}\\{year}\\{month}\\{day}";
+        return $"{year}\\{month}\\{day}";
+    }
+
+    private string GenerateFullPath(string relativePath)
+    {
+        return $"{_completeRootPath}\\{relativePath}";
     }
 
     private static void CheckOrCreateDirectoryTree(string path)

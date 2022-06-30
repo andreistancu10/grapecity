@@ -8,6 +8,8 @@ public class UploadFileMapping : Profile
 {
     public UploadFileMapping()
     {
+        CreateMap<UploadFileCommand, UploadedFile>()
+            .ForMember(c => c.ContentType, opt => opt.MapFrom(src => src.File.ContentType));
         CreateMap<UploadedFile, UploadFileResponse>()
             .ForMember(c => c.FileGuid, opt => opt.MapFrom(dest => dest.Guid))
             .ForMember(c => c.FileId, opt => opt.MapFrom(dest => dest.Id));

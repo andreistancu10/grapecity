@@ -1,13 +1,13 @@
-﻿using System;
-using System.IO;
+﻿using HTSS.Platform.Core.Files.Abstractions;
 
 namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries;
 
 public class DownloadFileResponse
 {
-    public int Id { get; set; }
-    public Guid Guid{ get; set; }
-    public string Name { get; set; }
-    public string RelativePath { get; set; }
-    public Stream FileStream { get; set; }
+    public DownloadFileResponse(FileContent fileContent)
+    {
+        FileContent = fileContent;
+    }
+
+    public FileContent FileContent{ get; set; }
 }

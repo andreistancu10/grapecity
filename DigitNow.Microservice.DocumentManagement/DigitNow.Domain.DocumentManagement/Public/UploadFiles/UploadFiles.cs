@@ -1,8 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.Services;
-using DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Commands.Create;
-using DigitNow.Domain.DocumentManagement.Public.SpecialRegisters.Models;
+using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload;
+using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries;
+using DigitNow.Domain.DocumentManagement.Public.UploadFiles.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -15,27 +16,35 @@ namespace DigitNow.Domain.DocumentManagement.Public.UploadFiles;
 [Route("api/upload-file")]
 public class UploadFilesController : ApiController
 {
-    private readonly IFileUploadService _fileUploadService;
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
 
-    public UploadFilesController(IFileUploadService fileUploadService, IMediator mediator, IMapper mapper)
+    public UploadFilesController(IMediator mediator, IMapper mapper)
     {
-        _fileUploadService = fileUploadService;
         _mediator = mediator;
         _mapper = mapper;
     }
 
-
     [HttpPost("upload")]
-    public async Task<IActionResult> CreateSpecialRegisterAsync([FromBody] CreateSpecialRegisterRequest request)
+    public async Task<IActionResult> UploadAsync([FromForm] UploadFileRequest request)
     {
-        return await _mediator.Send(_mapper.Map<CreateSpecialRegisterCommand>(request))
+        return await _mediator.Send(_mapper.Map<UploadFileCommand>(request))
             switch
-            {
-                null => NotFound(),
-                var result => Ok(result)
-            };
+        {
+            null => NotFound(),
+            var result => Ok(result)
+        };
     }
 
+    [HttpGet("download/{fileId:int}")]
+    public async Task<IActionResult> DownloadAsync([FromRoute] int fileId)
+    {
+        var result = await _mediator.Send(new DownloadFileQuery(fileId));
+
+        return result switch
+        {
+            null => NotFound(),
+            _ => File(result.FileContent.Content, result.FileContent.ContentType, result.FileContent.Name)
+        };
+    }
 }
