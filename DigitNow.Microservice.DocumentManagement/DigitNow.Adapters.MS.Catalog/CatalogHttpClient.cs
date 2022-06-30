@@ -26,14 +26,8 @@ namespace DigitNow.Adapters.MS.Catalog
             await SetAuthorizationTokenAsync();
 
             var response = await _httpClient.GetAsync(requestUri, cancellationToken);
-            if (!response.IsSuccessStatusCode)
-            {
-                if (response.StatusCode == HttpStatusCode.Unauthorized)
-                {
-                    throw new UnauthorizedAccessException();
-                }
-                throw new HttpRequestException(); //TODO: Throw a descriptive error
-            }
+            
+            await HandleResponseMessage(response);
 
             var responseContent = await response.Content.ReadAsStringAsync();
 
@@ -53,14 +47,7 @@ namespace DigitNow.Adapters.MS.Catalog
             var jsonObject = JsonConvert.SerializeObject(content);
             var response = await _httpClient.PostAsync(requestUri, new StringContent(jsonObject, Encoding.UTF8, "application/json"), cancellationToken);
 
-            if (!response.IsSuccessStatusCode)
-            {
-                if (response.StatusCode == HttpStatusCode.Unauthorized)
-                {
-                    throw new UnauthorizedAccessException();
-                }
-                throw new HttpRequestException(); //TODO: Throw a descriptive error
-            }
+            await HandleResponseMessage(response);
         }
 
         private async Task SetAuthorizationTokenAsync()
@@ -68,6 +55,18 @@ namespace DigitNow.Adapters.MS.Catalog
             var httpContextAccessor = _serviceProvider.GetService<IHttpContextAccessor>();
             var token = await httpContextAccessor.HttpContext.GetTokenAsync("access_token");
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
+
+        private async Task HandleResponseMessage(HttpResponseMessage httpResponseMessage)
+        {
+            if (!httpResponseMessage.IsSuccessStatusCode)
+            {
+                if (httpResponseMessage.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    throw new UnauthorizedAccessException();
+                }
+                throw new HttpRequestException(); //TODO: Throw a descriptive error
+            }
         }
     }
 }
