@@ -45,7 +45,7 @@ public class GetDocumentsMappings : Profile
             return
                 source.WorkflowHistory
                     .OrderByDescending(c => c.CreationDate)
-                    .FirstDynamic()
+                    .First()
                     .Status;
         }
     }
@@ -54,6 +54,17 @@ public class GetDocumentsMappings : Profile
     {
         public int Resolve(OutgoingDocument source, GetDocumentResponse destination, int destMember, ResolutionContext context)
         {
+            var workflowStatus = source.WorkflowHistory
+                .OrderByDescending(c => c.CreationDate)
+                .First()
+                .Status;
+
+            if ((DocumentStatus)destination.Status == DocumentStatus.Finalized
+                || (DocumentStatus)workflowStatus == DocumentStatus.Finalized)
+            {
+                return (int)DocumentType.IncomingToOutgoing;
+            }
+
             return (int)DocumentType.Outgoing;
         }
     }
@@ -65,7 +76,7 @@ public class GetDocumentsMappings : Profile
             return
                 source.WorkflowHistory
                     .OrderByDescending(c => c.CreationDate)
-                    .FirstDynamic()
+                    .First()
                     .Status;
         }
     }
@@ -74,6 +85,17 @@ public class GetDocumentsMappings : Profile
     {
         public int Resolve(IncomingDocument source, GetDocumentResponse destination, int destMember, ResolutionContext context)
         {
+            var workflowStatus = source.WorkflowHistory
+                .OrderByDescending(c => c.CreationDate)
+                .First()
+                .Status;
+
+            if ((DocumentStatus)destination.Status == DocumentStatus.Finalized
+                || (DocumentStatus)workflowStatus == DocumentStatus.Finalized)
+            {
+                return (int)DocumentType.IncomingToOutgoing;
+            }
+
             return (int)DocumentType.Incoming;
         }
     }
