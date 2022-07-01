@@ -65,7 +65,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="Business\Common\HtmlTemplates\registration_proof_template.html">
+		<None Update="Business\Common\Export\Pdf\Templates\Html\registration_proof_template.html">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="domain.DocumentManagementSettings.Development.json">

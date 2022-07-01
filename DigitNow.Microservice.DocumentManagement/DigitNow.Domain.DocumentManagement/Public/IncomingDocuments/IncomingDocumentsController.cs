@@ -2,7 +2,6 @@
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.GetRegistrationProof;
-using DigitNow.Domain.DocumentManagement.Contracts.Documents;
 using DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
@@ -14,7 +13,8 @@ using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments;
 
-[Authorize]
+//[Authorize]
+[AllowAnonymous]
 [ApiController]
 [Route("api/incoming-documents")]
 public class IncomingDocumentsController : ApiController
@@ -22,18 +22,15 @@ public class IncomingDocumentsController : ApiController
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IDocumentPdfGeneratorService _documentPdfGeneratorService;
 
     public IncomingDocumentsController(
         IMediator mediator, 
         IMapper mapper, 
-        IHttpContextAccessor httpContextAccessor, 
-        IDocumentPdfGeneratorService documentPdfGeneratorService)
+        IHttpContextAccessor httpContextAccessor)
     {
         _mediator = mediator;
         _mapper = mapper;
         _httpContextAccessor = httpContextAccessor;
-        _documentPdfGeneratorService = documentPdfGeneratorService;
     }
 
     [HttpPost]
@@ -67,18 +64,6 @@ public class IncomingDocumentsController : ApiController
             return NotFound();
         }
 
-        //TODO: integrate information about cityHall and header
-
-        var file = await _documentPdfGeneratorService.GenerateIncomingDocRegistrationProofPdfAsync(new DocumentPdfDetails
-        {
-            IssuerName = response.IssuerName,
-            RegistrationDate = response.RegistrationDate,
-            RegistrationNumber = response.RegistrationNumber,
-            ResolutionPeriod = response.ResolutionPeriod,
-            DocumentType = response.DocumentType,
-            CityHall = "Primaria Bucuresti",
-            InstitutionHeader = "Primaria Bucuresti"
-        });
-        return File(file.Content, file.ContentType, file.Name);
+        return File(response.Content, response.ContentType, response.Name);
     }
 }

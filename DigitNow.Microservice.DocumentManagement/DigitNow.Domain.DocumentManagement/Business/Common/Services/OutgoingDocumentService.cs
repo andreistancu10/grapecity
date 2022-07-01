@@ -15,7 +15,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
     {
         Task<OutgoingDocument> CreateAsync(OutgoingDocument outgoingDocument, CancellationToken cancellationToken);
         Task<List<OutgoingDocument>> FindAllAsync(Expression<Func<OutgoingDocument, bool>> predicate, CancellationToken cancellationToken);
-        Task<OutgoingDocument> GetDocumentByIdAsync(long id, CancellationToken cancellationToken);
+        Task<OutgoingDocument> FindFirstAsync(long id, CancellationToken cancellationToken);
     }
 
     public class OutgoingDocumentService : IOutgoingDocumentService
@@ -50,7 +50,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
                 .ToListAsync(cancellationToken);
         }
 
-        public Task<OutgoingDocument> GetDocumentByIdAsync(long id, CancellationToken cancellationToken)
+        public Task<OutgoingDocument> FindFirstAsync(long id, CancellationToken cancellationToken)
         {
             return _dbContext.OutgoingDocuments.Where(x => x.Id == id).Include(x => x.Document).FirstOrDefaultAsync();
         }
