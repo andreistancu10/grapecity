@@ -1,5 +1,7 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using System;
+using System.Collections.Generic;
+using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
@@ -16,6 +18,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public IncomingDocument IncomingDocument { get; set; }
         public InternalDocument InternalDocument { get; set; }
         public OutgoingDocument OutgoingDocument { get; set; }
+        public List<DocumentUploadedFile> DocumentUploadedFiles { get; set; }
 
         #endregion
     }

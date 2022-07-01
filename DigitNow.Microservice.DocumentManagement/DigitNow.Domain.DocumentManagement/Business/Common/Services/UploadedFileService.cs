@@ -1,16 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload;
 using DigitNow.Domain.DocumentManagement.Data;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles;
 using DigitNow.Domain.DocumentManagement.Data.Entities.UploadedFiles;
+using MassTransit.Initializers;
+using Microsoft.EntityFrameworkCore;
+using Z.Expressions;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services;
 
 public interface IUploadedFileService
 {
     Task<UploadedFile> CreateAsync(UploadFileCommand request, Guid newGuid, string filePath, CancellationToken cancellationToken);
+    Task CreateDocumentUploadedFilesAsync(IEnumerable<long> uploadedFileIds, Document document, CancellationToken cancellationToken);
+    Task UpdateDocumentUploadedFilesAsync(IEnumerable<long> uploadedFileIds, Document document, CancellationToken cancellationToken);
+    Task<List<UploadedFile>> GetUploadedFilesAsync(IEnumerable<long> ids, CancellationToken cancellationToken);
 }
 
 public class UploadedFileService : IUploadedFileService
@@ -38,5 +48,35 @@ public class UploadedFileService : IUploadedFileService
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return newFile;
+    }
+
+    public async Task CreateDocumentUploadedFilesAsync(IEnumerable<long> uploadedFileIds, Document document, CancellationToken cancellationToken)
+    {
+        var uploadedFiles = await GetUploadedFilesAsync(uploadedFileIds, cancellationToken);
+        var documentUploadedFiles = uploadedFiles.Select(c => new DocumentUploadedFile
+        {
+            UploadedFile = c,
+            Document = document
+        });
+
+        await _dbContext.DocumentUploadedFiles.AddRangeAsync(documentUploadedFiles, cancellationToken);
+    }
+
+    public async Task UpdateDocumentUploadedFilesAsync(IEnumerable<long> uploadedFileIds, Document document,
+        CancellationToken cancellationToken)
+    {
+        var uploadedFiles = (await GetUploadedFilesAsync(uploadedFileIds, cancellationToken))
+            .Select(c => new DocumentUploadedFile
+            {
+                UploadedFile = c,
+                Document = document
+            }).ToList();
+
+        document.DocumentUploadedFiles = uploadedFiles;
+    }
+
+    public async Task<List<UploadedFile>> GetUploadedFilesAsync(IEnumerable<long> ids, CancellationToken cancellationToken)
+    {
+        return await _dbContext.UploadedFiles.Where(c => ids.Contains(c.Id)).ToListAsync(cancellationToken);
     }
 }

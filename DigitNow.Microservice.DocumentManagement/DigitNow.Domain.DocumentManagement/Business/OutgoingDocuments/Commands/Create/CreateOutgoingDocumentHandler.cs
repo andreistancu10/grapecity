@@ -11,6 +11,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 
 namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Create;
 
@@ -20,17 +21,19 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
     private readonly IMapper _mapper;
     private readonly IOutgoingDocumentService _outgoingDocumentService;
     private readonly IIdentityAdapterClient _identityAdapterClient;
+    private readonly IUploadedFileService _uploadedFileService;
 
     public CreateOutgoingDocumentHandler(DocumentManagementDbContext dbContext,
         IMapper mapper,
         IDocumentService service,
         IOutgoingDocumentService outgoingDocumentService,
-        IIdentityAdapterClient identityAdapterClient)
+        IIdentityAdapterClient identityAdapterClient, IUploadedFileService uploadedFileService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _outgoingDocumentService = outgoingDocumentService;
         _identityAdapterClient = identityAdapterClient;
+        _uploadedFileService = uploadedFileService;
     }
 
     public async Task<ResultObject> Handle(CreateOutgoingDocumentCommand request, CancellationToken cancellationToken)
@@ -41,8 +44,8 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
         var newOutgoingDocument = _mapper.Map<OutgoingDocument>(request);
 
         await _outgoingDocumentService.CreateAsync(newOutgoingDocument, cancellationToken);
-
         await AttachConnectedDocumentsAsync(request, newOutgoingDocument, cancellationToken);
+        await _uploadedFileService.CreateDocumentUploadedFilesAsync(request.UploadedFileIds, newOutgoingDocument.Document, cancellationToken);
 
         newOutgoingDocument.WorkflowHistory.Add(
             new WorkflowHistory
@@ -54,8 +57,8 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
                 RegistrationNumber = newOutgoingDocument.Document.RegistrationNumber
             });
 
-        await _dbContext.SingleUpdateAsync(newOutgoingDocument);
-        await _dbContext.SaveChangesAsync();
+        await _dbContext.SingleUpdateAsync(newOutgoingDocument, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return ResultObject.Created(newOutgoingDocument.Id);
     }

@@ -1,4 +1,4 @@
-﻿#define MIGRATION_ONLY
+﻿#undef MIGRATION_ONLY
 
 using System;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +9,7 @@ using System.Threading;
 #if  MIGRATION_ONLY
 using Microsoft.EntityFrameworkCore.Design;
 #endif
+
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles;
 using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
@@ -26,11 +27,12 @@ namespace DigitNow.Domain.DocumentManagement.Data
             : base(options) { }
 
         public DocumentManagementDbContext(DbContextOptions<DocumentManagementDbContext> options,
-            IIdentityService identityService) 
+            IIdentityService identityService)
             : base(options)
         {
             _identityService = identityService;
         }
+
         public DbSet<Document> Documents { get; set; }
         public DbSet<IncomingDocument> IncomingDocuments { get; set; }
         public DbSet<OutgoingDocument> OutgoingDocuments { get; set; }
@@ -41,7 +43,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<SpecialRegister> SpecialRegisters { get; set; }
         public DbSet<UploadedFile> UploadedFiles { get; set; }
         public DbSet<DocumentUploadedFile> DocumentUploadedFiles { get; set; }
-        
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema(Schema);
@@ -67,7 +69,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
 
             foreach (var entry in ChangeTracker.Entries<ISoftExtendedEntity>())
             {
-                if(entry.State == EntityState.Deleted)
+                if (entry.State == EntityState.Deleted)
                 {
                     entry.Entity.IsDeleted = true;
                     entry.Entity.DeletedAt = DateTime.Now;
