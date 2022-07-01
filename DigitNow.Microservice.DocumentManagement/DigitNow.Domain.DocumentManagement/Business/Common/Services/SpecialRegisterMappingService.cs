@@ -25,7 +25,7 @@ public class SpecialRegisterMappingService : ISpecialRegisterMappingService
 
     public async Task<bool> MapDocumentAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken)
     {
-        var register = await FindDocumentSpecialRegisterAsync(incomingDocument.DocumentTypeId, cancellationToken);
+        var register = await GetDocumentSpecialRegisterAsync(incomingDocument.DocumentTypeId, cancellationToken);
         await AddDocumentMappingAsync(incomingDocument, register, cancellationToken);
 
         return true;
@@ -44,7 +44,7 @@ public class SpecialRegisterMappingService : ISpecialRegisterMappingService
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
-    private async Task<SpecialRegister> FindDocumentSpecialRegisterAsync(int documentType,
+    private async Task<SpecialRegister> GetDocumentSpecialRegisterAsync(int documentType,
         CancellationToken cancellationToken)
     {
         return await _dbContext.SpecialRegisters.AsNoTracking().FirstAsync(c => c.DocumentCategoryId == documentType, cancellationToken);
