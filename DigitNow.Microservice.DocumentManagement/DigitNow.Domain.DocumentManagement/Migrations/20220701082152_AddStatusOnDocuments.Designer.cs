@@ -4,6 +4,7 @@ using DigitNow.Domain.DocumentManagement.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    partial class DocumentManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220701082152_AddStatusOnDocuments")]
+    partial class AddStatusOnDocuments
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -405,44 +407,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("RegistrationNumberCounters", "DocumentMangement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterAssociations.SpecialRegisterMapping", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("CreatedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("DocumentId")
-                        .HasColumnType("int");
-
-                    b.Property<long?>("IncomingDocumentId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("ModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long>("ModifiedBy")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("SpecialRegisterId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IncomingDocumentId");
-
-                    b.HasIndex("SpecialRegisterId");
-
-                    b.ToTable("SpecialRegisterMappings", "DocumentMangement");
-                });
-
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters.SpecialRegister", b =>
                 {
                     b.Property<long>("Id")
@@ -601,23 +565,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("ContactDetail");
 
                     b.Navigation("Document");
-                });
-
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterAssociations.SpecialRegisterMapping", b =>
-                {
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", "IncomingDocument")
-                        .WithMany()
-                        .HasForeignKey("IncomingDocumentId");
-
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters.SpecialRegister", "SpecialRegister")
-                        .WithMany()
-                        .HasForeignKey("SpecialRegisterId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("IncomingDocument");
-
-                    b.Navigation("SpecialRegister");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.WorkflowHistory", b =>
