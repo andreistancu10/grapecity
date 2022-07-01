@@ -12,8 +12,7 @@ using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Public.OutgoingDocuments;
 
-//[Authorize]
-[AllowAnonymous]
+[Authorize]
 [ApiController]
 [Route("api/outgoing-documents")]
 public class OutgoingDocumentsController : ApiController
