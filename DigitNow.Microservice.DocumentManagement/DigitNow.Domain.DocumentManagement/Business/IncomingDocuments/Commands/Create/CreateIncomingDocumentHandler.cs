@@ -65,7 +65,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             });
 
             await _dbContext.SaveChangesAsync(cancellationToken);
-            await _specialRegisterAssociationService.AssociateDocumentAsync(newIncomingDocument);
+            await _specialRegisterAssociationService.MapDocumentAsync(newIncomingDocument, cancellationToken);
         }
         catch (Exception ex)
         {

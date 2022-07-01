@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
-    public partial class RefactorRegisterAssociation : Migration
+    public partial class RefactorSpecialRegisterMapping : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -14,7 +14,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 schema: "DocumentMangement");
 
             migrationBuilder.CreateTable(
-                name: "SpecialRegisterAssociations",
+                name: "SpecialRegisterMappings",
                 schema: "DocumentMangement",
                 columns: table => new
                 {
@@ -22,7 +22,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     DocumentId = table.Column<int>(type: "int", nullable: false),
                     SpecialRegisterId = table.Column<long>(type: "bigint", nullable: false),
-                    DocumentId1 = table.Column<long>(type: "bigint", nullable: true),
+                    IncomingDocumentId = table.Column<long>(type: "bigint", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatedBy = table.Column<long>(type: "bigint", nullable: false),
                     ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -30,15 +30,15 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SpecialRegisterAssociations", x => x.Id);
+                    table.PrimaryKey("PK_SpecialRegisterMappings", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SpecialRegisterAssociations_IncomingDocument_DocumentId1",
-                        column: x => x.DocumentId1,
+                        name: "FK_SpecialRegisterMappings_IncomingDocument_IncomingDocumentId",
+                        column: x => x.IncomingDocumentId,
                         principalSchema: "DocumentMangement",
                         principalTable: "IncomingDocument",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_SpecialRegisterAssociations_SpecialRegister_SpecialRegisterId",
+                        name: "FK_SpecialRegisterMappings_SpecialRegister_SpecialRegisterId",
                         column: x => x.SpecialRegisterId,
                         principalSchema: "DocumentMangement",
                         principalTable: "SpecialRegister",
@@ -47,22 +47,22 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_SpecialRegisterAssociations_DocumentId1",
+                name: "IX_SpecialRegisterMappings_IncomingDocumentId",
                 schema: "DocumentMangement",
-                table: "SpecialRegisterAssociations",
-                column: "DocumentId1");
+                table: "SpecialRegisterMappings",
+                column: "IncomingDocumentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SpecialRegisterAssociations_SpecialRegisterId",
+                name: "IX_SpecialRegisterMappings_SpecialRegisterId",
                 schema: "DocumentMangement",
-                table: "SpecialRegisterAssociations",
+                table: "SpecialRegisterMappings",
                 column: "SpecialRegisterId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "SpecialRegisterAssociations",
+                name: "SpecialRegisterMappings",
                 schema: "DocumentMangement");
 
             migrationBuilder.CreateTable(

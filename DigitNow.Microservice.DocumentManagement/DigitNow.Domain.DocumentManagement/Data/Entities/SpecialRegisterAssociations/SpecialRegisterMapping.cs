@@ -2,10 +2,13 @@
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterAssociations;
 
-public class SpecialRegisterAssociation : ExtendedEntity
+public class SpecialRegisterMapping : ExtendedEntity
 {
     public int DocumentId { get; set; }
     public long SpecialRegisterId { get; set; }
-    public IncomingDocument Document { get; set; }
+
+    #region [ References ]
+    public IncomingDocument IncomingDocument { get; set; }
     public SpecialRegister SpecialRegister { get; set; }
+    #endregion
 }

@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterAssociations.Configurations;
 
-public class SpecialRegisterAssociationConfiguration : IEntityTypeConfiguration<SpecialRegisterAssociation>
+public class SpecialRegisterMappingConfiguration : IEntityTypeConfiguration<SpecialRegisterMapping>
 {
-    public void Configure(EntityTypeBuilder<SpecialRegisterAssociation> builder)
+    public void Configure(EntityTypeBuilder<SpecialRegisterMapping> builder)
     {
         builder.HasKey(c => c.Id);
     }

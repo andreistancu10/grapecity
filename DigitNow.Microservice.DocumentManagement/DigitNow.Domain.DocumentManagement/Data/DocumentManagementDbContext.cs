@@ -38,7 +38,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<InternalDocument> InternalDocuments { get; set; }
         public DbSet<RegistrationNumberCounter> RegistrationNumberCounters { get; set; }
         public DbSet<SpecialRegister> SpecialRegisters { get; set; }
-        public DbSet<SpecialRegisterAssociation> SpecialRegisterAssociations { get; set; }
+        public DbSet<SpecialRegisterMapping> SpecialRegisterMappings { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
