@@ -14,7 +14,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
                 RecipientType = (int)role,
                 RecipientId = user.Id,
                 RecipientName = user.FormatUserNameByRole(role),
-                Status = (int)documentStatus,
+                Status = documentStatus,
                 CreationDate = DateTime.Now,
                 RegistrationNumber = document.RegistrationNumber
             };
