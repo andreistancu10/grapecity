@@ -1,8 +1,8 @@
-﻿namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Models
+﻿namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Models
 {
     using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-    using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers._Interfaces;
-    using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers.Functionary;
+    using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers._Interfaces;
+    using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers.Functionary;
     using DigitNow.Domain.DocumentManagement.Data.Entities;
     using HTSS.Platform.Core.CQRS;
     using HTSS.Platform.Core.Errors;

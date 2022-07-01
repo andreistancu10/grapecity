@@ -1,17 +1,18 @@
-﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers._Interfaces;
+using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using HTSS.Platform.Core.CQRS;
 using System;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers._Interfaces
+namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Commands.Create
 {
-    public interface ICreateWorkflowHistoryCommand
+    public class CreateWorkflowDecisionCommand : ICreateWorkflowHistoryCommand, ICommand<ResultObject>
     {
         public int DocumentId { get; set; }
         public UserRole InitiatorType { get; set; }
         public int ActionType { get; set; }
-        public int? RecipientId { get; set; }
         public string? Remarks { get; set; }
         public string? DeclineReason { get; set; }
+        public long? RecipientId { get; set; }
         public int? Resolution { get; set; }
         public int? Decision { get; set; }
         public DateTime? OpinionRequestedUntil { get; set; }

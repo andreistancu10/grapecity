@@ -1,11 +1,11 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers._Interfaces;
+﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers._Interfaces;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers.Mayor
+namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers.Mayor
 {
     public class MayorMakesDecision : IWorkflowHandler
     {

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Commands.Create;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;

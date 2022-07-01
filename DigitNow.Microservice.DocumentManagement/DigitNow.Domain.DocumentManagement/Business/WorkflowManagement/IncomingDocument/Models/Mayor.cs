@@ -1,13 +1,13 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers._Interfaces;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers.Mayor;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers._Interfaces;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers.Mayor;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Models
+namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Models
 {
     public class Mayor : IWorkflowHandler
     {

@@ -1,21 +1,18 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers._Interfaces;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Handlers.HeadOfDepartment;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
+﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers._Interfaces;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers.HeadOfDepartment;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDocument.Models
+namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Models
 {
     public class HeadOfDepartment : IWorkflowHandler
     {
         private enum ActionType { Allocate, Decline, MakeDecision };
 
-        private Dictionary<ActionType, IWorkflowHandler> actionStrategy
-            = new Dictionary<ActionType, IWorkflowHandler>();
+        private Dictionary<ActionType, IWorkflowHandler> actionStrategy = new Dictionary<ActionType, IWorkflowHandler>();
 
         public HeadOfDepartment()
         {
@@ -23,6 +20,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowHistory.IncomingDo
             actionStrategy.Add(ActionType.Decline, new HeadOfDepartmentDeclines());
             actionStrategy.Add(ActionType.MakeDecision, new HeadOfDepartmentMakesDecision());
         }
+
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
             var actionKey = (ActionType)command.ActionType;
