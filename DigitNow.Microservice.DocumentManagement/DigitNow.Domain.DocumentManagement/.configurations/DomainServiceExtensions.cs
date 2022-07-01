@@ -4,7 +4,6 @@ using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.configurations.HostedServices;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents;
-using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments.Queries;
 using DigitNow.Domain.DocumentManagement.Data.Repositories;
 using Domain.Localization.Client.configurations;
 using HTSS.Platform.Core.Files.MicrosoftExtensions;
@@ -67,7 +66,6 @@ namespace DigitNow.Domain.DocumentManagement.configurations
         
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
-            services.AddScoped<IDocumentsQueryService, DocumentsQueryService>();
             services.AddScoped<IPdfGeneratorService, PdfGeneratorService>();
             services.AddScoped<IDocumentPdfGeneratorService, DocumentPdfGeneratorService>();
             services.AddTransient<IIdentityService, IdentityService>();

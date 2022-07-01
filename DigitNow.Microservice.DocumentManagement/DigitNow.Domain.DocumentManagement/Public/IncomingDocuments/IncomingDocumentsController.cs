@@ -67,13 +67,15 @@ public class IncomingDocumentsController : ApiController
             return NotFound();
         }
 
+        //TODO: integrate information about cityHall and header
+
         var file = await _documentPdfGeneratorService.GenerateIncomingDocRegistrationProofPdfAsync(new DocumentPdfDetails
         {
             IssuerName = response.IssuerName,
             RegistrationDate = response.RegistrationDate,
             RegistrationNumber = response.RegistrationNumber,
             ResolutionPeriod = response.ResolutionPeriod,
-            DocumentType = "Cerere",
+            DocumentType = response.DocumentType,
             CityHall = "Primaria Bucuresti",
             InstitutionHeader = "Primaria Bucuresti"
         });

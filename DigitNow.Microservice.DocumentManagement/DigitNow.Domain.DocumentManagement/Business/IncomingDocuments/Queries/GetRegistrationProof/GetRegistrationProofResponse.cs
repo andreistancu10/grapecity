@@ -7,7 +7,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.
         public int RegistrationNumber { get; set; }
         public DateTime RegistrationDate { get; set; }
         public string IssuerName { get; set; }
-        public int DocumentTypeId { get; set; } 
+        public string DocumentType { get; set; } 
         public double ResolutionPeriod { get; set; }
     }
 }

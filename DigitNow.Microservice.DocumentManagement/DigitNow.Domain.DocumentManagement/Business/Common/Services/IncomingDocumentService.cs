@@ -17,6 +17,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
         Task<IncomingDocument> AddAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken);
         Task<List<IncomingDocument>> FindAllAsync(Expression<Func<IncomingDocument, bool>> predicate, CancellationToken cancellationToken);
         Task SetResolutionAsync(IList<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken);
+        Task<IncomingDocument> GetIncomingDocumentById(long id, CancellationToken cancellationToken);
     }
 
     public class IncomingDocumentService : IIncomingDocumentService
@@ -53,6 +54,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
                 .Include(x => x.Document)
                 .Where(predicate)
                 .ToListAsync(cancellationToken);
+        }
+
+        public Task<IncomingDocument> GetIncomingDocumentById(long id, CancellationToken cancellationToken)
+        {
+            return _dbContext.IncomingDocuments.Where(x => x.Id == id).Include(x => x.Document).FirstOrDefaultAsync();
         }
 
         public async Task SetResolutionAsync(IList<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken)

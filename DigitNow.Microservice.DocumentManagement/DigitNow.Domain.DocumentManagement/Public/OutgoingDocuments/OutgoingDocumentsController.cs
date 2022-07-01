@@ -7,7 +7,6 @@ using DigitNow.Domain.DocumentManagement.Public.OutgoingDocuments.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading;
@@ -67,13 +66,14 @@ public class OutgoingDocumentsController : ApiController
             return NotFound();
         }
 
+        //TODO: integrate information about cityHall and header
         var file = await _documentPdfGeneratorService.GenerateOutgoingDocRegistrationProofPdfAsync(new DocumentPdfDetails
         {
             IssuerName = response.RecipientName,
             RegistrationDate = DateTime.Now,
             RegistrationNumber = response.RegistrationNumber,
             ResolutionPeriod = null,
-            DocumentType = "Cerere",
+            DocumentType = response.DocumentType,
             CityHall = "Primaria Bucuresti",
             InstitutionHeader = "Primaria Bucuresti"
         });

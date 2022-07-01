@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Data.IncomingDocuments;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.GetRegistrationProof
 {
@@ -7,7 +7,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.
     {
         public GetRegistrationProofMapping()
         {
-            CreateMap<IncomingDocument, GetRegistrationProofResponse>();
+            CreateMap<IncomingDocument, GetRegistrationProofResponse>()
+                .ForMember(x => x.RegistrationNumber, opt => opt.MapFrom(source => source.Document.RegistrationNumber))
+                .ForMember(x => x.RegistrationDate, opt => opt.MapFrom(source => source.Document.RegistrationDate));
         }
     }
 }
