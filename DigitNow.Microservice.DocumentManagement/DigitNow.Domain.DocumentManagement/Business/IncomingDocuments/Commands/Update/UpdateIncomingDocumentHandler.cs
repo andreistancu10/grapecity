@@ -28,7 +28,10 @@ public class UpdateIncomingDocumentHandler : ICommandHandler<UpdateIncomingDocum
 
     public async Task<ResultObject> Handle(UpdateIncomingDocumentCommand request, CancellationToken cancellationToken)
     {
-        var dbIncomingDocument = await _dbContext.IncomingDocuments.Include(cd => cd.ConnectedDocuments)
+        var dbIncomingDocument = await _dbContext.IncomingDocuments
+            .Include(cd => cd.ConnectedDocuments)
+            .Include(c=>c.Document)
+            .ThenInclude(c=>c.DocumentUploadedFiles)
             .FirstOrDefaultAsync(doc => doc.Id == request.Id, cancellationToken: cancellationToken);
 
         if (dbIncomingDocument is null)
