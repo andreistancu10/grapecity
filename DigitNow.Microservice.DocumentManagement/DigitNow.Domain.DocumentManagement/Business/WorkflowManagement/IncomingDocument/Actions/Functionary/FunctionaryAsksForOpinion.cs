@@ -1,4 +1,6 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers._Interfaces;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions._Interfaces;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
@@ -7,31 +9,33 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers.Functionary
+namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions.Functionary
 {
-    public class FunctionaryAsksForOpinion : IWorkflowHandler
+    public class FunctionaryAsksForOpinion : BaseWorkflowManager, IWorkflowHandler
     {
         private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated };
 
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            // functionar solicita opinia unui sef de departament -> Solicitat_Opinie_Nerepatizat
-            // Data este mandatory?
+            var document = await GetDocumentById(command.DocumentId, token);
+            var lastWorkFlowRecord = GetLastWorkflowRecord(document);
 
-            if (!Validate(command))
-            {
+            if (!Validate(command, lastWorkFlowRecord))
                 return command;
-            }
 
-            //command.Status = DocumentStatus.OpinionRequestedUnallocated;
-            //command.RecipientHasChanged = true;
-            //command.RecipientType = UserRole.HeadOfDepartment;
+            var headOfDepartment = await GetUserByDepartmentIdAsync((long)command.RecipientId, token);
+
+            document.IncomingDocument.WorkflowHistory
+                .Add(WorkflowHistoryFactory
+                .Create(document, UserRole.HeadOfDepartment, headOfDepartment, DocumentStatus.OpinionRequestedUnallocated, string.Empty, command.Remarks, command.OpinionRequestedUntil));
 
             return command;
         }
 
-        private bool Validate(ICreateWorkflowHistoryCommand command)
+        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
         {
+            if (!IsTransitionAllowed(command, lastWorkFlowRecord, allowedTransitionStatuses)) return false;
+
             if (command.RecipientId <= 0)
             {
                 command.Result = ResultObject.Error(new ErrorMessage

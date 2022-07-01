@@ -1,9 +1,7 @@
-﻿namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Models
+﻿namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.WorkflowEditors
 {
-    using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-    using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers._Interfaces;
-    using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers.Functionary;
-    using DigitNow.Domain.DocumentManagement.Data.Entities;
+    using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions._Interfaces;
+    using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions.Functionary;
     using HTSS.Platform.Core.CQRS;
     using HTSS.Platform.Core.Errors;
     using System.Collections.Generic;
@@ -12,7 +10,7 @@
 
     public class Functionary : IWorkflowHandler
     {
-        private enum ActionType { Decline, AskForOpinion, Finalize, AsksForApproval, SendOpinion };
+        private enum ActionType { AskForOpinion = 1, AsksForApproval = 2, Finalize = 3, Decline = 4, SendOpinion = 5  };
 
         private Dictionary<ActionType, IWorkflowHandler> actionStrategy 
             = new Dictionary<ActionType, IWorkflowHandler>();

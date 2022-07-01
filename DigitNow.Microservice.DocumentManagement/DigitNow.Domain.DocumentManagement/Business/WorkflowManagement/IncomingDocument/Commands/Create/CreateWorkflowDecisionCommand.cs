@@ -1,4 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers._Interfaces;
+﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions._Interfaces;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using HTSS.Platform.Core.CQRS;
 using System;

@@ -1,5 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers._Interfaces;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions._Interfaces;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
@@ -9,7 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers.HeadOfDepartment
+namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions.HeadOfDepartment
 {
     public class HeadOfDepartmentDeclines : BaseWorkflowManager, IWorkflowHandler
     {
@@ -23,7 +24,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
 
-            var user = await GetFunctionaryByIdAsync((long)command.RecipientId, token);
+            var user = await GetUserByIdAsync((long)command.RecipientId, token);
 
             if (!UserExists(user, command))
                 return command;

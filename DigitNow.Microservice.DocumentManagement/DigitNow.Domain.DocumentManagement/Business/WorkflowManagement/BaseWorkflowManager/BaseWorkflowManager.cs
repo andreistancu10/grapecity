@@ -1,8 +1,7 @@
 ﻿using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers._Interfaces;
-using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions._Interfaces;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
@@ -11,7 +10,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers
+namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager
 {
     public class BaseWorkflowManager
     {
@@ -44,11 +43,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
             return null;
         }
 
-        public async Task<User> GetFunctionaryByIdAsync(long id, CancellationToken token)
+        public async Task<User> GetUserByIdAsync(long id, CancellationToken token)
         {
             var user = new User() { FirstName = "Ciprian", LastName = "Rosca" };
             return user;
             //return await IdentityService.GetUserByIdAsync(id, token);
+        }
+
+        public async Task<User> GetUserByDepartmentIdAsync(long id, CancellationToken token)
+        {
+            var user = new User() { FirstName = "Ciprian", LastName = "Rosca" };
+            return user;
+            //return await IdentityService.GetUserByDepartmentIdAsync(id, token);
         }
 
         public async Task<User> GetMayorAsync(int id, CancellationToken token)
@@ -63,6 +69,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
         public async Task SaveDocument(CancellationToken token)
         {
             await DocumentService.CommitChangesAsync(token);
+        }
+
+        public void ResetWorkflowRecord(WorkflowHistory record)
+        {
+            record.DeclineReason = default;
+            record.Resolution = default;
+            record.OpinionRequestedUntil = default;
+            record.Remarks = default;
+            record.Resolution = default;
         }
 
         public bool IsTransitionAllowed(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord, int[] allowedTransitionStatuses)

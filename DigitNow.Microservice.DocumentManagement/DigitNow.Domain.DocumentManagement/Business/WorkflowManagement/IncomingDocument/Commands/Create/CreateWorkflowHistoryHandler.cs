@@ -1,7 +1,7 @@
-﻿using HTSS.Platform.Core.CQRS;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
+using HTSS.Platform.Core.CQRS;
 using System.Threading;
 using System.Threading.Tasks;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Factory;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Commands.Create
 {

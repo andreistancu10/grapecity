@@ -1,4 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers._Interfaces;
+﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions._Interfaces;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 using System.Threading;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers.HeadOfDepartment
+namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions.HeadOfDepartment
 {
     public class HeadOfDepartmentAllocatesRequest : BaseWorkflowManager, IWorkflowHandler
     {
@@ -20,7 +21,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
 
-            var user = await  GetFunctionaryByIdAsync((long)command.RecipientId, token);
+            var user = await  GetUserByIdAsync((long)command.RecipientId, token);
 
             var newDocumentStatus = lastWorkFlowRecord.Status == (int)DocumentStatus.OpinionRequestedUnallocated
                 ? DocumentStatus.OpinionRequestedAllocated

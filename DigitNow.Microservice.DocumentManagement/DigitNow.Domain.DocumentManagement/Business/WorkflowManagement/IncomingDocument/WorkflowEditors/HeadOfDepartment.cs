@@ -1,16 +1,16 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers._Interfaces;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers.HeadOfDepartment;
+﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions._Interfaces;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions.HeadOfDepartment;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Models
+namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.WorkflowEditors
 {
     public class HeadOfDepartment : IWorkflowHandler
     {
-        private enum ActionType { Allocate, Decline, MakeDecision };
+        private enum ActionType { Allocate = 1, MakeDecision = 3, Decline = 2 };
 
         private Dictionary<ActionType, IWorkflowHandler> actionStrategy = new Dictionary<ActionType, IWorkflowHandler>();
 

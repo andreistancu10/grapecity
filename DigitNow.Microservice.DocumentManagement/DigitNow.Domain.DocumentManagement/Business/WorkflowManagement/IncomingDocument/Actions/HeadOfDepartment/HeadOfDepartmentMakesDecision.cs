@@ -1,5 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers._Interfaces;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions._Interfaces;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
@@ -8,7 +9,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers.HeadOfDepartment
+namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions.HeadOfDepartment
 {
     public class HeadOfDepartmentMakesDecision : BaseWorkflowManager, IWorkflowHandler
     {
@@ -57,16 +58,19 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
         private async Task<ICreateWorkflowHistoryCommand> ApplicationDeclined(ICreateWorkflowHistoryCommand command, Document document)
         {
-            var functionaryRecord = document.IncomingDocument.WorkflowHistory.Where(x => x.RecipientType == (int)UserRole.Functionary).OrderByDescending(x => x.CreationDate).FirstOrDefault();
-            var user = await GetFunctionaryByIdAsync(functionaryRecord.RecipientId, _token);
+            var responsibleFunctionaryRecord = document.IncomingDocument.WorkflowHistory
+                .Where(x => x.RecipientType == (int)UserRole.Functionary)
+                .OrderByDescending(x => x.CreationDate)
+                .FirstOrDefault();
 
-            if (!UserExists(user, command))
-                return command;
+            ResetWorkflowRecord(responsibleFunctionaryRecord);
 
-            document.IncomingDocument.WorkflowHistory
-                .Add(WorkflowHistoryFactory
-                .Create(document, UserRole.Functionary, user, DocumentStatus.InWorkDeclined, command.DeclineReason, command.Remarks));
+            responsibleFunctionaryRecord.Status = (int)DocumentStatus.InWorkDeclined;
+            responsibleFunctionaryRecord.DeclineReason = command.DeclineReason;
+            responsibleFunctionaryRecord.Remarks = command.Remarks;
 
+
+            document.IncomingDocument.WorkflowHistory.Add(responsibleFunctionaryRecord);
             await SaveDocument(_token);
 
             return command;

@@ -1,17 +1,16 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers._Interfaces;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers.Mayor;
+﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions._Interfaces;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions.Mayor;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Models
+namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.WorkflowEditors
 {
     public class Mayor : IWorkflowHandler
     {
-        private enum ActionType { MakeDecision };
+        private enum ActionType { MakeDecision = 1 };
 
         private Dictionary<ActionType, IWorkflowHandler> actionStrategy
             = new Dictionary<ActionType, IWorkflowHandler>();

@@ -1,11 +1,10 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Handlers._Interfaces;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Models;
+﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions._Interfaces;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.WorkflowEditors;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using System;
 using System.Collections.Generic;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Factory
+namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
 {
     public static class WorkflowInitiatorFactory
     {
