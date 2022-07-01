@@ -28,7 +28,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.
                 return null;
             }
 
-            var documentType = await _catalogAdapterClient.GetDocumentTypeById(result.DocumentTypeId, cancellationToken);
+            var documentType = await _catalogAdapterClient.GetDocumentTypeByIdAsync(result.DocumentTypeId, cancellationToken);
             var registrationProof = _mapper.Map<GetRegistrationProofResponse>(result);
 
             registrationProof.DocumentType = documentType.Name;

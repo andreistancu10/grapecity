@@ -65,7 +65,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="Business\_Common\Documents\HtmlTemplates\registration_proof_template.html">
+		<None Update="Business\Common\HtmlTemplates\registration_proof_template.html">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="domain.DocumentManagementSettings.Development.json">
@@ -87,6 +87,7 @@
 
 	<ItemGroup>
 		<Folder Include="Business\Consumers\" />
+		<Folder Include="Business\_Common\Documents\" />
 		<Folder Include="Public\Maintenance\" />
 		<Folder Include="Public\SpecialRegisters\Validators\" />
 	</ItemGroup>

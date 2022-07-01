@@ -12,14 +12,14 @@ namespace DigitNow.Domain.DocumentManagement.Business._Common.Documents.Services
 
             var replaceableStrings = GetReplaceableStrings(incomingDocumentPdfDetails);
 
-            return GeneratePdfAsync("Business/_Common/Documents/HtmlTemplates/registration_proof_template.html", "dovada_inregistrare.pdf", replaceableStrings);
+            return GeneratePdfAsync("Business/Common/HtmlTemplates/registration_proof_template.html", "dovada_inregistrare_document_intrare.pdf", replaceableStrings);
         }
 
         public Task<FileContent> GenerateOutgoingDocRegistrationProofPdfAsync(DocumentPdfDetails outgoingDocumentPdfDetails)
         {
             var replaceableStrings = GetReplaceableStrings(outgoingDocumentPdfDetails);
 
-            return GeneratePdfAsync("Business/_Common/Documents/HtmlTemplates/registration_proof_template.html", "dovada_inregistrare.pdf", replaceableStrings);
+            return GeneratePdfAsync("Business/Common/HtmlTemplates/registration_proof_template.html", "dovada_inregistrare_document_iesire.pdf", replaceableStrings);
         }
 
         private List<Tuple<string, string>> GetReplaceableStrings(DocumentPdfDetails documentPdfDetails)
