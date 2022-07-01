@@ -70,7 +70,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<IInternalDocumentService, InternalDocumentService>();
             services.AddTransient<IOutgoingDocumentService, OutgoingDocumentService>();
             services.AddTransient<IDocumentResolutionService, DocumentResolutionService>();
-            services.AddTransient<ISpecialRegisterAssociationService, SpecialRegisterMappingService>();
+            services.AddTransient<ISpecialRegisterMappingService, SpecialRegisterMappingService>();
             services.AddTransient<ISpecialRegisterService, SpecialRegisterService>();
 
             return services;

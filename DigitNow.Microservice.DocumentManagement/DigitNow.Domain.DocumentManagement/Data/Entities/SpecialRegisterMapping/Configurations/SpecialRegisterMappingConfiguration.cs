@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterAssociations.Configurations;
+namespace DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMapping.Configurations;
 
 public class SpecialRegisterMappingConfiguration : IEntityTypeConfiguration<SpecialRegisterMapping>
 {

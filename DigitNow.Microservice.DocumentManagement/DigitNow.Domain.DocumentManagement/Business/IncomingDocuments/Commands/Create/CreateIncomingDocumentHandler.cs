@@ -23,19 +23,21 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
     private readonly IDocumentService _service;
     private readonly IIdentityAdapterClient _identityAdapterClient;
     private readonly IIncomingDocumentService _incomingDocumentService;
-    private readonly ISpecialRegisterAssociationService _specialRegisterAssociationService;
+    private readonly ISpecialRegisterMappingService _specialRegisterMappingService;
 
     public CreateIncomingDocumentHandler(DocumentManagementDbContext dbContext, 
         IMapper mapper, 
         IDocumentService service, 
         IIdentityAdapterClient identityAdapterClient,
-        IIncomingDocumentService incomingDocumentService)
+        IIncomingDocumentService incomingDocumentService, 
+        ISpecialRegisterMappingService specialRegisterMappingService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _service = service;
         _identityAdapterClient = identityAdapterClient;
         _incomingDocumentService = incomingDocumentService;
+        _specialRegisterMappingService = specialRegisterMappingService;
     }
 
     public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
@@ -65,7 +67,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             });
 
             await _dbContext.SaveChangesAsync(cancellationToken);
-            await _specialRegisterAssociationService.MapDocumentAsync(newIncomingDocument, cancellationToken);
+            await _specialRegisterMappingService.MapDocumentAsync(newIncomingDocument, cancellationToken);
         }
         catch (Exception ex)
         {
