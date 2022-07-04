@@ -43,7 +43,7 @@ public class GetDocumentsMappings : Profile
         public int Resolve(OutgoingDocument source, GetDocumentResponse destination, int destMember, ResolutionContext context)
         {
             return
-                source.WorkflowHistory
+                (int)source.WorkflowHistory
                     .OrderByDescending(c => c.CreationDate)
                     .First()
                     .Status;
@@ -74,7 +74,7 @@ public class GetDocumentsMappings : Profile
         public int Resolve(IncomingDocument source, GetDocumentResponse destination, int destMember, ResolutionContext context)
         {
             return
-                source.WorkflowHistory
+                (int)source.WorkflowHistory
                     .OrderByDescending(c => c.CreationDate)
                     .First()
                     .Status;

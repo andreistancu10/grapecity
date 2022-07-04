@@ -1,4 +1,5 @@
-﻿using DigitNow.Domain.DocumentManagement.Data;
+﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -89,6 +90,8 @@ public class DocumentService : IDocumentService
 
             if (document.InternalDocument == null && document.IncomingDocument == null && document.OutgoingDocument == null)
                 throw new InvalidOperationException(); //TODO: Add descriptive error
+
+            document.Status = DocumentStatus.InWorkUnallocated;
 
             await _dbContext.AddAsync(document, cancellationToken);
             await _dbContext.RegistrationNumberCounters.AddAsync(new RegistrationNumberCounter

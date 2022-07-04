@@ -92,6 +92,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
         private void CreateWorkflowRecord(IncomingDocument doc)
         {
             var isHeadOfDepartment = _user.Roles.Contains((long)UserRole.HeadOfDepartment);
+            var status = isHeadOfDepartment ? DocumentStatus.InWorkDelegatedUnallocated : DocumentStatus.InWorkDelegated;
+
+            doc.Document.Status = status;
 
             doc.WorkflowHistory.Add(
                 new WorkflowHistory()
@@ -99,7 +102,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                     RecipientType = isHeadOfDepartment ? (int)UserRole.HeadOfDepartment : (int)UserRole.Functionary,
                     RecipientId = (int)_user.Id,
                     RecipientName =_user.FormatUserNameByRole( isHeadOfDepartment ? UserRole.HeadOfDepartment : UserRole.Functionary),
-                    Status = isHeadOfDepartment ? (int)DocumentStatus.InWorkDelegatedUnallocated : (int)DocumentStatus.InWorkDelegated,
+                    Status = status,
                     CreationDate = DateTime.Now,
                     RegistrationNumber = doc.Document.RegistrationNumber
                 });
