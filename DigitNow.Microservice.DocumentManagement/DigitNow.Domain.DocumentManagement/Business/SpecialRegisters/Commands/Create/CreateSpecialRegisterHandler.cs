@@ -26,7 +26,7 @@ public class CreateSpecialRegisterHandler : ICommandHandler<CreateSpecialRegiste
         var lowerRequestName = request.Name.ToLowerInvariant();
 
         if (await _specialRegisterService
-                .AnyAsync(c => c.Name.ToLowerInvariant() == lowerRequestName,
+                .AnyAsync(c => c.Name.ToLower() == lowerRequestName,
                     cancellationToken))
         {
             return ResultObject.Error(new ErrorMessage

@@ -3,4 +3,5 @@
 public class UpdateSpecialRegisterRequest
 {
     public int DocumentCategoryId { get; set; }
+    public string Observations { get; set; }
 }
