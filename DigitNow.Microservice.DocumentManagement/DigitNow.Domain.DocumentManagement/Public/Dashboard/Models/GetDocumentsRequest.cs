@@ -14,9 +14,9 @@ public class DocumentFilterDto
 {
     public DocumentRegistyTypeFilterDto RegistryTypeFilter { get; set; }
 
-    public RegistrationNoFilterDto RegistrationNoFilter { get; set; }
+    public DocumentRegistrationNoFilterDto RegistrationNoFilter { get; set; }
 
-    public RegistrationDateFilterDto RegistrationDateFilter { get; set; }
+    public DocumentRegistrationDateFilterDto RegistrationDateFilter { get; set; }
 
     public DocumentTypeFilterDto DocumentTypeFilter { get; set; }
 
@@ -30,13 +30,13 @@ public class DocumentRegistyTypeFilterDto
     public string RegistryType { get; set; }
 }
 
-public class RegistrationNoFilterDto
+public class DocumentRegistrationNoFilterDto
 {
     public int From { get; set; }
     public int To { get; set; }
 }
 
-public class RegistrationDateFilterDto
+public class DocumentRegistrationDateFilterDto
 {
     public DateTime From { get; set; }
     public DateTime To { get; set; }
@@ -54,5 +54,5 @@ public class DocumentCategoryFilterDto
 
 public class DocumentStatusFilterDto
 {
-    public string Status { get; set; }
+    public DocumentStatus Status { get; set; }
 }

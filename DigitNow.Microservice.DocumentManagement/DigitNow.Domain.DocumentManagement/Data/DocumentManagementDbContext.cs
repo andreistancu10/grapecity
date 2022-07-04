@@ -1,12 +1,16 @@
-﻿#undef MIGRATION_ONLY
+﻿#define MIGRATION_ONLY
 
 using System;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using System.Threading.Tasks;
 using System.Threading;
+
+#if  MIGRATION_ONLY
+using Microsoft.EntityFrameworkCore.Design;
+#endif
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
 
 namespace DigitNow.Domain.DocumentManagement.Data
 {
@@ -25,21 +29,15 @@ namespace DigitNow.Domain.DocumentManagement.Data
         {
             _identityService = identityService;
         }
-
         public DbSet<Document> Documents { get; set; }
-
         public DbSet<IncomingDocument> IncomingDocuments { get; set; }
-
         public DbSet<OutgoingDocument> OutgoingDocuments { get; set; }
-
-        public DbSet<InternalDocument> InternalDocuments { get; set; }
-
         public DbSet<DocumentResolution> DocumentResolutions { get; set; }
-
         public DbSet<ConnectedDocument> ConnectedDocuments { get; set; }
-
+        public DbSet<InternalDocument> InternalDocuments { get; set; }
         public DbSet<RegistrationNumberCounter> RegistrationNumberCounters { get; set; }
-
+        public DbSet<SpecialRegister> SpecialRegisters { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema(Schema);

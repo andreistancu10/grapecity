@@ -48,7 +48,7 @@ public class GetDocumentsMappings : Profile
             if (foundWorkflowHistory == null)
                 return default(int);
 
-            return foundWorkflowHistory.Status;
+            return (int)foundWorkflowHistory.Status;
         }
     }
 
@@ -71,7 +71,7 @@ public class GetDocumentsMappings : Profile
             if (foundWorkflowHistory == null)
                 return default(int);
 
-            return foundWorkflowHistory.Status;
+            return (int)foundWorkflowHistory.Status;
         }
     }
 

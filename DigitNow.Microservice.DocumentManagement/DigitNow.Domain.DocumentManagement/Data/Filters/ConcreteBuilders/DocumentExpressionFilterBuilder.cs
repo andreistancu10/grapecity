@@ -85,8 +85,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
         {
             if (EntityFilter.StatusFilter != null)
             {
-                // TODO: Apply filter after the status is set to documents
-                GeneratedFilters.Add(document => document != null);
+                GeneratedFilters.Add(document => document.Status == EntityFilter.StatusFilter.Status);
             }
         }
 

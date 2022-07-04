@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
+using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
 using DigitNow.Domain.DocumentManagement.Public.Dashboard.Models;
 using System;
 
@@ -9,6 +10,15 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Mappings
     {
         public GetDocumentsMapping()
         {
+            CreateMap<DocumentFilterDto, DocumentFilter>();
+            {
+                CreateMap<DocumentRegistyTypeFilterDto, DocumentRegistyTypeFilter>();
+                CreateMap<DocumentRegistrationNoFilterDto, DocumentRegistrationNoFilter>();
+                CreateMap<DocumentRegistrationDateFilterDto, DocumentRegistrationDateFilter>();
+                CreateMap<DocumentTypeFilterDto, DocumentTypeFilter>();
+                CreateMap<DocumentCategoryFilterDto, DocumentCategoryFilter>();
+                CreateMap<DocumentStatusFilterDto, DocumentStatusFilter>();
+            }
             CreateMap<GetDocumentsRequest, GetDocumentsQuery>();
 
                 //.ForMember(dest => dest.Filter, opt => opt.MapFrom(FilterModelMappingFunction));

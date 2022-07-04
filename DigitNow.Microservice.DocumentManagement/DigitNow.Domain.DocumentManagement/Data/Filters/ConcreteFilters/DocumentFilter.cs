@@ -47,6 +47,6 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
 
     public class DocumentStatusFilter
     {
-        public string Status { get; set; }
+        public DocumentStatus Status { get; set; }
     }
 }

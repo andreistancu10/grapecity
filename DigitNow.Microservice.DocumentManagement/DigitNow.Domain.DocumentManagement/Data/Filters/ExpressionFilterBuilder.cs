@@ -34,6 +34,10 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters
 
         protected abstract void InternalBuild();
 
-        public IList<Expression<Func<T, bool>>> Build() => GeneratedFilters;
+        public IList<Expression<Func<T, bool>>> Build()
+        {
+            InternalBuild();
+            return GeneratedFilters;
+        }
     }
 }

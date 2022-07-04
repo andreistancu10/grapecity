@@ -181,7 +181,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         private async Task<DocumentRelationsBag> GetDocumentsRelationsBagAsync(IList<Document> documents, CancellationToken cancellationToken)            
         {
-            // TODO: Ask if we should show last user createdBy or modifiedBy
             var users = await GetRelatedUserRegistryAsync(cancellationToken);
             var documentCategories = await GetDocumentCategoriesAsync(cancellationToken);
             var internalDocumentCategories = await GetInternalDocumentCategoriesAsync(cancellationToken);
@@ -194,15 +193,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             };
         }
 
-        private Task<Dictionary<long, User>> GetRelatedUserRegistryAsync(CancellationToken cancellationToken)
+        private async Task<List<User>> GetRelatedUserRegistryAsync(IList<Document> documents, CancellationToken cancellationToken)
         {
-            var registry = new Dictionary<long, User>
-            {
-                [1] = new User { Id = 1, Email = "test@test.com", Roles = new List<long> { 1 } },
-                [2] = new User { Id = 2, Email = "test2@test.com", Roles = new List<long> { 2 } }
-            };
+            var createdByUsers = documents
+                .Select(x => x.CreatedBy)
+                .ToList();
 
-            return Task.FromResult<Dictionary<long, User>>(registry);
+            var usersList = await _identityAdapterClient.GetUsersAsync(cancellationToken);
+
+            var relatedUsers = usersList.Users.Where(x => createdByUsers.Contains(x.Id)).ToList();
+
+            return relatedUsers;
         }
 
         private Task<Dictionary<long, object>> GetDocumentCategoriesAsync(CancellationToken cancellationToken)
@@ -222,7 +223,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         private class DocumentRelationsBag
         {
-            public Dictionary<long, User> Users { get; set; }
+            public List<User> Users { get; set; }
             public Dictionary<long, object> Categories { get; set; }
             public Dictionary<long, object> InternalCategories { get; set; }
         }
