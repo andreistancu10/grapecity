@@ -1,5 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
-using System;
+﻿using DigitNow.Domain.DocumentManagement.Business.Dashboard.Models;
 using System.Collections.Generic;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
@@ -11,5 +10,5 @@ public class GetDocumentsResponse
     public int PageSize { get; set; }
     public long TotalPages { get; set; }
 
-    public List<DashboardDocumentViewModel> Documents { get; set; }
+    public IList<DocumentViewModel> Documents { get; set; }
 }

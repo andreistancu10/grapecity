@@ -39,25 +39,25 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
     public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
     {
         if (!string.IsNullOrWhiteSpace(request.IdentificationNumber))
-            CreateContactDetails(request);
+            await CreateContactDetailsAsync(request, cancellationToken);
 
         var newIncomingDocument = _mapper.Map<IncomingDocument>(request);
 
         try
         {
-            await AttachConnectedDocuments(request, newIncomingDocument, cancellationToken);
-            await _service.AssignRegistrationNumberAsync(new Document 
+            await AttachConnectedDocumentsAsync(request, newIncomingDocument, cancellationToken);
+            await _service.AddDocument(new Document 
             { 
                 DocumentType = DocumentType.Incoming,
                 IncomingDocument = newIncomingDocument 
-            });
+            }, cancellationToken);
 
             newIncomingDocument.WorkflowHistory.Add(
             new WorkflowHistory()
             {
                 RecipientType = (int)UserRole.HeadOfDepartment,
                 RecipientId = request.RecipientId,
-                Status = (int)Status.inWorkUnallocated,
+                Status = (int)DocumentStatus.InWorkUnallocated,
                 CreationDate = DateTime.Now,
                 RegistrationNumber = newIncomingDocument.Document.RegistrationNumber
             });
@@ -75,7 +75,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
         return ResultObject.Created(newIncomingDocument.Id);
     }
 
-    private async Task AttachConnectedDocuments(CreateIncomingDocumentCommand request, IncomingDocument incomingDocumentForCreation, CancellationToken cancellationToken)
+    private async Task AttachConnectedDocumentsAsync(CreateIncomingDocumentCommand request, IncomingDocument incomingDocumentForCreation, CancellationToken cancellationToken)
     {
         if (request.ConnectedDocumentIds.Any())
         {
@@ -91,12 +91,12 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             }
         }
     }
-    private async void CreateContactDetails(CreateIncomingDocumentCommand request)
+    private async Task CreateContactDetailsAsync(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
     {
         var contactDetails = request.ContactDetail;
         contactDetails.IdentificationNumber = request.IdentificationNumber;
 
         var contactDetailDto = _mapper.Map<ContactDetailDto>(contactDetails);
-        await _identityAdapterClient.CreateContactDetails(contactDetailDto);
+        await _identityAdapterClient.CreateContactDetailsAsync(contactDetailDto, cancellationToken);
     }
 }

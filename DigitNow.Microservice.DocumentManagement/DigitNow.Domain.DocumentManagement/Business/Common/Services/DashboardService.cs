@@ -2,7 +2,6 @@
 using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
@@ -13,14 +12,15 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using DigitNow.Domain.DocumentManagement.Data.EFExtensions;
+using DigitNow.Domain.DocumentManagement.Data.Extensions;
+using DigitNow.Domain.DocumentManagement.Business.Dashboard.Models;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IDashboardService
     {
         Task<long> CountAllDocumentsAsync(IList<Expression<Func<Document, bool>>> predicate, CancellationToken cancellationToken);
-        Task<List<DashboardDocumentViewModel>> GetAllDocumentsAsync(Expression<Func<Document, bool>> predicate, int skip, int take, CancellationToken cancellationToken);
+        Task<List<DocumentViewModel>> GetAllDocumentsAsync(IList<Expression<Func<Document, bool>>> predicates, int page, int count, CancellationToken cancellationToken);
     }
 
     public class DashboardService : IDashboardService
@@ -46,27 +46,21 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task<long> CountAllDocumentsAsync(IList<Expression<Func<Document, bool>>> predicates, CancellationToken cancellationToken)
         {
-            var user = await GetCurrentUserAsync();
+            var user = await GetCurrentUserAsync(cancellationToken);
 
-            var documentsQuery = _dbContext.Documents.Where(x => true); //default(IQueryable<Document>);
-            foreach (var predicate in predicates)
-            {
-                documentsQuery.Where(predicate);
-            }            
-            
             var result = default(long);
             if (user.Roles.ToList().Contains((long)UserRole.Mayor))
             {
-                //TODO: Modify document service to support this
-
-                result = await documentsQuery.CountAsync(cancellationToken);
+                result = await _dbContext.Documents
+                    .WhereAll(predicates)
+                    .CountAsync(cancellationToken);
             }
             else
             {
-                var relatedUserIds = await GetRelatedUserIdsASync(user);
+                var relatedUserIds = await GetRelatedUserIdsASync(user, cancellationToken);
 
-                //TODO: Modify document service to support this
-                result = await documentsQuery
+                result = await _dbContext.Documents
+                    .WhereAll(predicates)
                     .Where(x => relatedUserIds.Contains(x.CreatedBy))
                     .CountAsync(cancellationToken);
             }
@@ -74,108 +68,163 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return result;
         }
 
-        public async Task<List<DashboardDocumentViewModel>> GetAllDocumentsAsync(Expression<Func<Document, bool>> predicate, int skip, int take, CancellationToken cancellationToken)
+        public async Task<List<DocumentViewModel>> GetAllDocumentsAsync(IList<Expression<Func<Document, bool>>> predicates, int page, int count, CancellationToken cancellationToken)
         {
-            var user = await GetCurrentUserAsync();
+            var user = await GetCurrentUserAsync(cancellationToken);
 
             var documents = default(List<Document>);
 
-            if (user.Roles.ToList().Contains((long)UserRole.Mayor))
+            if (user.Roles.Contains((long)UserRole.Mayor))
             {
-                //TODO: Modify document service to support this
                 documents = await _dbContext.Documents
-                    .Where(predicate)
-                    .Skip(skip)
-                    .Take(take)
+                    .WhereAll(predicates)
+                    .OrderByDescending(x => x.RegistrationDate)
+                    .Skip((page - 1) * count)
+                    .Take(count)
                     .ToListAsync(cancellationToken);
             }
             else
             {
-                var relatedUserIds = await GetRelatedUserIdsASync(user);
+                var relatedUserIds = await GetRelatedUserIdsASync(user, cancellationToken);
 
-                //TODO: Modify document service to support this
                 documents = await _dbContext.Documents
-                    .Where(predicate)
+                    .WhereAll(predicates)
                     .Where(x => relatedUserIds.Contains(x.CreatedBy))
-                    .Skip(skip)
-                    .Take(take)
+                    .OrderByDescending(x => x.RegistrationDate)
+                    .Skip((page - 1) * count)
+                    .Take(count)
                     .ToListAsync(cancellationToken);
             }
 
-            return await MapDocumentsAsync(documents, cancellationToken);
+            var documentsRelationsBag = await GetDocumentsRelationsBagAsync(documents, cancellationToken);
+
+            return await MapDocumentsAsync(documents, documentsRelationsBag, cancellationToken);
         }
 
-        private async Task<User> GetCurrentUserAsync()
+        private async Task<User> GetCurrentUserAsync(CancellationToken cancellationToken)
         {
-            var user = await _identityAdapterClient.GetUserByIdAsync(_identityService.GetCurrentUserId());
+            var userId = _identityService.GetCurrentUserId();
+            var user = await _identityAdapterClient.GetUserByIdAsync(userId, cancellationToken);
             if (user == null)
                 throw new InvalidOperationException(); //TODO: Add not found exception
 
             return user;
         }
 
-        private async Task<List<DashboardDocumentViewModel>> MapDocumentsAsync(IEnumerable<Document> documents, CancellationToken cancellationToken)
+        private async Task<List<DocumentViewModel>> MapDocumentsAsync(IEnumerable<Document> documents, DocumentRelationsBag documentRelationsBag, CancellationToken cancellationToken)
         {
-            var result = new List<DashboardDocumentViewModel>();
+            var result = new List<DocumentViewModel>();
 
             var incomingDocuments = documents
                 .Where(x => x.DocumentType == DocumentType.Incoming)
                 .ToList();
-            result.AddRange(await MapChildDocumentAsync<IncomingDocument>(incomingDocuments, cancellationToken, x => x.WorkflowHistory));
+            result.AddRange(await MapChildDocumentAsync<IncomingDocument>(incomingDocuments, documentRelationsBag, cancellationToken, x => x.WorkflowHistory));
 
             var internalDocuments = documents
                 .Where(x => x.DocumentType == DocumentType.Internal)
                 .ToList();
-            result.AddRange(await MapChildDocumentAsync<InternalDocument>(internalDocuments, cancellationToken));
+            result.AddRange(await MapChildDocumentAsync<InternalDocument>(internalDocuments, documentRelationsBag, cancellationToken));
 
             var outogingDocuments = documents
                 .Where(x => x.DocumentType == DocumentType.Outgoing)
                 .ToList();
-            result.AddRange(await MapChildDocumentAsync<OutgoingDocument>(outogingDocuments, cancellationToken, x => x.WorkflowHistory));
+            result.AddRange(await MapChildDocumentAsync<OutgoingDocument>(outogingDocuments, documentRelationsBag, cancellationToken, x => x.WorkflowHistory));
 
             return result;
         }
 
-        private async Task<List<DashboardDocumentViewModel>> MapChildDocumentAsync<T>(List<Document> documents, CancellationToken cancellationToken, params Expression<Func<T, object>>[] includes)
+        private async Task<List<DocumentViewModel>> MapChildDocumentAsync<T>(List<Document> documents, DocumentRelationsBag documentRelationsBag, CancellationToken cancellationToken, params Expression<Func<T, object>>[] includes)
             where T : VirtualDocument
         {
             var documentIds = documents.Select(x => x.Id).ToList();
 
-            var virtualDocuments = await _dbContext.Set<T>()
+            var virtualDocuments = await _dbContext.Set<T>().AsQueryable()
                 .Includes(includes)
-                .Where(x => documentIds.Contains(x.Id))
+                .Where(x => documentIds.Contains(x.DocumentId))
                 .ToListAsync(cancellationToken);
 
             var documentRegistry = documents.ToDictionary(x => x, y => virtualDocuments.Where(x => x.DocumentId == y.Id));
 
-            var result = new List<DashboardDocumentViewModel>();
+            var result = new List<DocumentViewModel>();
             foreach (var registryEntry in documentRegistry)
             {
-                var document = registryEntry.Value;
+                var document = registryEntry.Key;
 
                 foreach (var virtualDocument in registryEntry.Value)
                 {
-                    result.Add(_mapper.Map<T, DashboardDocumentViewModel>(virtualDocument));
+                    var viewModel = _mapper.Map<T, DocumentViewModel>(virtualDocument);
+                    //SetUserRelationship(document, virtualDocument, viewModel);                    
+                    //SetCategoryRelationship(document, virtualDocument, viewModel);
+                    //SetInternalCategoryRelationship(document, virtualDocument, viewModel);
+                    result.Add(viewModel);
                 }
             }
             return result;
         }
 
-        private async Task<IEnumerable<long>> GetRelatedUserIdsASync(User user)
+        private async Task<IList<User>> GetRelatedUsersAsync(User user, CancellationToken cancellationToken)
         {
-            if (user.Roles.ToList().Contains((long)UserRole.Functionary))
-            {
-                return new List<long> { user.Id };
-            }
-
             if (user.Roles.ToList().Contains((long)UserRole.HeadOfDepartment))
             {
                 var departmentId = user.Departments.FirstOrDefault();
-                var departmentUsers = await _identityAdapterClient.GetUsersByDepartmentIdAsync(departmentId);
-                return departmentUsers.Users.Select(x => x.Id).ToList();
+                var departmentUsers = await _identityAdapterClient.GetUsersByDepartmentIdAsync(departmentId, cancellationToken);
+
+                return departmentUsers.Users
+                    .ToList();
             }
 
-            throw new InvalidOperationException(); //TODO: Add descriptive error
+            return new List<User> { user };
+        }
+
+        private async Task<IEnumerable<long>> GetRelatedUserIdsASync(User user, CancellationToken cancellationToken) =>
+            (await GetRelatedUsersAsync(user, cancellationToken)).Select(x => x.Id);
+
+        private async Task<DocumentRelationsBag> GetDocumentsRelationsBagAsync(IList<Document> documents, CancellationToken cancellationToken)            
+        {
+            // TODO: Ask if we should show last user createdBy or modifiedBy
+            var users = await GetRelatedUserRegistryAsync(cancellationToken);
+            var documentCategories = await GetDocumentCategoriesAsync(cancellationToken);
+            var internalDocumentCategories = await GetInternalDocumentCategoriesAsync(cancellationToken);
+
+            return new DocumentRelationsBag
+            {
+                Users = users,
+                Categories = documentCategories,
+                InternalCategories = internalDocumentCategories
+            };
+        }
+
+        private Task<Dictionary<long, User>> GetRelatedUserRegistryAsync(CancellationToken cancellationToken)
+        {
+            var registry = new Dictionary<long, User>
+            {
+                [1] = new User { Id = 1, Email = "test@test.com", Roles = new List<long> { 1 } },
+                [2] = new User { Id = 2, Email = "test2@test.com", Roles = new List<long> { 2 } }
+            };
+
+            return Task.FromResult<Dictionary<long, User>>(registry);
+        }
+
+        private Task<Dictionary<long, object>> GetDocumentCategoriesAsync(CancellationToken cancellationToken)
+        {
+            var categories = new Dictionary<long, object>();
+
+            return Task.FromResult(categories);
+        }
+
+        private Task<Dictionary<long, object>> GetInternalDocumentCategoriesAsync(CancellationToken cancellationToken)
+        {
+            var internalCategories = new Dictionary<long, object>();
+
+            return Task.FromResult(internalCategories);
+        }
+
+
+        private class DocumentRelationsBag
+        {
+            public Dictionary<long, User> Users { get; set; }
+            public Dictionary<long, object> Categories { get; set; }
+            public Dictionary<long, object> InternalCategories { get; set; }
         }
     }
 }

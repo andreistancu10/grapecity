@@ -17,12 +17,9 @@ public class OutgoingDocumentConfiguration : IEntityTypeConfiguration<OutgoingDo
         builder.Property(p => p.NumberOfPages).IsRequired();
         builder.Property(p => p.RecipientId).IsRequired();
         builder.Property(p => p.DocumentTypeId).IsRequired();
-        builder.Property(p => p.DocumentTypeDetail).IsRequired();
-        builder.Property(p => p.CreationDate).IsRequired();
 
         builder.HasOne(item => item.Document)
             .WithOne(item => item.OutgoingDocument)
             .HasForeignKey<OutgoingDocument>(item => item.DocumentId);
-     
     }
 }

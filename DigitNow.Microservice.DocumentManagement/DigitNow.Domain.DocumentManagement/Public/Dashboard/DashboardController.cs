@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateUserRecipient;
+using DigitNow.Domain.DocumentManagement.Business.Dashboard.Models;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
 using DigitNow.Domain.DocumentManagement.Public.Dashboard.Models;
 using HTSS.Platform.Core.Files;
@@ -24,14 +23,12 @@ public class DashboardController : ApiController
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
-    private readonly IIdentityService _identityService;
-    private readonly IExportService<DashboardDocumentViewModel> _exportService;
+    private readonly IExportService<DocumentViewModel> _exportService;
 
-    public DashboardController(IMediator mediator, IMapper mapper, IIdentityService identityService, IExportService<DashboardDocumentViewModel> exportService)
+    public DashboardController(IMediator mediator, IMapper mapper, IExportService<DocumentViewModel> exportService)
     {
         _mediator = mediator;        
         _mapper = mapper;
-        _identityService = identityService;
         _exportService = exportService;
     }
 

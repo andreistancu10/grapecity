@@ -7,37 +7,52 @@ public class GetDocumentsRequest
 {
     public int Page { get; set; } = 1;
     public int Count { get; set; } = 10;
-    public DocumentsFilter Filter { get; set; }
+    public DocumentFilterDto Filter { get; set; }
 }
 
-public class DocumentsFilter
+public class DocumentFilterDto
 {
-    public string RegistryType { get; set; } //????
+    public DocumentRegistyTypeFilterDto RegistryTypeFilter { get; set; }
 
-    public RegistrationNoFilter RegistrationNoFilter { get; set; }
+    public RegistrationNoFilterDto RegistrationNoFilter { get; set; }
 
-    public RegistrationDateFilter RegistrationDateFilter { get; set; }
+    public RegistrationDateFilterDto RegistrationDateFilter { get; set; }
 
-    public DocumentType DocumentType { get; set; }
+    public DocumentTypeFilterDto DocumentTypeFilter { get; set; }
 
-    public DocumentCategoryFilter DocumentCategoryFilter { get; set; }
+    public DocumentCategoryFilterDto DocumentCategoryFilter { get; set; }
 
-    public string DocumentState { get; set; }
+    public DocumentStatusFilterDto DocumentStatusFilter { get; set; }
 }
 
-public class RegistrationNoFilter
+public class DocumentRegistyTypeFilterDto
+{
+    public string RegistryType { get; set; }
+}
+
+public class RegistrationNoFilterDto
 {
     public int From { get; set; }
     public int To { get; set; }
 }
 
-public class RegistrationDateFilter
+public class RegistrationDateFilterDto
 {
     public DateTime From { get; set; }
     public DateTime To { get; set; }
 }
 
-public class DocumentCategoryFilter
+public class DocumentTypeFilterDto
+{
+    public DocumentType DocumentType { get; set; }
+}
+
+public class DocumentCategoryFilterDto
 {
     public int CategoryId { get; set; }
+}
+
+public class DocumentStatusFilterDto
+{
+    public string Status { get; set; }
 }

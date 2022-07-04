@@ -1,4 +1,6 @@
-﻿using System;
+﻿#undef MIGRATION_ONLY
+
+using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
@@ -61,9 +63,20 @@ namespace DigitNow.Domain.DocumentManagement.Data
                 }
             }
 
+            foreach (var entry in ChangeTracker.Entries<ISoftExtendedEntity>())
+            {
+                if(entry.State == EntityState.Deleted)
+                {
+                    entry.Entity.IsDeleted = true;
+                    entry.Entity.DeletedAt = DateTime.Now;
+                    entry.Entity.DeletedBy = _identityService.GetCurrentUserId();
+                }
+            }
+
             return base.SaveChangesAsync(cancellationToken);
         }
 
+#if MIGRATION_ONLY
         public class DbContextFactory : IDesignTimeDbContextFactory<DocumentManagementDbContext>
         {
             public DocumentManagementDbContext CreateDbContext(string[] args)
@@ -78,5 +91,6 @@ namespace DigitNow.Domain.DocumentManagement.Data
                 return new DocumentManagementDbContext(optionsBuilder.Options);
             }
         }
+#endif
     }
 }

@@ -28,7 +28,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
         }
         public async Task<ResultObject> Handle(UpdateDocumentUserRecipientCommand request, CancellationToken cancellationToken)
         {
-            _user = await _identityAdapterClient.GetUserByIdAsync(request.UserId);
+            _user = await _identityAdapterClient.GetUserByIdAsync(request.UserId, cancellationToken);
 
             if (_user == null)
                 return ResultObject.Error(new ErrorMessage
@@ -99,7 +99,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                     RecipientType = isHeadOfDepartment ? (int)UserRole.HeadOfDepartment : (int)UserRole.Functionary,
                     RecipientId = (int)_user.Id,
                     RecipientName =_user.FormatUserNameByRole( isHeadOfDepartment ? UserRole.HeadOfDepartment : UserRole.Functionary),
-                    Status = isHeadOfDepartment ? (int)Status.inWorkDelegatedUnallocated : (int)Status.inWorkDelegated,
+                    Status = isHeadOfDepartment ? (int)DocumentStatus.InWorkDelegatedUnallocated : (int)DocumentStatus.InWorkDelegated,
                     CreationDate = DateTime.Now,
                     RegistrationNumber = doc.Document.RegistrationNumber
                 });

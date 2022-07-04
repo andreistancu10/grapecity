@@ -14,6 +14,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
     public interface ISoftExtendedEntity : IExtendedEntity
     {
         bool IsDeleted { get; set; }
+        DateTime DeletedAt { get; set; }
         long DeletedBy { get; set; }
     }
 }

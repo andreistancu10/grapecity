@@ -1,9 +1,7 @@
 ﻿
-using HTSS.Platform.Core.Domain;
-
 namespace DigitNow.Domain.DocumentManagement.Data.Entities;
 
-public class ContactDetail : Entity
+public class ContactDetail : ExtendedEntity
 {
     public int CountryId { get; set; }
     public int CountyId { get; set; }

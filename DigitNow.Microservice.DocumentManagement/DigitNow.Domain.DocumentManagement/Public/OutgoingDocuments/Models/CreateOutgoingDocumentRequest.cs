@@ -6,12 +6,12 @@ namespace DigitNow.Domain.DocumentManagement.Public.OutgoingDocuments.Models;
 public record CreateOutgoingDocumentRequest
 {
     public string RecipientName { get; init; }
-    public long? IdentificationNumber { get; init; }
+    public string? IdentificationNumber { get; init; }
     public CreateContactDetailsRequest ContactDetail { get; init; }
     public string ContentSummary { get; init; }
     public int NumberOfPages { get; init; }
     public int RecipientId { get; init; }
-    public int DocumentTypeId { get; init; }
+    public int DocumentTypeId { get; init; }  //TODO: Rename it to DocumentCategoryId
     public string? DocumentTypeDetail { get; init; }
     public List<int>? ConnectedDocumentIds { get; init; }
 }
