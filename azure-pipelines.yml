@@ -133,7 +133,7 @@ stages:
       buildPlatform: ${{ parameters.buildPlatform }}
       buildConfiguration: ${{ parameters.buildConfiguration }}
       feedsToUse: ${{variables.feedsToUse}}
-      nugetConfigPath : ${{variables.baseFolder}}/Digitnow.${{variables.projectService}}.${{variables.projectName}}/nuget.config
+      nugetConfigPath : ${{variables.baseFolder}}/DigitNow.${{variables.projectService}}.${{variables.projectName}}/nuget.config
       sonarQubeProjectKey: ${{variables.sonarQubeProjectKey}}
       sonarQubeProjectName:  ${{variables.sonarQubeProjectName}}
       sonarScaner: true
