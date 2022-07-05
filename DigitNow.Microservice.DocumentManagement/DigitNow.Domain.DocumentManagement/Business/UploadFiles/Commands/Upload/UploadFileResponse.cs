@@ -3,5 +3,4 @@
 public class UploadFileResponse
 {
     public long FileId { get; set; }
-    public string FileGuid { get; set; }
 }
