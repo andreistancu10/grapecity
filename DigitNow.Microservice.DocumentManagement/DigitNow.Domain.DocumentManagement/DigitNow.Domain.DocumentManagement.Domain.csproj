@@ -71,6 +71,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\DigitNow.Adapters.MS.Identity\DigitNow.Adapters.MS.Identity.csproj" />
+		<ProjectReference Include="..\DigitNow.Adapters.MS.Catalog\DigitNow.Adapters.MS.Catalog.csproj" />
 		<ProjectReference Include="..\DigitNow.Domain.DocumentManagement.Contracts\DigitNow.Domain.DocumentManagement.Contracts.csproj" />
 	</ItemGroup>
 
