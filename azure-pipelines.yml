@@ -125,7 +125,7 @@ resources:
 
 stages:
 - ${{if eq(variables['Build.Reason'], 'PullRequest')}}:
-  - template: build-dotnet-pullrequest-validation.yml@Devops
+  - template: build-dotnet-validation.yml@Devops
     parameters:  
       pool: ${{ parameters.pool }}
       image: ${{ parameters.image }}
