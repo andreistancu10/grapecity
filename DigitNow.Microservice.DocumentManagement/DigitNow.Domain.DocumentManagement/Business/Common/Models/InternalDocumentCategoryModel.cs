@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Models
 {
-    public class DocumentCategory
+    public class InternalDocumentCategoryModel
     {
         public long Id { get; set; }
         public string Name { get; set; }

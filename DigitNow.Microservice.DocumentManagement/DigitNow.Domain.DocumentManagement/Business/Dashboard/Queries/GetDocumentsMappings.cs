@@ -1,6 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Dashboard.Models;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 
@@ -10,76 +11,134 @@ public class GetDocumentsMappings : Profile
 {
     public GetDocumentsMappings()
     {
-        CreateMap<IncomingDocument, DocumentViewModel>()
-            .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.Document.RegistrationDate))
-            .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.Document.RegistrationNumber))
-            .ForMember(c => c.Recipient, opt => opt.MapFrom(src => src.RecipientId))
-            .ForMember(c => c.IssuerName, opt => opt.MapFrom(src => src.CreatedBy))
-            .ForMember(c => c.Status, opt => opt.MapFrom<GetDocumentResponseIncomingStatusValueResolver>())
-            .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.DocumentTypeId))
-            .ForMember(c => c.DocumentType, opt => opt.MapFrom<GetDocumentResponseIncomingDocumentTypeValueResolver>())
-            .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.DocumentTypeId))
-            .ForMember(c => c.ResolutionDuration, opt => opt.MapFrom(src => src.ResolutionPeriod));            
+        CreateMap<VirtualDocumentAggregate<IncomingDocument>, DocumentViewModel>()
+            .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationDate))
+            .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationNumber))
+            .ForMember(c => c.Recipient, opt => opt.MapFrom(src => src.VirtualDocument.RecipientId))
+            .ForMember(c => c.IssuerName, opt => opt.MapFrom(src => src.VirtualDocument.CreatedBy))
+            .ForMember(c => c.Status, opt => opt.MapFrom<MapDocumentStatus>())
+            .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.VirtualDocument.DocumentTypeId))
+            .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>())
+            .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.VirtualDocument.DocumentTypeId))
+            .ForMember(c => c.ResolutionDuration, opt => opt.MapFrom(src => src.VirtualDocument.ResolutionPeriod))
+            .ForMember(c => c.User, opt => opt.MapFrom<MapUserFromAggregate>())
+            .ForMember(c => c.DocumentCategory, opt => opt.MapFrom<MapDocumentCategory>());
 
-        CreateMap<OutgoingDocument, DocumentViewModel>()
-            .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.Document.RegistrationDate))
-            .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.Document.RegistrationNumber))
-            .ForMember(c => c.Recipient, opt => opt.MapFrom(src => src.RecipientName))
-            .ForMember(c => c.IssuerName, opt => opt.MapFrom(src => src.CreatedBy))
-            .ForMember(c => c.Status, opt => opt.MapFrom<GetDocumentResponseOutgoingStatusValueResolver>())
-            .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.DocumentTypeId))
-            .ForMember(c => c.DocumentType, opt => opt.MapFrom<GetDocumentResponseOutgoingDocumentTypeValueResolver>())
-            .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.DocumentTypeId));
+        CreateMap<VirtualDocumentAggregate<OutgoingDocument>, DocumentViewModel>()
+            .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationDate))
+            .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationNumber))
+            .ForMember(c => c.Recipient, opt => opt.MapFrom(src => src.VirtualDocument.RecipientName))
+            .ForMember(c => c.IssuerName, opt => opt.MapFrom(src => src.VirtualDocument.CreatedBy))
+            .ForMember(c => c.Status, opt => opt.MapFrom<MapDocumentStatus>())
+            .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.VirtualDocument.DocumentTypeId))
+            .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>())
+            .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.VirtualDocument.DocumentTypeId))
+            .ForMember(c => c.User, opt => opt.MapFrom<MapUserFromAggregate>())
+            .ForMember(c => c.DocumentCategory, opt => opt.MapFrom<MapDocumentCategory>());
 
-        CreateMap<InternalDocument, DocumentViewModel>()
-            .BeforeMap((s, d) => d.DocumentType = (int)DocumentType.Internal);
+        CreateMap<VirtualDocumentAggregate<InternalDocument>, DocumentViewModel>()
+            .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>())
+            .ForMember(c => c.User, opt => opt.MapFrom<MapUserFromAggregate>())
+            .ForMember(c => c.DocumentCategory, opt => opt.MapFrom<MapDocumentCategory>());            
 
         CreateMap<DocumentViewModel, GetDocumentResponse>();
     }
 
-    private class GetDocumentResponseOutgoingStatusValueResolver : IValueResolver<OutgoingDocument, DocumentViewModel, int>
+    private class MapDocumentType :
+        IValueResolver<VirtualDocumentAggregate<IncomingDocument>, DocumentViewModel, int>,
+        IValueResolver<VirtualDocumentAggregate<OutgoingDocument>, DocumentViewModel, int>,
+        IValueResolver<VirtualDocumentAggregate<InternalDocument>, DocumentViewModel, int>
     {
-        public int Resolve(OutgoingDocument source, DocumentViewModel destination, int destMember, ResolutionContext context)
+        public int Resolve(VirtualDocumentAggregate<IncomingDocument> source, DocumentViewModel destination, int destMember, ResolutionContext context) =>
+            (int)DocumentType.Incoming;
+
+        public int Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, int destMember, ResolutionContext context) =>
+            (int)DocumentType.Outgoing;
+
+        public int Resolve(VirtualDocumentAggregate<InternalDocument> source, DocumentViewModel destination, int destMember, ResolutionContext context) =>
+            (int)DocumentType.Internal;
+    }
+
+    private class MapDocumentStatus :
+        IValueResolver<VirtualDocumentAggregate<IncomingDocument>, DocumentViewModel, int>,
+        IValueResolver<VirtualDocumentAggregate<OutgoingDocument>, DocumentViewModel, int>
+    {
+        public int Resolve(VirtualDocumentAggregate<IncomingDocument> source, DocumentViewModel destination, int destMember, ResolutionContext context) =>
+            (int)source.VirtualDocument.Document.Status;
+
+        public int Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, int destMember, ResolutionContext context) =>
+            (int)source.VirtualDocument.Document.Status;
+    }
+
+    private class MapUserFromAggregate :
+        IValueResolver<VirtualDocumentAggregate<IncomingDocument>, DocumentViewModel, string>,
+        IValueResolver<VirtualDocumentAggregate<InternalDocument>, DocumentViewModel, string>,
+        IValueResolver<VirtualDocumentAggregate<OutgoingDocument>, DocumentViewModel, string>
+    {
+        public string Resolve(VirtualDocumentAggregate<IncomingDocument> source, DocumentViewModel destination, string destMember, ResolutionContext context)
         {
-            var foundWorkflowHistory = source.WorkflowHistory
-                    .OrderByDescending(c => c.CreationDate)
-                    .FirstOrDefault();
+            var foundUser = source.Users.FirstOrDefault(x => x.Id == source.VirtualDocument.Document.CreatedBy);
+            if (foundUser != null)
+            {
+                return $"{foundUser.FirstName} {foundUser.LastName}";
+            }
+            return default(string);
+        }
 
-            if (foundWorkflowHistory == null)
-                return default(int);
+        public string Resolve(VirtualDocumentAggregate<InternalDocument> source, DocumentViewModel destination, string destMember, ResolutionContext context)
+        {
+            var foundUser = source.Users.FirstOrDefault(x => x.Id == source.VirtualDocument.Document.CreatedBy);
+            if (foundUser != null)
+            {
+                return $"{foundUser.FirstName} {foundUser.LastName}";
+            }
+            return default(string);
+        }
 
-            return (int)foundWorkflowHistory.Status;
+        public string Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, string destMember, ResolutionContext context)
+        {
+            var foundUser = source.Users.FirstOrDefault(x => x.Id == source.VirtualDocument.Document.CreatedBy);
+            if (foundUser != null)
+            {
+                return $"{foundUser.FirstName} {foundUser.LastName}";
+            }
+            return default(string);
         }
     }
 
-    private class GetDocumentResponseOutgoingDocumentTypeValueResolver : IValueResolver<OutgoingDocument, DocumentViewModel, int>
+    private class MapDocumentCategory :
+        IValueResolver<VirtualDocumentAggregate<IncomingDocument>, DocumentViewModel, string>,
+        IValueResolver<VirtualDocumentAggregate<OutgoingDocument>, DocumentViewModel, string>,
+        IValueResolver<VirtualDocumentAggregate<InternalDocument>, DocumentViewModel, string>
     {
-        public int Resolve(OutgoingDocument source, DocumentViewModel destination, int destMember, ResolutionContext context)
+        public string Resolve(VirtualDocumentAggregate<IncomingDocument> source, DocumentViewModel destination, string destMember, ResolutionContext context)
         {
-            return (int)DocumentType.Outgoing;
+            var foundCategory = source.Categories.FirstOrDefault(x => x.Id == source.VirtualDocument.DocumentTypeId);
+            if (foundCategory != null)
+            {
+                return foundCategory.Name;
+            }
+            return default(string);
         }
-    }
 
-    private class GetDocumentResponseIncomingStatusValueResolver : IValueResolver<IncomingDocument, DocumentViewModel, int>
-    {
-        public int Resolve(IncomingDocument source, DocumentViewModel destination, int destMember, ResolutionContext context)
+        public string Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, string destMember, ResolutionContext context)
         {
-            var foundWorkflowHistory = source.WorkflowHistory
-                    .OrderByDescending(c => c.CreationDate)
-                    .FirstOrDefault();
-
-            if (foundWorkflowHistory == null)
-                return default(int);
-
-            return (int)foundWorkflowHistory.Status;
+            var foundCategory = source.Categories.FirstOrDefault(x => x.Id == source.VirtualDocument.DocumentTypeId);
+            if (foundCategory != null)
+            {
+                return foundCategory.Name;
+            }
+            return default(string);
         }
-    }
 
-    private class GetDocumentResponseIncomingDocumentTypeValueResolver : IValueResolver<IncomingDocument, DocumentViewModel, int>
-    {
-        public int Resolve(IncomingDocument source, DocumentViewModel destination, int destMember, ResolutionContext context)
+        public string Resolve(VirtualDocumentAggregate<InternalDocument> source, DocumentViewModel destination, string destMember, ResolutionContext context)
         {
-            return (int)DocumentType.Incoming;
+            var foundCategory = source.InternalCategories.FirstOrDefault(x => x.Id == source.VirtualDocument.InternalDocumentTypeId);
+            if (foundCategory != null)
+            {
+                return foundCategory.Name;
+            }
+            return default(string);
         }
     }
 }

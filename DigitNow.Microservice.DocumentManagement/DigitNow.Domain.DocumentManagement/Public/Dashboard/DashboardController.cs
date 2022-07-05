@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateUserRecipient;
-using DigitNow.Domain.DocumentManagement.Business.Dashboard.Models;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
 using DigitNow.Domain.DocumentManagement.Public.Dashboard.Models;
 using HTSS.Platform.Core.Files;

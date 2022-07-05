@@ -1,10 +1,14 @@
 ﻿using AutoMapper;
 using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
+using DigitNow.Domain.Catalog.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Extensions;
+using Domain.Authentication.Client;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -12,12 +16,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using DigitNow.Domain.DocumentManagement.Data.Extensions;
-using DigitNow.Domain.DocumentManagement.Business.Dashboard.Models;
-using DigitNow.Domain.Catalog.Client;
-using DigitNow.Domain.Catalog.Contracts.InternalDocumentTypes;
-using Domain.Authentication.Client;
-using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -56,10 +54,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task<long> CountAllDocumentsAsync(IList<Expression<Func<Document, bool>>> predicates, CancellationToken cancellationToken)
         {
-            var user = await GetCurrentUserAsync(cancellationToken);
+            var userModel = await GetCurrentUserAsync(cancellationToken);
 
             var result = default(long);
-            if (user.Roles.ToList().Contains((long)UserRole.Mayor))
+            if (userModel.Roles.ToList().Contains((long)UserRole.Mayor))
             {
                 result = await _dbContext.Documents
                     .WhereAll(predicates)
@@ -67,7 +65,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
             else
             {
-                var relatedUserIds = await GetRelatedUserIdsASync(user, cancellationToken);
+                var relatedUserIds = await GetRelatedUserIdsASync(userModel, cancellationToken);
 
                 result = await _dbContext.Documents
                     .WhereAll(predicates)
@@ -80,11 +78,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task<List<DocumentViewModel>> GetAllDocumentsAsync(IList<Expression<Func<Document, bool>>> predicates, int page, int count, CancellationToken cancellationToken)
         {
-            var user = await GetCurrentUserAsync(cancellationToken);
+            var userModel = await GetCurrentUserAsync(cancellationToken);
 
             var documents = default(List<Document>);
 
-            if (user.Roles.Contains((long)UserRole.Mayor))
+            if (userModel.Roles.Contains((long)UserRole.Mayor))
             {
                 documents = await _dbContext.Documents
                     .WhereAll(predicates)
@@ -95,7 +93,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
             else
             {
-                var relatedUserIds = await GetRelatedUserIdsASync(user, cancellationToken);
+                var relatedUserIds = await GetRelatedUserIdsASync(userModel, cancellationToken);
 
                 documents = await _dbContext.Documents
                     .WhereAll(predicates)
@@ -111,14 +109,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return await MapDocumentsAsync(documents, documentsRelationsBag, cancellationToken);
         }
 
-        private async Task<User> GetCurrentUserAsync(CancellationToken cancellationToken)
+        private async Task<UserModel> GetCurrentUserAsync(CancellationToken cancellationToken)
         {
             var userId = _identityService.GetCurrentUserId();
-            var user = await _identityAdapterClient.GetUserByIdAsync(userId, cancellationToken);
-            if (user == null)
+
+            var getUserByIdResponse = await _identityManager.GetUserById(userId, cancellationToken);
+            if (getUserByIdResponse == null)
                 throw new InvalidOperationException(); //TODO: Add not found exception
 
-            return user;
+            return _mapper.Map<UserModel>(getUserByIdResponse);            
         }
 
         private async Task<List<DocumentViewModel>> MapDocumentsAsync(IEnumerable<Document> documents, DocumentRelationsBag documentRelationsBag, CancellationToken cancellationToken)
@@ -162,32 +161,40 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
                 foreach (var virtualDocument in registryEntry.Value)
                 {
-                    var viewModel = _mapper.Map<T, DocumentViewModel>(virtualDocument);
-                    //SetUserRelationship(document, virtualDocument, viewModel);                    
-                    //SetCategoryRelationship(document, virtualDocument, viewModel);
-                    //SetInternalCategoryRelationship(document, virtualDocument, viewModel);
-                    result.Add(viewModel);
+                    // Note: ViewModels relationships can be loaded dynamically in future versions
+                    var aggregate = new VirtualDocumentAggregate<T>
+                    {
+                        VirtualDocument = virtualDocument,
+                        Users = documentRelationsBag.Users,
+                        Categories = documentRelationsBag.Categories,
+                        InternalCategories = documentRelationsBag.InternalCategories
+                    };
+
+                    result.Add(_mapper.Map<VirtualDocumentAggregate<T>, DocumentViewModel>(aggregate));
                 }
             }
             return result;
         }
 
-        private async Task<IList<User>> GetRelatedUsersAsync(User user, CancellationToken cancellationToken)
+        private async Task<IList<UserModel>> GetRelatedUsersAsync(UserModel userModel, CancellationToken cancellationToken)
         {
-            if (user.Roles.ToList().Contains((long)UserRole.HeadOfDepartment))
+            if (userModel.Roles.ToList().Contains((long)UserRole.HeadOfDepartment))
             {
-                var departmentId = user.Departments.FirstOrDefault();
+                // Note: This should be refactored along with adapters
+                var departmentId = userModel.Departments.FirstOrDefault();
                 var departmentUsers = await _identityAdapterClient.GetUsersByDepartmentIdAsync(departmentId, cancellationToken);
-
+                
                 return departmentUsers.Users
-                    .ToList();
+                    .Select(x => _mapper.Map<UserModel>(x))
+                    .Append(userModel)
+                    .ToList();                
             }
 
-            return new List<User> { user };
+            return new List<UserModel> { userModel };
         }
 
-        private async Task<IEnumerable<long>> GetRelatedUserIdsASync(User user, CancellationToken cancellationToken) =>
-            (await GetRelatedUsersAsync(user, cancellationToken)).Select(x => x.Id);
+        private async Task<IEnumerable<long>> GetRelatedUserIdsASync(UserModel userModel, CancellationToken cancellationToken) =>
+            (await GetRelatedUsersAsync(userModel, cancellationToken)).Select(x => x.Id);
 
         private async Task<DocumentRelationsBag> GetDocumentsRelationsBagAsync(IList<Document> documents, CancellationToken cancellationToken)
         {
@@ -226,44 +233,36 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return relatedUsers;
         }
 
-        private async Task<List<DocumentCategory>> GetDocumentCategoriesAsync(CancellationToken cancellationToken)
+        private async Task<List<DocumentCategoryModel>> GetDocumentCategoriesAsync(CancellationToken cancellationToken)
         {
             var documentTypesResponse = await _catalogClient.GetDocumentTypesAsync(cancellationToken);
 
             // Note: DocumentTypes is actual DocumentCategory
-            var documentCategories = documentTypesResponse.DocumentTypes
-                .Select(x => new DocumentCategory
-                {
-                    Id = x.Id,
-                    Name = x.Name
-                })
+            var documentCategoryModels = documentTypesResponse.DocumentTypes
+                .Select(x => _mapper.Map<DocumentCategoryModel>(x))
                 .ToList();
 
-            return documentCategories;
+            return documentCategoryModels;
         }
 
-        private async Task<List<InternalDocumentCategory>> GetInternalDocumentCategoriesAsync(CancellationToken cancellationToken)
+        private async Task<List<InternalDocumentCategoryModel>> GetInternalDocumentCategoriesAsync(CancellationToken cancellationToken)
         {
             var internalDocumentTypesResponse = await _catalogClient.GetInternalDocumentTypes(cancellationToken);
 
             // Note: DocumentTypes is actual DocumentCategory
-            var internalDocumentCategories = internalDocumentTypesResponse.InternalDocumentTypes
-                .Select(x => new InternalDocumentCategory
-                {
-                    Id = x.Id,
-                    Name = x.Name
-                })
+            var internalDocumentCategoryModels = internalDocumentTypesResponse.InternalDocumentTypes
+                .Select(x => _mapper.Map<InternalDocumentCategoryModel>(x))
                 .ToList();
 
-            return internalDocumentCategories;
+            return internalDocumentCategoryModels;
         }
 
 
         private class DocumentRelationsBag
         {
             public IReadOnlyList<User> Users { get; set; }
-            public IReadOnlyList<DocumentCategory> Categories { get; set; }
-            public IReadOnlyList<InternalDocumentCategory> InternalCategories { get; set; }
+            public IReadOnlyList<DocumentCategoryModel> Categories { get; set; }
+            public IReadOnlyList<InternalDocumentCategoryModel> InternalCategories { get; set; }
         }
     }
 }

@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Models
+namespace DigitNow.Domain.DocumentManagement.Business.Common.Models
 {
     public class DocumentViewModel
     {
@@ -14,7 +10,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Models
         public string IssuerName { get; set; }
         public string Recipient { get; set; }
         public int DocumentType { get; set; }
-        public int DocumentCategory { get; set; }
+        public string DocumentCategory { get; set; }
         public int ResolutionDuration { get; set; }
         public int Status { get; set; }
         public string DispatchBy { get; set; }
