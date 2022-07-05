@@ -133,12 +133,24 @@ stages:
       buildPlatform: ${{ parameters.buildPlatform }}
       buildConfiguration: ${{ parameters.buildConfiguration }}
       feedsToUse: ${{variables.feedsToUse}}
-      nugetConfigPath : ${{variables.baseFolder}}/Digitnow.${{variables.projectService}}.${{variables.projectName}}/nuget.config
+      nugetConfigPath : ${{variables.baseFolder}}/DigitNow.${{variables.projectService}}.${{variables.projectName}}/nuget.config
       sonarQubeProjectKey: ${{variables.sonarQubeProjectKey}}
       sonarQubeProjectName:  ${{variables.sonarQubeProjectName}}
       sonarScaner: true
       dotnetVersion: ${{ variables.dotnetVersion }}
-      
+      #ef
+      runMigration: ${{variables.runMigration}}
+      domainProjectPath: ${{ variables.domainProjectPath }}
+      domainSettingsFilename: ${{ variables.domainSettingsFilename }}
+      startupProjectPath: ${{ variables.startupProjectPath }}
+      appSettingsFilename: ${{ variables.appSettingsFilename }} 
+      projectContext: ${{ variables.projectContext }}
+      sqlServerResourceGroup: $(sqlServerResourceGroup)
+      sqlServer: $(sqlServer)
+      databaseName: $(sqlDatabaseName)
+      sqlLogin: $(sqlLogin)
+      sqlLoginPassword: $(sqlLoginPassword)
+      azureServiceConnection: $(azureServiceConnection)
 
 - ${{if eq(variables['Build.Reason'], 'Schedule')}}:
   - template: build-dotnet-schedule-validation.yml@Devops
