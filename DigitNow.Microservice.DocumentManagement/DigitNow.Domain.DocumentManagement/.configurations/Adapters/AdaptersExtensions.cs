@@ -12,6 +12,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations.Adapters
         {
             var identityApi = GetConfigurationKey(configuration, "Adapters:Identity");
             var catalogApi = GetConfigurationKey(configuration, "Adapters:Catalog");
+       
 
             services.AddTransient(serviceProvider => new IdentityHttpClient(serviceProvider, identityApi));
             services.AddTransient(serviceProvider => new CatalogHttpClient(serviceProvider, catalogApi));
