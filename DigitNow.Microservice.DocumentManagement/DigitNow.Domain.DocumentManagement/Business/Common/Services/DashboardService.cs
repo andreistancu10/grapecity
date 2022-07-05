@@ -14,6 +14,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Models;
+using DigitNow.Domain.Catalog.Client;
+using DigitNow.Domain.Catalog.Contracts.InternalDocumentTypes;
+using Domain.Authentication.Client;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -30,18 +34,24 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private readonly IDocumentService _documentService;
         private readonly IIdentityService _identityService;
         private readonly IIdentityAdapterClient _identityAdapterClient;
+        private readonly ICatalogClient _catalogClient;
+        private readonly IIdentityManager _identityManager;
 
         public DashboardService(DocumentManagementDbContext dbContext,
             IMapper mapper,
             IDocumentService documentService,
             IIdentityService identityService,
-            IIdentityAdapterClient identityAdapterClient)
+            IIdentityAdapterClient identityAdapterClient,
+            ICatalogClient catalogClient,
+            IIdentityManager identityManager)
         {
             _dbContext = dbContext;
             _mapper = mapper;
             _documentService = documentService;
             _identityService = identityService;
             _identityAdapterClient = identityAdapterClient;
+            _catalogClient = catalogClient;
+            _identityManager = identityManager;
         }
 
         public async Task<long> CountAllDocumentsAsync(IList<Expression<Func<Document, bool>>> predicates, CancellationToken cancellationToken)
@@ -179,9 +189,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private async Task<IEnumerable<long>> GetRelatedUserIdsASync(User user, CancellationToken cancellationToken) =>
             (await GetRelatedUsersAsync(user, cancellationToken)).Select(x => x.Id);
 
-        private async Task<DocumentRelationsBag> GetDocumentsRelationsBagAsync(IList<Document> documents, CancellationToken cancellationToken)            
+        private async Task<DocumentRelationsBag> GetDocumentsRelationsBagAsync(IList<Document> documents, CancellationToken cancellationToken)
         {
-            var users = await GetRelatedUserRegistryAsync(cancellationToken);
+            var users = await GetRelatedUserRegistryAsync(documents, cancellationToken);
             var documentCategories = await GetDocumentCategoriesAsync(cancellationToken);
             var internalDocumentCategories = await GetInternalDocumentCategoriesAsync(cancellationToken);
 
@@ -199,33 +209,61 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .Select(x => x.CreatedBy)
                 .ToList();
 
-            var usersList = await _identityAdapterClient.GetUsersAsync(cancellationToken);
+            var usersList = await _identityManager.GetUsersWithExtensions(cancellationToken);
 
-            var relatedUsers = usersList.Users.Where(x => createdByUsers.Contains(x.Id)).ToList();
+            var relatedUsers = usersList.UserExtensions
+                .Where(x => createdByUsers.Contains(x.Id))
+                .Select(x => new User
+                {
+                    Id = x.Id,
+                    FirstName = x.FirstName,
+                    LastName = x.LastName,
+                    Active = x.Active,
+                    Email = x.UserName
+                })
+                .ToList();
 
             return relatedUsers;
         }
 
-        private Task<Dictionary<long, object>> GetDocumentCategoriesAsync(CancellationToken cancellationToken)
+        private async Task<List<DocumentCategory>> GetDocumentCategoriesAsync(CancellationToken cancellationToken)
         {
-            var categories = new Dictionary<long, object>();
+            var documentTypesResponse = await _catalogClient.GetDocumentTypesAsync(cancellationToken);
 
-            return Task.FromResult(categories);
+            // Note: DocumentTypes is actual DocumentCategory
+            var documentCategories = documentTypesResponse.DocumentTypes
+                .Select(x => new DocumentCategory
+                {
+                    Id = x.Id,
+                    Name = x.Name
+                })
+                .ToList();
+
+            return documentCategories;
         }
 
-        private Task<Dictionary<long, object>> GetInternalDocumentCategoriesAsync(CancellationToken cancellationToken)
+        private async Task<List<InternalDocumentCategory>> GetInternalDocumentCategoriesAsync(CancellationToken cancellationToken)
         {
-            var internalCategories = new Dictionary<long, object>();
+            var internalDocumentTypesResponse = await _catalogClient.GetInternalDocumentTypes(cancellationToken);
 
-            return Task.FromResult(internalCategories);
+            // Note: DocumentTypes is actual DocumentCategory
+            var internalDocumentCategories = internalDocumentTypesResponse.InternalDocumentTypes
+                .Select(x => new InternalDocumentCategory
+                {
+                    Id = x.Id,
+                    Name = x.Name
+                })
+                .ToList();
+
+            return internalDocumentCategories;
         }
 
 
         private class DocumentRelationsBag
         {
-            public List<User> Users { get; set; }
-            public Dictionary<long, object> Categories { get; set; }
-            public Dictionary<long, object> InternalCategories { get; set; }
+            public IReadOnlyList<User> Users { get; set; }
+            public IReadOnlyList<DocumentCategory> Categories { get; set; }
+            public IReadOnlyList<InternalDocumentCategory> InternalCategories { get; set; }
         }
     }
 }

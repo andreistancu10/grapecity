@@ -1,8 +1,10 @@
 ﻿using System.Reflection;
+using DigitNow.Domain.Catalog.Client.configurations;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.configurations.HostedServices;
 using DigitNow.Domain.DocumentManagement.Data.Repositories;
+using Domain.Authentication.Client.configurations;
 using Domain.Localization.Client.configurations;
 using HTSS.Platform.Core.Files.MicrosoftExtensions;
 using HTSS.Platform.Infrastructure.Api.Tools;
@@ -48,6 +50,8 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddScoped<RouteParameterAccessor>();
             services.AddAuthenticationClientDomainServices(configuration);
             services.AddLocalizationMQServices();
+            services.AddCatalogClientDomainServices(configuration);
+            services.AddIdentityMQServices();
 
             return services;
         }
