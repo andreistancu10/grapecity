@@ -13,6 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
         // Search in Catalog for DocumentType & DocumentTypeInternal
         void BuildFilterByDocumentCategory();
         void BuildFilterByDocumentState();
+        void BuildFilterByIdentifiers();
     }
 
     internal class DocumentExpressionFilterBuilder : ExpressionFilterBuilder<Document, DocumentFilter>, IDocumentExpressionFilterBuilder
@@ -89,6 +90,14 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
             }
         }
 
+        public void BuildFilterByIdentifiers()
+        {
+            if (EntityFilter.DocumentIdentifiersFilter != null)
+            {
+                GeneratedFilters.Add(document => EntityFilter.DocumentIdentifiersFilter.Identifiers.Contains(document.Id));
+            }
+        }
+
         protected override void InternalBuild()
         {
             BuildFilterByRegistryType();
@@ -97,6 +106,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
             BuildFilterByDocumentType();
             BuildFilterByDocumentCategory();
             BuildFilterByDocumentState();
+            BuildFilterByIdentifiers();
         }
     }
 }

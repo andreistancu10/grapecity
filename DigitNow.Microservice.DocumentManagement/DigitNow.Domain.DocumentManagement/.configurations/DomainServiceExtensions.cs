@@ -4,7 +4,6 @@ using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.configurations.HostedServices;
 using DigitNow.Domain.DocumentManagement.Data.Repositories;
-using Domain.Authentication.Client.configurations;
 using Domain.Localization.Client.configurations;
 using HTSS.Platform.Core.Files.MicrosoftExtensions;
 using HTSS.Platform.Infrastructure.Api.Tools;
@@ -15,7 +14,8 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ShiftIn.Domain.Authentication.Client;
+using DigitNow.Domain.Authentication;
+using DigitNow.Domain.Authentication.Client;
 
 namespace DigitNow.Domain.DocumentManagement.configurations
 {
@@ -48,10 +48,9 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddServices();
 
             services.AddScoped<RouteParameterAccessor>();
-            services.AddAuthenticationClientDomainServices(configuration);
+            services.AddAuthenticationClientDomainServices(configuration);            
             services.AddLocalizationMQServices();
-            services.AddCatalogClientDomainServices(configuration);
-            services.AddIdentityMQServices();
+            services.AddCatalogClientDomainServices(configuration);            
 
             return services;
         }

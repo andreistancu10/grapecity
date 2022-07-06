@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
+using DigitNow.Domain.Authentication.Client;
 using DigitNow.Domain.Catalog.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
@@ -8,7 +9,6 @@ using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
-using Domain.Authentication.Client;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -29,27 +29,24 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IMapper _mapper;
-        private readonly IDocumentService _documentService;
         private readonly IIdentityService _identityService;
         private readonly IIdentityAdapterClient _identityAdapterClient;
         private readonly ICatalogClient _catalogClient;
-        private readonly IIdentityManager _identityManager;
+        private readonly IAuthenticationClient _authenticationClient;
 
         public DashboardService(DocumentManagementDbContext dbContext,
             IMapper mapper,
-            IDocumentService documentService,
             IIdentityService identityService,
             IIdentityAdapterClient identityAdapterClient,
             ICatalogClient catalogClient,
-            IIdentityManager identityManager)
+            IAuthenticationClient identityManager)
         {
             _dbContext = dbContext;
             _mapper = mapper;
-            _documentService = documentService;
             _identityService = identityService;
             _identityAdapterClient = identityAdapterClient;
             _catalogClient = catalogClient;
-            _identityManager = identityManager;
+            _authenticationClient = identityManager;
         }
 
         public async Task<long> CountAllDocumentsAsync(IList<Expression<Func<Document, bool>>> predicates, CancellationToken cancellationToken)
@@ -113,7 +110,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             var userId = _identityService.GetCurrentUserId();
 
-            var getUserByIdResponse = await _identityManager.GetUserById(userId, cancellationToken);
+            var getUserByIdResponse = await _authenticationClient.GetUserById(userId, cancellationToken);
             if (getUserByIdResponse == null)
                 throw new InvalidOperationException(); //TODO: Add not found exception
 
@@ -216,7 +213,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .Select(x => x.CreatedBy)
                 .ToList();
 
-            var usersList = await _identityManager.GetUsersWithExtensions(cancellationToken);
+            var usersList = await _authenticationClient.GetUsersWithExtensions(cancellationToken);
 
             var relatedUsers = usersList.UserExtensions
                 .Where(x => createdByUsers.Contains(x.Id))
@@ -235,7 +232,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         private async Task<List<DocumentCategoryModel>> GetDocumentCategoriesAsync(CancellationToken cancellationToken)
         {
-            var documentTypesResponse = await _catalogClient.GetDocumentTypesAsync(cancellationToken);
+            var documentTypesResponse = await _catalogClient.DocumentTypes.GetDocumentTypesAsync(cancellationToken);
 
             // Note: DocumentTypes is actual DocumentCategory
             var documentCategoryModels = documentTypesResponse.DocumentTypes
@@ -247,7 +244,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         private async Task<List<InternalDocumentCategoryModel>> GetInternalDocumentCategoriesAsync(CancellationToken cancellationToken)
         {
-            var internalDocumentTypesResponse = await _catalogClient.GetInternalDocumentTypes(cancellationToken);
+            var internalDocumentTypesResponse = await _catalogClient.InternalDocumentTypes.GetInternalDocumentTypesAsync(cancellationToken);
 
             // Note: DocumentTypes is actual DocumentCategory
             var internalDocumentCategoryModels = internalDocumentTypesResponse.InternalDocumentTypes

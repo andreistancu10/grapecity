@@ -12,6 +12,7 @@ public class GetDocumentsMappings : Profile
     public GetDocumentsMappings()
     {
         CreateMap<VirtualDocumentAggregate<IncomingDocument>, DocumentViewModel>()
+            .ForMember(c => c.Id, opt => opt.MapFrom(src => src.VirtualDocument.Document.Id))
             .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationDate))
             .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationNumber))
             .ForMember(c => c.Recipient, opt => opt.MapFrom(src => src.VirtualDocument.RecipientId))
@@ -25,6 +26,7 @@ public class GetDocumentsMappings : Profile
             .ForMember(c => c.DocumentCategory, opt => opt.MapFrom<MapDocumentCategory>());
 
         CreateMap<VirtualDocumentAggregate<OutgoingDocument>, DocumentViewModel>()
+            .ForMember(c => c.Id, opt => opt.MapFrom(src => src.VirtualDocument.Document.Id))
             .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationDate))
             .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationNumber))
             .ForMember(c => c.Recipient, opt => opt.MapFrom(src => src.VirtualDocument.RecipientName))
@@ -37,6 +39,7 @@ public class GetDocumentsMappings : Profile
             .ForMember(c => c.DocumentCategory, opt => opt.MapFrom<MapDocumentCategory>());
 
         CreateMap<VirtualDocumentAggregate<InternalDocument>, DocumentViewModel>()
+            .ForMember(c => c.Id, opt => opt.MapFrom(src => src.VirtualDocument.Document.Id))
             .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>())
             .ForMember(c => c.User, opt => opt.MapFrom<MapUserFromAggregate>())
             .ForMember(c => c.DocumentCategory, opt => opt.MapFrom<MapDocumentCategory>());            

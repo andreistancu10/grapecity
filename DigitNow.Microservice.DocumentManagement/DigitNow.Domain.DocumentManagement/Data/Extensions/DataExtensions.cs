@@ -25,7 +25,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Extensions
             if (predicates == null) return queryable;
             foreach (var predicate in predicates)
             {
-                queryable.Where(predicate);
+                queryable = queryable.Where(predicate);
             }
             return queryable;
         }

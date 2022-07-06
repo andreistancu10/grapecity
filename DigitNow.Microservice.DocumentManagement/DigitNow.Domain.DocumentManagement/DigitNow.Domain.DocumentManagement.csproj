@@ -5,9 +5,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Business\Consumers\**" />
 	  <Compile Remove="Business\Dashboard\Commands\GetDocuments\**" />
+	  <Compile Remove="Public\Maintenance\**" />
+	  <EmbeddedResource Remove="Business\Consumers\**" />
 	  <EmbeddedResource Remove="Business\Dashboard\Commands\GetDocuments\**" />
+	  <EmbeddedResource Remove="Public\Maintenance\**" />
+	  <None Remove="Business\Consumers\**" />
 	  <None Remove="Business\Dashboard\Commands\GetDocuments\**" />
+	  <None Remove="Public\Maintenance\**" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -30,10 +36,10 @@
 		<Compile Include=".utils\FilterDescriptor.cs" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="DigitNow.Domain.Catalog.Client" Version="6.0.2" />
-		<PackageReference Include="DigitNow.Domain.Catalog.Contracts" Version="6.0.1" />
-		<PackageReference Include="Domain.Authentication.Client" Version="6.0.0" />
-		<PackageReference Include="Domain.Authentication.Contracts" Version="6.0.0" />
+		<PackageReference Include="DigitNow.Domain.Authentication.Client" Version="6.0.6" />
+		<PackageReference Include="DigitNow.Domain.Authentication.Contracts" Version="6.0.6" />
+		<PackageReference Include="DigitNow.Domain.Catalog.Client" Version="6.0.5" />
+		<PackageReference Include="DigitNow.Domain.Catalog.Contracts" Version="6.0.5" />
 		<PackageReference Include="Domain.Localization.Client" Version="1.0.7" />
 		<PackageReference Include="HTSS.Platform.Core.Files" Version="6.0.2" />
 		<PackageReference Include="HTSS.Platform.Infrastructure.Api.Tools" Version="6.0.1" />
@@ -61,7 +67,6 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="ShiftIn.Domain.Authentication.Client" Version="6.0.1" />
 		<PackageReference Include="ShiftIn.Utils" Version="6.0.2" />
 		<PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="6.13.15" />
 		<PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="6.13.15" />
@@ -86,11 +91,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Business\Consumers\" />
 		<Folder Include="Business\Dashboard\Commands\GetDocuments\" />
 		<Folder Include="Business\Dashboard\Models\" />
 		<Folder Include="Migrations\" />
-		<Folder Include="Public\Maintenance\" />
 		<Folder Include="Public\SpecialRegisters\Validators\" />
+		<Folder Include="Rpc\Consumers\" />
 	</ItemGroup>
 </Project>

@@ -1,5 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using System;
+using System.Collections.Generic;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
 {
@@ -16,6 +17,13 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
         public DocumentCategoryFilter CategoryFilter { get; set; }
 
         public DocumentStatusFilter StatusFilter { get; set; }
+
+        public DocumentIdentifiersFilter DocumentIdentifiersFilter { get; set; }
+    }
+
+    public class DocumentIdentifiersFilter
+    {
+        public List<long> Identifiers { get; set; }
     }
 
     public class DocumentRegistyTypeFilter
