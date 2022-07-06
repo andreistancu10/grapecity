@@ -23,7 +23,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
             var user = await  GetUserByIdAsync((long)command.RecipientId, token);
 
-            var newDocumentStatus = lastWorkFlowRecord.Status == (int)DocumentStatus.OpinionRequestedUnallocated
+            var newDocumentStatus = lastWorkFlowRecord.Status == DocumentStatus.OpinionRequestedUnallocated
                 ? DocumentStatus.OpinionRequestedAllocated
                 : DocumentStatus.InWorkAllocated;
 

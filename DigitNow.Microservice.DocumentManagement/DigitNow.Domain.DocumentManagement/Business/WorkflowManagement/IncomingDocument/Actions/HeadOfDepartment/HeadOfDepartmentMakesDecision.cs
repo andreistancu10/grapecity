@@ -65,7 +65,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
             ResetWorkflowRecord(responsibleFunctionaryRecord);
 
-            responsibleFunctionaryRecord.Status = (int)DocumentStatus.InWorkDeclined;
+            responsibleFunctionaryRecord.Status = DocumentStatus.InWorkDeclined;
             responsibleFunctionaryRecord.DeclineReason = command.DeclineReason;
             responsibleFunctionaryRecord.Remarks = command.Remarks;
 

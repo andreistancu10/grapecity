@@ -21,7 +21,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
             ResetWorkflowRecord(lastWorkFlowRecord);
 
-            lastWorkFlowRecord.Status = (int)DocumentStatus.Finalized;
+            lastWorkFlowRecord.Status = DocumentStatus.Finalized;
             lastWorkFlowRecord.Remarks = command.Remarks;
 
             document.IncomingDocument.WorkflowHistory.Add(lastWorkFlowRecord);

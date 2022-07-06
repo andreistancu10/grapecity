@@ -30,7 +30,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
             ResetWorkflowRecord(responsibleHeadOfDepartmentRecord);
 
-            responsibleHeadOfDepartmentRecord.Status = (int)DocumentStatus.InWorkApprovalRequested;
+            responsibleHeadOfDepartmentRecord.Status = DocumentStatus.InWorkApprovalRequested;
 
             //Todo make column int
             responsibleHeadOfDepartmentRecord.Resolution = command.Resolution.ToString();

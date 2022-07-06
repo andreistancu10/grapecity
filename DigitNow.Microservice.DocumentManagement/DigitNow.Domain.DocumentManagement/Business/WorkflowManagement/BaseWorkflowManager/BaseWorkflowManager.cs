@@ -25,7 +25,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
 
         public bool ValidateTransitionStatus(WorkflowHistory record, int[] allowedStatusesForTransition)
         {
-            if (record == null || !allowedStatusesForTransition.Contains(record.Status))
+            if (record == null || !allowedStatusesForTransition.Contains((int)record.Status))
             {
                 return false;
             }
@@ -82,7 +82,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
 
         public bool IsTransitionAllowed(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord, int[] allowedTransitionStatuses)
         {
-            if (lastWorkFlowRecord == null || !allowedTransitionStatuses.Contains(lastWorkFlowRecord.Status))
+            if (lastWorkFlowRecord == null || !allowedTransitionStatuses.Contains((int)lastWorkFlowRecord.Status))
             {
                 command.Result = ResultObject.Error(new ErrorMessage
                 {

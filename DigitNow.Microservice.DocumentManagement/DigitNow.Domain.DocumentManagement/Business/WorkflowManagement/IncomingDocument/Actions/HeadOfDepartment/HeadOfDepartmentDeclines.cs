@@ -29,7 +29,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
             if (!UserExists(user, command))
                 return command;
 
-            var newDocumentStatus = lastWorkFlowRecord.Status == (int)DocumentStatus.OpinionRequestedUnallocated
+            var newDocumentStatus = lastWorkFlowRecord.Status == DocumentStatus.OpinionRequestedUnallocated
                 ? DocumentStatus.InWorkAllocated
                 : DocumentStatus.NewDeclinedCompetence;
 
@@ -44,7 +44,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
         {
-            if (lastWorkFlowRecord == null || !allowedTransitionStatuses.Contains(lastWorkFlowRecord.Status))
+            if (lastWorkFlowRecord == null || !allowedTransitionStatuses.Contains((int)lastWorkFlowRecord.Status))
             {
                 command.Result = ResultObject.Error(new ErrorMessage
                 {

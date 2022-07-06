@@ -27,7 +27,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
 
-            var newDocumentStatus = lastWorkFlowRecord.Status == (int)DocumentStatus.OpinionRequestedAllocated
+            var newDocumentStatus = lastWorkFlowRecord.Status == DocumentStatus.OpinionRequestedAllocated
                 ? DocumentStatus.InWorkAllocated
                 : DocumentStatus.NewDeclinedCompetence;
 
@@ -59,7 +59,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
             ResetWorkflowRecord(responsibleFunctionaryRecord);
 
-            responsibleFunctionaryRecord.Status = (int)DocumentStatus.InWorkAllocated;
+            responsibleFunctionaryRecord.Status = DocumentStatus.InWorkAllocated;
             responsibleFunctionaryRecord.DeclineReason = _command.DeclineReason;
             responsibleFunctionaryRecord.Remarks = _command.Remarks;
 

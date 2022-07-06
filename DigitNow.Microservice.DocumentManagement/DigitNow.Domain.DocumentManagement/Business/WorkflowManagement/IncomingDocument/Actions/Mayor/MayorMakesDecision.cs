@@ -50,7 +50,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
             ResetWorkflowRecord(responsibleFunctionaryRecord);
 
-            responsibleFunctionaryRecord.Status = (int)DocumentStatus.InWorkCountersignature;
+            responsibleFunctionaryRecord.Status = DocumentStatus.InWorkCountersignature;
 
             _document.IncomingDocument.WorkflowHistory.Add(responsibleFunctionaryRecord);
         }
@@ -64,7 +64,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
             ResetWorkflowRecord(responsibleHeadOfDepartmentRecord);
 
-            responsibleHeadOfDepartmentRecord.Status = (int)DocumentStatus.InWorkMayorDeclined;
+            responsibleHeadOfDepartmentRecord.Status = DocumentStatus.InWorkMayorDeclined;
 
             _document.IncomingDocument.WorkflowHistory.Add(responsibleHeadOfDepartmentRecord);
         }
