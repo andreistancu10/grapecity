@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetWorkflowInformation;
 
 namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments;
 
@@ -56,6 +57,17 @@ public class DocumentsController : ApiController
     public async Task<IActionResult> GetByRegistrationNumber([FromQuery] int registrationNumber, [FromQuery] int year)
     {
         return await _mediator.Send(new GetDocsByRegistrationNumberQuery { RegistrationNumber = registrationNumber, Year = year })
+            switch
+        {
+            null => NotFound(),
+            var result => Ok(result)
+        };
+    }
+
+    [HttpGet("workflow-information/{documentId}")]
+    public async Task<IActionResult> GetWorkflowInformation([FromRoute] long documentId)
+    {
+        return await _mediator.Send(new GetWorkflowInformationByDocumentIdQuery { DocumentId = documentId })
             switch
         {
             null => NotFound(),
