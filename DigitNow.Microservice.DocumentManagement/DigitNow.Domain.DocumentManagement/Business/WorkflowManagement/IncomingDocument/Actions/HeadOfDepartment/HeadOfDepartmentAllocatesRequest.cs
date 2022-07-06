@@ -1,5 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions._Interfaces;
-using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using System.Threading.Tasks;
@@ -7,6 +6,7 @@ using System.Threading;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
+using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions.HeadOfDepartment
 {

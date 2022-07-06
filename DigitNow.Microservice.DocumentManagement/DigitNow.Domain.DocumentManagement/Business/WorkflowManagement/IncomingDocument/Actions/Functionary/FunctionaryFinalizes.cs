@@ -1,6 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions._Interfaces;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using System;
 using System.Threading;
@@ -19,7 +19,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
 
-            ResetWorkflowRecord(lastWorkFlowRecord);
+            ResetWorkflowRecord(lastWorkFlowRecord, command);
 
             lastWorkFlowRecord.Status = DocumentStatus.Finalized;
             lastWorkFlowRecord.Remarks = command.Remarks;

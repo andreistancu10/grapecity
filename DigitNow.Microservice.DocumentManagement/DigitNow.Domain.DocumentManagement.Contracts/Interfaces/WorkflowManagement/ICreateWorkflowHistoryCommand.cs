@@ -2,7 +2,7 @@
 using HTSS.Platform.Core.CQRS;
 using System;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions._Interfaces
+namespace DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement
 {
     public interface ICreateWorkflowHistoryCommand
     {

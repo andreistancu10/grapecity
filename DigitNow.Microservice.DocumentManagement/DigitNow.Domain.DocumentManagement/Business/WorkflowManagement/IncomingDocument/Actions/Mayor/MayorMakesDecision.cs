@@ -1,6 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions._Interfaces;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
@@ -48,7 +48,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
                 .OrderByDescending(x => x.CreationDate)
                 .FirstOrDefault();
 
-            ResetWorkflowRecord(responsibleFunctionaryRecord);
+            ResetWorkflowRecord(responsibleFunctionaryRecord, command);
 
             responsibleFunctionaryRecord.Status = DocumentStatus.InWorkCountersignature;
 
@@ -62,7 +62,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
                 .OrderByDescending(x => x.CreationDate)
                 .FirstOrDefault();
 
-            ResetWorkflowRecord(responsibleHeadOfDepartmentRecord);
+            ResetWorkflowRecord(responsibleHeadOfDepartmentRecord, command);
 
             responsibleHeadOfDepartmentRecord.Status = DocumentStatus.InWorkMayorDeclined;
 

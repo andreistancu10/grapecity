@@ -1,8 +1,8 @@
 ﻿
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions._Interfaces;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
@@ -32,7 +32,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
                 : DocumentStatus.NewDeclinedCompetence;
 
             if (newDocumentStatus == DocumentStatus.InWorkAllocated)
-                PassDocumentToFunctionary();
+                PassDocumentToFunctionary(command);
             else
                 await PassDocumentToRegistry(token);
 
@@ -50,14 +50,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
                 .Create(_document, UserRole.Functionary, creator, DocumentStatus.NewDeclinedCompetence, _command.DeclineReason, _command.Remarks));
         }
 
-        private void PassDocumentToFunctionary()
+        private void PassDocumentToFunctionary(ICreateWorkflowHistoryCommand command)
         {
             var responsibleFunctionaryRecord = _document.IncomingDocument.WorkflowHistory
                 .Where(x => x.RecipientType == (int)UserRole.Functionary)
                 .OrderByDescending(x => x.CreationDate)
                 .FirstOrDefault();
 
-            ResetWorkflowRecord(responsibleFunctionaryRecord);
+            ResetWorkflowRecord(responsibleFunctionaryRecord, command);
 
             responsibleFunctionaryRecord.Status = DocumentStatus.InWorkAllocated;
             responsibleFunctionaryRecord.DeclineReason = _command.DeclineReason;

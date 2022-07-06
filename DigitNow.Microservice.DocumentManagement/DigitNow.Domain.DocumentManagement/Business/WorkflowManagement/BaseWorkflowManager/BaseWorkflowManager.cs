@@ -1,7 +1,7 @@
 ﻿using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions._Interfaces;
+using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
@@ -71,8 +71,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             await DocumentService.CommitChangesAsync(token);
         }
 
-        public void ResetWorkflowRecord(WorkflowHistory record)
+        public void ResetWorkflowRecord(WorkflowHistory record, ICreateWorkflowHistoryCommand command)
         {
+            if (record == null)
+            {
+                TransitionNotAllowed(command);
+            }
+
             record.DeclineReason = default;
             record.Resolution = default;
             record.OpinionRequestedUntil = default;
@@ -84,15 +89,20 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
         {
             if (lastWorkFlowRecord == null || !allowedTransitionStatuses.Contains((int)lastWorkFlowRecord.Status))
             {
-                command.Result = ResultObject.Error(new ErrorMessage
-                {
-                    Message = $"Transition not allwed!",
-                    TranslationCode = "dms.invalidState.backend.update.validation.invalidState",
-                    Parameters = new object[] { command.Resolution }
-                });
+                TransitionNotAllowed(command);
                 return false;
             }
             return true;
+        }
+
+        private static void TransitionNotAllowed(ICreateWorkflowHistoryCommand command)
+        {
+            command.Result = ResultObject.Error(new ErrorMessage
+            {
+                Message = $"Transition not allwed!",
+                TranslationCode = "dms.invalidState.backend.update.validation.invalidState",
+                Parameters = new object[] { command.Resolution }
+            });
         }
 
         public bool UserExists(User user, ICreateWorkflowHistoryCommand command)

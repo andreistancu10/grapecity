@@ -1,6 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions._Interfaces;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
@@ -28,7 +28,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
             //Todo check if record is not null
 
-            ResetWorkflowRecord(responsibleHeadOfDepartmentRecord);
+            ResetWorkflowRecord(responsibleHeadOfDepartmentRecord, command);
 
             responsibleHeadOfDepartmentRecord.Status = DocumentStatus.InWorkApprovalRequested;
 
@@ -42,20 +42,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
         {
-            if (!IsTransitionAllowed(command, lastWorkFlowRecord, allowedTransitionStatuses)) return false;
 
-            if (command.RecipientId <= 0)
-            {
-                command.Result = ResultObject.Error(new ErrorMessage
-                {
-                    Message = $"Functionary not specified!",
-                    TranslationCode = "dms.functionary.backend.update.validation.notSpcified",
-                    Parameters = new object[] { command.Resolution }
-                });
-                return false;
-            }
-
-            return true;
         }
     }
 }

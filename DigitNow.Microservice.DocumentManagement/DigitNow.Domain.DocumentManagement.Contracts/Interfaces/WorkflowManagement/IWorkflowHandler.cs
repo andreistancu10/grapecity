@@ -1,8 +1,7 @@
-﻿
-using System.Threading;
+﻿using System.Threading;
 using System.Threading.Tasks;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions._Interfaces
+namespace DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement
 {
     public interface IWorkflowHandler
     {
