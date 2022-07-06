@@ -32,8 +32,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
             responsibleHeadOfDepartmentRecord.Status = DocumentStatus.InWorkApprovalRequested;
 
-            //Todo make column int
-            responsibleHeadOfDepartmentRecord.Resolution = command.Resolution.ToString();
+            responsibleHeadOfDepartmentRecord.Resolution = command.Resolution;
 
             document.IncomingDocument.WorkflowHistory.Add(responsibleHeadOfDepartmentRecord);
             await SaveDocument(token);
