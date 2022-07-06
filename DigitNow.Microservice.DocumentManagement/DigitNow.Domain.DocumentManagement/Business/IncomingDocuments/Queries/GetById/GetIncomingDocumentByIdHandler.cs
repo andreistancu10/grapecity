@@ -18,9 +18,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.
             _dbContext = dbContext;
         }
         
-        public async Task<GetIncomingDocumentByIdResponse> Handle(GetIncomingDocumentByIdQuery query, CancellationToken cancellationToken)
+        public async Task<GetIncomingDocumentByIdResponse> Handle(GetIncomingDocumentByIdQuery request, CancellationToken cancellationToken)
         {
-            var foundIncomingDocument = await _dbContext.IncomingDocuments.FirstOrDefaultAsync(c => c.Id == query.Id, cancellationToken);
+            var foundIncomingDocument = await _dbContext.IncomingDocuments.FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
             if (foundIncomingDocument == null) return null;
 
             return _mapper.Map<GetIncomingDocumentByIdResponse>(foundIncomingDocument);
