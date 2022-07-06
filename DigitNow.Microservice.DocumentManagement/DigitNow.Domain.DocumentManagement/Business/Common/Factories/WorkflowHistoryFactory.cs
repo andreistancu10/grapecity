@@ -14,6 +14,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
                 RecipientType = (int)role,
                 RecipientId = user.Id,
                 RecipientName = user.FormatUserNameByRole(role),
+                Status = documentStatus,
+                CreationDate = DateTime.Now,
+                RegistrationNumber = document.RegistrationNumber
                 Status = (int)documentStatus,
                 RegistrationNumber = document.RegistrationNumber,
                 DeclineReason = declineReason,

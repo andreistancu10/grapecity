@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using DigitNow.Adapters.MS.Identity;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
 using DigitNow.Domain.DocumentManagement.configurations.HostedServices;
 using DigitNow.Domain.DocumentManagement.Data.Repositories;
@@ -71,6 +72,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<IInternalDocumentService, InternalDocumentService>();
             services.AddTransient<IOutgoingDocumentService, OutgoingDocumentService>();
             services.AddTransient<IDocumentResolutionService, DocumentResolutionService>();
+            services.AddTransient<ISpecialRegisterService, SpecialRegisterService>();
 
             BaseWorkflowManager.DocumentService = services.BuildServiceProvider().GetService<IDocumentService>();
             BaseWorkflowManager.IdentityService = services.BuildServiceProvider().GetService<IIdentityAdapterClient>();

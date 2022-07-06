@@ -22,7 +22,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IDocumentService _documentService;
 
-
         public OutgoingDocumentService(
             DocumentManagementDbContext dbContext,
             IDocumentService documentService)

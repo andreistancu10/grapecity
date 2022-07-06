@@ -1,4 +1,5 @@
-﻿using HTSS.Platform.Core.Domain;
+﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+using HTSS.Platform.Core.Domain;
 using System;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
@@ -12,7 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public string DeclineReason { get; set; }
         public string Resolution { get; set; }
         public DateTime? OpinionRequestedUntil { get; set; }
-        public int Status { get; set; }
+        public DocumentStatus Status { get; set; }
         public int RegistrationNumber { get; set; }
         public DateTime CreationDate { get; set; }
     }
