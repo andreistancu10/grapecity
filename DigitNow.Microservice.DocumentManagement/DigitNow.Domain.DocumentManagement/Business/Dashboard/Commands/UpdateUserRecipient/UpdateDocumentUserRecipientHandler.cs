@@ -38,21 +38,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                     Parameters = new object[] { request.UserId }
                 });
 
-            var incomingDocIds = request.DocumentInfo
-                                          .Where(doc => doc.DocType == (int)DocumentType.Incoming)
-                                          .Select(doc => doc.RegistrationNumber)
-                                          .ToList();
 
-            if (incomingDocIds.Any())
-                await UpdateRecipientForIncomingDocuments(incomingDocIds);
+            await UpdateRecipientForIncomingDocuments(request.RegistrationNumbers);
 
-            var internalDocIds = request.DocumentInfo
-                                        .Where(doc => doc.DocType == (int)DocumentType.Internal)
-                                        .Select(doc => doc.RegistrationNumber)
-                                        .ToList();
-
-            if (internalDocIds.Any())
-                await UpdateRecipientForInternalDocuments(incomingDocIds);
+            await UpdateRecipientForInternalDocuments(request.RegistrationNumbers);
 
 
             await _dbContext.SaveChangesAsync();
@@ -60,26 +49,26 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
             return new ResultObject(ResultStatusCode.Ok);
         }
 
-        private async Task UpdateRecipientForInternalDocuments(List<int> incomingDocIds)
+        private async Task UpdateRecipientForInternalDocuments(List<long> registrationNumbers)
         {
-            foreach (var registrationNo in incomingDocIds)
+            foreach (var registrationNumber in registrationNumbers)
             {
                 var internalDoc = await _dbContext.InternalDocuments
                     .Include(x => x.Document)
-                    .FirstOrDefaultAsync(x => x.Document.RegistrationNumber == registrationNo);
+                    .FirstOrDefaultAsync(x => x.Document.RegistrationNumber == registrationNumber);
 
                 if (internalDoc != null)
                     internalDoc.ReceiverDepartmentId = (int)_user.Id;     
             }
         }
 
-        private async Task UpdateRecipientForIncomingDocuments(List<int> incomingDocIds)
+        private async Task UpdateRecipientForIncomingDocuments(List<long> registrationNumbers)
         {
-            foreach (var registrationNo in incomingDocIds)
+            foreach (var registrationNumber in registrationNumbers)
             {
                 var doc = await _dbContext.IncomingDocuments
                     .Include(x => x.Document)
-                    .FirstOrDefaultAsync(x => x.Document.RegistrationNumber == registrationNo);
+                    .FirstOrDefaultAsync(x => x.Document.RegistrationNumber == registrationNumber);
 
                 if (doc != null)
                 {
