@@ -13,7 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generato
     }
     public class PdfGenerator : IPdfGenerator
     {
-        private List<PdfToken> _tokens = new List<PdfToken>();
+        private readonly List<PdfToken> _tokens = new List<PdfToken>();
         public async Task<FileContent> GenerateAsync(string filePath, string pdfName)
         {
             var html = await File.ReadAllTextAsync(filePath);
