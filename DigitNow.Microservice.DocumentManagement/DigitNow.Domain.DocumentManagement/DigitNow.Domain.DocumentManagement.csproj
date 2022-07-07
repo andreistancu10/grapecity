@@ -89,6 +89,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Business\Reports\Queries\" />
 		<Folder Include="Public\Maintenance\" />
 		<Folder Include="Business\Consumers\" />
 		<Folder Include="Public\SpecialRegisters\Validators\" />
