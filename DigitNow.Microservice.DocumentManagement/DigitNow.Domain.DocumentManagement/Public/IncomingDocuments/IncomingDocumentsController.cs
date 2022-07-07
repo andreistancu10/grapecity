@@ -21,16 +21,13 @@ public class IncomingDocumentsController : ApiController
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
-    private readonly IHttpContextAccessor _httpContextAccessor;
 
     public IncomingDocumentsController(
         IMediator mediator, 
-        IMapper mapper, 
-        IHttpContextAccessor httpContextAccessor)
+        IMapper mapper)
     {
         _mediator = mediator;
         _mapper = mapper;
-        _httpContextAccessor = httpContextAccessor;
     }
 
     [HttpGet("{id:long}")]

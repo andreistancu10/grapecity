@@ -52,7 +52,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
         public Task<OutgoingDocument> FindFirstAsync(long id, CancellationToken cancellationToken)
         {
-            return _dbContext.OutgoingDocuments.Where(x => x.Id == id).Include(x => x.Document).FirstOrDefaultAsync();
+            return _dbContext.OutgoingDocuments.Where(x => x.Id == id).Include(x => x.Document).FirstOrDefaultAsync(cancellationToken);
         }
     }
 }

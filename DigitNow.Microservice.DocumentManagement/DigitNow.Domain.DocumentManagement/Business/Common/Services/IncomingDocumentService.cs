@@ -52,7 +52,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
         public Task<IncomingDocument> FindFirstAsync(long id, CancellationToken cancellationToken)
         {
-            return _dbContext.IncomingDocuments.Where(x => x.Id == id).Include(x => x.Document).FirstOrDefaultAsync();
+            return _dbContext.IncomingDocuments.Where(x => x.Id == id).Include(x => x.Document).FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task SetResolutionAsync(IList<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken)

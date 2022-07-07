@@ -13,7 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generato
     }
     public class PdfGenerator : IPdfGenerator
     {
-        public List<PdfToken> _tokens = new List<PdfToken>();
+        private List<PdfToken> _tokens = new List<PdfToken>();
         public async Task<FileContent> GenerateAsync(string filePath, string pdfName)
         {
             var html = await File.ReadAllTextAsync(filePath);
@@ -22,9 +22,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generato
                 html = html.Replace(item.TokenName, item.TokenValue);
             }
 
-            var pdf = OpenHtmlToPdf.Pdf
-                .From(html)
-                .Content();
+            var pdf = OpenHtmlToPdf.Pdf.From(html).Content();
 
             return new FileContent(pdfName, "application/pdf", pdf);
         }
