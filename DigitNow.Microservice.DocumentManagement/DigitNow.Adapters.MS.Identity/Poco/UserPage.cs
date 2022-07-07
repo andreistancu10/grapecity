@@ -8,6 +8,6 @@ namespace DigitNow.Adapters.MS.Identity.Poco
 {
     public class UserPage
     {
-        public List<User> Users { get; set; }        
+        public List<User>? Users { get; set; }        
     }
 }

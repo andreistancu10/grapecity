@@ -10,8 +10,6 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
         void BuildFilterByRegistrationNo();
         void BuildFilterByRegistrationDate();
         void BuildFilterByDocumentType();
-        // Search in Catalog for DocumentType & DocumentTypeInternal
-        void BuildFilterByDocumentCategory();
         void BuildFilterByDocumentState();
         void BuildFilterByIdentifiers();
     }
@@ -64,24 +62,6 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
             }
         }
 
-        // Search in Catalog for DocumentType & DocumentTypeInternal
-        public void BuildFilterByDocumentCategory()
-        {
-            var documentTypeFilter = EntityFilter.TypeFilter;
-            if (documentTypeFilter == null) return;
-
-            if (documentTypeFilter.DocumentType == DocumentType.Incoming || documentTypeFilter.DocumentType == DocumentType.Outgoing)
-            {
-                // TODO: Move this after the data is retrieved
-                GeneratedFilters.Add(document => document != null);
-            }
-            else if (documentTypeFilter.DocumentType != DocumentType.Internal)
-            {
-                // TODO: Move this after the data is retrieved
-                GeneratedFilters.Add(document => document != null);
-            }
-        }
-
         public void BuildFilterByDocumentState()
         {
             if (EntityFilter.StatusFilter != null)
@@ -110,7 +90,6 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
                 BuildFilterByRegistrationNo();
                 BuildFilterByRegistrationDate();
                 BuildFilterByDocumentType();
-                BuildFilterByDocumentCategory();
                 BuildFilterByDocumentState();
             }
         }
