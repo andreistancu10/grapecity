@@ -1,4 +1,5 @@
-﻿using HTSS.Platform.Core.CQRS;
+﻿using System.Collections.Generic;
+using HTSS.Platform.Core.CQRS;
 
 namespace DigitNow.Domain.DocumentManagement.Business.InternalDocuments.Commands.Create;
 
@@ -11,4 +12,5 @@ public class CreateInternalDocumentCommand : ICommand<ResultObject>
     public string Observation { get; set; }
     public int ReceiverDepartmentId { get; set; }
     public bool? IsUrgent { get; set; }
+    public List<long> UploadedFileIds { get; set; }
 }

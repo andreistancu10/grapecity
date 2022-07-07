@@ -1,4 +1,6 @@
-﻿namespace DigitNow.Domain.DocumentManagement.Public.InternalDocuments.Models;
+﻿using System.Collections.Generic;
+
+namespace DigitNow.Domain.DocumentManagement.Public.InternalDocuments.Models;
 
 public record CreateInternalDocumentRequest(
     int DepartmentId,
@@ -7,4 +9,5 @@ public record CreateInternalDocumentRequest(
     string Description,
     string? Observation,
     int ReceiverDepartmentId,
-    bool? IsUrgent);
+    bool? IsUrgent,
+    List<long> UploadedFileIds);
