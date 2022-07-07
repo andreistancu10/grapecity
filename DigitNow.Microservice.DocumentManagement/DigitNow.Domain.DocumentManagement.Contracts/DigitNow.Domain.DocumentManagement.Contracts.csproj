@@ -10,4 +10,8 @@
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<OutputPath>../.nuget</OutputPath>
 	</PropertyGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="OpenHtmlToPdf" Version="1.12.0" />
+	</ItemGroup>
 </Project>

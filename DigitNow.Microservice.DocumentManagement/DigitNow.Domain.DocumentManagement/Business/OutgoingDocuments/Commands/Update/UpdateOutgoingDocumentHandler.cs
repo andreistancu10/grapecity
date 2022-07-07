@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 
 namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Update;
 
@@ -16,15 +17,23 @@ public class UpdateOutgoingDocumentHandler : ICommandHandler<UpdateOutgoingDocum
 {
     private readonly DocumentManagementDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly IUploadedFileService _uploadedFileService;
 
-    public UpdateOutgoingDocumentHandler(DocumentManagementDbContext dbContext, IMapper mapper)
+    public UpdateOutgoingDocumentHandler(DocumentManagementDbContext dbContext,
+        IMapper mapper,
+        IUploadedFileService uploadedFileService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _uploadedFileService = uploadedFileService;
     }
+
     public async Task<ResultObject> Handle(UpdateOutgoingDocumentCommand request, CancellationToken cancellationToken)
     {
-        var outgoingDocFromDb = await _dbContext.OutgoingDocuments.Include(cd => cd.ConnectedDocuments)
+        var outgoingDocFromDb = await _dbContext.OutgoingDocuments
+            .Include(cd => cd.ConnectedDocuments)
+            .Include(c=>c.Document)
+            .ThenInclude(c=>c.DocumentUploadedFiles)
             .FirstOrDefaultAsync(doc => doc.Id == request.Id, cancellationToken);
 
         if (outgoingDocFromDb is null)
@@ -35,13 +44,14 @@ public class UpdateOutgoingDocumentHandler : ICommandHandler<UpdateOutgoingDocum
                 Parameters = new object[] { request.Id }
             });
 
-        var outcomingDocumentIds = outgoingDocFromDb.ConnectedDocuments
+        var outgoingDocumentIds = outgoingDocFromDb.ConnectedDocuments
            .Where(x => x.DocumentType == DocumentType.Outgoing)
            .Select(cd => cd.RegistrationNumber)
            .ToList();
 
-        RemoveConnectedDocumentsAsync(request, outcomingDocumentIds, outgoingDocFromDb);
-        await AddConnectedDocsAsync(request, outcomingDocumentIds, outgoingDocFromDb, cancellationToken);
+        RemoveConnectedDocumentsAsync(request, outgoingDocumentIds, outgoingDocFromDb);
+        await AddConnectedDocsAsync(request, outgoingDocumentIds, outgoingDocFromDb, cancellationToken);
+        await _uploadedFileService.UpdateDocumentUploadedFilesAsync(request.UploadedFileIds, outgoingDocFromDb.Document, cancellationToken);
 
         _mapper.Map(request, outgoingDocFromDb);
 
@@ -50,10 +60,10 @@ public class UpdateOutgoingDocumentHandler : ICommandHandler<UpdateOutgoingDocum
         return ResultObject.Ok(outgoingDocFromDb.Id);
     }
 
-    private async Task AddConnectedDocsAsync(UpdateOutgoingDocumentCommand request, IList<long> outcomingDocumentIds, OutgoingDocument dbOutcomingDocuments, CancellationToken cancellationToken)
+    private async Task AddConnectedDocsAsync(UpdateOutgoingDocumentCommand request, IList<long> outgoingDocumentIds, OutgoingDocument dbOutcomingDocuments, CancellationToken cancellationToken)
     {
         var linksToAdd = request.ConnectedDocumentIds
-            .Except(outcomingDocumentIds);
+            .Except(outgoingDocumentIds);
 
         if (!linksToAdd.Any())
             return;
@@ -65,21 +75,21 @@ public class UpdateOutgoingDocumentHandler : ICommandHandler<UpdateOutgoingDocum
 
         foreach (var connectedDocument in connectedDocuments)
         {
-            var outcomingConnectedDocument = new ConnectedDocument()
+            var outgoingConnectedDocument = new ConnectedDocument()
             {
                 ChildDocumentId = connectedDocument.Id,
                 RegistrationNumber = connectedDocument.Document.RegistrationNumber,
                 DocumentType = DocumentType.Outgoing
             };
 
-            dbOutcomingDocuments.ConnectedDocuments.Add(outcomingConnectedDocument);
+            dbOutcomingDocuments.ConnectedDocuments.Add(outgoingConnectedDocument);
         }
         return;
     }
 
-    private void RemoveConnectedDocumentsAsync(UpdateOutgoingDocumentCommand request, IList<long> outcommingDocumentIds, OutgoingDocument dbOutcomingDocuments)
+    private void RemoveConnectedDocumentsAsync(UpdateOutgoingDocumentCommand request, IList<long> outgoingDocumentIds, OutgoingDocument dbOutcomingDocuments)
     {
-        var linksToRemove = outcommingDocumentIds.Except(request.ConnectedDocumentIds);
+        var linksToRemove = outgoingDocumentIds.Except(request.ConnectedDocumentIds);
 
         if (!linksToRemove.Any())
             return;
@@ -87,7 +97,5 @@ public class UpdateOutgoingDocumentHandler : ICommandHandler<UpdateOutgoingDocum
         _dbContext.ConnectedDocuments
             .RemoveRange(dbOutcomingDocuments.ConnectedDocuments.Where(cd => linksToRemove.Contains(cd.RegistrationNumber))
             .ToList());
-
-        return;
     }
 }

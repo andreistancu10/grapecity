@@ -10,8 +10,10 @@ using HTSS.Platform.Core.Errors;
 using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
 
@@ -19,18 +21,24 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
 {
     private readonly DocumentManagementDbContext _dbContext;
     private readonly IMapper _mapper;
-    private readonly IDocumentService _service;
+    private readonly IDocumentService _documentService;
     private readonly IIdentityAdapterClient _identityAdapterClient;
+    private readonly IUploadedFileService _uploadedFileService;
+    private readonly IIncomingDocumentService _incomingDocumentService;
 
-    public CreateIncomingDocumentHandler(DocumentManagementDbContext dbContext, 
-        IMapper mapper, 
-        IDocumentService service, 
-        IIdentityAdapterClient identityAdapterClient)
+    public CreateIncomingDocumentHandler(DocumentManagementDbContext dbContext,
+        IMapper mapper,
+        IDocumentService documentService,
+        IIdentityAdapterClient identityAdapterClient,
+        IIncomingDocumentService incomingDocumentService, 
+        IUploadedFileService uploadedFileService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
-        _service = service;
+        _documentService = documentService;
         _identityAdapterClient = identityAdapterClient;
+        _incomingDocumentService = incomingDocumentService;
+        _uploadedFileService = uploadedFileService;
     }
 
     public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
@@ -43,14 +51,17 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
         try
         {
             await AttachConnectedDocumentsAsync(request, newIncomingDocument, cancellationToken);
-            await _service.AddDocument(new Document 
-            { 
+            var newDocument = new Document
+            {
                 DocumentType = DocumentType.Incoming,
-                IncomingDocument = newIncomingDocument 
-            }, cancellationToken);
+                IncomingDocument = newIncomingDocument
+            };
+
+            await _documentService.AddDocument(newDocument, cancellationToken);
+            await _uploadedFileService.CreateDocumentUploadedFilesAsync(request.UploadedFileIds, newDocument, cancellationToken);
 
             newIncomingDocument.WorkflowHistory.Add(
-            new WorkflowHistory()
+            new WorkflowHistory
             {
                 RecipientType = (int)UserRole.HeadOfDepartment,
                 RecipientId = request.RecipientId,
@@ -59,7 +70,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
                 RegistrationNumber = newIncomingDocument.Document.RegistrationNumber
             });
 
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
         catch (Exception ex)
         {

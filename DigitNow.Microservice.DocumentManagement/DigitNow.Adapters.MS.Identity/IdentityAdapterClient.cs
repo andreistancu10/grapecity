@@ -19,13 +19,13 @@ namespace DigitNow.Adapters.MS.Identity
         }
 
         public Task CreateContactDetailsAsync(ContactDetailDto contactDetail, CancellationToken cancellationToken) =>
-            _identityHttpClient.PostAsync($"api/contact-details/", contactDetail, cancellationToken);
+            _identityHttpClient.PostAsync($"contact-details/", contactDetail, cancellationToken);
 
         public Task<User> GetUserByIdAsync(long id, CancellationToken cancellationToken) => 
-            _identityHttpClient.GetAsync<User>($"api/userExtensions/{id}", cancellationToken);
+            _identityHttpClient.GetAsync<User>($"userExtensions/{id}", cancellationToken);
        
 
         public Task<UserList> GetUsersByDepartmentIdAsync(long id, CancellationToken cancellationToken) =>
-            _identityHttpClient.GetAsync<UserList>($"api/userExtensions/department/{id}", cancellationToken);
+            _identityHttpClient.GetAsync<UserList>($"userExtensions/department/{id}", cancellationToken);
     }
 }

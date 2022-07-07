@@ -23,4 +23,5 @@ public class CreateIncomingDocumentCommand : ICommand<ResultObject>
     public bool? IsUrgent { get; set; }
     public bool? IsGDPRAgreed { get; set; }
     public List<int> ConnectedDocumentIds { get; set; }
+    public List<long> UploadedFileIds { get; set; }
 }

@@ -17,21 +17,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
         Task<IncomingDocument> AddAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken);
         Task<List<IncomingDocument>> FindAllAsync(Expression<Func<IncomingDocument, bool>> predicate, CancellationToken cancellationToken);
         Task SetResolutionAsync(IList<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken);
+        Task<IncomingDocument> FindFirstAsync(long id, CancellationToken cancellationToken);
     }
 
     public class IncomingDocumentService : IIncomingDocumentService
     {
         private readonly DocumentManagementDbContext _dbContext;
-        private readonly IDocumentService _documentService;
-        private readonly IIdentityService _identityService;
 
-        public IncomingDocumentService(DocumentManagementDbContext dbContext, 
-            IDocumentService documentService, 
-            IIdentityService identityService)
+        public IncomingDocumentService(DocumentManagementDbContext dbContext)
         {
             _dbContext = dbContext;
-            _documentService = documentService;
-            _identityService = identityService;
         }
 
         public async Task<IncomingDocument> AddAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken)
@@ -53,6 +48,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
                 .Include(x => x.Document)
                 .Where(predicate)
                 .ToListAsync(cancellationToken);
+        }
+
+        public Task<IncomingDocument> FindFirstAsync(long id, CancellationToken cancellationToken)
+        {
+            return _dbContext.IncomingDocuments.Where(x => x.Id == id).Include(x => x.Document).FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task SetResolutionAsync(IList<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken)

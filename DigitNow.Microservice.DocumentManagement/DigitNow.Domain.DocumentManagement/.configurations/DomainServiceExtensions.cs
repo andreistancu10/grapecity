@@ -1,6 +1,7 @@
-﻿using System.Reflection;
+using System.Reflection;
 using DigitNow.Domain.Catalog.Client.configurations;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generators;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.configurations.HostedServices;
 using DigitNow.Domain.DocumentManagement.Data.Repositories;
@@ -14,7 +15,6 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using DigitNow.Domain.Authentication;
 using DigitNow.Domain.Authentication.Client;
 
 namespace DigitNow.Domain.DocumentManagement.configurations
@@ -67,14 +67,19 @@ namespace DigitNow.Domain.DocumentManagement.configurations
         
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
+            services.AddScoped<IPdfGenerator, PdfGenerator>();
+            services.AddScoped<IPdfDocumentGenerator, PdfDocumentGenerator>();
             services.AddTransient<IIdentityService, IdentityService>();
             services.AddTransient<IDocumentService, DocumentService>();
             services.AddTransient<IIncomingDocumentService, IncomingDocumentService>();
             services.AddTransient<IInternalDocumentService, InternalDocumentService>();
             services.AddTransient<IOutgoingDocumentService, OutgoingDocumentService>();
+            services.AddTransient<IVirtualDocumentService, VirtualDocumentService>();
             services.AddTransient<IDocumentResolutionService, DocumentResolutionService>();
             services.AddTransient<IDashboardService, DashboardService>();
             services.AddTransient<ISpecialRegisterService, SpecialRegisterService>();
+            services.AddTransient<IFileService, FileService>();
+            services.AddTransient<IUploadedFileService, UploadedFileService>();
 
             return services;
         }
