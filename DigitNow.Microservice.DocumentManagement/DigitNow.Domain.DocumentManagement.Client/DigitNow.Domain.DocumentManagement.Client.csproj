@@ -8,6 +8,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Internal\**" />
+	  <EmbeddedResource Remove="Internal\**" />
+	  <None Remove="Internal\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<Compile Include=".configurations\ServiceCollectionExtensions.cs" />
 	</ItemGroup>
 
@@ -18,10 +24,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\DigitNow.Domain.DocumentManagement.Contracts\DigitNow.Domain.DocumentManagement.Contracts.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Folder Include="Internal\Model\" />
 	</ItemGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

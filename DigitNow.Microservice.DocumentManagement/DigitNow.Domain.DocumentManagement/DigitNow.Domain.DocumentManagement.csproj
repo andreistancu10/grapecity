@@ -11,8 +11,6 @@
 	  <EmbeddedResource Remove="Business\Consumers\**" />
 	  <EmbeddedResource Remove="Business\Dashboard\Commands\GetDocuments\**" />
 	  <EmbeddedResource Remove="Public\Maintenance\**" />
-	  <EmbeddedResource Remove="Business\Consumers\**" />
-	  <EmbeddedResource Remove="Business\Dashboard\Commands\GetDocuments\**" />
 	  <None Remove="Business\Consumers\**" />
 	  <None Remove="Business\Dashboard\Commands\GetDocuments\**" />
 	  <None Remove="Public\Maintenance\**" />
@@ -97,11 +95,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Business\Dashboard\Commands\GetDocuments\" />
 		<Folder Include="Business\Dashboard\Models\" />
 		<Folder Include="Migrations\" />
 		<Folder Include="Public\Maintenance\" />
-		<Folder Include="Business\Consumers\" />
 		<Folder Include="Public\SpecialRegisters\Validators\" />
 		<Folder Include="Rpc\Consumers\" />
 	</ItemGroup>
