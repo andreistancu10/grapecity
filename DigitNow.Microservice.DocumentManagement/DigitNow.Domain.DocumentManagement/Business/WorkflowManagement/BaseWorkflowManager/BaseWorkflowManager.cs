@@ -1,25 +1,38 @@
 ﻿using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
+using DigitNow.Domain.Authentication.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager
 {
-    public class BaseWorkflowManager
+    public abstract class BaseWorkflowManager
     {
-        public static IWorkflowManagementService WorkflowService { get; set; }
-        public static IIdentityAdapterClient IdentityService { get; set; }
+        public BaseWorkflowManager(IServiceProvider serviceProvider)
+        {
+            WorkflowService = serviceProvider.GetService<IWorkflowManagementService>();
+            AuthenticationClient = serviceProvider.GetService<IAuthenticationClient>();
+            IdentityAdapterClient = serviceProvider.GetService<IIdentityAdapterClient>();
+        }
+
+        public readonly IWorkflowManagementService WorkflowService;
+        public readonly IAuthenticationClient AuthenticationClient;
+        public readonly IIdentityAdapterClient IdentityAdapterClient;
 
         public async Task<User> GetUserByIdAsync(long id, CancellationToken token)
         {
             var user = new User() { FirstName = "Ciprian", LastName = "Rosca" };
             return user;
-            //return await IdentityService.GetUserByIdAsync(id, token);
+             //return await IdentityService.GetUserByIdAsync(id, token);
+
+            var users = await AuthenticationClient.GetUserById(id, token);
         }
 
         public async Task<User> GetUserByDepartmentIdAsync(long id, CancellationToken token)
@@ -38,7 +51,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             //return users.Users.FirstOrDefault(x => x.Roles.Contains((long)UserRole.Mayor));
         }
 
-        public void ResetWorkflowRecord(WorkflowHistory oldRecord, WorkflowHistory newRecord, ICreateWorkflowHistoryCommand command)
+        protected virtual void TransferResponsibility(WorkflowHistory oldRecord, WorkflowHistory newRecord, ICreateWorkflowHistoryCommand command)
         {
             if (oldRecord == null)
             {
@@ -50,7 +63,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             newRecord.RecipientName = oldRecord.RecipientName;
         }
 
-        public static void TransitionNotAllowed(ICreateWorkflowHistoryCommand command)
+        protected virtual void TransitionNotAllowed(ICreateWorkflowHistoryCommand command)
         {
             command.Result = ResultObject.Error(new ErrorMessage
             {
@@ -60,7 +73,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             });
         }
 
-        public static bool UserExists(User user, ICreateWorkflowHistoryCommand command)
+        protected virtual bool UserExists(User user, ICreateWorkflowHistoryCommand command)
         {
             if (user == null)
             {

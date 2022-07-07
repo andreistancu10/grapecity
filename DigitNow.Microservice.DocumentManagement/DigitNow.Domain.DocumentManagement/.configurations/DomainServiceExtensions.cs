@@ -75,8 +75,10 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<ISpecialRegisterService, SpecialRegisterService>();
             services.AddTransient<IWorkflowManagementService, WorkflowManagementService>();
 
-            BaseWorkflowManager.WorkflowService = services.BuildServiceProvider().GetService<IWorkflowManagementService>();
-            BaseWorkflowManager.IdentityService = services.BuildServiceProvider().GetService<IIdentityAdapterClient>();
+            //BaseWorkflowManager.WorkflowService = services.BuildServiceProvider().GetService<IWorkflowManagementService>();
+            //BaseWorkflowManager.IdentityService = services.BuildServiceProvider().GetService<IIdentityAdapterClient>();
+
+
 
             return services;
         }

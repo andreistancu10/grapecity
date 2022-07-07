@@ -1,13 +1,9 @@
-﻿
-using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using HTSS.Platform.Core.CQRS;
-using HTSS.Platform.Core.Errors;
 using System;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,6 +11,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 {
     public class FunctionaryDeclines : BaseWorkflowManager, IWorkflowHandler
     {
+        public FunctionaryDeclines(IServiceProvider serviceProvider) : base(serviceProvider) { }
+
         private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.OpinionRequestedAllocated };
         private Document _document;
         private ICreateWorkflowHistoryCommand _command;
@@ -36,6 +34,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
             else
                 await PassDocumentToRegistry(token);
 
+            _document.Status = newDocumentStatus;
+
             await WorkflowService.CommitChangesAsync(token);
 
             return command;
@@ -56,7 +56,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
                 .GetOldWorkflowResponsible(_document, x => x.RecipientType == (int)UserRole.Functionary);
 
             var newWorkflowResponsible = new WorkflowHistory();
-            ResetWorkflowRecord(oldWorkflowResponsible, newWorkflowResponsible, command);
+            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 
             newWorkflowResponsible.Status = DocumentStatus.InWorkAllocated;
             newWorkflowResponsible.DeclineReason = _command.DeclineReason;
@@ -67,22 +67,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
         {
-            if (!WorkflowService.IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
+            if (string.IsNullOrWhiteSpace(command.DeclineReason) || !WorkflowService.IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
             {
                 TransitionNotAllowed(command);
                 return false;
             }
 
-            if (string.IsNullOrWhiteSpace(command.DeclineReason))
-            {
-                command.Result = ResultObject.Error(new ErrorMessage
-                {
-                    Message = $"The reason of decline was not specified.",
-                    TranslationCode = "dms.declineReason.backend.update.validation.notSpecified",
-                    Parameters = new object[] { command.DeclineReason }
-                });
-                return false;
-            }
             return true;
         }
     }

@@ -10,6 +10,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 {
     public class FunctionaryFinalizes : BaseWorkflowManager, IWorkflowHandler
     {
+        public FunctionaryFinalizes(IServiceProvider serviceProvider) : base(serviceProvider) { }
+
         private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated };
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
@@ -20,9 +22,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
                 return command;
 
             var newWorkflowResponsible = new WorkflowHistory();
-            ResetWorkflowRecord(oldWorkflowResponsible, newWorkflowResponsible, command);
+            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 
-            newWorkflowResponsible.Status = DocumentStatus.Finalized;
+            newWorkflowResponsible.Status = document.Status = DocumentStatus.Finalized;
             newWorkflowResponsible.Remarks = command.Remarks;
 
             document.IncomingDocument.WorkflowHistory.Add(newWorkflowResponsible);

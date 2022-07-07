@@ -13,8 +13,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 {
     public class FunctionaryAsksForOpinion : BaseWorkflowManager, IWorkflowHandler
     {
-        private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated };
+        public FunctionaryAsksForOpinion(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
+        private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated };
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
             var document = await WorkflowService.GetDocumentById(command.DocumentId, token);
@@ -29,6 +30,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
                 .Add(WorkflowHistoryFactory
                 .Create(document, UserRole.HeadOfDepartment, headOfDepartment, DocumentStatus.OpinionRequestedUnallocated, string.Empty, command.Remarks, command.OpinionRequestedUntil));
 
+            document.Status = DocumentStatus.OpinionRequestedUnallocated;
+            
             await WorkflowService.CommitChangesAsync(token);
 
             return command;
@@ -36,22 +39,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
         {
-            if (!WorkflowService.IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
+            if (command.RecipientId <= 0 || !WorkflowService.IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
             {
                 TransitionNotAllowed(command);
                 return false;
-            }
-
-            if (command.RecipientId <= 0)
-            {
-                command.Result = ResultObject.Error(new ErrorMessage
-                {
-                    Message = $"No responsible for department with id {command.RecipientId} was found.",
-                    TranslationCode = "dms.headOfdepartment.backend.update.validation.entityNotFound",
-                    Parameters = new object[] { command.RecipientId }
-                });
-                return false;
-
             }
 
             if (command.OpinionRequestedUntil is not null && command.OpinionRequestedUntil < DateTime.Now )

@@ -4,6 +4,7 @@
     using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
     using HTSS.Platform.Core.CQRS;
     using HTSS.Platform.Core.Errors;
+    using System;
     using System.Collections.Generic;
     using System.Threading;
     using System.Threading.Tasks;
@@ -15,13 +16,13 @@
         private Dictionary<ActionType, IWorkflowHandler> actionStrategy 
             = new Dictionary<ActionType, IWorkflowHandler>();
 
-        public Functionary()
+        public Functionary(IServiceProvider serviceProvider)
         {
-            actionStrategy.Add(ActionType.Decline, new FunctionaryDeclines());
-            actionStrategy.Add(ActionType.AskForOpinion, new FunctionaryAsksForOpinion());
-            actionStrategy.Add(ActionType.Finalize, new FunctionaryFinalizes());
-            actionStrategy.Add(ActionType.AsksForApproval, new FunctionaryAsksForApproval());
-            actionStrategy.Add(ActionType.SendOpinion, new FunctionarySendsOpinion());
+            actionStrategy.Add(ActionType.Decline, new FunctionaryDeclines(serviceProvider));
+            actionStrategy.Add(ActionType.AskForOpinion, new FunctionaryAsksForOpinion(serviceProvider));
+            actionStrategy.Add(ActionType.Finalize, new FunctionaryFinalizes(serviceProvider));
+            actionStrategy.Add(ActionType.AsksForApproval, new FunctionaryAsksForApproval(serviceProvider));
+            actionStrategy.Add(ActionType.SendOpinion, new FunctionarySendsOpinion(serviceProvider));
         }
 
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)

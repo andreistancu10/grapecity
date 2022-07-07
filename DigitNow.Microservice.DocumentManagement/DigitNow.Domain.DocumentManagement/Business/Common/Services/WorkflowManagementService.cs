@@ -18,7 +18,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         WorkflowHistory GetLastWorkflowRecord(Document document);
         bool IsTransitionAllowed(WorkflowHistory lastWorkFlowRecord, int[] allowedTransitionStatuses);
         WorkflowHistory GetOldWorkflowResponsible(Document document, Expression<Func<WorkflowHistory, bool>> predicate);
-
+        void AddWorkflowRecord(Document document, WorkflowHistory workflowRecord);
+        void SetNewRecipientBasedOnWorkflowDecision(Document document, long recipientId);
     }
     public class WorkflowManagementService : IWorkflowManagementService
     {
@@ -80,6 +81,24 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 return ExtractResponsible(document.OutgoingDocument.WorkflowHistory.AsQueryable(), predicate);
 
             return null;
+        }
+
+        public void AddWorkflowRecord(Document document, WorkflowHistory workflowRecord)
+        {
+            if (document.IncomingDocument != null)
+                document.IncomingDocument.WorkflowHistory.Add(workflowRecord);
+
+            if (document.OutgoingDocument != null)
+                document.OutgoingDocument.WorkflowHistory.Add(workflowRecord);
+        }
+
+        public void SetNewRecipientBasedOnWorkflowDecision(Document document, long recipientId)
+        {
+            if (document.IncomingDocument != null)
+                document.IncomingDocument.RecipientId = (int)recipientId;
+
+            if (document.OutgoingDocument != null)
+                document.OutgoingDocument.RecipientId = (int)recipientId;
         }
 
         private WorkflowHistory ExtractResponsible(IQueryable<WorkflowHistory> history, Expression<Func<WorkflowHistory, bool>> predicate)

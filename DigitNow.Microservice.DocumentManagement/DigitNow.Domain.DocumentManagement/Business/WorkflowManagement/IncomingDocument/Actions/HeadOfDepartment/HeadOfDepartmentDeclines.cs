@@ -14,8 +14,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 {
     public class HeadOfDepartmentDeclines : BaseWorkflowManager, IWorkflowHandler
     {
+        public HeadOfDepartmentDeclines(IServiceProvider serviceProvider) : base(serviceProvider) { }
+
         private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkUnallocated, (int)DocumentStatus.OpinionRequestedUnallocated, (int)DocumentStatus.InWorkDelegatedUnallocated };
-        
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
             var document = await WorkflowService.GetDocumentById(command.DocumentId, token);
@@ -36,6 +37,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
             document.IncomingDocument.WorkflowHistory
                 .Add(WorkflowHistoryFactory
                 .Create(document, UserRole.Functionary, user, newDocumentStatus, command.DeclineReason));
+
+            document.Status = newDocumentStatus;
 
             await WorkflowService.CommitChangesAsync(token);
 

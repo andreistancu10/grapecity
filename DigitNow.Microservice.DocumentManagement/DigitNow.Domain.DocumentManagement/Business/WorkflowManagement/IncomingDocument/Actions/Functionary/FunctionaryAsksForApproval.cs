@@ -2,8 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using HTSS.Platform.Core.CQRS;
-using HTSS.Platform.Core.Errors;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,6 +10,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 {
     public class FunctionaryAsksForApproval : BaseWorkflowManager, IWorkflowHandler
     {
+        public FunctionaryAsksForApproval(IServiceProvider serviceProvider) : base(serviceProvider) { }
+
         private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.OpinionRequestedAllocated };
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
@@ -23,12 +24,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
             var oldWorkflowResponsible = WorkflowService.GetOldWorkflowResponsible(document, x => x.RecipientType == (int)UserRole.HeadOfDepartment);
 
             var newWorkflowResponsible = new WorkflowHistory();
-            ResetWorkflowRecord(oldWorkflowResponsible, newWorkflowResponsible, command);
+            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 
-            newWorkflowResponsible.Status = DocumentStatus.InWorkApprovalRequested;
+            newWorkflowResponsible.Status = document.Status = DocumentStatus.InWorkApprovalRequested;
             newWorkflowResponsible.Resolution = command.Resolution;
 
-            document.IncomingDocument.WorkflowHistory.Add(newWorkflowResponsible);
+            WorkflowService.AddWorkflowRecord(document, newWorkflowResponsible);
+            WorkflowService.SetNewRecipientBasedOnWorkflowDecision(document, newWorkflowResponsible.RecipientId);
+            
             await WorkflowService.CommitChangesAsync(token);
 
             return command;
@@ -36,23 +39,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
         {
-            if (!WorkflowService.IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
+            if (command.RecipientId <= 0 || !WorkflowService.IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
             {
                 TransitionNotAllowed(command);
                 return false;
             }
-
-            if (command.RecipientId <= 0)
-            {
-                command.Result = ResultObject.Error(new ErrorMessage
-                {
-                    Message = $"Functionary not specified!",
-                    TranslationCode = "dms.functionary.backend.update.validation.notSpcified",
-                    Parameters = new object[] { command.Resolution }
-                });
-                return false;
-            }
-
             return true;
         }
     }

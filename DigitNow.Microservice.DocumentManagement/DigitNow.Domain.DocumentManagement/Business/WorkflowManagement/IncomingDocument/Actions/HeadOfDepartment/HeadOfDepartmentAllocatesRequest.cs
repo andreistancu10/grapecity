@@ -1,17 +1,18 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using HTSS.Platform.Core.CQRS;
-using HTSS.Platform.Core.Errors;
 using System.Threading.Tasks;
 using System.Threading;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
+using System;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions.HeadOfDepartment
 {
     public class HeadOfDepartmentAllocatesRequest : BaseWorkflowManager, IWorkflowHandler
     {
+        public HeadOfDepartmentAllocatesRequest(IServiceProvider serviceProvider) : base(serviceProvider) { }
+
         private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkUnallocated, (int)DocumentStatus.OpinionRequestedUnallocated, (int)DocumentStatus.InWorkDelegatedUnallocated };
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
@@ -31,6 +32,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
                 .Add(WorkflowHistoryFactory
                 .Create(document, UserRole.Functionary, user, newDocumentStatus));
 
+            document.Status = newDocumentStatus;
+
             await WorkflowService.CommitChangesAsync(token);
 
             return command;
@@ -38,23 +41,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
         {
-            if (!WorkflowService.IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
+            if (command.RecipientId <= 0 || !WorkflowService.IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
             {
                 TransitionNotAllowed(command);
                 return false;
             }
-
-            if (command.RecipientId <= 0)
-            {
-                command.Result = ResultObject.Error(new ErrorMessage
-                {
-                    Message = $"Functionary not specified!",
-                    TranslationCode = "dms.functionary.backend.update.validation.notSpcified",
-                    Parameters = new object[] { command.Resolution }
-                });
-                return false;
-            }
-
             return true;
         }
     }

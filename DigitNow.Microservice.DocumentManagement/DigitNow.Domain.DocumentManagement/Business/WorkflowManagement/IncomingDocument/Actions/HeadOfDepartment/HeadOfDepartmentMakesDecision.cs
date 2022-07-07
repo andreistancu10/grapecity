@@ -5,7 +5,7 @@ using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
-using System.Linq;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,6 +13,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 {
     public class HeadOfDepartmentMakesDecision : BaseWorkflowManager, IWorkflowHandler
     {
+        public HeadOfDepartmentMakesDecision(IServiceProvider serviceProvider) : base(serviceProvider) { }
+
         private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkApprovalRequested };
         private CancellationToken _token;
         private enum Decision { Approved = 1, Declined = 2};
@@ -53,6 +55,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
                 .Add(WorkflowHistoryFactory
                 .Create(document, UserRole.Mayor, user, DocumentStatus.InWorkMayorReview, command.DeclineReason, command.Remarks));
 
+            document.Status = DocumentStatus.InWorkMayorReview;
+
             return command;
         }
 
@@ -61,9 +65,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
             var oldWorkflowResponsible = WorkflowService.GetOldWorkflowResponsible(document, x => x.RecipientType == (int)UserRole.Functionary);
 
             var newWorkflowResponsible = new WorkflowHistory();
-            ResetWorkflowRecord(oldWorkflowResponsible, newWorkflowResponsible, command);
+            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 
-            newWorkflowResponsible.Status = DocumentStatus.InWorkDeclined;
+            newWorkflowResponsible.Status = document.Status = DocumentStatus.InWorkDeclined;
             newWorkflowResponsible.DeclineReason = command.DeclineReason;
             newWorkflowResponsible.Remarks = command.Remarks;
 

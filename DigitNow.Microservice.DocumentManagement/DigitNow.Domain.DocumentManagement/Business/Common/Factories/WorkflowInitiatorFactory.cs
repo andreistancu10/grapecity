@@ -6,17 +6,17 @@ using System.Collections.Generic;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
 {
-    public static class WorkflowInitiatorFactory
+    public class WorkflowInitiatorFactory
     {
         private static readonly IDictionary<UserRole, Func<IWorkflowHandler>> factory = new Dictionary<UserRole, Func<IWorkflowHandler>>();
-        static WorkflowInitiatorFactory()
+        public WorkflowInitiatorFactory(IServiceProvider serviceProvider)
         {
-            factory.Add(UserRole.HeadOfDepartment, () => new HeadOfDepartment());
-            factory.Add(UserRole.Functionary, () => new Functionary());
-            factory.Add(UserRole.Mayor, () => new Mayor());
+            factory.Add(UserRole.HeadOfDepartment, () => new HeadOfDepartment(serviceProvider));
+            factory.Add(UserRole.Functionary, () => new Functionary(serviceProvider));
+            factory.Add(UserRole.Mayor, () => new Mayor(serviceProvider));
         }
 
-        public static IWorkflowHandler Create(UserRole userRole)
+        public IWorkflowHandler Create(UserRole userRole)
         {
             return factory[userRole]();
         }

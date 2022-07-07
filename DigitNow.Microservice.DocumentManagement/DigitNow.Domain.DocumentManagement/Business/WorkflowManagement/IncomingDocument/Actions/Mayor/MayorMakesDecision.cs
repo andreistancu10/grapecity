@@ -4,6 +4,7 @@ using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,6 +12,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 {
     public class MayorMakesDecision : BaseWorkflowManager, IWorkflowHandler
     {
+        public MayorMakesDecision(IServiceProvider serviceProvider) : base(serviceProvider) { }
+
         private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkMayorReview };
         private enum Decision { Declined, Approved };
         private Document _document;
@@ -45,9 +48,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
             var oldWorkflowResponsible = WorkflowService.GetOldWorkflowResponsible(_document, x => x.RecipientType == (int)UserRole.Functionary);
 
             var newWorkflowResponsible = new WorkflowHistory();
-            ResetWorkflowRecord(oldWorkflowResponsible, newWorkflowResponsible, command);
+            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 
-            newWorkflowResponsible.Status = DocumentStatus.InWorkCountersignature;
+            newWorkflowResponsible.Status = _document.Status = DocumentStatus.InWorkCountersignature;
 
             _document.IncomingDocument.WorkflowHistory.Add(newWorkflowResponsible);
         }
@@ -57,9 +60,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
             var oldWorkflowResponsible = WorkflowService.GetOldWorkflowResponsible(_document, x => x.RecipientType == (int)UserRole.HeadOfDepartment);
 
             var newWorkflowResponsible = new WorkflowHistory();
-            ResetWorkflowRecord(oldWorkflowResponsible, newWorkflowResponsible, command);
+            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 
-            newWorkflowResponsible.Status = DocumentStatus.InWorkMayorDeclined;
+            newWorkflowResponsible.Status = _document.Status = DocumentStatus.InWorkMayorDeclined;
 
             _document.IncomingDocument.WorkflowHistory.Add(newWorkflowResponsible);
         }
