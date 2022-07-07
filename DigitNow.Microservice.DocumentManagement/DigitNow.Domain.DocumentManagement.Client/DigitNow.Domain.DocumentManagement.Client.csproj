@@ -13,6 +13,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="HTSS.Platform.Infrastructure.MassTransit" Version="6.0.1" />
+		<PackageReference Include="OpenHtmlToPdf" Version="1.12.0" />
 	</ItemGroup>
 
 	<ItemGroup>
