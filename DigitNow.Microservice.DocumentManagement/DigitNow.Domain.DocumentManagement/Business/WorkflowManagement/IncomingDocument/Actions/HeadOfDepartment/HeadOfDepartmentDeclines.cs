@@ -18,8 +18,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
         
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            var document = await GetDocumentById(command.DocumentId, token);
-            var lastWorkFlowRecord = GetLastWorkflowRecord(document);
+            var document = await WorkflowService.GetDocumentById(command.DocumentId, token);
+            var lastWorkFlowRecord = WorkflowService.GetLastWorkflowRecord(document);
 
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
@@ -37,7 +37,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
                 .Add(WorkflowHistoryFactory
                 .Create(document, UserRole.Functionary, user, newDocumentStatus, command.DeclineReason));
 
-            await SaveDocument(token);
+            await WorkflowService.CommitChangesAsync(token);
 
             return command;
         }

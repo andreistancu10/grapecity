@@ -75,4 +75,15 @@ public class DocumentsController : ApiController
         };
     }
 
+    [HttpGet("{documentId}")]
+    public async Task<IActionResult> GetById([FromRoute] long documentId)
+    {
+        return await _mediator.Send(new GetWorkflowInformationByDocumentIdQuery { DocumentId = documentId })
+            switch
+        {
+            null => NotFound(),
+            var result => Ok(result)
+        };
+    }
+
 }

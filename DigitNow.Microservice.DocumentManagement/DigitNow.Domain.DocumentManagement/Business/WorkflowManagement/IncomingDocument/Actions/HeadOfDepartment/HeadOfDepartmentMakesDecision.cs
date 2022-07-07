@@ -19,8 +19,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
             _token = token;
-            var document = await GetDocumentById(command.DocumentId, token);
-            var lastWorkFlowRecord = GetLastWorkflowRecord(document);
+            var document = await WorkflowService.GetDocumentById(command.DocumentId, token);
+            var lastWorkFlowRecord = WorkflowService.GetLastWorkflowRecord(document);
 
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
@@ -28,7 +28,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
             switch ((Decision)command.Decision)
             {
                 case Decision.Declined:
-                    await ApplicationDeclined(command, document);
+                    ApplicationDeclined(command, document);
                     break;
                 case Decision.Approved:
                     await ApplicationApproved(command, document);
@@ -36,7 +36,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
                 default:
                     break;
             }
-            
+
+            await WorkflowService.CommitChangesAsync(_token);
+
             return command;
         }
 
@@ -51,34 +53,32 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
                 .Add(WorkflowHistoryFactory
                 .Create(document, UserRole.Mayor, user, DocumentStatus.InWorkMayorReview, command.DeclineReason, command.Remarks));
 
-            await SaveDocument(_token);
-
             return command;
         }
 
-        private async Task<ICreateWorkflowHistoryCommand> ApplicationDeclined(ICreateWorkflowHistoryCommand command, Document document)
+        private ICreateWorkflowHistoryCommand ApplicationDeclined(ICreateWorkflowHistoryCommand command, Document document)
         {
-            var responsibleFunctionaryRecord = document.IncomingDocument.WorkflowHistory
-                .Where(x => x.RecipientType == (int)UserRole.Functionary)
-                .OrderByDescending(x => x.CreationDate)
-                .FirstOrDefault();
+            var oldWorkflowResponsible = WorkflowService.GetOldWorkflowResponsible(document, x => x.RecipientType == (int)UserRole.Functionary);
 
-            ResetWorkflowRecord(responsibleFunctionaryRecord, command);
+            var newWorkflowResponsible = new WorkflowHistory();
+            ResetWorkflowRecord(oldWorkflowResponsible, newWorkflowResponsible, command);
 
-            responsibleFunctionaryRecord.Status = DocumentStatus.InWorkDeclined;
-            responsibleFunctionaryRecord.DeclineReason = command.DeclineReason;
-            responsibleFunctionaryRecord.Remarks = command.Remarks;
+            newWorkflowResponsible.Status = DocumentStatus.InWorkDeclined;
+            newWorkflowResponsible.DeclineReason = command.DeclineReason;
+            newWorkflowResponsible.Remarks = command.Remarks;
 
-
-            document.IncomingDocument.WorkflowHistory.Add(responsibleFunctionaryRecord);
-            await SaveDocument(_token);
+            document.IncomingDocument.WorkflowHistory.Add(newWorkflowResponsible);
 
             return command;
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
         {
-            if (!IsTransitionAllowed(command, lastWorkFlowRecord, allowedTransitionStatuses)) return false;
+            if (!WorkflowService.IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
+            {
+                TransitionNotAllowed(command);
+                return false;
+            }
 
             if (command.Decision != (int)Decision.Approved || command.Decision != (int)Decision.Declined)
             {

@@ -21,8 +21,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
             _command = command;
-            _document = await GetDocumentById(command.DocumentId, token);
-            var lastWorkFlowRecord = GetLastWorkflowRecord(_document);
+            _document = await WorkflowService.GetDocumentById(command.DocumentId, token);
+            var lastWorkFlowRecord = WorkflowService.GetLastWorkflowRecord(_document);
 
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
@@ -36,7 +36,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
             else
                 await PassDocumentToRegistry(token);
 
-            await SaveDocument(token);
+            await WorkflowService.CommitChangesAsync(token);
 
             return command;
         }
@@ -52,23 +52,26 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
         private void PassDocumentToFunctionary(ICreateWorkflowHistoryCommand command)
         {
-            var responsibleFunctionaryRecord = _document.IncomingDocument.WorkflowHistory
-                .Where(x => x.RecipientType == (int)UserRole.Functionary)
-                .OrderByDescending(x => x.CreationDate)
-                .FirstOrDefault();
+            var oldWorkflowResponsible = WorkflowService
+                .GetOldWorkflowResponsible(_document, x => x.RecipientType == (int)UserRole.Functionary);
 
-            ResetWorkflowRecord(responsibleFunctionaryRecord, command);
+            var newWorkflowResponsible = new WorkflowHistory();
+            ResetWorkflowRecord(oldWorkflowResponsible, newWorkflowResponsible, command);
 
-            responsibleFunctionaryRecord.Status = DocumentStatus.InWorkAllocated;
-            responsibleFunctionaryRecord.DeclineReason = _command.DeclineReason;
-            responsibleFunctionaryRecord.Remarks = _command.Remarks;
+            newWorkflowResponsible.Status = DocumentStatus.InWorkAllocated;
+            newWorkflowResponsible.DeclineReason = _command.DeclineReason;
+            newWorkflowResponsible.Remarks = _command.Remarks;
 
-            _document.IncomingDocument.WorkflowHistory.Add(responsibleFunctionaryRecord);
+            _document.IncomingDocument.WorkflowHistory.Add(newWorkflowResponsible);
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
         {
-            if (!IsTransitionAllowed(command, lastWorkFlowRecord, allowedTransitionStatuses)) return false;
+            if (!WorkflowService.IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
+            {
+                TransitionNotAllowed(command);
+                return false;
+            }
 
             if (string.IsNullOrWhiteSpace(command.DeclineReason))
             {

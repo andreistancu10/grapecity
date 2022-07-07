@@ -4,7 +4,6 @@ using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,34 +14,46 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
         private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.OpinionRequestedAllocated };
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            var document = await GetDocumentById(command.DocumentId, token);
-            var lastWorkFlowRecord = GetLastWorkflowRecord(document);
+            var document = await WorkflowService.GetDocumentById(command.DocumentId, token);
+            var lastWorkFlowRecord = WorkflowService.GetLastWorkflowRecord(document);
 
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
 
-            var responsibleHeadOfDepartmentRecord = document.IncomingDocument.WorkflowHistory
-                .Where(x => x.RecipientType == (int)UserRole.HeadOfDepartment)
-                .OrderByDescending(x => x.CreationDate)
-                .FirstOrDefault();
+            var oldWorkflowResponsible = WorkflowService.GetOldWorkflowResponsible(document, x => x.RecipientType == (int)UserRole.HeadOfDepartment);
 
-            //Todo check if record is not null
+            var newWorkflowResponsible = new WorkflowHistory();
+            ResetWorkflowRecord(oldWorkflowResponsible, newWorkflowResponsible, command);
 
-            ResetWorkflowRecord(responsibleHeadOfDepartmentRecord, command);
+            newWorkflowResponsible.Status = DocumentStatus.InWorkApprovalRequested;
+            newWorkflowResponsible.Resolution = command.Resolution;
 
-            responsibleHeadOfDepartmentRecord.Status = DocumentStatus.InWorkApprovalRequested;
-
-            responsibleHeadOfDepartmentRecord.Resolution = command.Resolution;
-
-            document.IncomingDocument.WorkflowHistory.Add(responsibleHeadOfDepartmentRecord);
-            await SaveDocument(token);
+            document.IncomingDocument.WorkflowHistory.Add(newWorkflowResponsible);
+            await WorkflowService.CommitChangesAsync(token);
 
             return command;
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
         {
+            if (!WorkflowService.IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
+            {
+                TransitionNotAllowed(command);
+                return false;
+            }
 
+            if (command.RecipientId <= 0)
+            {
+                command.Result = ResultObject.Error(new ErrorMessage
+                {
+                    Message = $"Functionary not specified!",
+                    TranslationCode = "dms.functionary.backend.update.validation.notSpcified",
+                    Parameters = new object[] { command.Resolution }
+                });
+                return false;
+            }
+
+            return true;
         }
     }
 }

@@ -13,26 +13,33 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
         private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated };
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            var document = await GetDocumentById(command.DocumentId, token);
-            var lastWorkFlowRecord = GetLastWorkflowRecord(document);
+            var document = await WorkflowService.GetDocumentById(command.DocumentId, token);
+            var oldWorkflowResponsible = WorkflowService.GetLastWorkflowRecord(document);
 
-            if (!Validate(command, lastWorkFlowRecord))
+            if (!Validate(command, oldWorkflowResponsible))
                 return command;
 
-            ResetWorkflowRecord(lastWorkFlowRecord, command);
+            var newWorkflowResponsible = new WorkflowHistory();
+            ResetWorkflowRecord(oldWorkflowResponsible, newWorkflowResponsible, command);
 
-            lastWorkFlowRecord.Status = DocumentStatus.Finalized;
-            lastWorkFlowRecord.Remarks = command.Remarks;
+            newWorkflowResponsible.Status = DocumentStatus.Finalized;
+            newWorkflowResponsible.Remarks = command.Remarks;
 
-            document.IncomingDocument.WorkflowHistory.Add(lastWorkFlowRecord);
-            await SaveDocument(token);
+            document.IncomingDocument.WorkflowHistory.Add(newWorkflowResponsible);
+            await WorkflowService.CommitChangesAsync(token);
 
             return command;
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
         {
-            return IsTransitionAllowed(command, lastWorkFlowRecord, allowedTransitionStatuses);
+            if (!WorkflowService.IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
+            {
+                TransitionNotAllowed(command);
+                return false;
+            }
+
+            return true;
         }
     }
 }

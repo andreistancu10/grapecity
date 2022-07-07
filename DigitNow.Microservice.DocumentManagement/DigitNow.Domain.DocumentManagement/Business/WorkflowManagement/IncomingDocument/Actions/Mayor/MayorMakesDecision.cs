@@ -4,7 +4,6 @@ using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,8 +17,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            _document = await GetDocumentById(command.DocumentId, token);
-            var lastWorkFlowRecord = GetLastWorkflowRecord(_document);
+            _document = await WorkflowService.GetDocumentById(command.DocumentId, token);
+            var lastWorkFlowRecord = WorkflowService.GetLastWorkflowRecord(_document);
 
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
@@ -36,42 +35,42 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
                     break;
             }
 
-            await SaveDocument(token);
+            await WorkflowService.CommitChangesAsync(token);
 
             return command;
         }
 
         private void MayorApproved(ICreateWorkflowHistoryCommand command)
         {
-            var responsibleFunctionaryRecord = _document.IncomingDocument.WorkflowHistory
-                .Where(x => x.RecipientType == (int)UserRole.Functionary)
-                .OrderByDescending(x => x.CreationDate)
-                .FirstOrDefault();
+            var oldWorkflowResponsible = WorkflowService.GetOldWorkflowResponsible(_document, x => x.RecipientType == (int)UserRole.Functionary);
 
-            ResetWorkflowRecord(responsibleFunctionaryRecord, command);
+            var newWorkflowResponsible = new WorkflowHistory();
+            ResetWorkflowRecord(oldWorkflowResponsible, newWorkflowResponsible, command);
 
-            responsibleFunctionaryRecord.Status = DocumentStatus.InWorkCountersignature;
+            newWorkflowResponsible.Status = DocumentStatus.InWorkCountersignature;
 
-            _document.IncomingDocument.WorkflowHistory.Add(responsibleFunctionaryRecord);
+            _document.IncomingDocument.WorkflowHistory.Add(newWorkflowResponsible);
         }
 
         private void MayorDeclined(ICreateWorkflowHistoryCommand command)
         {
-            var responsibleHeadOfDepartmentRecord = _document.IncomingDocument.WorkflowHistory
-                .Where(x => x.RecipientType == (int)UserRole.HeadOfDepartment)
-                .OrderByDescending(x => x.CreationDate)
-                .FirstOrDefault();
+            var oldWorkflowResponsible = WorkflowService.GetOldWorkflowResponsible(_document, x => x.RecipientType == (int)UserRole.HeadOfDepartment);
 
-            ResetWorkflowRecord(responsibleHeadOfDepartmentRecord, command);
+            var newWorkflowResponsible = new WorkflowHistory();
+            ResetWorkflowRecord(oldWorkflowResponsible, newWorkflowResponsible, command);
 
-            responsibleHeadOfDepartmentRecord.Status = DocumentStatus.InWorkMayorDeclined;
+            newWorkflowResponsible.Status = DocumentStatus.InWorkMayorDeclined;
 
-            _document.IncomingDocument.WorkflowHistory.Add(responsibleHeadOfDepartmentRecord);
+            _document.IncomingDocument.WorkflowHistory.Add(newWorkflowResponsible);
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
         {
-            if (!IsTransitionAllowed(command, lastWorkFlowRecord, allowedTransitionStatuses)) return false;
+            if (!WorkflowService.IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
+            {
+                TransitionNotAllowed(command);
+                return false;
+            }
 
             if (command.Decision != (int)Decision.Approved || command.Decision != (int)Decision.Declined)
             {
