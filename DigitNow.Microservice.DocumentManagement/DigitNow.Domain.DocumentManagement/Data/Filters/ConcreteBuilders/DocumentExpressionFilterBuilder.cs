@@ -100,13 +100,19 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
 
         protected override void InternalBuild()
         {
-            BuildFilterByRegistryType();
-            BuildFilterByRegistrationNo();
-            BuildFilterByRegistrationDate();
-            BuildFilterByDocumentType();
-            BuildFilterByDocumentCategory();
-            BuildFilterByDocumentState();
-            BuildFilterByIdentifiers();
+            if (EntityFilter.DocumentIdentifiersFilter != null)
+            {
+                BuildFilterByIdentifiers();
+            }
+            else
+            {
+                BuildFilterByRegistryType();
+                BuildFilterByRegistrationNo();
+                BuildFilterByRegistrationDate();
+                BuildFilterByDocumentType();
+                BuildFilterByDocumentCategory();
+                BuildFilterByDocumentState();
+            }
         }
     }
 }
