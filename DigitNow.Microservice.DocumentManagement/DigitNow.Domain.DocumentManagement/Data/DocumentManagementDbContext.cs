@@ -43,7 +43,6 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<RegistrationNumberCounter> RegistrationNumberCounters { get; set; }
         public DbSet<SpecialRegister> SpecialRegisters { get; set; }
         public DbSet<SpecialRegisterMapping> SpecialRegisterMappings { get; set; }
-        
         public DbSet<UploadedFile> UploadedFiles { get; set; }
         public DbSet<DocumentUploadedFile> DocumentUploadedFiles { get; set; }
 
