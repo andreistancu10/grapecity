@@ -53,22 +53,23 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             var userModel = await GetCurrentUserAsync(cancellationToken);
 
-            var result = default(long);
+            var documentsCountQuery = default(IQueryable<Document>);
+
             if (userModel.Roles.ToList().Contains((long)UserRole.Mayor))
             {
-                result = await _dbContext.Documents
-                    .WhereAll(predicates)
-                    .CountAsync(cancellationToken);
+                documentsCountQuery = _dbContext.Documents
+                    .WhereAll(predicates);
             }
             else
             {
                 var relatedUserIds = await GetRelatedUserIdsASync(userModel, cancellationToken);
 
-                result = await _dbContext.Documents
+                documentsCountQuery = _dbContext.Documents
                     .WhereAll(predicates)
-                    .Where(x => relatedUserIds.Contains(x.CreatedBy))
-                    .CountAsync(cancellationToken);
+                    .Where(x => relatedUserIds.Contains(x.CreatedBy));
             }
+
+            var result = await documentsCountQuery.CountAsync(cancellationToken);
 
             return result;
         }
@@ -77,29 +78,29 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             var userModel = await GetCurrentUserAsync(cancellationToken);
 
-            var documents = default(List<Document>);
+            var documentsQuery = default(IQueryable<Document>);
 
             if (userModel.Roles.Contains((long)UserRole.Mayor))
             {
-                documents = await _dbContext.Documents
+                documentsQuery = _dbContext.Documents
                     .WhereAll(predicates)
                     .OrderByDescending(x => x.RegistrationDate)
                     .Skip((page - 1) * count)
-                    .Take(count)
-                    .ToListAsync(cancellationToken);
+                    .Take(count);
             }
             else
             {
                 var relatedUserIds = await GetRelatedUserIdsASync(userModel, cancellationToken);
 
-                documents = await _dbContext.Documents
+                documentsQuery = _dbContext.Documents
                     .WhereAll(predicates)
                     .Where(x => relatedUserIds.Contains(x.CreatedBy))
                     .OrderByDescending(x => x.RegistrationDate)
                     .Skip((page - 1) * count)
-                    .Take(count)
-                    .ToListAsync(cancellationToken);
+                    .Take(count);
             }
+
+            var documents = await documentsQuery.ToListAsync(cancellationToken);
 
             var documentsRelationsBag = await GetDocumentsRelationsBagAsync(documents, cancellationToken);
 
