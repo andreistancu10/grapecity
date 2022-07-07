@@ -14,4 +14,5 @@ public record CreateOutgoingDocumentRequest
     public int DocumentTypeId { get; init; }  //TODO: Rename it to DocumentCategoryId
     public string? DocumentTypeDetail { get; init; }
     public List<int>? ConnectedDocumentIds { get; init; }
+    public List<long> UploadedFileIds { get; set; }
 }

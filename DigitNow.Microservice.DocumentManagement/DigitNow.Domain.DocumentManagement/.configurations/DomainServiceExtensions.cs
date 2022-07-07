@@ -69,9 +69,12 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<IIncomingDocumentService, IncomingDocumentService>();
             services.AddTransient<IInternalDocumentService, InternalDocumentService>();
             services.AddTransient<IOutgoingDocumentService, OutgoingDocumentService>();
+            services.AddTransient<IVirtualDocumentService, VirtualDocumentService>();
             services.AddTransient<IDocumentResolutionService, DocumentResolutionService>();
             services.AddTransient<ISpecialRegisterMappingService, SpecialRegisterMappingService>();
             services.AddTransient<ISpecialRegisterService, SpecialRegisterService>();
+            services.AddTransient<IFileService, FileService>();
+            services.AddTransient<IUploadedFileService, UploadedFileService>();
 
             return services;
         }

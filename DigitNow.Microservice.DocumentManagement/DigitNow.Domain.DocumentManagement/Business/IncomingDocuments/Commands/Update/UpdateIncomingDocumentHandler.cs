@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
@@ -16,19 +17,24 @@ public class UpdateIncomingDocumentHandler : ICommandHandler<UpdateIncomingDocum
 {
     private readonly DocumentManagementDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly IUploadedFileService _uploadedFileService;
 
-    public UpdateIncomingDocumentHandler(DocumentManagementDbContext dbContext, IMapper mapper)
+    public UpdateIncomingDocumentHandler(DocumentManagementDbContext dbContext, IMapper mapper, IUploadedFileService uploadedFileService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _uploadedFileService = uploadedFileService;
     }
 
     public async Task<ResultObject> Handle(UpdateIncomingDocumentCommand request, CancellationToken cancellationToken)
     {
-        var dbIncomingDocuments = await _dbContext.IncomingDocuments.Include(cd => cd.ConnectedDocuments)
+        var dbIncomingDocument = await _dbContext.IncomingDocuments
+            .Include(cd => cd.ConnectedDocuments)
+            .Include(c=>c.Document)
+            .ThenInclude(c=>c.DocumentUploadedFiles)
             .FirstOrDefaultAsync(doc => doc.Id == request.Id, cancellationToken: cancellationToken);
 
-        if (dbIncomingDocuments is null)
+        if (dbIncomingDocument is null)
             return ResultObject.Error(new ErrorMessage
             {
                 Message = $"Incoming Document with id {request.Id} does not exist.",
@@ -36,20 +42,20 @@ public class UpdateIncomingDocumentHandler : ICommandHandler<UpdateIncomingDocum
                 Parameters = new object[] { request.Id }
             });
 
-        var incomingDocumentIds = dbIncomingDocuments.ConnectedDocuments
+        var incomingDocumentIds = dbIncomingDocument.ConnectedDocuments
             .Where(x => x.DocumentType == DocumentType.Incoming)
             .Select(cd => cd.RegistrationNumber)
             .ToList();
 
+        await RemoveConnectedDocumentsAsync(request, incomingDocumentIds, dbIncomingDocument, cancellationToken);
+        await AddConnectedDocsAsync(request, incomingDocumentIds, dbIncomingDocument, cancellationToken);
+        await _uploadedFileService.UpdateDocumentUploadedFilesAsync(request.UploadedFileIds, dbIncomingDocument.Document, cancellationToken);
 
-        await RemoveConnectedDocumentsAsync(request, incomingDocumentIds, dbIncomingDocuments, cancellationToken);
-        await AddConnectedDocsAsync(request, incomingDocumentIds, dbIncomingDocuments, cancellationToken);        
-
-        _mapper.Map(request, dbIncomingDocuments);
+        _mapper.Map(request, dbIncomingDocument);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return ResultObject.Ok(dbIncomingDocuments.Id);
+        return ResultObject.Ok(dbIncomingDocument.Id);
     }
 
     private async Task<bool> AddConnectedDocsAsync(UpdateIncomingDocumentCommand request, IList<long> incomingDocumentIds, IncomingDocument dbIncomingDocuments, CancellationToken cancellationToken)
