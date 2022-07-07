@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update;
+using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.GetById;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.GetRegistrationProof;
 using DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
@@ -13,7 +14,8 @@ using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments;
 
-[Authorize]
+//[Authorize]
+[AllowAnonymous]
 [ApiController]
 [Route("api/incoming-documents")]
 public class IncomingDocumentsController : ApiController
@@ -30,6 +32,18 @@ public class IncomingDocumentsController : ApiController
         _mediator = mediator;
         _mapper = mapper;
         _httpContextAccessor = httpContextAccessor;
+    }
+
+    [HttpGet("{id:long}")]
+    public async Task<IActionResult> GetById([FromRoute] long id, CancellationToken cancellationToken)
+    {
+        var query = new GetIncomingDocumentByIdQuery { Id = id };
+
+        return await _mediator.Send(query, cancellationToken) switch
+        {
+            null => NotFound(),
+            var result => Ok(result)
+        };
     }
 
     [HttpPost]

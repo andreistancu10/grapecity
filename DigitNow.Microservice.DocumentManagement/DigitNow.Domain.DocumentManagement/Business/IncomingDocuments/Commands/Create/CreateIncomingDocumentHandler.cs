@@ -21,19 +21,16 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
     private readonly IMapper _mapper;
     private readonly IDocumentService _service;
     private readonly IIdentityAdapterClient _identityAdapterClient;
-    private readonly IIncomingDocumentService _incomingDocumentService;
 
     public CreateIncomingDocumentHandler(DocumentManagementDbContext dbContext, 
         IMapper mapper, 
         IDocumentService service, 
-        IIdentityAdapterClient identityAdapterClient,
-        IIncomingDocumentService incomingDocumentService)
+        IIdentityAdapterClient identityAdapterClient)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _service = service;
         _identityAdapterClient = identityAdapterClient;
-        _incomingDocumentService = incomingDocumentService;
     }
 
     public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
@@ -57,7 +54,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             {
                 RecipientType = (int)UserRole.HeadOfDepartment,
                 RecipientId = request.RecipientId,
-                Status = (int)DocumentStatus.InWorkUnallocated,
+                Status = DocumentStatus.InWorkUnallocated,
                 CreationDate = DateTime.Now,
                 RegistrationNumber = newIncomingDocument.Document.RegistrationNumber
             });
