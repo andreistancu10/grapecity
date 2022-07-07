@@ -5,8 +5,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Business\Consumers\**" />
 	  <Compile Remove="Business\Dashboard\Commands\GetDocuments\**" />
+	  <EmbeddedResource Remove="Business\Consumers\**" />
 	  <EmbeddedResource Remove="Business\Dashboard\Commands\GetDocuments\**" />
+	  <None Remove="Business\Consumers\**" />
 	  <None Remove="Business\Dashboard\Commands\GetDocuments\**" />
 	</ItemGroup>
 
@@ -82,6 +85,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Public\Maintenance\" />
 		<Folder Include="Business\Consumers\" />
 		<Folder Include="Public\SpecialRegisters\Validators\" />
 	</ItemGroup>
