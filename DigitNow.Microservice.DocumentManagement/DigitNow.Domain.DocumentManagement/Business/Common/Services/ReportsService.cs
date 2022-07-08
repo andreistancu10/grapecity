@@ -7,5 +7,5 @@ public interface IReportService
 
 public class ReportsService : IReportService
 {
-    public 
+
 }

@@ -1,10 +1,8 @@
 ﻿using System;
-using DigitNow.Adapters.MS.Catalog.Poco;
-using DocumentType = DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums.DocumentType;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries;
+namespace DigitNow.Domain.DocumentManagement.Business.Common.Models;
 
-public class GetReportResponse
+public class ReportViewModel
 {
     public long Id { get; set; }
     public int RegistrationNumber { get; set; }

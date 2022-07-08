@@ -1,11 +1,10 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.Models;
+using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
+namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings;
 
 public class GetDocumentsMappings : Profile
 {
@@ -37,7 +36,6 @@ public class GetDocumentsMappings : Profile
             .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.VirtualDocument.DocumentTypeId))
             .ForMember(c => c.User, opt => opt.MapFrom<MapUserFromAggregate>())
             .ForMember(c => c.DocumentCategory, opt => opt.MapFrom<MapDocumentCategory>());
-
         CreateMap<VirtualDocumentAggregate<InternalDocument>, DocumentViewModel>()
             .ForMember(c => c.Id, opt => opt.MapFrom(src => src.VirtualDocument.Document.Id))
             .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>())

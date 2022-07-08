@@ -16,17 +16,21 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, GetDocuments
 {
     private readonly IMapper _mapper;
     private readonly IDashboardService _dashboardService;
+    private readonly IDocumentMappingService _documentMappingService;
 
     private int PreviousYear => DateTime.UtcNow.Year - 1;
 
-    public GetDocumentsHandler(IMapper mapper, IDashboardService dashboardService)
+    public GetDocumentsHandler(IMapper mapper,
+        IDashboardService dashboardService,
+        IDocumentMappingService documentMappingService)
     {
         _mapper = mapper;
         _dashboardService = dashboardService;
+        _documentMappingService = documentMappingService;
     }
 
     public Task<GetDocumentsResponse> Handle(GetDocumentsQuery query, CancellationToken cancellationToken)
-    {        
+    {
         if (query.Filter == null)
         {
             return GetSimpleResponseAsync(query, cancellationToken);
@@ -36,16 +40,16 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, GetDocuments
 
     private async Task<GetDocumentsResponse> GetSimpleResponseAsync(GetDocumentsQuery query, CancellationToken cancellationToken)
     {
-        var predicates = PredicateFactory.CreatePredicatesList<Document>(x => x.CreatedAt.Year >= PreviousYear);
+        var totalItems = await _dashboardService.CountAllDocumentsAsync(query.Filter, cancellationToken);
 
-        var totalItems = await _dashboardService.CountAllDocumentsAsync(predicates, cancellationToken);
-
-        var items = await _dashboardService.GetAllDocumentsAsync(predicates,
+        var documents = await _dashboardService.GetAllDocumentsAsync(query.Filter,
                 query.Page,
                 query.Count,
             cancellationToken);
 
-        return BuildDocumentResponse(query, totalItems, items);
+        var viewModels = await _documentMappingService.MapToDocumentViewModelAsync(documents, cancellationToken);
+
+        return BuildDocumentResponse(query, totalItems, viewModels);
     }
 
     private async Task<GetDocumentsResponse> GetComplexResponseAsync(GetDocumentsQuery query, CancellationToken cancellationToken)
@@ -54,15 +58,16 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, GetDocuments
             .GetDocumentPredicatesByFilter(query.Filter)
             .Build();
 
-        var totalItems = await _dashboardService.CountAllDocumentsAsync(predicates, cancellationToken);
+        var totalItems = await _dashboardService.CountAllDocumentsAsync(query.Filter, cancellationToken);
 
-        var items = await _dashboardService.GetAllDocumentsAsync(
-            predicates,
+        var documents = await _dashboardService.GetAllDocumentsAsync(
             query.Page,
             query.Count,
             cancellationToken);
 
-        return BuildDocumentResponse(query, totalItems, items);
+        var viewModels = await _documentMappingService.MapToDocumentViewModelAsync(documents, cancellationToken);
+
+        return BuildDocumentResponse(query, totalItems, viewModels);
     }
 
     private GetDocumentsResponse BuildDocumentResponse(GetDocumentsQuery query, long totalItems, IList<DocumentViewModel> items)
