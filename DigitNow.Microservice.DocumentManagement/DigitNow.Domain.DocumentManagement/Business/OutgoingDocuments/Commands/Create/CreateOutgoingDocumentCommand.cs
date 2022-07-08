@@ -14,4 +14,5 @@ public class CreateOutgoingDocumentCommand : ICommand<ResultObject>
     public int DocumentTypeId { get; set; }
     public string? DocumentTypeDetail { get; set; }
     public List<int>? ConnectedDocumentIds { get; set; }
+    public List<long> UploadedFileIds { get; set; }
 }

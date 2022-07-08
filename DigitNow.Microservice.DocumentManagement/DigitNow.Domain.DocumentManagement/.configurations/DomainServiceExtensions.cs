@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using DigitNow.Adapters.MS.Identity;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generators;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
 using DigitNow.Domain.DocumentManagement.configurations.HostedServices;
@@ -16,6 +17,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ShiftIn.Domain.Authentication.Client;
+using System.Reflection;
 
 namespace DigitNow.Domain.DocumentManagement.configurations
 {
@@ -66,19 +68,20 @@ namespace DigitNow.Domain.DocumentManagement.configurations
         
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
+            services.AddScoped<IPdfGenerator, PdfGenerator>();
+            services.AddScoped<IPdfDocumentGenerator, PdfDocumentGenerator>();
             services.AddTransient<IIdentityService, IdentityService>();
             services.AddTransient<IDocumentService, DocumentService>();
             services.AddTransient<IIncomingDocumentService, IncomingDocumentService>();
             services.AddTransient<IInternalDocumentService, InternalDocumentService>();
             services.AddTransient<IOutgoingDocumentService, OutgoingDocumentService>();
+            services.AddTransient<IVirtualDocumentService, VirtualDocumentService>();
             services.AddTransient<IDocumentResolutionService, DocumentResolutionService>();
+            services.AddTransient<ISpecialRegisterMappingService, SpecialRegisterMappingService>();
             services.AddTransient<ISpecialRegisterService, SpecialRegisterService>();
+            services.AddTransient<IFileService, FileService>();
+            services.AddTransient<IUploadedFileService, UploadedFileService>();
             services.AddTransient<IWorkflowManagementService, WorkflowManagementService>();
-
-            //BaseWorkflowManager.WorkflowService = services.BuildServiceProvider().GetService<IWorkflowManagementService>();
-            //BaseWorkflowManager.IdentityService = services.BuildServiceProvider().GetService<IIdentityAdapterClient>();
-
-
 
             return services;
         }

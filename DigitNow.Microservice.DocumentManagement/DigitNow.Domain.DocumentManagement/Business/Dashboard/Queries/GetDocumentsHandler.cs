@@ -8,37 +8,36 @@ using AutoMapper;
 using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Extensions;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Infrastructure.Data.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
 
-// TODO: Refactor code and move dbContext to service
 public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedList<GetDocumentResponse>>
 {
-    private readonly DocumentManagementDbContext _dbContext;
     private readonly IDocumentService _documentService;
+    private readonly IVirtualDocumentService _virtualDocumentService;
     private readonly IIdentityService _identityService;
     private readonly IIdentityAdapterClient _identityAdapterClient;
     private readonly IMapper _mapper;
 
     private int PreviousYear => DateTime.UtcNow.Year - 1;
 
-    public GetDocumentsHandler(DocumentManagementDbContext dbContext,
+    public GetDocumentsHandler(
         IMapper mapper,
         IDocumentService documentService,
         IIdentityService identityService,
-        IIdentityAdapterClient identityAdapterClient)
+        IIdentityAdapterClient identityAdapterClient, 
+        IVirtualDocumentService virtualDocumentService)
     {
-        _dbContext = dbContext;
         _documentService = documentService;
         _identityService = identityService;
         _identityAdapterClient = identityAdapterClient;
+        _virtualDocumentService = virtualDocumentService;
         _mapper = mapper;
     }
 
@@ -54,7 +53,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
         {
             pageCount += 1;
         }
-        
+
         var header = new PagingHeader(
             allDocumentsCount,
             request.Page,
@@ -80,7 +79,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
             &&
             relatedUserIds.Contains(x.CreatedBy)
         , cancellationToken);
-        
+
     }
 
     private async Task<List<GetDocumentResponse>> GetAllDocumentsAsync(int page, int count, CancellationToken cancellationToken)
@@ -88,12 +87,11 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
         var user = await _identityAdapterClient.GetUserByIdAsync(_identityService.GetCurrentUserId(), cancellationToken);
         if (user == null) throw new InvalidOperationException(); //TODO: Add not found exception
 
-        var documents = default(List<Document>);
+        List<Document> documents;
 
         if (user.Roles.ToList().Contains((long)UserRole.Mayor))
         {
-            documents = await _dbContext.Documents
-                .Where(x => x.CreatedAt.Year >= PreviousYear)
+            documents = await _documentService.FindAllQueryable(x => x.CreatedAt.Year >= PreviousYear)
                 .OrderByDescending(x => x.RegistrationDate)
                 .Skip((page - 1) * count)
                 .Take(count)
@@ -103,8 +101,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
         {
             var relatedUserIds = await GetRelatedUserIdsASync(user, cancellationToken);
 
-            documents = await _dbContext.Documents
-                .Where(x => x.CreatedAt.Year >= PreviousYear && relatedUserIds.Contains(x.CreatedBy))
+            documents = await _documentService.FindAllQueryable(x => x.CreatedAt.Year >= PreviousYear && relatedUserIds.Contains(x.CreatedBy))
                 .OrderByDescending(x => x.RegistrationDate)
                 .Skip((page - 1) * count)
                 .Take(count)
@@ -140,10 +137,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
         where T : VirtualDocument
     {
         var documentIds = documents.Select(x => x.Id).ToList();
-        var virtualDocuments = await _dbContext.Set<T>()
-            .Includes(includes)
-            .Where(x => documentIds.Contains(x.DocumentId))
-            .ToListAsync(cancellationToken);
+        var virtualDocuments = await _virtualDocumentService.FindAllAsync(x => documentIds.Contains(x.DocumentId), cancellationToken, includes);
         var documentRegistry = documents.ToDictionary(x => x, y => virtualDocuments.Where(x => x.DocumentId == y.Id));
         var result = new List<GetDocumentResponse>();
 
@@ -151,9 +145,10 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
         {
             foreach (var virtualDocument in document)
             {
-                result.Add(_mapper.Map<T, GetDocumentResponse>(virtualDocument));
+                result.Add(_mapper.Map<T, GetDocumentResponse>(virtualDocument as T));
             }
         }
+
         return result;
     }
 
@@ -167,8 +162,9 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
         if (user.Roles.ToList().Contains((long)UserRole.HeadOfDepartment))
         {
             var departmentId = user.Departments.FirstOrDefault();
-            var departmentUsers = await _identityAdapterClient.GetUsersByDepartmentIdAsync(departmentId, cancellationToken);
-            return departmentUsers.Users.Select(x => x.Id).ToList();
+
+            var response = await _identityAdapterClient.GetUsersAsync(cancellationToken);
+            return response.Users.Where(x => x.Departments.Contains(departmentId)).Select(x => x.Id);
         }
 
         throw new InvalidOperationException(); //TODO: Add descriptive error

@@ -4,7 +4,7 @@ namespace DigitNow.Adapters.MS.Catalog
 {
     public interface ICatalogAdapterClient
     {
-        Task<DocumentType> GetDocumentTypeById(int id, CancellationToken cancellationToken);
+        Task<DocumentType> GetDocumentTypeByIdAsync(int id, CancellationToken cancellationToken);
     }
     public class CatalogAdapterClient : ICatalogAdapterClient
     {
@@ -14,7 +14,7 @@ namespace DigitNow.Adapters.MS.Catalog
         {
             _catalogHttpClient = catalogHttpClient;
         }
-        public Task<DocumentType> GetDocumentTypeById(int id, CancellationToken cancellationToken) => _catalogHttpClient.GetAsync<DocumentType>($"api/DocumentTypes/{id}", cancellationToken);
+        public Task<DocumentType> GetDocumentTypeByIdAsync(int id, CancellationToken cancellationToken) => _catalogHttpClient.GetAsync<DocumentType>($"DocumentTypes/{id}", cancellationToken);
         
     }
 }

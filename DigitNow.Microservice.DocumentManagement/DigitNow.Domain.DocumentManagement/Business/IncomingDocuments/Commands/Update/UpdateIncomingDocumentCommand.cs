@@ -23,4 +23,5 @@ public class UpdateIncomingDocumentCommand : ICommand<ResultObject>
     public bool? IsUrgent { get; set; }
     public bool? IsGDPRAgreed { get; set; }
     public List<long> ConnectedDocumentIds { get; set; }
+    public List<long> UploadedFileIds { get; set; }
 }

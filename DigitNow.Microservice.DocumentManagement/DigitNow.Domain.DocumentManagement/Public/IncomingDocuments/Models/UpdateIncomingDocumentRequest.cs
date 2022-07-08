@@ -21,4 +21,5 @@ public class UpdateIncomingDocumentRequest
     public bool? IsGDPRAgreed { get; set; }
     public UpdateContactDetailsRequest ContactDetail { get; set; }
     public List<int> ConnectedDocumentIds { get; set; }
+    public List<long> UploadedFileIds { get; set; }
 }
