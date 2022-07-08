@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
@@ -6,21 +7,30 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
     {
         #region [ Entity ]
 
-        public long Id { get; set; }
+        [Column(nameof(Id), Order = 1)]
+        public new long Id { get; set; }
 
         #endregion
 
         #region [ IExtendedEntity ]
 
+        [Column(nameof(CreatedAt), Order = 2)]
         public DateTime CreatedAt { get; set; }
+
+        [Column(nameof(CreatedBy), Order = 3)]
         public long CreatedBy { get; set; }
+
+        [Column(nameof(ModifiedAt), Order = 4)]
         public DateTime ModifiedAt { get; set; }
+
+        [Column(nameof(ModifiedBy), Order = 5)]
         public long ModifiedBy { get; set; }
 
         #endregion
 
         #region [ Parent Relationship ]
 
+        [Column(nameof(DocumentId), Order = 6)]
         public long DocumentId { get; set; }
 
         #endregion
