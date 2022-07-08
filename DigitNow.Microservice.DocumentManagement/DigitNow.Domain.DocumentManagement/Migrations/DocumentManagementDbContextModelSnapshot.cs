@@ -204,7 +204,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<long>("CreatedBy")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("DocumentId")
+                    b.Property<long>("DocumentId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("ModifiedAt")
@@ -213,7 +213,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<long>("ModifiedBy")
                         .HasColumnType("bigint");
 
-                    b.Property<long?>("UploadedFileId")
+                    b.Property<long>("UploadedFileId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
@@ -440,7 +440,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("RegistrationNumberCounters", "DocumentMangement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterAssociations.SpecialRegisterMapping", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMapping.SpecialRegisterMapping", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -634,12 +634,16 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles.DocumentUploadedFile", b =>
                 {
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Document", "Document")
-                        .WithMany()
-                        .HasForeignKey("DocumentId");
+                        .WithMany("DocumentUploadedFiles")
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.UploadedFiles.UploadedFile", "UploadedFile")
                         .WithMany()
-                        .HasForeignKey("UploadedFileId");
+                        .HasForeignKey("UploadedFileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Document");
 
@@ -693,7 +697,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("Document");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterAssociations.SpecialRegisterMapping", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMapping.SpecialRegisterMapping", b =>
                 {
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", "IncomingDocument")
                         .WithMany()
@@ -723,6 +727,8 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Document", b =>
                 {
+                    b.Navigation("DocumentUploadedFiles");
+
                     b.Navigation("IncomingDocument");
 
                     b.Navigation("InternalDocument");

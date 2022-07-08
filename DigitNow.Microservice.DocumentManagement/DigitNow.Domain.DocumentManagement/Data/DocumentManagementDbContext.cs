@@ -1,4 +1,4 @@
-﻿#undef MIGRATION_ONLY
+﻿#define MIGRATION_ONLY
 
 using System;
 using Microsoft.EntityFrameworkCore;
