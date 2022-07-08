@@ -75,8 +75,6 @@ public class IncomingDocumentsController : ApiController
 
         return File(response.Content, response.ContentType, response.Name);
     }
-}
-
     [HttpPost("{id}/submit-workflow")]
     public async Task<IActionResult> SubmitWorkflowDecision([FromRoute] int id, [FromBody] CreateWorkflowDecisionRequest request)
     {
