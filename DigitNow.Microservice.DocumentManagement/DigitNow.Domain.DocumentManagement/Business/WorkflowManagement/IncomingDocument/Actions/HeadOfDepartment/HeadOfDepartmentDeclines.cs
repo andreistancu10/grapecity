@@ -16,33 +16,37 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
     {
         public HeadOfDepartmentDeclines(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
+        private Document _document;
+        private ICreateWorkflowHistoryCommand _command;
         private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkUnallocated, (int)DocumentStatus.OpinionRequestedUnallocated, (int)DocumentStatus.InWorkDelegatedUnallocated };
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            var document = await WorkflowService.GetDocumentById(command.DocumentId, token);
-            var lastWorkFlowRecord = WorkflowService.GetLastWorkflowRecord(document);
+            _command = command;
+            var _document = await WorkflowService.GetDocumentById(command.DocumentId, token);
+            var lastWorkFlowRecord = WorkflowService.GetLastWorkflowRecord(_document);
 
             if (!Validate(command, lastWorkFlowRecord))
-                return command;
-
-            var user = await GetUserByIdAsync((long)command.RecipientId, token);
-
-            if (!UserExists(user, command))
                 return command;
 
             var newDocumentStatus = lastWorkFlowRecord.Status == DocumentStatus.OpinionRequestedUnallocated
                 ? DocumentStatus.InWorkAllocated
                 : DocumentStatus.NewDeclinedCompetence;
 
-            document.IncomingDocument.WorkflowHistory
-                .Add(WorkflowHistoryFactory
-                .Create(document, UserRole.Functionary, user, newDocumentStatus, command.DeclineReason));
+            _document.Status = newDocumentStatus;
 
-            document.Status = newDocumentStatus;
+            await SetResponsibleBasedOnStatus(newDocumentStatus, token);
 
             await WorkflowService.CommitChangesAsync(token);
 
             return command;
+        }
+
+        private async Task SetResponsibleBasedOnStatus(DocumentStatus newDocumentStatus, CancellationToken token)
+        {
+            if (newDocumentStatus == DocumentStatus.InWorkAllocated)
+                PassDocumentToFunctionary(_document, _command);
+            else
+                await PassDocumentToRegistry(_document, _command, token);
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)

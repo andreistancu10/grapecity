@@ -6,6 +6,7 @@ using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using System;
+using DigitNow.Adapters.MS.Identity.Poco;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions.HeadOfDepartment
 {
@@ -22,7 +23,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
 
-            var user = await  GetUserByIdAsync((long)command.RecipientId, token);
+            var user = await IdentityAdapterClient.GetUserByIdAsync((long)command.RecipientId, token);
+
+            if (!UserExists(user, command))
+                return command;
 
             var newDocumentStatus = lastWorkFlowRecord.Status == DocumentStatus.OpinionRequestedUnallocated
                 ? DocumentStatus.OpinionRequestedAllocated

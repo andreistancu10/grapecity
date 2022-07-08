@@ -24,7 +24,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
 
-            var headOfDepartment = await GetUserByDepartmentIdAsync((long)command.RecipientId, token);
+            var headOfDepartment = await FetchHeadOfDepartmentByDepartmentId((long)command.RecipientId, token);
+
+            if (!UserExists(headOfDepartment, command))
+                return command;
 
             document.IncomingDocument.WorkflowHistory
                 .Add(WorkflowHistoryFactory

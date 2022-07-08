@@ -1,5 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
+﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
@@ -14,13 +13,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
         public FunctionaryDeclines(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
         private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.OpinionRequestedAllocated };
-        private Document _document;
-        private ICreateWorkflowHistoryCommand _command;
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            _command = command;
-            _document = await WorkflowService.GetDocumentById(command.DocumentId, token);
-            var lastWorkFlowRecord = WorkflowService.GetLastWorkflowRecord(_document);
+            var document = await WorkflowService.GetDocumentById(command.DocumentId, token);
+            var lastWorkFlowRecord = WorkflowService.GetLastWorkflowRecord(document);
 
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
@@ -30,39 +26,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
                 : DocumentStatus.NewDeclinedCompetence;
 
             if (newDocumentStatus == DocumentStatus.InWorkAllocated)
-                PassDocumentToFunctionary(command);
+                PassDocumentToFunctionary(document, command);
             else
-                await PassDocumentToRegistry(token);
+                await PassDocumentToRegistry(document, command, token);
 
-            _document.Status = newDocumentStatus;
+            document.Status = newDocumentStatus;
 
             await WorkflowService.CommitChangesAsync(token);
 
             return command;
-        }
-
-        private async Task PassDocumentToRegistry(CancellationToken token)
-        {
-            var creator = await GetUserByIdAsync(_document.CreatedBy, token);
-
-            _document.IncomingDocument.WorkflowHistory
-                .Add(WorkflowHistoryFactory
-                .Create(_document, UserRole.Functionary, creator, DocumentStatus.NewDeclinedCompetence, _command.DeclineReason, _command.Remarks));
-        }
-
-        private void PassDocumentToFunctionary(ICreateWorkflowHistoryCommand command)
-        {
-            var oldWorkflowResponsible = WorkflowService
-                .GetOldWorkflowResponsible(_document, x => x.RecipientType == (int)UserRole.Functionary);
-
-            var newWorkflowResponsible = new WorkflowHistory();
-            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
-
-            newWorkflowResponsible.Status = DocumentStatus.InWorkAllocated;
-            newWorkflowResponsible.DeclineReason = _command.DeclineReason;
-            newWorkflowResponsible.Remarks = _command.Remarks;
-
-            _document.IncomingDocument.WorkflowHistory.Add(newWorkflowResponsible);
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
