@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using HTSS.Platform.Core.Errors;
 using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
@@ -23,14 +24,16 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
     private readonly IMapper _mapper;
     private readonly IDocumentService _documentService;
     private readonly IIdentityAdapterClient _identityAdapterClient;
-    private readonly IUploadedFileService _uploadedFileService;
     private readonly IIncomingDocumentService _incomingDocumentService;
+    private readonly ISpecialRegisterMappingService _specialRegisterMappingService;
+    private readonly IUploadedFileService _uploadedFileService;
 
     public CreateIncomingDocumentHandler(DocumentManagementDbContext dbContext,
         IMapper mapper,
         IDocumentService documentService,
         IIdentityAdapterClient identityAdapterClient,
-        IIncomingDocumentService incomingDocumentService, 
+        IIncomingDocumentService incomingDocumentService,
+        ISpecialRegisterMappingService specialRegisterMappingService,
         IUploadedFileService uploadedFileService)
     {
         _dbContext = dbContext;
@@ -39,6 +42,8 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
         _identityAdapterClient = identityAdapterClient;
         _incomingDocumentService = incomingDocumentService;
         _uploadedFileService = uploadedFileService;
+        _incomingDocumentService = incomingDocumentService;
+        _specialRegisterMappingService = specialRegisterMappingService;
     }
 
     public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
@@ -71,10 +76,11 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             });
 
             await _dbContext.SaveChangesAsync(cancellationToken);
+            await _specialRegisterMappingService.MapDocumentAsync(newIncomingDocument, cancellationToken);
         }
         catch (Exception ex)
         {
-            return ResultObject.Error(new ErrorMessage()
+            return ResultObject.Error(new ErrorMessage
             {
                 Message = ex.InnerException?.Message
             });
@@ -99,6 +105,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             }
         }
     }
+
     private async Task CreateContactDetailsAsync(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
     {
         var contactDetails = request.ContactDetail;
