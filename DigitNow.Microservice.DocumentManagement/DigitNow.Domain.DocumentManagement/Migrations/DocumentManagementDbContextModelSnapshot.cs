@@ -605,8 +605,8 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Resolution")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("Resolution")
+                        .HasColumnType("int");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");

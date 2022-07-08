@@ -11,7 +11,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public string RecipientName { get; set; }
         public string Remarks { get; set; }
         public string DeclineReason { get; set; }
-        public string Resolution { get; set; }
+        public int? Resolution { get; set; }
         public DateTime? OpinionRequestedUntil { get; set; }
         public DocumentStatus Status { get; set; }
         public int RegistrationNumber { get; set; }

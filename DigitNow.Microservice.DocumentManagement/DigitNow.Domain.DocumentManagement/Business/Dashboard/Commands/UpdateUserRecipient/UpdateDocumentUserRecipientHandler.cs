@@ -97,7 +97,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
             doc.Document.Status = status;
 
             doc.WorkflowHistory.Add(
-                new WorkflowHistory()
+                new Data.Entities.WorkflowHistory()
                 {
                     RecipientType = isHeadOfDepartment ? (int)UserRole.HeadOfDepartment : (int)UserRole.Functionary,
                     RecipientId = (int)_user.Id,

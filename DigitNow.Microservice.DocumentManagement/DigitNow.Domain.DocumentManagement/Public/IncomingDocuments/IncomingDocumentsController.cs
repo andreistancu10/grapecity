@@ -3,18 +3,18 @@ using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Cre
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.GetById;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.GetRegistrationProof;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments;
 
-[Authorize]
+//[Authorize]
 [ApiController]
 [Route("api/incoming-documents")]
 public class IncomingDocumentsController : ApiController
@@ -74,5 +74,15 @@ public class IncomingDocumentsController : ApiController
         }
 
         return File(response.Content, response.ContentType, response.Name);
+    }
+}
+
+    [HttpPost("{id}/submit-workflow")]
+    public async Task<IActionResult> SubmitWorkflowDecision([FromRoute] int id, [FromBody] CreateWorkflowDecisionRequest request)
+    {
+        var command = _mapper.Map<CreateWorkflowDecisionCommand>(request);
+        command.DocumentId = id;
+
+        return CreateResponse(await _mediator.Send(command));
     }
 }

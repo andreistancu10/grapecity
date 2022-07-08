@@ -9,14 +9,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
 {
     public static class WorkflowHistoryFactory
     {
-        public static WorkflowHistory Create(Document document, UserRole role, User user, DocumentStatus documentStatus)
+        public static WorkflowHistory Create(Document document, UserRole role, User user, DocumentStatus documentStatus, string declineReason = "", string remarks = "", DateTime? opinionRequestedUntil = null)
             => new WorkflowHistory {
                 RecipientType = (int)role,
                 RecipientId = user.Id,
                 RecipientName = user.FormatUserNameByRole(role),
                 Status = documentStatus,
                 CreationDate = DateTime.Now,
-                RegistrationNumber = document.RegistrationNumber
+                RegistrationNumber = document.RegistrationNumber,
+                DeclineReason = declineReason,
+                Remarks = remarks,
+                OpinionRequestedUntil = opinionRequestedUntil
             };
     }
 }

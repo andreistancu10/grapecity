@@ -48,7 +48,7 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
         await _uploadedFileService.CreateDocumentUploadedFilesAsync(request.UploadedFileIds, newOutgoingDocument.Document, cancellationToken);
 
         newOutgoingDocument.WorkflowHistory.Add(
-            new WorkflowHistory
+            new Data.Entities.WorkflowHistory
             {
                 RecipientType = (int)UserRole.HeadOfDepartment,
                 RecipientId = newOutgoingDocument.RecipientId,
