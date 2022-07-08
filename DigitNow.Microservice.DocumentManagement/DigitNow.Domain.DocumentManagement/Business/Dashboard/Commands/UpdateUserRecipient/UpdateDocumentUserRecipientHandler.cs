@@ -54,13 +54,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
             return new ResultObject(ResultStatusCode.Ok);
         }
 
-        private async Task UpdateRecipientForOutgoingDocuments(List<long> registrationNumbers)
+        private async Task UpdateRecipientForOutgoingDocuments(List<long> documentIds)
         {
-            foreach (var registrationNumber in registrationNumbers)
+            foreach (var documentId in documentIds)
             {
                 var doc = await _dbContext.OutgoingDocuments
                     .Include(x => x.Document)
-                    .FirstOrDefaultAsync(x => x.Document.RegistrationNumber == registrationNumber);
+                    .FirstOrDefaultAsync(x => x.DocumentId == documentId);
 
                 if (doc != null)
                 {
@@ -70,26 +70,26 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
             }
         }
 
-        private async Task UpdateRecipientForInternalDocuments(List<long> registrationNumbers)
+        private async Task UpdateRecipientForInternalDocuments(List<long> documentIds)
         {
-            foreach (var registrationNumber in registrationNumbers)
+            foreach (var documentId in documentIds)
             {
                 var internalDoc = await _dbContext.InternalDocuments
                     .Include(x => x.Document)
-                    .FirstOrDefaultAsync(x => x.Document.RegistrationNumber == registrationNumber);
+                    .FirstOrDefaultAsync(x => x.DocumentId == documentId);
 
                 if (internalDoc != null)
                     internalDoc.ReceiverDepartmentId = (int)_user.Id;     
             }
         }
 
-        private async Task UpdateRecipientForIncomingDocuments(List<long> registrationNumbers)
+        private async Task UpdateRecipientForIncomingDocuments(List<long> documentIds)
         {
-            foreach (var registrationNumber in registrationNumbers)
+            foreach (var documentId in documentIds)
             {
                 var doc = await _dbContext.IncomingDocuments
                     .Include(x => x.Document)
-                    .FirstOrDefaultAsync(x => x.Document.RegistrationNumber == registrationNumber);
+                    .FirstOrDefaultAsync(x => x.DocumentId == documentId);
 
                 if (doc != null)
                 {
