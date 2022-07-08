@@ -1,14 +1,13 @@
-﻿#undef MIGRATION_ONLY
+﻿#define MIGRATION_ONLY
+#if     MIGRATION_ONLY
+using Microsoft.EntityFrameworkCore.Design;
+#endif
 
 using System;
 using Microsoft.EntityFrameworkCore;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using System.Threading.Tasks;
 using System.Threading;
-
-#if  MIGRATION_ONLY
-using Microsoft.EntityFrameworkCore.Design;
-#endif
 
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles;
