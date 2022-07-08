@@ -18,7 +18,9 @@ public class UpdateSpecialRegisterHandler : ICommandHandler<UpdateSpecialRegiste
 
     public async Task<ResultObject> Handle(UpdateSpecialRegisterCommand command, CancellationToken cancellationToken)
     {
-        if (await _specialRegisterService.AnyAsync(c => c.DocumentCategoryId == command.DocumentCategoryId, cancellationToken))
+        if (await _specialRegisterService.AnyAsync(c => c.DocumentCategoryId == command.DocumentCategoryId &&
+                                                        c.Id != command.Id,
+                cancellationToken))
         {
             return ResultObject.Error(new ErrorMessage
             {
@@ -29,8 +31,9 @@ public class UpdateSpecialRegisterHandler : ICommandHandler<UpdateSpecialRegiste
         var specialRegister = await _specialRegisterService
             .FindAsync(c => c.Id == command.Id,
                 cancellationToken);
-        
+
         specialRegister.DocumentCategoryId = command.DocumentCategoryId;
+        specialRegister.Observations = command.Observations;
         await _specialRegisterService.UpdateAsync(specialRegister, cancellationToken);
 
         return ResultObject.Ok();

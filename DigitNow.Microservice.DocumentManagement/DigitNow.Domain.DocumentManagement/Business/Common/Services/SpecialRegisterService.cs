@@ -30,6 +30,7 @@ public class SpecialRegisterService : ISpecialRegisterService
     public async Task<SpecialRegister> CreateAsync(SpecialRegister specialRegister, CancellationToken cancellationToken)
     {
         await _dbContext.SpecialRegisters.AddAsync(specialRegister, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
 
         return specialRegister;
     }

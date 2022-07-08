@@ -23,10 +23,8 @@ public class CreateSpecialRegisterHandler : ICommandHandler<CreateSpecialRegiste
 
     public async Task<ResultObject> Handle(CreateSpecialRegisterCommand request, CancellationToken cancellationToken)
     {
-        var lowerRequestName = request.Name.ToLowerInvariant();
-
         if (await _specialRegisterService
-                .AnyAsync(c => c.Name.ToLowerInvariant() == lowerRequestName,
+                .AnyAsync(c => c.Name.ToLower() == request.Name.ToLower(),
                     cancellationToken))
         {
             return ResultObject.Error(new ErrorMessage
