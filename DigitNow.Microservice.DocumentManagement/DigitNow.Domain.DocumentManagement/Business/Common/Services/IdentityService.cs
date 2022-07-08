@@ -29,7 +29,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
         public long GetCurrentUserId()
         {
-            return 1;
+            return 7;
             if (!TryGetCurrentUserId(out int userId))
             {
                 throw new UnauthorizedAccessException("UserId is not attached on the request!");

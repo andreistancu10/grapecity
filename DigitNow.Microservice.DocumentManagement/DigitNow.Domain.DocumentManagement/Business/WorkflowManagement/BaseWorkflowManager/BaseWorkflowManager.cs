@@ -31,12 +31,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
 
         public async Task<User> FetchHeadOfDepartmentByDepartmentId(long id, CancellationToken token)
         {
-            var users = await IdentityAdapterClient.GetUsersByDepartmentIdAsync(id, token);
-            return users.Users.FirstOrDefault(x => x.Roles.Contains((long)UserRole.HeadOfDepartment));
+            return new User();
         }
 
         public async Task<User> GetMayorAsync(CancellationToken token)
         {
+
             var users = await AuthenticationClient.GetUsersWithExtensions(token);
             var user = new User() { FirstName = "Ciprian", LastName = "Rosca" };
             return user;

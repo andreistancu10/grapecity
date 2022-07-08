@@ -46,7 +46,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
         private async Task<ICreateWorkflowHistoryCommand> ApplicationApproved(ICreateWorkflowHistoryCommand command, Document document)
         {
-            var user = await GetMayorAsync(2, _token);
+            var user = await GetMayorAsync(_token);
 
             if (!UserExists(user, command))
                 return command;
