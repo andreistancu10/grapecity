@@ -89,6 +89,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Folder Include="Migrations\" />
 		<Folder Include="Public\Maintenance\" />
 		<Folder Include="Business\Consumers\" />
 		<Folder Include="Public\SpecialRegisters\Validators\" />
