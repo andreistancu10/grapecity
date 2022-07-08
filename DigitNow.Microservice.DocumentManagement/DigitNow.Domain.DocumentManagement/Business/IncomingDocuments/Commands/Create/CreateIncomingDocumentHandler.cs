@@ -11,10 +11,9 @@ using HTSS.Platform.Core.Errors;
 using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles;
+using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
 
@@ -24,7 +23,6 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
     private readonly IMapper _mapper;
     private readonly IDocumentService _documentService;
     private readonly IIdentityAdapterClient _identityAdapterClient;
-    private readonly IIncomingDocumentService _incomingDocumentService;
     private readonly ISpecialRegisterMappingService _specialRegisterMappingService;
     private readonly IUploadedFileService _uploadedFileService;
 
@@ -40,9 +38,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
         _mapper = mapper;
         _documentService = documentService;
         _identityAdapterClient = identityAdapterClient;
-        _incomingDocumentService = incomingDocumentService;
         _uploadedFileService = uploadedFileService;
-        _incomingDocumentService = incomingDocumentService;
         _specialRegisterMappingService = specialRegisterMappingService;
     }
 
@@ -50,6 +46,10 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
     {
         if (!string.IsNullOrWhiteSpace(request.IdentificationNumber))
             await CreateContactDetailsAsync(request, cancellationToken);
+
+        var response = await _identityAdapterClient.GetUsersAsync(cancellationToken);
+        var departmentUsers = response.Users.Where(x => x.Departments.Contains(request.RecipientId));
+        var headOfDepartment = departmentUsers.FirstOrDefault(x => x.Roles.Contains((long)UserRole.HeadOfDepartment));
 
         var newIncomingDocument = _mapper.Map<IncomingDocument>(request);
 
@@ -65,15 +65,8 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             await _documentService.AddDocument(newDocument, cancellationToken);
             await _uploadedFileService.CreateDocumentUploadedFilesAsync(request.UploadedFileIds, newDocument, cancellationToken);
 
-            newIncomingDocument.WorkflowHistory.Add(
-            new WorkflowHistory
-            {
-                RecipientType = (int)UserRole.HeadOfDepartment,
-                RecipientId = request.RecipientId,
-                Status = DocumentStatus.InWorkUnallocated,
-                CreationDate = DateTime.Now,
-                RegistrationNumber = newIncomingDocument.Document.RegistrationNumber
-            });
+            newIncomingDocument.WorkflowHistory.Add(WorkflowHistoryFactory
+                .Create(newDocument, UserRole.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkUnallocated));
 
             await _dbContext.SaveChangesAsync(cancellationToken);
             await _specialRegisterMappingService.MapDocumentAsync(newIncomingDocument, cancellationToken);
