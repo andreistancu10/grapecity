@@ -20,6 +20,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IIdentityAdapterClient _identityAdapterClient;
         private User _user;
+        private DocumentStatus _status;
+        private bool _isHeadOfDepartment;
 
         public UpdateDocumentUserRecipientHandler(DocumentManagementDbContext dbContext, IIdentityAdapterClient identityAdapterClient)
         {
@@ -38,15 +40,34 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                     Parameters = new object[] { request.UserId }
                 });
 
+            _isHeadOfDepartment = _user.Roles.Contains((long)UserRole.HeadOfDepartment);
+            _status = _isHeadOfDepartment ? DocumentStatus.InWorkDelegatedUnallocated : DocumentStatus.InWorkDelegated;
 
             await UpdateRecipientForIncomingDocuments(request.RegistrationNumbers);
 
             await UpdateRecipientForInternalDocuments(request.RegistrationNumbers);
 
+            await UpdateRecipientForOutgoingDocuments(request.RegistrationNumbers);
 
             await _dbContext.SaveChangesAsync();
 
             return new ResultObject(ResultStatusCode.Ok);
+        }
+
+        private async Task UpdateRecipientForOutgoingDocuments(List<long> registrationNumbers)
+        {
+            foreach (var registrationNumber in registrationNumbers)
+            {
+                var doc = await _dbContext.OutgoingDocuments
+                    .Include(x => x.Document)
+                    .FirstOrDefaultAsync(x => x.Document.RegistrationNumber == registrationNumber);
+
+                if (doc != null)
+                {
+                    doc.RecipientId = (int)_user.Id;
+                    CreateWorkflowRecord(doc);
+                }
+            }
         }
 
         private async Task UpdateRecipientForInternalDocuments(List<long> registrationNumbers)
@@ -78,20 +99,28 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
             }
         }
 
-        private void CreateWorkflowRecord(IncomingDocument doc)
+        private void CreateWorkflowRecord(VirtualDocument document)
         {
-            var isHeadOfDepartment = _user.Roles.Contains((long)UserRole.HeadOfDepartment);
-            var status = isHeadOfDepartment ? DocumentStatus.InWorkDelegatedUnallocated : DocumentStatus.InWorkDelegated;
-
-            doc.Document.Status = status;
+            var type = document.GetType();
+            dynamic doc;
+            if (type.Name.Equals("IncomingDocument"))
+            {
+                doc = (IncomingDocument)document;
+            }
+            else
+            {
+                doc = (OutgoingDocument)document;
+            }
+            
+            doc.Document.Status = _status;
 
             doc.WorkflowHistory.Add(
                 new WorkflowHistory()
                 {
-                    RecipientType = isHeadOfDepartment ? (int)UserRole.HeadOfDepartment : (int)UserRole.Functionary,
+                    RecipientType = _isHeadOfDepartment ? (int)UserRole.HeadOfDepartment : (int)UserRole.Functionary,
                     RecipientId = (int)_user.Id,
-                    RecipientName =_user.FormatUserNameByRole( isHeadOfDepartment ? UserRole.HeadOfDepartment : UserRole.Functionary),
-                    Status = status,
+                    RecipientName =_user.FormatUserNameByRole(_isHeadOfDepartment ? UserRole.HeadOfDepartment : UserRole.Functionary),
+                    Status = _status,
                     CreationDate = DateTime.Now,
                     RegistrationNumber = doc.Document.RegistrationNumber
                 });
