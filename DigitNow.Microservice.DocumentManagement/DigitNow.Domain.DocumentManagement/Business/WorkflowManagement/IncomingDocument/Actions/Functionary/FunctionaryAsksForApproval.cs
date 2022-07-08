@@ -1,0 +1,50 @@
+﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
+using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions.Functionary
+{
+    public class FunctionaryAsksForApproval : BaseWorkflowManager, IWorkflowHandler
+    {
+        public FunctionaryAsksForApproval(IServiceProvider serviceProvider) : base(serviceProvider) { }
+
+        private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.OpinionRequestedAllocated };
+        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
+        {
+            var document = await WorkflowService.GetDocumentById(command.DocumentId, token);
+            var lastWorkFlowRecord = WorkflowService.GetLastWorkflowRecord(document);
+
+            if (!Validate(command, lastWorkFlowRecord))
+                return command;
+
+            var oldWorkflowResponsible = WorkflowService.GetOldWorkflowResponsible(document, x => x.RecipientType == (int)UserRole.HeadOfDepartment);
+
+            var newWorkflowResponsible = new WorkflowHistory();
+            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
+
+            newWorkflowResponsible.Status = document.Status = DocumentStatus.InWorkApprovalRequested;
+            newWorkflowResponsible.Resolution = command.Resolution;
+
+            WorkflowService.AddWorkflowRecord(document, newWorkflowResponsible);
+            WorkflowService.SetNewRecipientBasedOnWorkflowDecision(document, newWorkflowResponsible.RecipientId);
+            
+            await WorkflowService.CommitChangesAsync(token);
+
+            return command;
+        }
+
+        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
+        {
+            if (command.RecipientId <= 0 || !WorkflowService.IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
+            {
+                TransitionNotAllowed(command);
+                return false;
+            }
+            return true;
+        }
+    }
+}
