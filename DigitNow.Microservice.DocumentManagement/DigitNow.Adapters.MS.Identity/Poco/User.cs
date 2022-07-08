@@ -33,5 +33,8 @@ namespace DigitNow.Adapters.MS.Identity.Poco
 
         [JsonProperty("departments")]
         public IEnumerable<long> Departments { get; set; } = new List<long>();
+        
+        [JsonProperty("tenantRoles")]
+        public IEnumerable<long> TenantRoles { get; set; } = new List<long>();
     }
 }

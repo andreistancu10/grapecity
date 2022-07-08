@@ -26,8 +26,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
         }
         public async Task<ResultObject> Handle(UpdateDocumentHeadOfDepartmentCommand request, CancellationToken cancellationToken)
         {
-            var users = await _identityAdapterClient.GetUsersByDepartmentIdAsync(request.DepartmentId, cancellationToken);
-            _headOfDepartment = users.Users.FirstOrDefault(x => x.Roles.Contains((long)UserRole.HeadOfDepartment));
+            var response = await _identityAdapterClient.GetUsersAsync(cancellationToken);
+            var departmentUsers = response.Users.Where(x => x.Departments.Contains(request.DepartmentId));
+            _headOfDepartment = departmentUsers.FirstOrDefault(x => x.Roles.Contains((long)UserRole.HeadOfDepartment));
 
             if (_headOfDepartment == null)
                 return ResultObject.Error(new ErrorMessage

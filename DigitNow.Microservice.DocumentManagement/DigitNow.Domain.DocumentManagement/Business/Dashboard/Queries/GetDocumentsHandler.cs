@@ -162,8 +162,9 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
         if (user.Roles.ToList().Contains((long)UserRole.HeadOfDepartment))
         {
             var departmentId = user.Departments.FirstOrDefault();
-            var departmentUsers = await _identityAdapterClient.GetUsersByDepartmentIdAsync(departmentId, cancellationToken);
-            return departmentUsers.Users.Select(x => x.Id).ToList();
+
+            var response = await _identityAdapterClient.GetUsersAsync(cancellationToken);
+            return response.Users.Where(x => x.Departments.Contains(departmentId)).Select(x => x.Id);
         }
 
         throw new InvalidOperationException(); //TODO: Add descriptive error
