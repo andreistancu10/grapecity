@@ -1,4 +1,5 @@
 ﻿#define MIGRATION_ONLY
+
 #if     MIGRATION_ONLY
 using Microsoft.EntityFrameworkCore.Design;
 #endif

@@ -141,11 +141,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             if (userModel.Roles.ToList().Contains((long)UserRole.HeadOfDepartment))
             {
-                // Note: This should be refactored along with adapters
-                var departmentId = userModel.Departments.FirstOrDefault();
-                var departmentUsers = await _identityAdapterClient.GetUsersByDepartmentIdAsync(departmentId, cancellationToken);
+                var usersResponse = await _identityAdapterClient.GetUsersAsync(cancellationToken);
 
-                return departmentUsers.Users
+                return usersResponse.Users
                     .Select(x => _mapper.Map<UserModel>(x))
                     .Append(userModel)
                     .ToList();

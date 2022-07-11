@@ -24,7 +24,7 @@ public interface IDocumentMappingService
     Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<Document> documents, CancellationToken cancellationToken);
 }
 
-public class DocumentMappingService
+public class DocumentMappingService : IDocumentMappingService
 {
     private readonly DocumentManagementDbContext _dbContext;
     private readonly IMapper _mapper;
