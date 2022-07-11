@@ -12,6 +12,7 @@ using DigitNow.Domain.DocumentManagement.Data.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
@@ -21,7 +22,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IDashboardService
     {
-        Task<long> CountAllDocumentsAsync(IList<Expression<Func<Document, bool>>> predicate, CancellationToken cancellationToken);
+        Task<long> CountAllDocumentsAsync(IList<Expression<Func<Document, bool>>> predicates, CancellationToken cancellationToken);
         Task<List<DocumentViewModel>> GetAllDocumentsAsync(IList<Expression<Func<Document, bool>>> predicates, int page, int count, CancellationToken cancellationToken);
     }
 
@@ -62,7 +63,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
             else
             {
-                var relatedUserIds = await GetRelatedUserIdsASync(userModel, cancellationToken);
+                var relatedUserIds = await GetRelatedUserIdsAsync(userModel, cancellationToken);
 
                 documentsCountQuery = _dbContext.Documents
                     .WhereAll(predicates)
@@ -90,7 +91,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
             else
             {
-                var relatedUserIds = await GetRelatedUserIdsASync(userModel, cancellationToken);
+                var relatedUserIds = await GetRelatedUserIdsAsync(userModel, cancellationToken);
 
                 documentsQuery = _dbContext.Documents
                     .WhereAll(predicates)
@@ -113,7 +114,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             var getUserByIdResponse = await _authenticationClient.GetUserById(userId, cancellationToken);
             if (getUserByIdResponse == null)
-                throw new InvalidOperationException(); //TODO: Add not found exception
+                throw new UnauthorizedAccessException("Cannot retrieve request user!");                
 
             return _mapper.Map<UserModel>(getUserByIdResponse);            
         }
@@ -156,7 +157,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             foreach (var registryEntry in documentRegistry)
             {
                 var document = registryEntry.Key;
-
+                
                 foreach (var virtualDocument in registryEntry.Value)
                 {
                     // Note: ViewModels relationships can be loaded dynamically in future versions
@@ -189,7 +190,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return new List<UserModel> { userModel };
         }
 
-        private async Task<IEnumerable<long>> GetRelatedUserIdsASync(UserModel userModel, CancellationToken cancellationToken) =>
+        private async Task<IEnumerable<long>> GetRelatedUserIdsAsync(UserModel userModel, CancellationToken cancellationToken) =>
             (await GetRelatedUsersAsync(userModel, cancellationToken)).Select(x => x.Id);
 
         private async Task<DocumentRelationsBag> GetDocumentsRelationsBagAsync(IList<Document> documents, CancellationToken cancellationToken)
