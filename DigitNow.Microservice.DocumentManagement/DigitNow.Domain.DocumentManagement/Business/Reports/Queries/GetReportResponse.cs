@@ -1,6 +1,4 @@
 ﻿using System;
-using DigitNow.Adapters.MS.Catalog.Poco;
-using DocumentType = DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums.DocumentType;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries;
 

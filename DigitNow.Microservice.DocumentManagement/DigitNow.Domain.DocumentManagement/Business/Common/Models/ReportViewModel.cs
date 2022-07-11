@@ -11,10 +11,10 @@ public class ReportViewModel
     public int DocumentType { get; set; }
     public BasicViewModel DocumentCategory { get; set; }
     public BasicViewModel Issuer{ get; set; }
-    public int Recipient { get; set; }
+    public BasicViewModel Recipient { get; set; }
     public BasicViewModel Functionary { get; set; }
     public DateTime AllocationDate { get; set; }
     public DateTime ResolutionDate { get; set; }
-    public int CurrentStatus { get; set; }
+    public int? CurrentStatus { get; set; }
     public int Expired { get; set; }
 }

@@ -15,7 +15,7 @@ public class GetReportMapping : Profile
             .ForMember(c => c.Id, opt => opt.MapFrom(src => src.VirtualDocument.Document.Id))
             .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationDate))
             .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationNumber))
-            .ForMember(c => c.Recipient, opt => opt.MapFrom(src => src.VirtualDocument.RecipientId))
+            .ForMember(c => c.Recipient, opt => opt.MapFrom<MapRecipient>())
             .ForMember(c => c.Issuer, opt => opt.MapFrom<MapUserFromAggregate>())
             .ForMember(c => c.CurrentStatus, opt => opt.MapFrom<MapDocumentCurrentStatus>())
             .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>())
@@ -30,7 +30,7 @@ public class GetReportMapping : Profile
             .ForMember(c => c.Id, opt => opt.MapFrom(src => src.VirtualDocument.Document.Id))
             .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationDate))
             .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationNumber))
-            .ForMember(c => c.Recipient, opt => opt.MapFrom(src => src.VirtualDocument.RecipientId))
+            .ForMember(c => c.Recipient, opt => opt.MapFrom<MapRecipient>())
             .ForMember(c => c.Issuer, opt => opt.MapFrom<MapUserFromAggregate>())
             .ForMember(c => c.CurrentStatus, opt => opt.MapFrom<MapDocumentCurrentStatus>())
             .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>())
@@ -45,7 +45,7 @@ public class GetReportMapping : Profile
             .ForMember(c => c.Id, opt => opt.MapFrom(src => src.VirtualDocument.Document.Id))
             .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationDate))
             .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationNumber))
-            .ForMember(c => c.Recipient, opt => opt.MapFrom(src => src.VirtualDocument.RecipientId))
+            .ForMember(c => c.Recipient, opt => opt.MapFrom<MapRecipient>())
             .ForMember(c => c.Issuer, opt => opt.MapFrom<MapUserFromAggregate>())
             .ForMember(c => c.CurrentStatus, opt => opt.MapFrom<MapDocumentCurrentStatus>())
             .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>())
@@ -55,24 +55,6 @@ public class GetReportMapping : Profile
             .ForMember(c => c.ResolutionDate, opt => opt.MapFrom<MapResolutionDate>())
             .ForMember(c => c.Expired, opt => opt.MapFrom<MapExpired>())
             .ForMember(c => c.SpecialRegister, opt => opt.MapFrom<MapSpecialRegister>());
-
-        //CreateMap<VirtualDocumentAggregate<InternalDocument>, ReportViewModel>()
-        //    .ForMember(c => c.Id, opt => opt.MapFrom(src => src.VirtualDocument.Document.Id))
-        //    .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationDate))
-        //    .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationNumber))
-        //    .ForMember(c => c.Recipient, opt => opt.MapFrom(src => src.VirtualDocument.RecipientName))
-        //    .ForMember(c => c.IssuerName, opt => opt.MapFrom(src => src.VirtualDocument.CreatedBy))
-        //    .ForMember(c => c.Status, opt => opt.MapFrom<MapDocumentCurrentStatus>())
-        //    .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>())
-        //    .ForMember(c => c.User, opt => opt.MapFrom<MapUserFromAggregate>())
-        //    .ForMember(c => c.DocumentCategoryId, opt => opt.MapFrom<MapDocumentCategory>());
-
-        //CreateMap<VirtualDocumentAggregate<OutgoingDocument>, ReportViewModel>()
-        //    .ForMember(c => c.Id, opt => opt.MapFrom(src => src.VirtualDocument.Document.Id))
-        //    .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>())
-        //    .ForMember(c => c.User, opt => opt.MapFrom<MapUserFromAggregate>())
-        //    .ForMember(c => c.DocumentCategoryId, opt => opt.MapFrom<MapDocumentCategory>());
-
     }
 
     private class MapFunctionary :
@@ -89,9 +71,12 @@ public class GetReportMapping : Profile
 
         public BasicViewModel Resolve(VirtualDocumentAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
         {
-            var lastWorkflowHistory = source.VirtualDocument.WorkflowHistory.Last(c => c.Status == DocumentStatus.InWorkAllocated);
+            //TODO: should Internal doc have WorkflowHistory?
+            var foundUser = source.Users.FirstOrDefault(x => x.Id == source.VirtualDocument.Document.CreatedBy);
 
-            return new BasicViewModel(lastWorkflowHistory.RecipientId, lastWorkflowHistory.RecipientName);
+            return foundUser != null ?
+                new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}") :
+                null;
         }
 
         public BasicViewModel Resolve(VirtualDocumentAggregate<OutgoingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
@@ -138,8 +123,9 @@ public class GetReportMapping : Profile
 
         public DateTime Resolve(VirtualDocumentAggregate<InternalDocument> source, ReportViewModel destination, DateTime destMember, ResolutionContext context)
         {
-            var allocationDate = source.VirtualDocument.WorkflowHistory.Last(c => c.Status == DocumentStatus.InWorkAllocated).CreationDate;
-            var resolutionDate = allocationDate.AddDays(source.VirtualDocument.ResolutionPeriod);
+            var allocationDate = source.VirtualDocument.Document.CreatedAt;
+            var resolutionPeriod = source.InternalCategories.First(c => c.Id == source.VirtualDocument.InternalDocumentTypeId).ResolutionPeriod;
+            var resolutionDate = allocationDate.AddDays(resolutionPeriod);
 
             return resolutionDate;
         }
@@ -147,7 +133,8 @@ public class GetReportMapping : Profile
         public DateTime Resolve(VirtualDocumentAggregate<OutgoingDocument> source, ReportViewModel destination, DateTime destMember, ResolutionContext context)
         {
             var allocationDate = source.VirtualDocument.WorkflowHistory.Last(c => c.Status == DocumentStatus.InWorkAllocated).CreationDate;
-            var resolutionDate = allocationDate.AddDays(source.VirtualDocument.ResolutionPeriod);
+            var resolutionPeriod = source.Categories.First(c => c.Id == source.VirtualDocument.DocumentTypeId).ResolutionPeriod;
+            var resolutionDate = allocationDate.AddDays(resolutionPeriod);
 
             return resolutionDate;
         }
@@ -169,18 +156,20 @@ public class GetReportMapping : Profile
 
         public int Resolve(VirtualDocumentAggregate<InternalDocument> source, ReportViewModel destination, int destMember, ResolutionContext context)
         {
-            var allocationDate = source.VirtualDocument.WorkflowHistory.Last(c => c.Status == DocumentStatus.InWorkAllocated).CreationDate;
-            var resolutionDate = allocationDate.AddDays(source.VirtualDocument.ResolutionPeriod);
-            var expired = DateTime.Now - resolutionDate;
+            var resolutionPeriod = source.InternalCategories.First(c => c.Id == source.VirtualDocument.InternalDocumentTypeId).ResolutionPeriod;
+            var allocationDate = source.VirtualDocument.Document.CreatedAt;
+            var resolutionDate = allocationDate.AddDays(resolutionPeriod);
+            var expired = DateTime.UtcNow - resolutionDate;
 
             return expired.Days;
         }
 
         public int Resolve(VirtualDocumentAggregate<OutgoingDocument> source, ReportViewModel destination, int destMember, ResolutionContext context)
         {
+            var resolutionPeriod = source.Categories.First(c => c.Id == source.VirtualDocument.DocumentTypeId).ResolutionPeriod;
             var allocationDate = source.VirtualDocument.WorkflowHistory.Last(c => c.Status == DocumentStatus.InWorkAllocated).CreationDate;
-            var resolutionDate = allocationDate.AddDays(source.VirtualDocument.ResolutionPeriod);
-            var expired = DateTime.Now - resolutionDate;
+            var resolutionDate = allocationDate.AddDays(resolutionPeriod);
+            var expired = DateTime.UtcNow - resolutionDate;
 
             return expired.Days;
         }
@@ -229,14 +218,18 @@ public class GetReportMapping : Profile
     }
 
     private class MapDocumentCurrentStatus :
-        IValueResolver<VirtualDocumentAggregate<IncomingDocument>, ReportViewModel, int>,
-        IValueResolver<VirtualDocumentAggregate<OutgoingDocument>, ReportViewModel, int>
+        IValueResolver<VirtualDocumentAggregate<IncomingDocument>, ReportViewModel, int?>,
+        IValueResolver<VirtualDocumentAggregate<OutgoingDocument>, ReportViewModel, int?>,
+        IValueResolver<VirtualDocumentAggregate<InternalDocument>, ReportViewModel, int?>
     {
-        public int Resolve(VirtualDocumentAggregate<IncomingDocument> source, ReportViewModel destination, int destMember, ResolutionContext context) =>
+        public int? Resolve(VirtualDocumentAggregate<IncomingDocument> source, ReportViewModel destination, int? destMember, ResolutionContext context) =>
             (int)source.VirtualDocument.Document.Status;
 
-        public int Resolve(VirtualDocumentAggregate<OutgoingDocument> source, ReportViewModel destination, int destMember, ResolutionContext context) =>
+        public int? Resolve(VirtualDocumentAggregate<OutgoingDocument> source, ReportViewModel destination, int? destMember, ResolutionContext context) =>
             (int)source.VirtualDocument.Document.Status;
+
+        public int? Resolve(VirtualDocumentAggregate<InternalDocument> source, ReportViewModel destination, int? destMember, ResolutionContext context) =>
+            null;
     }
 
     private class MapUserFromAggregate :
@@ -293,6 +286,30 @@ public class GetReportMapping : Profile
         {
             var foundCategory = source.InternalCategories.FirstOrDefault(x => x.Id == source.VirtualDocument.InternalDocumentTypeId);
             return new BasicViewModel(foundCategory.Id, foundCategory.Name);
+        }
+    }
+
+    private class MapRecipient :
+        IValueResolver<VirtualDocumentAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
+        IValueResolver<VirtualDocumentAggregate<OutgoingDocument>, ReportViewModel, BasicViewModel>,
+        IValueResolver<VirtualDocumentAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
+    {
+        public BasicViewModel Resolve(VirtualDocumentAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember,
+            ResolutionContext context)
+        {
+            throw new NotImplementedException();
+        }
+
+        public BasicViewModel Resolve(VirtualDocumentAggregate<OutgoingDocument> source, ReportViewModel destination, BasicViewModel destMember,
+            ResolutionContext context)
+        {
+            throw new NotImplementedException();
+        }
+
+        public BasicViewModel Resolve(VirtualDocumentAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember,
+            ResolutionContext context)
+        {
+            throw new NotImplementedException();
         }
     }
 }

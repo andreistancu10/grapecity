@@ -27,7 +27,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         Task<long> CountAllDocumentsAsync(CancellationToken cancellationToken);
         Task<long> CountAllDocumentsAsync(DocumentFilter documentFilter, CancellationToken cancellationToken);
 
-        Task<List<Document>> GetAllDocumentsAsync(int page, int count, CancellationToken cancellationToken);
+        Task<List<Document>> GetAllDocumentsAsync(int page, int count, CancellationToken cancellationToken, params Expression<Func<Document, bool>>[] predicates);
         Task<List<Document>> GetAllDocumentsAsync(DocumentFilter documentFilter, int page, int count, CancellationToken cancellationToken, params Expression<Func<Document, bool>>[] predicates);
     }
 
@@ -98,18 +98,24 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return result;
         }
 
-        public async Task<List<Document>> GetAllDocumentsAsync(int page, int count, CancellationToken cancellationToken)
+        public async Task<List<Document>> GetAllDocumentsAsync(int page, int count, CancellationToken cancellationToken, params Expression<Func<Document, bool>>[] predicates)
         {
-            var predicates = PredicateFactory.CreatePredicatesList<Document>(x => x.CreatedAt.Year >= PreviousYear);
+            var allPredicates = PredicateFactory.CreatePredicatesList<Document>(x => x.CreatedAt.Year >= PreviousYear).ToList();
 
-            return await GetAllInternalDocumentsAsync(predicates, page, count, cancellationToken);
+            if (predicates.Any())
+            {
+                allPredicates.AddRange(predicates);
+            }
+
+            return await GetAllInternalDocumentsAsync(allPredicates, page, count, cancellationToken);
         }
 
         public async Task<List<Document>> GetAllDocumentsAsync(DocumentFilter documentFilter, int page, int count, CancellationToken cancellationToken, params Expression<Func<Document, bool>>[] predicates)
         {
             var allPredicates = ExpressionFilterBuilderRegistry
                 .GetDocumentPredicatesByFilter(documentFilter)
-                .Build().ToList();
+                .Build()
+                .ToList();
 
             if (predicates.Any())
             {
