@@ -39,7 +39,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                     Parameters = new object[] { request.UserId }
                 });
 
-            _isHeadOfDepartment = _user.Roles.Contains((long)UserRole.HeadOfDepartment);
+            _isHeadOfDepartment = _user.Roles.Contains(UserRole.HeadOfDepartment.Code);
             _status = _isHeadOfDepartment ? DocumentStatus.InWorkDelegatedUnallocated : DocumentStatus.InWorkDelegated;
 
             await UpdateRecipientForIncomingDocuments(request.RegistrationNumbers);
