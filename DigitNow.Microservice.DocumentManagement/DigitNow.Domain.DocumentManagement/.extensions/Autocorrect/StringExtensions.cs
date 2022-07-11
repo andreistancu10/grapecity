@@ -1,5 +1,4 @@
 ﻿using DigitNow.Adapters.MS.Identity.Poco;
-using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using System;
 
 namespace DigitNow.Domain.DocumentManagement.extensions.Autocorrect
@@ -16,15 +15,19 @@ namespace DigitNow.Domain.DocumentManagement.extensions.Autocorrect
             };
         }
         
-        public static string FormatUserNameByRole(this User user, UserRole role)
+        public static string FormatUserNameByRole(this User user, string role)
         {
-            return role switch
+            switch (role)
             {
-                UserRole.HeadOfDepartment => user.LastName + " " + user.FirstName + " Sef Departament",
-                UserRole.Functionary => user.LastName + " " + user.FirstName + " Functionar",
-                UserRole.Mayor => user.LastName + " " + user.FirstName + " Primar",
-                _ => string.Empty,
-            };
+                case "headOfDepartment":
+                    return user.LastName + " " + user.FirstName + " Sef Departament";
+                case "functionary":
+                    return user.LastName + " " + user.FirstName + " Functionar";
+                case "mayor":
+                    return user.LastName + " " + user.FirstName + " Primar";
+                default:
+                    return string.Empty;
+            }
         }
     }
 }
