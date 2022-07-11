@@ -26,7 +26,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters
             private set;
         }
 
-        public ExpressionFilterBuilder(TFilter entityFilter)
+        protected ExpressionFilterBuilder(TFilter entityFilter)
         {
             GeneratedFilters = new List<Expression<Func<T, bool>>>();
             EntityFilter = entityFilter;

@@ -7,7 +7,6 @@ using DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using System.Threading.Tasks;
@@ -73,6 +72,6 @@ public class IncomingDocumentsController : ApiController
             return NotFound();
         }
 
-        return File(response.Content, response.ContentType, response.Name);
+        return Ok(File(response.Content, response.ContentType, response.Name));
     }
 }

@@ -8,7 +8,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         #region [ Entity ]
 
         [Column(nameof(Id), Order = 1)]
-        public new long Id { get; set; }
+        public long Id { get; set; }
 
         #endregion
 

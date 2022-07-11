@@ -6,17 +6,18 @@ using DigitNow.Domain.Catalog.Contracts.InternalDocumentTypes;
 using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMapping;
 using Domain.Authentication.Contracts;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings;
-
-public class ModelsMappings : Profile
+namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings
 {
-    public ModelsMappings()
+    public class ModelsMappings : Profile
     {
-        CreateMap<IGetUserByIdResponse, UserModel>();
-        CreateMap<User, UserModel>();
+        public ModelsMappings()
+        {
+            CreateMap<IGetUserByIdResponse, UserModel>();
+            CreateMap<User, UserModel>();
 
-        CreateMap<IDocumentTypeResponse, DocumentCategoryModel>();
-        CreateMap<IInternalDocumentTypeResponse, InternalDocumentCategoryModel>();
-        CreateMap<SpecialRegisterMapping, SpecialRegisterMappingModel>();
+            CreateMap<IDocumentTypeResponse, DocumentCategoryModel>();
+            CreateMap<IInternalDocumentTypeResponse, InternalDocumentCategoryModel>();
+            CreateMap<SpecialRegisterMapping, SpecialRegisterMappingModel>();
+        }
     }
 }
