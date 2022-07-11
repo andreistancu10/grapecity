@@ -84,8 +84,6 @@ public class GetReportMapping : Profile
     {
         public int Resolve(VirtualDocumentAggregate<IncomingDocument> source, GetReportResponse destination, int destMember, ResolutionContext context)
         {
-            source.SpecialRegisterMapping
-
             //TODO
             throw new System.NotImplementedException();
         }

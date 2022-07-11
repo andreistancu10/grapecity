@@ -12,7 +12,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Mappings
         {
             CreateMap<DocumentFilterDto, DocumentFilter>();
             {
-                CreateMap<DocumentRegistyTypeFilterDto, DocumentRegistyTypeFilter>();
+                CreateMap<DocumentRegistyTypeFilterDto, DocumentRegistryTypeFilter>();
                 CreateMap<DocumentRegistrationNoFilterDto, DocumentRegistrationNoFilter>();
                 CreateMap<DocumentRegistrationDateFilterDto, DocumentRegistrationDateFilter>();
                 CreateMap<DocumentTypeFilterDto, DocumentTypeFilter>();

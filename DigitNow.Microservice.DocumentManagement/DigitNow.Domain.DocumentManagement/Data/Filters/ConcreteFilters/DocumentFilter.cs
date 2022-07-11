@@ -6,7 +6,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
 {
     public class DocumentFilter
     {
-        public DocumentRegistyTypeFilter RegistryTypeFilter { get; set; }
+        public DocumentRegistryTypeFilter RegistryTypeFilter { get; set; }
 
         public DocumentRegistrationNoFilter RegistrationNoFilter { get; set; }
 
@@ -26,7 +26,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
         public List<long> Identifiers { get; set; }
     }
 
-    public class DocumentRegistyTypeFilter
+    public class DocumentRegistryTypeFilter
     {
         public string RegistryType { get; set; }
     }

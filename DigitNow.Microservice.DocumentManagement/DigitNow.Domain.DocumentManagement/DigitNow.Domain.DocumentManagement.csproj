@@ -8,16 +8,19 @@
 	  <Compile Remove="Business\Consumers\**" />
 	  <Compile Remove="Business\Dashboard\Commands\GetDocuments\**" />
 	  <Compile Remove="Business\Dashboard\Models\**" />
+	  <Compile Remove="Migrations\**" />
 	  <Compile Remove="Public\Maintenance\**" />
 	  <Compile Remove="Rpc\**" />
 	  <EmbeddedResource Remove="Business\Consumers\**" />
 	  <EmbeddedResource Remove="Business\Dashboard\Commands\GetDocuments\**" />
 	  <EmbeddedResource Remove="Business\Dashboard\Models\**" />
+	  <EmbeddedResource Remove="Migrations\**" />
 	  <EmbeddedResource Remove="Public\Maintenance\**" />
 	  <EmbeddedResource Remove="Rpc\**" />
 	  <None Remove="Business\Consumers\**" />
 	  <None Remove="Business\Dashboard\Commands\GetDocuments\**" />
 	  <None Remove="Business\Dashboard\Models\**" />
+	  <None Remove="Migrations\**" />
 	  <None Remove="Public\Maintenance\**" />
 	  <None Remove="Rpc\**" />
 	</ItemGroup>
@@ -105,6 +108,7 @@
 		<Folder Include="Public\Maintenance\" />
 		<Folder Include="Business\Consumers\" />
 		<Folder Include="Migrations\" />
+		<Folder Include="Public\Maintenance\" />
 		<Folder Include="Public\SpecialRegisters\Validators\" />
 	</ItemGroup>
 </Project>

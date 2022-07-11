@@ -1,11 +1,7 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Filters;
 using HTSS.Platform.Core.CQRS;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,8 +13,6 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, GetDocuments
     private readonly IMapper _mapper;
     private readonly IDashboardService _dashboardService;
     private readonly IDocumentMappingService _documentMappingService;
-
-    private int PreviousYear => DateTime.UtcNow.Year - 1;
 
     public GetDocumentsHandler(IMapper mapper,
         IDashboardService dashboardService,
@@ -54,10 +48,6 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, GetDocuments
 
     private async Task<GetDocumentsResponse> GetComplexResponseAsync(GetDocumentsQuery query, CancellationToken cancellationToken)
     {
-        var predicates = ExpressionFilterBuilderRegistry
-            .GetDocumentPredicatesByFilter(query.Filter)
-            .Build();
-
         var totalItems = await _dashboardService.CountAllDocumentsAsync(query.Filter, cancellationToken);
 
         var documents = await _dashboardService.GetAllDocumentsAsync(

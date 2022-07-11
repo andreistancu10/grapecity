@@ -4,7 +4,7 @@ namespace DigitNow.Adapters.MS.Identity
 {
     public interface IIdentityAdapterClient
     {
-        Task<UserList> GetUsersByDepartmentIdAsync(long id, CancellationToken cancellationToken);
+        Task<UserList> GetUsersAsync(CancellationToken cancellationToken);
         Task<User> GetUserByIdAsync(long id, CancellationToken cancellationToken);
         Task CreateContactDetailsAsync(ContactDetailDto contactDetail, CancellationToken cancellationToken);
     }
@@ -25,7 +25,7 @@ namespace DigitNow.Adapters.MS.Identity
             _identityHttpClient.GetAsync<User>($"userExtensions/{id}", cancellationToken);
        
 
-        public Task<UserList> GetUsersByDepartmentIdAsync(long id, CancellationToken cancellationToken) =>
-            _identityHttpClient.GetAsync<UserList>($"userExtensions/department/{id}", cancellationToken);
+        public Task<UserList> GetUsersAsync(CancellationToken cancellationToken) =>
+            _identityHttpClient.GetAsync<UserList>($"userExtensions/users/", cancellationToken);
     }
 }
