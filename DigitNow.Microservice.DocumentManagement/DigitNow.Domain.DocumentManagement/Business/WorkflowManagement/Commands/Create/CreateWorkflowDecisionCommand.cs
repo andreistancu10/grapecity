@@ -9,7 +9,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Command
     {
         public DocumentType DocumentType { get; set; }
         public int DocumentId { get; set; }
-        public UserRole InitiatorType { get; set; }
+        public int InitiatorType { get; set; }
         public int ActionType { get; set; }
         public long? RecipientId { get; set; }
         public string? Remarks { get; set; }

@@ -45,7 +45,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
         private void MayorApproved(ICreateWorkflowHistoryCommand command)
         {
-            var oldWorkflowResponsible = WorkflowService.GetOldWorkflowResponsible(_document, x => x.RecipientType == (int)UserRole.Functionary);
+            var oldWorkflowResponsible = WorkflowService.GetOldWorkflowResponsible(_document, x => x.RecipientType == UserRole.Functionary.Id);
 
             var newWorkflowResponsible = new WorkflowHistory();
             TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
@@ -57,7 +57,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
         private void MayorDeclined(ICreateWorkflowHistoryCommand command)
         {
-            var oldWorkflowResponsible = WorkflowService.GetOldWorkflowResponsible(_document, x => x.RecipientType == (int)UserRole.HeadOfDepartment);
+            var oldWorkflowResponsible = WorkflowService.GetOldWorkflowResponsible(_document, x => x.RecipientType == UserRole.HeadOfDepartment.Id);
 
             var newWorkflowResponsible = new WorkflowHistory();
             TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);

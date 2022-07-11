@@ -6,7 +6,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetWorkf
     {
         public DocumentStatus DocumentStatus { get; set; }
 
-        public UserRole UserRole { get; set; }
+        public int UserRole { get; set; }
 
     }
 }

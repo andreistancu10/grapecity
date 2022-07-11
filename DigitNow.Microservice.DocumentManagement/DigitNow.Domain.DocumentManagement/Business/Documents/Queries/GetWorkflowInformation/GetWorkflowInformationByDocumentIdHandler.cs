@@ -21,7 +21,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetWorkf
             var document = await _documentService.FindAsync(x => x.Id == request.DocumentId, cancellationToken);
             var userRole = await _identityService.GetCurrentUserRoleAsync(cancellationToken);
 
-            var response = new GetWorkflowInformationByDocumentIdResponse { DocumentStatus = document.Status, UserRole = userRole };
+            var response = new GetWorkflowInformationByDocumentIdResponse { DocumentStatus = document.Status, UserRole = userRole.Id };
             
             return response;
         }

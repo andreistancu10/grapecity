@@ -62,7 +62,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
         private ICreateWorkflowHistoryCommand ApplicationDeclined(ICreateWorkflowHistoryCommand command, Document document)
         {
-            var oldWorkflowResponsible = WorkflowService.GetOldWorkflowResponsible(document, x => x.RecipientType == (int)UserRole.Functionary);
+            var oldWorkflowResponsible = WorkflowService.GetOldWorkflowResponsible(document, x => x.RecipientType == UserRole.Functionary.Id);
 
             var newWorkflowResponsible = new WorkflowHistory();
             TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);

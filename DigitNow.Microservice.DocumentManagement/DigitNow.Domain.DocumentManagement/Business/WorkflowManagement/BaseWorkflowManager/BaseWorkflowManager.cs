@@ -34,15 +34,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             var response = await IdentityAdapterClient.GetUsersAsync(token);
             var departmentUsers = response.Users.Where(x => x.Departments.Contains(departmentId));
             
-            return departmentUsers.FirstOrDefault(x => x.Roles.Contains((long)UserRole.HeadOfDepartment));
+            return departmentUsers.FirstOrDefault(x => x.Roles.Contains(UserRole.HeadOfDepartment.Code));
         }
 
         public async Task<User> FetchMayorAsync(CancellationToken token)
         {
             var response = await IdentityAdapterClient.GetUsersAsync(token);
-            var departmentUsers = response.Users.Where(x => x.Departments.Contains(4));
-
-            return departmentUsers.FirstOrDefault(x => x.Roles.Contains((long)UserRole.HeadOfDepartment));
+            return response.Users.FirstOrDefault(x => x.Roles.Contains(UserRole.HeadOfDepartment.Code));
         }
 
         protected virtual void TransferResponsibility(WorkflowHistory oldRecord, WorkflowHistory newRecord, ICreateWorkflowHistoryCommand command)
@@ -94,7 +92,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
         protected void PassDocumentToFunctionary(Document document, ICreateWorkflowHistoryCommand command)
         {
             var oldWorkflowResponsible = WorkflowService
-                .GetOldWorkflowResponsible(document, x => x.RecipientType == (int)UserRole.Functionary);
+                .GetOldWorkflowResponsible(document, x => x.RecipientType == UserRole.Functionary.Id);
 
             var newWorkflowResponsible = new WorkflowHistory();
             TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);

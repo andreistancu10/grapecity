@@ -23,7 +23,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
 
-            var oldWorkflowResponsible = WorkflowService.GetOldWorkflowResponsible(document, x => x.RecipientType == (int)UserRole.HeadOfDepartment);
+            var oldWorkflowResponsible = WorkflowService.GetOldWorkflowResponsible(document, x => x.RecipientType == UserRole.HeadOfDepartment.Id);
 
             var newWorkflowResponsible = new WorkflowHistory();
             TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);

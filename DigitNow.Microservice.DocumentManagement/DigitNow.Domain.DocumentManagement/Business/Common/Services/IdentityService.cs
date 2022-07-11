@@ -29,7 +29,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
         public long GetCurrentUserId()
         {
-            return 7;
+            return 2;
             if (!TryGetCurrentUserId(out int userId))
             {
                 throw new UnauthorizedAccessException("UserId is not attached on the request!");
@@ -49,12 +49,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             var userId = GetCurrentUserId();
             var user = await _identityAdapterClient.GetUserByIdAsync(userId, cancellationToken);
 
-            var roles = Enum.GetValues(typeof(UserRole));
-            var rolesArray = roles.Cast<int>().ToArray();
+            var userRole = user.Roles.Intersect(UserRole.ListOfRoles.Select(x => x.Code)).FirstOrDefault();
 
-            var userRole = user.Roles.Intersect(rolesArray.Select(item => (long)item).ToArray()).FirstOrDefault();
-
-            return (UserRole)userRole;
+            return UserRole.ListOfRoles.FirstOrDefault(role => role.Code == userRole) ?? new UserRole { Id = 0 };
         }
     }
 }

@@ -8,17 +8,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
 {
     public class WorkflowInitiatorFactory
     {
-        private static readonly IDictionary<UserRole, Func<IWorkflowHandler>> factory = new Dictionary<UserRole, Func<IWorkflowHandler>>();
+        private static readonly IDictionary<int, Func<IWorkflowHandler>> factory = new Dictionary<int, Func<IWorkflowHandler>>();
         public WorkflowInitiatorFactory(IServiceProvider serviceProvider)
         {
             factory.Clear();
 
-            factory.Add(UserRole.HeadOfDepartment, () => new HeadOfDepartment(serviceProvider));
-            factory.Add(UserRole.Functionary, () => new Functionary(serviceProvider));
-            factory.Add(UserRole.Mayor, () => new Mayor(serviceProvider));
+            factory.Add(UserRole.HeadOfDepartment.Id, () => new HeadOfDepartment(serviceProvider));
+            factory.Add(UserRole.Functionary.Id, () => new Functionary(serviceProvider));
+            factory.Add(UserRole.Mayor.Id, () => new Mayor(serviceProvider));
         }
 
-        public IWorkflowHandler Create(UserRole userRole)
+        public IWorkflowHandler Create(int userRole)
         {
             return factory[userRole]();
         }

@@ -6,7 +6,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Documents.Models
     public class CreateWorkflowDecisionRequest
     {
         public DocumentType DocumentType { get; set; }
-        public UserRole InitiatorType { get; set; }
+        public int InitiatorType { get; set; }
         public int ActionType { get; set; }
         public string? Remarks { get; set; }
         public string? DeclineReason { get; set; }
