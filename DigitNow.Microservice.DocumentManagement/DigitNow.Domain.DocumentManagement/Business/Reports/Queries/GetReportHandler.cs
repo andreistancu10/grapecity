@@ -66,7 +66,11 @@ public class ExpiredReportsProcessor : IReport
             RegistrationDateFilter = request.DateFilter
         };
 
-        var documents = await _dashboardService.GetAllDocumentsAsync(filter, request.Page, request.Count, cancellationToken);
+        var documents = await _dashboardService.GetAllDocumentsAsync(filter,
+            request.Page,
+            request.Count,
+            cancellationToken,
+            c => c.Status != DocumentStatus.Finalized);
 
         return await _documentMappingService.MapToReportViewModelAsync(documents, cancellationToken);
     }

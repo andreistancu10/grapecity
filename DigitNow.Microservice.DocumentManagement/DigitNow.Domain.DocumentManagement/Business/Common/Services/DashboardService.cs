@@ -28,7 +28,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         Task<long> CountAllDocumentsAsync(DocumentFilter documentFilter, CancellationToken cancellationToken);
 
         Task<List<Document>> GetAllDocumentsAsync(int page, int count, CancellationToken cancellationToken);
-        Task<List<Document>> GetAllDocumentsAsync(DocumentFilter documentFilter, int page, int count, CancellationToken cancellationToken);
+        Task<List<Document>> GetAllDocumentsAsync(DocumentFilter documentFilter, int page, int count, CancellationToken cancellationToken, params Expression<Func<Document, bool>>[] predicates);
     }
 
     public class DashboardService : IDashboardService
@@ -105,13 +105,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return await GetAllInternalDocumentsAsync(predicates, page, count, cancellationToken);
         }
 
-        public async Task<List<Document>> GetAllDocumentsAsync(DocumentFilter documentFilter, int page, int count, CancellationToken cancellationToken)
+        public async Task<List<Document>> GetAllDocumentsAsync(DocumentFilter documentFilter, int page, int count, CancellationToken cancellationToken, params Expression<Func<Document, bool>>[] predicates)
         {
-            var predicates = ExpressionFilterBuilderRegistry
+            var allPredicates = ExpressionFilterBuilderRegistry
                 .GetDocumentPredicatesByFilter(documentFilter)
-                .Build();
+                .Build().ToList();
 
-            return await GetAllInternalDocumentsAsync(predicates, page, count, cancellationToken);
+            if (predicates.Any())
+            {
+                allPredicates.AddRange(predicates);
+            }
+
+            return await GetAllInternalDocumentsAsync(allPredicates, page, count, cancellationToken);
         }
 
         private async Task<List<Document>> GetAllInternalDocumentsAsync(IList<Expression<Func<Document, bool>>> predicates, int page, int count, CancellationToken cancellationToken)

@@ -9,7 +9,7 @@ public class GetReportResponse
     public long Id { get; set; }
     public int RegistrationNumber { get; set; }
     public DateTime RegistrationDate { get; set; }
-    public int SpecialRegisterId { get; set; }
+    public long? SpecialRegisterId { get; set; }
     public int DocumentType { get; set; }
     public int DocumentCategoryId { get; set; }
     public string DocumentCategory { get; set; }
