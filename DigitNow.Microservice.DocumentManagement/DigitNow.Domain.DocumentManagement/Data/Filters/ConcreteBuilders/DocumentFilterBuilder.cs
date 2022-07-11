@@ -1,10 +1,8 @@
-﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Public.Dashboard.Models;
+﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
 {
-    internal interface IDocumentExpressionFilterBuilder : IExpressionFilterBuilder<Document, DocumentFilter>
+    internal interface IDocumentFilterBuilder : IExpressionFilterBuilder<Document, DocumentFilter>
     {
         void BuildFilterByRegistryType();
         void BuildFilterByRegistrationNo();
@@ -14,9 +12,9 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
         void BuildFilterByIdentifiers();
     }
 
-    internal class DocumentExpressionFilterBuilder : ExpressionFilterBuilder<Document, DocumentFilter>, IDocumentExpressionFilterBuilder
+    internal class DocumentFilterBuilder : ExpressionFilterBuilder<Document, DocumentFilter>, IDocumentFilterBuilder
     {
-        public DocumentExpressionFilterBuilder(DocumentFilter documentFilterModel)
+        public DocumentFilterBuilder(DocumentFilter documentFilterModel)
             : base(documentFilterModel) { }
 
         public void BuildFilterByRegistryType()

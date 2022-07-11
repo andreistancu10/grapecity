@@ -6,6 +6,6 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters
     internal static class ExpressionFilterBuilderRegistry
     {
         public static IExpressionGenericFilterBuilder<Document> GetDocumentPredicatesByFilter(DocumentFilter documentFilter) =>
-            new DocumentExpressionFilterBuilder(documentFilter);
+            new DocumentFilterBuilder(documentFilter);
     }
 }

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using DigitNow.Adapters.MS.Identity;
-using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.Authentication.Client;
 using DigitNow.Domain.Catalog.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
