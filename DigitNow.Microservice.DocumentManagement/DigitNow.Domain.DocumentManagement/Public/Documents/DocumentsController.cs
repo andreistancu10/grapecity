@@ -10,10 +10,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetWorkflowInformation;
+using DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Commands.Create;
 
 namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments;
 
-//[Authorize]
+[Authorize]
 [ApiController]
 [Route("api/documents")]
 public class DocumentsController : ApiController
@@ -84,6 +86,15 @@ public class DocumentsController : ApiController
             null => NotFound(),
             var result => Ok(result)
         };
+    }
+
+    [HttpPost("{id}/submit-workflow")]
+    public async Task<IActionResult> SubmitWorkflowDecision([FromRoute] int id, [FromBody] CreateWorkflowDecisionRequest request)
+    {
+        var command = _mapper.Map<CreateWorkflowDecisionCommand>(request);
+        command.DocumentId = id;
+
+        return CreateResponse(await _mediator.Send(command));
     }
 
 }

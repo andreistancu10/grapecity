@@ -3,10 +3,11 @@ using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement
 using HTSS.Platform.Core.CQRS;
 using System;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Commands.Create
+namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Commands.Create
 {
     public class CreateWorkflowDecisionCommand : ICreateWorkflowHistoryCommand, ICommand<ResultObject>
     {
+        public DocumentType DocumentType { get; set; }
         public int DocumentId { get; set; }
         public UserRole InitiatorType { get; set; }
         public int ActionType { get; set; }

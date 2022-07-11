@@ -29,20 +29,20 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
         public readonly IAuthenticationClient AuthenticationClient;
         public readonly IIdentityAdapterClient IdentityAdapterClient;
 
-        public async Task<User> FetchHeadOfDepartmentByDepartmentId(long id, CancellationToken token)
+        public async Task<User> FetchHeadOfDepartmentByDepartmentId(long departmentId, CancellationToken token)
         {
-            return new User();
+            var response = await IdentityAdapterClient.GetUsersAsync(token);
+            var departmentUsers = response.Users.Where(x => x.Departments.Contains(departmentId));
+            
+            return departmentUsers.FirstOrDefault(x => x.Roles.Contains((long)UserRole.HeadOfDepartment));
         }
 
-        public async Task<User> GetMayorAsync(CancellationToken token)
+        public async Task<User> FetchMayorAsync(CancellationToken token)
         {
+            var response = await IdentityAdapterClient.GetUsersAsync(token);
+            var departmentUsers = response.Users.Where(x => x.Departments.Contains(4));
 
-            var users = await AuthenticationClient.GetUsersWithExtensions(token);
-            var user = new User() { FirstName = "Ciprian", LastName = "Rosca" };
-            return user;
-
-            //var users = await IdentityService.GetUsersByDepartmentIdAsync(id, token);
-            //return users.Users.FirstOrDefault(x => x.Roles.Contains((long)UserRole.Mayor));
+            return departmentUsers.FirstOrDefault(x => x.Roles.Contains((long)UserRole.HeadOfDepartment));
         }
 
         protected virtual void TransferResponsibility(WorkflowHistory oldRecord, WorkflowHistory newRecord, ICreateWorkflowHistoryCommand command)

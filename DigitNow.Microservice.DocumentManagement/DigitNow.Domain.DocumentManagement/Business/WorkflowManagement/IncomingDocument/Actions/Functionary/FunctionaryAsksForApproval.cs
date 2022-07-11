@@ -2,6 +2,8 @@
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using HTSS.Platform.Core.CQRS;
+using HTSS.Platform.Core.Errors;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -44,6 +46,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
                 TransitionNotAllowed(command);
                 return false;
             }
+
+            if (command.Resolution <= 0)
+            {
+                command.Result = ResultObject.Error(new ErrorMessage
+                {
+                    Message = $"Resolution was not set!",
+                    TranslationCode = "dms.resolution.backend.update.validation.notSet",
+                    Parameters = new object[] { command.Resolution }
+                });
+                return false;
+            }
+
             return true;
         }
     }

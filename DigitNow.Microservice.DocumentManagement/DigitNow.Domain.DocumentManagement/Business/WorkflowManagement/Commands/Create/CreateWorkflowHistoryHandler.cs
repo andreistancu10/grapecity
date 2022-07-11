@@ -4,9 +4,8 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Commands.Create
+namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Commands.Create
 {
-
     public class CreateWorkflowHistoryHandler : ICommandHandler<CreateWorkflowDecisionCommand, ResultObject>
     {
         private readonly IServiceProvider _provider;
