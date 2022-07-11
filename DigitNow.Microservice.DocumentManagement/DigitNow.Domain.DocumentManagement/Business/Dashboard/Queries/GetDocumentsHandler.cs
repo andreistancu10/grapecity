@@ -67,7 +67,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
     {
         var user = await GetCurrentUserAsync(cancellationToken);
 
-        if (user.Roles.ToList().Contains((long)UserRole.Mayor))
+        if (user.Roles.ToList().Contains(UserRole.Mayor.Code))
         {
             return await _documentService.CountAllAsync(x => x.CreatedAt.Year >= PreviousYear, cancellationToken);
         }
@@ -89,7 +89,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
 
         List<Document> documents;
 
-        if (user.Roles.ToList().Contains((long)UserRole.Mayor))
+        if (user.Roles.ToList().Contains(UserRole.Mayor.Code))
         {
             documents = await _documentService.FindAllQueryable(x => x.CreatedAt.Year >= PreviousYear)
                 .OrderByDescending(x => x.RegistrationDate)
@@ -154,12 +154,12 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, ResultPagedL
 
     private async Task<IEnumerable<long>> GetRelatedUserIdsASync(User user, CancellationToken cancellationToken)
     {
-        if (user.Roles.ToList().Contains((long)UserRole.Functionary))
+        if (user.Roles.ToList().Contains(UserRole.Functionary.Code))
         {
             return new List<long> { user.Id };
         }
 
-        if (user.Roles.ToList().Contains((long)UserRole.HeadOfDepartment))
+        if (user.Roles.ToList().Contains(UserRole.HeadOfDepartment.Code))
         {
             var departmentId = user.Departments.FirstOrDefault();
 

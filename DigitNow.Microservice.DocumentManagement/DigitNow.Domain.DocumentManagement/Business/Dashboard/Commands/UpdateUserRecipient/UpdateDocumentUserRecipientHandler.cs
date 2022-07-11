@@ -1,9 +1,8 @@
 ﻿using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
+using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.extensions.Autocorrect;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +19,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IIdentityAdapterClient _identityAdapterClient;
         private User _user;
+        private DocumentStatus _status;
+        private bool _isHeadOfDepartment;
 
         public UpdateDocumentUserRecipientHandler(DocumentManagementDbContext dbContext, IIdentityAdapterClient identityAdapterClient)
         {
@@ -38,74 +39,63 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                     Parameters = new object[] { request.UserId }
                 });
 
-            var incomingDocIds = request.DocumentInfo
-                                          .Where(doc => doc.DocType == (int)DocumentType.Incoming)
-                                          .Select(doc => doc.RegistrationNumber)
-                                          .ToList();
+            _isHeadOfDepartment = _user.Roles.Contains(UserRole.HeadOfDepartment.Code);
+            _status = _isHeadOfDepartment ? DocumentStatus.InWorkDelegatedUnallocated : DocumentStatus.InWorkDelegated;
 
-            if (incomingDocIds.Any())
-                await UpdateRecipientForIncomingDocuments(incomingDocIds);
+            await UpdateRecipientForIncomingDocuments(request.RegistrationNumbers);
 
-            var internalDocIds = request.DocumentInfo
-                                        .Where(doc => doc.DocType == (int)DocumentType.Internal)
-                                        .Select(doc => doc.RegistrationNumber)
-                                        .ToList();
+            await UpdateRecipientForInternalDocuments(request.RegistrationNumbers);
 
-            if (internalDocIds.Any())
-                await UpdateRecipientForInternalDocuments(incomingDocIds);
-
+            await UpdateRecipientForOutgoingDocuments(request.RegistrationNumbers);
 
             await _dbContext.SaveChangesAsync();
 
             return new ResultObject(ResultStatusCode.Ok);
         }
 
-        private async Task UpdateRecipientForInternalDocuments(List<int> incomingDocIds)
+        private async Task UpdateRecipientForOutgoingDocuments(List<long> documentIds)
         {
-            foreach (var registrationNo in incomingDocIds)
-            {
-                var internalDoc = await _dbContext.InternalDocuments
+            var outgoingDocuments = await _dbContext.OutgoingDocuments
                     .Include(x => x.Document)
-                    .FirstOrDefaultAsync(x => x.Document.RegistrationNumber == registrationNo);
+                    .Where(x => documentIds.Contains(x.DocumentId))
+                    .ToListAsync();
 
-                if (internalDoc != null)
-                    internalDoc.ReceiverDepartmentId = (int)_user.Id;     
+            foreach (var outgoingDocument in outgoingDocuments)
+            {
+                outgoingDocument.RecipientId = (int)_user.Id;
+                outgoingDocument.Document.Status = _status;
+
+                outgoingDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(outgoingDocument.Document, _isHeadOfDepartment ? UserRole.HeadOfDepartment : UserRole.Functionary, _user, _status));
             }
         }
 
-        private async Task UpdateRecipientForIncomingDocuments(List<int> incomingDocIds)
+        private async Task UpdateRecipientForInternalDocuments(List<long> documentIds)
         {
-            foreach (var registrationNo in incomingDocIds)
-            {
-                var doc = await _dbContext.IncomingDocuments
+            var documents = await _dbContext.InternalDocuments
                     .Include(x => x.Document)
-                    .FirstOrDefaultAsync(x => x.Document.RegistrationNumber == registrationNo);
+                    .Where(x => documentIds.Contains(x.DocumentId))
+                    .ToListAsync();
 
-                if (doc != null)
-                {
-                    doc.RecipientId = (int)_user.Id;
-                    CreateWorkflowRecord(doc);
-                }
+            foreach (var document in documents)
+            {
+                document.ReceiverDepartmentId = (int)_user.Id;     
             }
         }
 
-        private void CreateWorkflowRecord(IncomingDocument doc)
+        private async Task UpdateRecipientForIncomingDocuments(List<long> documentIds)
         {
-            var isHeadOfDepartment = _user.Roles.Contains((long)UserRole.HeadOfDepartment);
-            var status = isHeadOfDepartment ? DocumentStatus.InWorkDelegatedUnallocated : DocumentStatus.InWorkDelegated;
+            var incomingDocuments = await _dbContext.IncomingDocuments
+                    .Include(x => x.Document)
+                    .Where(x => documentIds.Contains(x.DocumentId))
+                    .ToListAsync();
 
-            doc.Document.Status = status;
+            foreach (var incomingDocument in incomingDocuments)
+            {
+                incomingDocument.RecipientId = (int)_user.Id;
+                incomingDocument.Document.Status = _status;
 
-            doc.WorkflowHistory.Add(
-                new Data.Entities.WorkflowHistory()
-                {
-                    RecipientType = isHeadOfDepartment ? (int)UserRole.HeadOfDepartment : (int)UserRole.Functionary,
-                    RecipientId = (int)_user.Id,
-                    RecipientName =_user.FormatUserNameByRole( isHeadOfDepartment ? UserRole.HeadOfDepartment : UserRole.Functionary),
-                    Status = status,
-                    CreationDate = DateTime.Now,
-                    RegistrationNumber = doc.Document.RegistrationNumber
-                });
+                incomingDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(incomingDocument.Document, _isHeadOfDepartment ? UserRole.HeadOfDepartment : UserRole.Functionary, _user, _status));
+            }
         }
     }
 }

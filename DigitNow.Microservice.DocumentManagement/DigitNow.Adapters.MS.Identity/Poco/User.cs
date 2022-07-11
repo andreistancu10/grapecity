@@ -29,7 +29,7 @@ namespace DigitNow.Adapters.MS.Identity.Poco
         public bool Active { get; set; }
 
         [JsonProperty("roles")]
-        public IEnumerable<long> Roles { get; set; } = new List<long>();
+        public IEnumerable<string> Roles { get; set; } = new List<string>();
 
         [JsonProperty("departments")]
         public IEnumerable<long> Departments { get; set; } = new List<long>();

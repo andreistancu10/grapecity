@@ -72,6 +72,6 @@ public class IncomingDocumentsController : ApiController
             return NotFound();
         }
 
-        return File(response.Content, response.ContentType, response.Name);
+        return Ok(File(response.Content, response.ContentType, response.Name));
     }
 }
