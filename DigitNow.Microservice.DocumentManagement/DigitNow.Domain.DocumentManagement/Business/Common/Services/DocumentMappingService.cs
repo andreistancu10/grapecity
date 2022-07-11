@@ -13,6 +13,7 @@ using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMapping;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -24,7 +25,7 @@ public interface IDocumentMappingService
     Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<Document> documents, CancellationToken cancellationToken);
 }
 
-public class DocumentMappingService
+public class DocumentMappingService : IDocumentMappingService
 {
     private readonly DocumentManagementDbContext _dbContext;
     private readonly IMapper _mapper;
@@ -53,10 +54,9 @@ public class DocumentMappingService
         return await MapDocumentsAsync<DocumentViewModel>(documents, documentRelationsBag, cancellationToken);
     }
 
-    public async Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<Document> documents,
-        CancellationToken cancellationToken)
+    public async Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<Document> documents, CancellationToken cancellationToken)
     {
-        var documentRelationsBag = await GetDocumentsRelationsBagAsync(documents, cancellationToken);
+        var documentRelationsBag = await GetDocumentsRelationsBagExtendedAsync(documents, cancellationToken);
         return await MapDocumentsAsync<ReportViewModel>(documents, documentRelationsBag, cancellationToken);
     }
 
@@ -108,7 +108,8 @@ public class DocumentMappingService
                     VirtualDocument = virtualDocument,
                     Users = documentRelationsBag.Users,
                     Categories = documentRelationsBag.Categories,
-                    InternalCategories = documentRelationsBag.InternalCategories
+                    InternalCategories = documentRelationsBag.InternalCategories,
+                    SpecialRegisterMapping = documentRelationsBag.SpecialRegisterMappings.FirstOrDefault(c => c.DocumentId == virtualDocument.DocumentId)
                 };
 
                 result.Add(_mapper.Map<VirtualDocumentAggregate<T>, TResult>(aggregate));
@@ -116,6 +117,24 @@ public class DocumentMappingService
         }
 
         return result;
+    }
+
+    private async Task<DocumentRelationsBag> GetDocumentsRelationsBagExtendedAsync(IList<Document> documents,
+        CancellationToken cancellationToken)
+    {
+        var relationsBag = (DocumentRelationsBag)(await GetDocumentsRelationsBagAsync(documents, cancellationToken));
+        relationsBag.SpecialRegisterMappings = await GetSpecialRegisterMappings(documents, cancellationToken);
+
+        return relationsBag;
+    }
+
+    private async Task<List<SpecialRegisterMappingModel>> GetSpecialRegisterMappings(IList<Document> documents, CancellationToken cancellationToken)
+    {
+        var documentIds = documents.Select(c => c.Id).ToList();
+        return await _dbContext.SpecialRegisterMappings
+            .Select(c => _mapper.Map<SpecialRegisterMappingModel>(c))
+            .Where(c => documentIds.Contains(c.DocumentId))
+            .ToListAsync(cancellationToken);
     }
 
     private async Task<DocumentRelationsBag> GetDocumentsRelationsBagAsync(IList<Document> documents, CancellationToken cancellationToken)
@@ -184,5 +203,6 @@ public class DocumentMappingService
         public IReadOnlyList<User> Users { get; set; }
         public IReadOnlyList<DocumentCategoryModel> Categories { get; set; }
         public IReadOnlyList<InternalDocumentCategoryModel> InternalCategories { get; set; }
+        public IReadOnlyList<SpecialRegisterMappingModel> SpecialRegisterMappings { get; set; }
     }
 }

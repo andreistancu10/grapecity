@@ -36,6 +36,7 @@ public class GetDocumentsMappings : Profile
             .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.VirtualDocument.DocumentTypeId))
             .ForMember(c => c.User, opt => opt.MapFrom<MapUserFromAggregate>())
             .ForMember(c => c.DocumentCategory, opt => opt.MapFrom<MapDocumentCategory>());
+
         CreateMap<VirtualDocumentAggregate<InternalDocument>, DocumentViewModel>()
             .ForMember(c => c.Id, opt => opt.MapFrom(src => src.VirtualDocument.Document.Id))
             .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>())

@@ -38,7 +38,7 @@ public class SpecialRegisterMappingService : ISpecialRegisterMappingService
     {
         var newMapping = new SpecialRegisterMapping
         {
-            IncomingDocument = incomingDocument,
+            Document = incomingDocument.Document,
             SpecialRegister = register
         };
 

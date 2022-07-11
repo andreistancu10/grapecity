@@ -8,7 +8,7 @@ public class SpecialRegisterMapping : ExtendedEntity
     public long SpecialRegisterId { get; set; }
 
     #region [ References ]
-    public IncomingDocument IncomingDocument { get; set; }
+    public Document Document { get; set; }
     public SpecialRegister SpecialRegister { get; set; }
     #endregion
 }
