@@ -15,7 +15,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings
             CreateMap<User, UserModel>();
 
             CreateMap<IDocumentTypeResponse, DocumentCategoryModel>();
-            CreateMap<IInternalDocumentTypeResponse, InternalDocumentCategoryModel>();
+            CreateMap<IInternalDocumentTypeResponse, DocumentCategoryModel>();
         }
     }
 }

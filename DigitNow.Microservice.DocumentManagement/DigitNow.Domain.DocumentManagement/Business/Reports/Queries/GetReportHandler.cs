@@ -81,6 +81,6 @@ public class Report : IReport
 
         var documents = await _dashboardService.GetAllDocumentsAsync(filter, request.Page, request.Count, cancellationToken);
 
-        return await _documentMappingService.MapToReportViewModelAsync(documents, cancellationToken);
+        return await _documentMappingService.MapToReportViewModelAsync(documents, filter, cancellationToken);
     }
 }

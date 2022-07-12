@@ -6,6 +6,7 @@ using System;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Mappings
 {
+    //TODO: Mappings do not work properly
     public class GetDocumentsMapping : Profile
     {
         public GetDocumentsMapping()

@@ -5,184 +5,188 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
-using DigitNow.Adapters.MS.Identity;
-using DigitNow.Adapters.MS.Identity.Poco;
-using DigitNow.Domain.Authentication.Client;
-using DigitNow.Domain.Catalog.Client;
+using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
+using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
+using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders;
+using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
 using Microsoft.EntityFrameworkCore;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Common.Services;
-
-public interface IDocumentMappingService
+namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
-    Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<Document> documents, CancellationToken cancellationToken);
-    Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<Document> documents, CancellationToken cancellationToken);
-}
-
-public class DocumentMappingService : IDocumentMappingService
-{
-    private readonly DocumentManagementDbContext _dbContext;
-    private readonly IMapper _mapper;
-    private readonly IIdentityAdapterClient _identityAdapterClient;
-    private readonly ICatalogClient _catalogClient;
-    private readonly IAuthenticationClient _authenticationClient;
-
-    public DocumentMappingService(
-        DocumentManagementDbContext dbContext,
-        IMapper mapper,
-        IIdentityAdapterClient identityAdapterClient,
-        ICatalogClient catalogClient,
-        IAuthenticationClient authenticationClient)
+    public interface IDocumentMappingService
     {
-        _dbContext = dbContext;
-        _mapper = mapper;
-        _identityAdapterClient = identityAdapterClient;
-        _catalogClient = catalogClient;
-        _authenticationClient = authenticationClient;
+        Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<Document> documents, CancellationToken cancellationToken);
+        Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken);
+
+        Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<Document> documents, CancellationToken cancellationToken);
+        Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken);
     }
 
-    public async Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<Document> documents,
-        CancellationToken cancellationToken)
+    public class DocumentMappingService : IDocumentMappingService
     {
-        var documentRelationsBag = await GetDocumentsRelationsBagAsync(documents, cancellationToken);
-        return await MapDocumentsAsync<DocumentViewModel>(documents, documentRelationsBag, cancellationToken);
-    }
+        #region [ Fields ]
 
-    public async Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<Document> documents,
-        CancellationToken cancellationToken)
-    {
-        var documentRelationsBag = await GetDocumentsRelationsBagAsync(documents, cancellationToken);
-        return await MapDocumentsAsync<ReportViewModel>(documents, documentRelationsBag, cancellationToken);
-    }
+        private readonly DocumentManagementDbContext _dbContext;
+        private readonly DocumentRelationsFetcher _documentRelationsFetcher;
+        private readonly IMapper _mapper;
+        
+        #endregion
 
-    private async Task<List<TViewModel>> MapDocumentsAsync<TViewModel>(IEnumerable<Document> documents, DocumentRelationsBag documentRelationsBag, CancellationToken cancellationToken) where TViewModel : class, new()
-    {
-        var result = new List<TViewModel>();
+        #region [ Construction ]
 
-        var incomingDocuments = documents
-            .Where(x => x.DocumentType == DocumentType.Incoming)
-            .ToList();
-        result.AddRange(await MapChildDocumentAsync<IncomingDocument, TViewModel>(incomingDocuments, documentRelationsBag, cancellationToken, x => x.WorkflowHistory));
-
-        var internalDocuments = documents
-            .Where(x => x.DocumentType == DocumentType.Internal)
-            .ToList();
-        result.AddRange(await MapChildDocumentAsync<InternalDocument, TViewModel>(internalDocuments, documentRelationsBag, cancellationToken));
-
-        var outogingDocuments = documents
-            .Where(x => x.DocumentType == DocumentType.Outgoing)
-            .ToList();
-        result.AddRange(await MapChildDocumentAsync<OutgoingDocument, TViewModel>(outogingDocuments, documentRelationsBag, cancellationToken, x => x.WorkflowHistory));
-
-        return result;
-    }
-
-    private async Task<List<TResult>> MapChildDocumentAsync<T, TResult>(IList<Document> documents, DocumentRelationsBag documentRelationsBag, CancellationToken cancellationToken, params Expression<Func<T, object>>[] includes)
-        where T : VirtualDocument
-        where TResult : class, new()
-    {
-        var documentIds = documents.Select(x => x.Id).ToList();
-
-        var virtualDocuments = await _dbContext.Set<T>().AsQueryable()
-            .Includes(includes)
-            .Where(x => documentIds.Contains(x.DocumentId))
-            .ToListAsync(cancellationToken);
-
-        var documentRegistry = documents.ToDictionary(x => x, y => virtualDocuments.Where(x => x.DocumentId == y.Id));
-
-        var result = new List<TResult>();
-        foreach (var registryEntry in documentRegistry)
+        public DocumentMappingService(
+            DocumentManagementDbContext dbContext,
+            IServiceProvider serviceProvider,
+            IMapper mapper)
         {
-            var document = registryEntry.Key;
+            _dbContext = dbContext;
+            _mapper = mapper;
+            _documentRelationsFetcher = new DocumentRelationsFetcher(serviceProvider);
+        }
 
-            foreach (var virtualDocument in registryEntry.Value)
+        #endregion
+
+        #region [ IDocumentMappingService ]
+
+        public async Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<Document> documents, CancellationToken cancellationToken)
+        {
+            await _documentRelationsFetcher.FetchRelationshipsAsync(new DocumentsFetcherContext { Documents = documents }, cancellationToken);
+            return await MapDocumentsAsync<DocumentViewModel>(documents, null, cancellationToken);
+        }
+
+        public async Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken)
+        {
+            await _documentRelationsFetcher.FetchRelationshipsAsync(new DocumentsFetcherContext { Documents = documents }, cancellationToken);
+            return await MapDocumentsAsync<DocumentViewModel>(documents, documentFilter, cancellationToken);
+        }
+
+
+        public async Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken)
+        {
+            await _documentRelationsFetcher.FetchRelationshipsAsync(new DocumentsFetcherContext { Documents = documents }, cancellationToken);
+            return await MapDocumentsAsync<ReportViewModel>(documents, documentFilter, cancellationToken);
+        }
+
+        public async Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<Document> documents, CancellationToken cancellationToken)
+        {
+            await _documentRelationsFetcher.FetchRelationshipsAsync(new DocumentsFetcherContext { Documents = documents }, cancellationToken);
+            return await MapDocumentsAsync<ReportViewModel>(documents, null, cancellationToken);
+        }
+
+        #endregion
+
+        #region [ Internal ]
+
+        private async Task<List<TViewModel>> MapDocumentsAsync<TViewModel>(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken)
+            where TViewModel : class, new()
+        {
+            var result = new List<TViewModel>();
+
+            var incomingDocuments = await FetchIncomingDocumentsAsync(documents, documentFilter, cancellationToken);
+            if (incomingDocuments.Any())
             {
-                // Note: ViewModels relationships can be loaded dynamically in future versions
+                result.AddRange(MapChildDocument<IncomingDocument, TViewModel>(incomingDocuments));
+            }
+
+            var internalDocuments = await FetchInternalDocumentsAsync(documents, documentFilter, cancellationToken);
+            if (internalDocuments.Any())
+            {
+                result.AddRange(MapChildDocument<InternalDocument, TViewModel>(internalDocuments));
+            }
+
+            var outgoingDocuments = await FetchOutgoingDocumentsAsync(documents, documentFilter, cancellationToken);
+            if (outgoingDocuments.Any())
+            {
+                result.AddRange(MapChildDocument<OutgoingDocument, TViewModel>(outgoingDocuments));
+            }
+            
+            return result;            
+        }
+
+        private Task<IList<IncomingDocument>> FetchIncomingDocumentsAsync(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken)
+        {
+            var incomingDocumentsIds = documents
+                    .Where(x => x.DocumentType == DocumentType.Incoming)
+                    .Select(x => x.Id)
+                    .ToList();
+            var incomingDocumentsIncludes = PredicateFactory.CreateIncludesList<IncomingDocument>(x => x.WorkflowHistory);
+            return FetchChildDocumentsAsync(incomingDocumentsIds, documentFilter, incomingDocumentsIncludes, cancellationToken);
+        }
+
+        private Task<IList<InternalDocument>> FetchInternalDocumentsAsync(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken)
+        {
+            var internalDocumentsIds = documents
+                .Where(x => x.DocumentType == DocumentType.Internal)
+                .Select(x => x.Id)
+                .ToList();
+            //TODO: Add workflow history once is implemented
+            return FetchChildDocumentsAsync<InternalDocument>(internalDocumentsIds, documentFilter, null, cancellationToken);
+        }
+
+        private Task<IList<OutgoingDocument>> FetchOutgoingDocumentsAsync(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken)
+        {
+            var outgoingDocumentsIds = documents
+                .Where(x => x.DocumentType == DocumentType.Outgoing)
+                .Select(x => x.Id)
+                .ToList();
+            var outgoingDocumentsIncludes = PredicateFactory.CreateIncludesList<OutgoingDocument>(x => x.WorkflowHistory);
+            return FetchChildDocumentsAsync(outgoingDocumentsIds, documentFilter, outgoingDocumentsIncludes, cancellationToken);
+        }
+
+        private List<TResult> MapChildDocument<T, TResult>(IList<T> childDocuments)
+            where T : VirtualDocument
+            where TResult : class, new()
+        {
+            var result = new List<TResult>();
+            foreach (var childDocument in childDocuments)
+            {
                 var aggregate = new VirtualDocumentAggregate<T>
                 {
-                    VirtualDocument = virtualDocument,
-                    Users = documentRelationsBag.Users,
-                    Categories = documentRelationsBag.Categories,
-                    InternalCategories = documentRelationsBag.InternalCategories
+                    VirtualDocument = childDocument,                    
+                    Users = _documentRelationsFetcher.DocumentUsers,
+                    Categories = _documentRelationsFetcher.DocumentCategories,
+                    InternalCategories = _documentRelationsFetcher.DocumentInternalCategories
                 };
 
                 result.Add(_mapper.Map<VirtualDocumentAggregate<T>, TResult>(aggregate));
             }
+            return result;            
         }
 
-        return result;
-    }
-
-    private async Task<DocumentRelationsBag> GetDocumentsRelationsBagAsync(IList<Document> documents, CancellationToken cancellationToken)
-    {
-        var users = await GetRelatedUserRegistryAsync(documents, cancellationToken);
-        var documentCategories = await GetDocumentCategoriesAsync(cancellationToken);
-        var internalDocumentCategories = await GetInternalDocumentCategoriesAsync(cancellationToken);
-
-        return new DocumentRelationsBag
+        private async Task<IList<T>> FetchChildDocumentsAsync<T>(IList<long> childDocumentIds, DocumentFilter documentFilter, IList<Expression<Func<T, object>>> includes, CancellationToken cancellationToken)
+            where T: VirtualDocument
         {
-            Users = users,
-            Categories = documentCategories,
-            InternalCategories = internalDocumentCategories
-        };
-    }
-
-    private async Task<List<User>> GetRelatedUserRegistryAsync(IList<Document> documents, CancellationToken cancellationToken)
-    {
-        var createdByUsers = documents
-            .Select(x => x.CreatedBy)
-            .ToList();
-
-        var usersList = await _authenticationClient.GetUsersWithExtensions(cancellationToken);
-
-        var relatedUsers = usersList.UserExtensions
-            .Where(x => createdByUsers.Contains(x.Id))
-            .Select(x => new User
+            var virtualDocumentsQuery = _dbContext.Set<T>().AsQueryable();
+            
+            if (includes != null)
             {
-                Id = x.Id,
-                FirstName = x.FirstName,
-                LastName = x.LastName,
-                Active = x.Active,
-                Email = x.UserName
-            })
-            .ToList();
+                virtualDocumentsQuery.Includes(includes);
+            }
 
-        return relatedUsers;
-    }
+            virtualDocumentsQuery.Where(x => childDocumentIds.Contains(x.DocumentId));
 
-    private async Task<List<DocumentCategoryModel>> GetDocumentCategoriesAsync(CancellationToken cancellationToken)
-    {
-        var documentTypesResponse = await _catalogClient.DocumentTypes.GetDocumentTypesAsync(cancellationToken);
+            if (documentFilter != null)
+            {
+                var categoriesIds = _documentRelationsFetcher.DocumentCategories
+                    .Select(x => x.Id).ToList();
 
-        // Note: DocumentTypes is actual DocumentCategory
-        var documentCategoryModels = documentTypesResponse.DocumentTypes
-            .Select(x => _mapper.Map<DocumentCategoryModel>(x))
-            .ToList();
+                var internalCategoriesIds = _documentRelationsFetcher.DocumentInternalCategories
+                    .Select(x => x.Id).ToList();
 
-        return documentCategoryModels;
-    }
+                var categoryPredicates = new DocumentCategoryFilterBuilder<T>(documentFilter, categoriesIds, internalCategoriesIds)
+                    .Build();
 
-    private async Task<List<InternalDocumentCategoryModel>> GetInternalDocumentCategoriesAsync(CancellationToken cancellationToken)
-    {
-        var internalDocumentTypesResponse = await _catalogClient.InternalDocumentTypes.GetInternalDocumentTypesAsync(cancellationToken);
+                virtualDocumentsQuery.WhereAll(categoryPredicates);
+            }
 
-        // Note: DocumentTypes is actual DocumentCategory
-        var internalDocumentCategoryModels = internalDocumentTypesResponse.InternalDocumentTypes
-            .Select(x => _mapper.Map<InternalDocumentCategoryModel>(x))
-            .ToList();
+            return await virtualDocumentsQuery.ToListAsync(cancellationToken);
+        }
 
-        return internalDocumentCategoryModels;
-    }
-
-    private class DocumentRelationsBag
-    {
-        public IReadOnlyList<User> Users { get; set; }
-        public IReadOnlyList<DocumentCategoryModel> Categories { get; set; }
-        public IReadOnlyList<InternalDocumentCategoryModel> InternalCategories { get; set; }
+        #endregion
     }
 }

@@ -34,9 +34,9 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, GetDocuments
 
     private async Task<GetDocumentsResponse> GetSimpleResponseAsync(GetDocumentsQuery query, CancellationToken cancellationToken)
     {
-        var totalItems = await _dashboardService.CountAllDocumentsAsync(query.Filter, cancellationToken);
+        var totalItems = await _dashboardService.CountAllDocumentsAsync(cancellationToken);
 
-        var documents = await _dashboardService.GetAllDocumentsAsync(query.Filter,
+        var documents = await _dashboardService.GetAllDocumentsAsync(
                 query.Page,
                 query.Count,
             cancellationToken);
@@ -55,7 +55,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, GetDocuments
             query.Count,
             cancellationToken);
 
-        var viewModels = await _documentMappingService.MapToDocumentViewModelAsync(documents, cancellationToken);
+        var viewModels = await _documentMappingService.MapToDocumentViewModelAsync(documents, query.Filter, cancellationToken);
 
         return BuildDocumentResponse(query, totalItems, viewModels);
     }

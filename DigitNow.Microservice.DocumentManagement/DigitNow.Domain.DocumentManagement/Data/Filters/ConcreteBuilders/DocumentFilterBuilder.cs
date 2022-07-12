@@ -1,6 +1,7 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
+namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders
 {
     internal interface IDocumentFilterBuilder : IExpressionFilterBuilder<Document, DocumentFilter>
     {

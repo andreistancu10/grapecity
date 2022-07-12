@@ -1,56 +1,118 @@
-﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
+﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
 using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFiltersData;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders
 {
-    internal interface IDocumentCategoryFilterBuilder : IExpressionFilterBuilder<VirtualDocument, DocumentFilter>
+    internal class DocumentCategoryFilterBuilder<T> : ExpressionFilterBuilder<T, DocumentFilter>
+        where T : VirtualDocument
     {
-        void BuildFilterByCategory();
-        void BuildFilterByInternalCategory();
-    }
+        private readonly IList<long> _categoriesIds;
+        private readonly IList<long> _internalCategoriesIds;
 
-    internal class DocumentCategoryFilterBuilder : ExpressionFilterBuilder<VirtualDocument, DocumentFilter>, IDocumentCategoryFilterBuilder
-    {
-        private readonly IList<DocumentCategoryFilterData> _categories;
-        private readonly IList<DocumentInternalCategoryFilterData> _internalCategories;
-
-        public DocumentCategoryFilterBuilder(DocumentFilter documentFilter, IList<DocumentCategoryFilterData> categories, IList<DocumentInternalCategoryFilterData> internalCategories) 
-            : base(documentFilter) 
+        public DocumentCategoryFilterBuilder(DocumentFilter filter, IList<long> categoriesIds, IList<long> internalCategoriesIds)
+            : base(filter)
         {
-            _categories = categories;
-            _internalCategories = internalCategories;
+            _categoriesIds = categoriesIds;
+            _internalCategoriesIds = internalCategoriesIds;
         }
 
-        public void BuildFilterByCategory()
+        private void BuildFilterByCategory()
         {
-            GeneratedFilters.Add(document => document.docu);
-        }
+            if (EntityFilter == null || EntityFilter.CategoryFilter == null)
+                return;
 
-        public void BuildFilterByInternalCategory()
-        {
+            if (typeof(T) == typeof(InternalDocument))
+            {
+                GeneratedFilters.Add(x => _internalCategoriesIds.Contains(((InternalDocument)(object)x).InternalDocumentTypeId));
+                return;
+            }
 
+            if (typeof(T) == typeof(IncomingDocument))
+            {
+                GeneratedFilters.Add(x => _categoriesIds.Contains(((IncomingDocument)(object)x).DocumentTypeId));
+                return;
+            }
+
+            if (typeof(T) == typeof(OutgoingDocument))
+            {
+                GeneratedFilters.Add(x => _categoriesIds.Contains(((OutgoingDocument)(object)x).DocumentTypeId));
+                return;
+            }
         }
 
         protected override void InternalBuild()
         {
-            var documentTypeFilter = EntityFilter.TypeFilter;
-            if (documentTypeFilter == null) return;
-
-            if (documentTypeFilter.DocumentType == DocumentType.Incoming || documentTypeFilter.DocumentType == DocumentType.Outgoing)
-            {
-                BuildFilterByCategory();
-            }
-            else if (documentTypeFilter.DocumentType != DocumentType.Internal)
-            {
-                BuildFilterByInternalCategory();
-            }
+            BuildFilterByCategory();
         }
     }
+
+
+    //internal class InternalDocumentCategoryFilterBuilder : ExpressionFilterBuilder<InternalDocument, DocumentFilter>
+    //{
+    //    private readonly IList<DocumentCategoryFilterData> _categories;
+
+    //    public InternalDocumentCategoryFilterBuilder(DocumentFilter filter, IList<DocumentCategoryFilterData> categories)
+    //        : base(filter)
+    //    {
+    //        _categories = categories;
+    //    }
+
+    //    private void BuildFilterByCategory()
+    //    {
+    //        var categoriesIds = _categories.Select(x => x.Id);
+    //        GeneratedFilters.Add(x => categoriesIds.Contains(x.InternalDocumentTypeId));
+    //    }
+
+    //    protected override void InternalBuild()
+    //    {
+    //        BuildFilterByCategory();
+    //    }
+    //}
+
+    //internal class IncommingDocumentCategoryFilterBuilder : ExpressionFilterBuilder<IncomingDocument, DocumentFilter>
+    //{
+    //    private readonly IList<DocumentCategoryFilterData> _categories;
+
+    //    public IncommingDocumentCategoryFilterBuilder(DocumentFilter filter, IList<DocumentCategoryFilterData> categories)
+    //        : base(filter)
+    //    {
+    //        _categories = categories;
+    //    }
+
+    //    private void BuildFilterByCategory()
+    //    {
+    //        var categoriesIds = _categories.Select(x => x.Id);
+    //        GeneratedFilters.Add(x => categoriesIds.Contains(x.DocumentTypeId));
+    //    }
+
+    //    protected override void InternalBuild()
+    //    {
+    //        BuildFilterByCategory();
+    //    }
+    //}
+
+    //internal class OutgoingDocumentCategoryFilterBuilder : ExpressionFilterBuilder<IncomingDocument, DocumentFilter>
+    //{
+    //    private readonly IList<DocumentCategoryFilterData> _categories;
+
+    //    public OutgoingDocumentCategoryFilterBuilder(DocumentFilter filter, IList<DocumentCategoryFilterData> categories)
+    //        : base(filter)
+    //    {
+    //        _categories = categories;
+    //    }
+
+    //    private void BuildFilterByCategory()
+    //    {
+    //        var categoriesIds = _categories.Select(x => x.Id);
+    //        GeneratedFilters.Add(x => categoriesIds.Contains(x.DocumentTypeId));
+    //    }
+
+    //    protected override void InternalBuild()
+    //    {
+    //        BuildFilterByCategory();
+    //    }
+    //}
 }

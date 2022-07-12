@@ -9,6 +9,9 @@ namespace DigitNow.Domain.DocumentManagement.Data.Extensions
 {
     public static class DataExtensions
     {
+        public static IQueryable<T> Includes<T>(this IQueryable<T> queryable, IList<Expression<Func<T, object>>> includes)
+            where T : class => Includes(queryable, includes.ToArray());
+
         public static IQueryable<T> Includes<T>(this IQueryable<T> queryable, params Expression<Func<T, object>>[] includes)
             where T : class
         {
