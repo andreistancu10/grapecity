@@ -4,7 +4,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMappin
 
 public class SpecialRegisterMapping : ExtendedEntity
 {
-    public int DocumentId { get; set; }
+    public long DocumentId { get; set; }
     public long SpecialRegisterId { get; set; }
 
     #region [ References ]

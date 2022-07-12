@@ -1,13 +1,14 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Reports.Queries;
+using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
+using DigitNow.Domain.DocumentManagement.Public.Reports.Models;
 
-namespace DigitNow.Domain.DocumentManagement.Public.Reports.Mappings
+namespace DigitNow.Domain.DocumentManagement.Public.Reports.Mappings;
+
+public class GetReportRequestMapping : Profile
 {
-    public class GetReportRequest : Profile
+    public GetReportRequestMapping()
     {
-        public GetReportRequest()
-        {
-            CreateMap<GetReportRequest, GetReportQuery>();
-        }
+        CreateMap<GetReportRequest, GetReportQuery>();
     }
 }

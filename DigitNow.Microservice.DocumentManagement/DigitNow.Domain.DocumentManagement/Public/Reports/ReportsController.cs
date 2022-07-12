@@ -1,6 +1,9 @@
-﻿using AutoMapper;
+﻿using System.Threading.Tasks;
+using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
+using DigitNow.Domain.DocumentManagement.Business.Reports.Queries;
+using DigitNow.Domain.DocumentManagement.Public.Reports.Models;
 using HTSS.Platform.Core.Files;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
@@ -26,5 +29,19 @@ public class ReportsController : ApiController
         _identityService = identityService;
         _exportService = exportService;
     }
-    
+
+    [HttpPost("get-report")]
+    public async Task<IActionResult> GetReportAsync([FromBody] GetReportRequest request)
+    {
+        var getReportQuery = _mapper.Map<GetReportQuery>(request);
+
+
+
+        return await _mediator.Send(getReportQuery)
+            switch
+            {
+                null => NotFound(),
+                var result => Ok(result)
+            };
+    }
 }

@@ -43,12 +43,15 @@
 		<Compile Include=".extensions\Validators\RuleBuilderExtensions.cs" />
 		<Compile Include=".utils\DevOnlyActionFilter.cs" />
 		<Compile Include=".utils\FilterDescriptor.cs" />
+		<Compile Include="Migrations\20220712111122_Init.cs" />
+		<Compile Include="Migrations\20220712111122_Init.Designer.cs" />
+		<Compile Include="Migrations\DocumentManagementDbContextModelSnapshot.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="DigitNow.Domain.Authentication.Client" Version="6.0.6" />
 		<PackageReference Include="DigitNow.Domain.Authentication.Contracts" Version="6.0.6" />
-		<PackageReference Include="DigitNow.Domain.Catalog.Client" Version="6.0.6" />
-		<PackageReference Include="DigitNow.Domain.Catalog.Contracts" Version="6.0.6" />
+		<PackageReference Include="DigitNow.Domain.Catalog.Client" Version="6.0.9" />
+		<PackageReference Include="DigitNow.Domain.Catalog.Contracts" Version="6.0.9" />
 		<PackageReference Include="Domain.Localization.Client" Version="1.0.7" />
 		<PackageReference Include="HTSS.Platform.Core.Files" Version="6.0.2" />
 		<PackageReference Include="HTSS.Platform.Infrastructure.Api.Tools" Version="6.0.1" />
@@ -106,7 +109,6 @@
 	<ItemGroup>
 		<Folder Include="Public\Maintenance\" />
 		<Folder Include="Business\Consumers\" />
-		<Folder Include="Migrations\" />
 		<Folder Include="Public\Maintenance\" />
 		<Folder Include="Public\SpecialRegisters\Validators\" />
 	</ItemGroup>

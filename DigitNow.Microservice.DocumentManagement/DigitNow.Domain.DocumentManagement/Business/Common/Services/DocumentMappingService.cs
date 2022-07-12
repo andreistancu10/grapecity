@@ -56,7 +56,7 @@ public class DocumentMappingService : IDocumentMappingService
 
     public async Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<Document> documents, CancellationToken cancellationToken)
     {
-        var documentRelationsBag = await GetDocumentsRelationsBagExtendedAsync(documents, cancellationToken);
+        var documentRelationsBag = await GetDocumentsRelationsBagAsync(documents, cancellationToken);
         return await MapDocumentsAsync<ReportViewModel>(documents, documentRelationsBag, cancellationToken);
     }
 
@@ -67,17 +67,17 @@ public class DocumentMappingService : IDocumentMappingService
         var incomingDocuments = documents
             .Where(x => x.DocumentType == DocumentType.Incoming)
             .ToList();
-        result.AddRange(await MapChildDocumentAsync<IncomingDocument, TViewModel>(incomingDocuments, documentRelationsBag, cancellationToken, x => x.WorkflowHistory));
+        result.AddRange(await MapChildDocumentAsync<IncomingDocument, TViewModel>(incomingDocuments, documentRelationsBag, cancellationToken, x => x.WorkflowHistory, x => x.Document));
 
         var internalDocuments = documents
             .Where(x => x.DocumentType == DocumentType.Internal)
             .ToList();
-        result.AddRange(await MapChildDocumentAsync<InternalDocument, TViewModel>(internalDocuments, documentRelationsBag, cancellationToken));
+        result.AddRange(await MapChildDocumentAsync<InternalDocument, TViewModel>(internalDocuments, documentRelationsBag, cancellationToken, x => x.Document));
 
-        var outogingDocuments = documents
+        var outgoingDocuments = documents
             .Where(x => x.DocumentType == DocumentType.Outgoing)
             .ToList();
-        result.AddRange(await MapChildDocumentAsync<OutgoingDocument, TViewModel>(outogingDocuments, documentRelationsBag, cancellationToken, x => x.WorkflowHistory));
+        result.AddRange(await MapChildDocumentAsync<OutgoingDocument, TViewModel>(outgoingDocuments, documentRelationsBag, cancellationToken, x => x.WorkflowHistory, x => x.Document));
 
         return result;
     }
@@ -109,6 +109,7 @@ public class DocumentMappingService : IDocumentMappingService
                     Users = documentRelationsBag.Users,
                     Categories = documentRelationsBag.Categories,
                     InternalCategories = documentRelationsBag.InternalCategories,
+                    Departments = documentRelationsBag.Departments,
                     SpecialRegisterMapping = documentRelationsBag.SpecialRegisterMappings.FirstOrDefault(c => c.DocumentId == virtualDocument.DocumentId)
                 };
 
@@ -119,22 +120,25 @@ public class DocumentMappingService : IDocumentMappingService
         return result;
     }
 
-    private async Task<DocumentRelationsBag> GetDocumentsRelationsBagExtendedAsync(IList<Document> documents,
-        CancellationToken cancellationToken)
-    {
-        var relationsBag = (DocumentRelationsBag)(await GetDocumentsRelationsBagAsync(documents, cancellationToken));
-        relationsBag.SpecialRegisterMappings = await GetSpecialRegisterMappings(documents, cancellationToken);
-
-        return relationsBag;
-    }
-
     private async Task<List<SpecialRegisterMappingModel>> GetSpecialRegisterMappings(IList<Document> documents, CancellationToken cancellationToken)
     {
         var documentIds = documents.Select(c => c.Id).ToList();
-        return await _dbContext.SpecialRegisterMappings
-            .Select(c => _mapper.Map<SpecialRegisterMappingModel>(c))
+        var specialRegisterMappings = await _dbContext.SpecialRegisterMappings
             .Where(c => documentIds.Contains(c.DocumentId))
-            .ToListAsync(cancellationToken);
+        .ToListAsync(cancellationToken);
+
+        return specialRegisterMappings.Select(c => _mapper.Map<SpecialRegisterMappingModel>(c)).ToList();
+    }
+
+    private async Task<List<DepartmentModel>> GetDepartmentsAsync(CancellationToken cancellationToken)
+    {
+        var departmentsResponse = await _catalogClient.Departments.GetDepartmentsAsync(cancellationToken);
+
+        var departmentModel = departmentsResponse.Departments
+            .Select(x => _mapper.Map<DepartmentModel>(x))
+            .ToList();
+
+        return departmentModel;
     }
 
     private async Task<DocumentRelationsBag> GetDocumentsRelationsBagAsync(IList<Document> documents, CancellationToken cancellationToken)
@@ -142,12 +146,16 @@ public class DocumentMappingService : IDocumentMappingService
         var users = await GetRelatedUserRegistryAsync(documents, cancellationToken);
         var documentCategories = await GetDocumentCategoriesAsync(cancellationToken);
         var internalDocumentCategories = await GetInternalDocumentCategoriesAsync(cancellationToken);
+        var specialRegisterMappings = await GetSpecialRegisterMappings(documents, cancellationToken);
+        var departments = await GetDepartmentsAsync(cancellationToken);
 
         return new DocumentRelationsBag
         {
             Users = users,
             Categories = documentCategories,
-            InternalCategories = internalDocumentCategories
+            InternalCategories = internalDocumentCategories,
+            SpecialRegisterMappings = specialRegisterMappings,
+            Departments = departments
         };
     }
 
@@ -204,5 +212,6 @@ public class DocumentMappingService : IDocumentMappingService
         public IReadOnlyList<DocumentCategoryModel> Categories { get; set; }
         public IReadOnlyList<InternalDocumentCategoryModel> InternalCategories { get; set; }
         public IReadOnlyList<SpecialRegisterMappingModel> SpecialRegisterMappings { get; set; }
+        public IReadOnlyList<DepartmentModel> Departments { get; set; }
     }
 }

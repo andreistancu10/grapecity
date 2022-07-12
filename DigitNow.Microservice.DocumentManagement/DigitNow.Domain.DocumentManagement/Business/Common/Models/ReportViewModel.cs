@@ -13,8 +13,8 @@ public class ReportViewModel
     public BasicViewModel Issuer{ get; set; }
     public BasicViewModel Recipient { get; set; }
     public BasicViewModel Functionary { get; set; }
-    public DateTime AllocationDate { get; set; }
-    public DateTime ResolutionDate { get; set; }
+    public DateTime? AllocationDate { get; set; }
+    public DateTime? ResolutionDate { get; set; }
     public int? CurrentStatus { get; set; }
     public int Expired { get; set; }
 }

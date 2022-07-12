@@ -12,5 +12,6 @@ public class VirtualDocumentAggregate<T>
     public IReadOnlyList<User> Users { get; set; }
     public IReadOnlyList<DocumentCategoryModel> Categories { get; set; }
     public IReadOnlyList<InternalDocumentCategoryModel> InternalCategories { get; set; }
+    public IReadOnlyList<DepartmentModel> Departments { get; set; }
     public SpecialRegisterMappingModel? SpecialRegisterMapping { get; set; }
 }
