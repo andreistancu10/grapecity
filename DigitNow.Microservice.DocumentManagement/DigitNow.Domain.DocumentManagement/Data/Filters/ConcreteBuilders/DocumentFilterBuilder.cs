@@ -71,15 +71,15 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders
 
         public void BuildFilterByIdentifiers()
         {
-            if (EntityFilter.DocumentIdentifiersFilter != null)
+            if (EntityFilter.IdentifiersFilter != null)
             {
-                GeneratedFilters.Add(document => EntityFilter.DocumentIdentifiersFilter.Identifiers.Contains(document.Id));
+                GeneratedFilters.Add(document => EntityFilter.IdentifiersFilter.Identifiers.Contains(document.Id));
             }
         }
 
         protected override void InternalBuild()
         {
-            if (EntityFilter.DocumentIdentifiersFilter != null)
+            if (EntityFilter.IdentifiersFilter != null)
             {
                 BuildFilterByIdentifiers();
             }

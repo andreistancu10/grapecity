@@ -24,21 +24,23 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders
             if (EntityFilter == null || EntityFilter.CategoryFilter == null)
                 return;
 
+            var categoriesIds = EntityFilter.CategoryFilter.CategoryIds;
+
             if (typeof(T) == typeof(InternalDocument))
             {
-                GeneratedFilters.Add(x => _internalCategoriesIds.Contains(((InternalDocument)(object)x).InternalDocumentTypeId));
+                GeneratedFilters.Add(x => categoriesIds.Contains(((InternalDocument)(object)x).InternalDocumentTypeId));
                 return;
             }
 
             if (typeof(T) == typeof(IncomingDocument))
             {
-                GeneratedFilters.Add(x => _categoriesIds.Contains(((IncomingDocument)(object)x).DocumentTypeId));
+                GeneratedFilters.Add(x => categoriesIds.Contains(((IncomingDocument)(object)x).DocumentTypeId));
                 return;
             }
 
             if (typeof(T) == typeof(OutgoingDocument))
             {
-                GeneratedFilters.Add(x => _categoriesIds.Contains(((OutgoingDocument)(object)x).DocumentTypeId));
+                GeneratedFilters.Add(x => categoriesIds.Contains(((OutgoingDocument)(object)x).DocumentTypeId));
                 return;
             }
         }

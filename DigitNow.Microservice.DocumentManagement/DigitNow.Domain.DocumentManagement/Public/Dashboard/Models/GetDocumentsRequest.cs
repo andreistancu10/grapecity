@@ -57,7 +57,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Models
 
     public class DocumentCategoryFilterDto
     {
-        public int CategoryId { get; set; }
+        public List<int> CategoryIds { get; set; }
     }
 
     public class DocumentStatusFilterDto

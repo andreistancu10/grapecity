@@ -108,34 +108,43 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return result;            
         }
 
-        private Task<IList<IncomingDocument>> FetchIncomingDocumentsAsync(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken)
+        private async Task<IList<IncomingDocument>> FetchIncomingDocumentsAsync(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken)
         {
             var incomingDocumentsIds = documents
                     .Where(x => x.DocumentType == DocumentType.Incoming)
                     .Select(x => x.Id)
                     .ToList();
+            if (!incomingDocumentsIds.Any())
+                return new List<IncomingDocument>();
+
             var incomingDocumentsIncludes = PredicateFactory.CreateIncludesList<IncomingDocument>(x => x.WorkflowHistory);
-            return FetchChildDocumentsAsync(incomingDocumentsIds, documentFilter, incomingDocumentsIncludes, cancellationToken);
+            return await FetchChildDocumentsAsync(incomingDocumentsIds, documentFilter, incomingDocumentsIncludes, cancellationToken);
         }
 
-        private Task<IList<InternalDocument>> FetchInternalDocumentsAsync(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken)
+        private async Task<IList<InternalDocument>> FetchInternalDocumentsAsync(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken)
         {
             var internalDocumentsIds = documents
                 .Where(x => x.DocumentType == DocumentType.Internal)
                 .Select(x => x.Id)
                 .ToList();
+            if (!internalDocumentsIds.Any())
+                return new List<InternalDocument>();
+            
             //TODO: Add workflow history once is implemented
-            return FetchChildDocumentsAsync<InternalDocument>(internalDocumentsIds, documentFilter, null, cancellationToken);
+            return await FetchChildDocumentsAsync<InternalDocument>(internalDocumentsIds, documentFilter, null, cancellationToken);
         }
 
-        private Task<IList<OutgoingDocument>> FetchOutgoingDocumentsAsync(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken)
+        private async Task<IList<OutgoingDocument>> FetchOutgoingDocumentsAsync(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken)
         {
             var outgoingDocumentsIds = documents
                 .Where(x => x.DocumentType == DocumentType.Outgoing)
                 .Select(x => x.Id)
                 .ToList();
+            if (!outgoingDocumentsIds.Any()) 
+                return new List<OutgoingDocument>();
+
             var outgoingDocumentsIncludes = PredicateFactory.CreateIncludesList<OutgoingDocument>(x => x.WorkflowHistory);
-            return FetchChildDocumentsAsync(outgoingDocumentsIds, documentFilter, outgoingDocumentsIncludes, cancellationToken);
+            return await FetchChildDocumentsAsync(outgoingDocumentsIds, documentFilter, outgoingDocumentsIncludes, cancellationToken);
         }
 
         private List<TResult> MapChildDocument<T, TResult>(IList<T> childDocuments)
@@ -165,10 +174,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             
             if (includes != null)
             {
-                virtualDocumentsQuery.Includes(includes);
+                virtualDocumentsQuery = virtualDocumentsQuery.Includes(includes);
             }
 
-            virtualDocumentsQuery.Where(x => childDocumentIds.Contains(x.DocumentId));
+            virtualDocumentsQuery = virtualDocumentsQuery
+                .Where(x => childDocumentIds.Contains(x.DocumentId));
 
             if (documentFilter != null)
             {
@@ -181,7 +191,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 var categoryPredicates = new DocumentCategoryFilterBuilder<T>(documentFilter, categoriesIds, internalCategoriesIds)
                     .Build();
 
-                virtualDocumentsQuery.WhereAll(categoryPredicates);
+                virtualDocumentsQuery = virtualDocumentsQuery.WhereAll(categoryPredicates);
             }
 
             return await virtualDocumentsQuery.ToListAsync(cancellationToken);

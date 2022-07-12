@@ -50,7 +50,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, GetDocuments
     {
         var totalItems = await _dashboardService.CountAllDocumentsAsync(query.Filter, cancellationToken);
 
-        var documents = await _dashboardService.GetAllDocumentsAsync(
+        var documents = await _dashboardService.GetAllDocumentsAsync(query.Filter,
             query.Page,
             query.Count,
             cancellationToken);

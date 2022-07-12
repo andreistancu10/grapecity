@@ -18,7 +18,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
 
         public DocumentStatusFilter StatusFilter { get; set; }
 
-        public DocumentIdentifiersFilter DocumentIdentifiersFilter { get; set; }
+        public DocumentIdentifiersFilter IdentifiersFilter { get; set; }
     }
 
     public class DocumentIdentifiersFilter
@@ -50,7 +50,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
 
     public class DocumentCategoryFilter
     {
-        public int CategoryId { get; set; }
+        public List<int> CategoryIds { get; set; }
     }
 
     public class DocumentStatusFilter
