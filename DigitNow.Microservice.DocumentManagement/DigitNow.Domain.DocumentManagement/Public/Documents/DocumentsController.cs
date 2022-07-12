@@ -13,6 +13,7 @@ using DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetWorkflowI
 using DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
 using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Commands.Create;
 using System;
+using DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetWorkflowHistoryByDocumentId;
 
 namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments;
 
@@ -67,8 +68,9 @@ public class DocumentsController : ApiController
         };
     }
 
-    [HttpGet("workflow-information/{documentId}")]
-    public async Task<IActionResult> GetWorkflowInformation([FromRoute] long documentId)
+
+    [HttpGet("{documentId}")]
+    public async Task<IActionResult> GetById([FromRoute] long documentId)
     {
         return await _mediator.Send(new GetWorkflowInformationByDocumentIdQuery { DocumentId = documentId })
             switch
@@ -78,8 +80,8 @@ public class DocumentsController : ApiController
         };
     }
 
-    [HttpGet("{documentId}")]
-    public async Task<IActionResult> GetById([FromRoute] long documentId)
+    [HttpGet("workflow-information/{documentId}")]
+    public async Task<IActionResult> GetWorkflowInformation([FromRoute] long documentId)
     {
         return await _mediator.Send(new GetWorkflowInformationByDocumentIdQuery { DocumentId = documentId })
             switch
@@ -96,5 +98,16 @@ public class DocumentsController : ApiController
         command.DocumentId = id;
 
         return CreateResponse(await _mediator.Send(command));
+    }
+
+    [HttpGet("workflow-history/{documentId}")]
+    public async Task<IActionResult> GetWorkflowHistory([FromRoute] long documentId)
+    {
+        return await _mediator.Send(new GetWorkflowHistoryByDocumentIdQuery { DocumentId = documentId })
+            switch
+        {
+            null => NotFound(),
+            var result => Ok(result)
+        };
     }
 }
