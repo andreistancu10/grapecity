@@ -84,7 +84,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
                 return false;
             }
 
-            if (command.Decision != (int)Decision.Approved || command.Decision != (int)Decision.Declined)
+            if (!Enum.IsDefined(typeof(Decision), command.Decision))
             {
                 command.Result = ResultObject.Error(new ErrorMessage
                 {
@@ -94,6 +94,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
                 });
                 return false;
             }
+            
             return true;
         }
     }

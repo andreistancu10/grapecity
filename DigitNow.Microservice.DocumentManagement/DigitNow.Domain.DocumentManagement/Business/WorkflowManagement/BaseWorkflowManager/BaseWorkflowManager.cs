@@ -40,7 +40,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
         public async Task<User> FetchMayorAsync(CancellationToken token)
         {
             var response = await IdentityAdapterClient.GetUsersAsync(token);
-            return response.Users.FirstOrDefault(x => x.Roles.Contains(UserRole.HeadOfDepartment.Code));
+            return response.Users.FirstOrDefault(x => x.Roles.Contains(UserRole.Mayor.Code));
         }
 
         protected virtual void TransferResponsibility(WorkflowHistory oldRecord, WorkflowHistory newRecord, ICreateWorkflowHistoryCommand command)

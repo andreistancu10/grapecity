@@ -22,18 +22,25 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
             if (!Validate(command, oldWorkflowResponsible))
                 return command;
 
-            var responsibleFunctionaryRecord = document.IncomingDocument.WorkflowHistory
-                .Where(x => x.RecipientType == UserRole.Functionary.Id && x.Status == DocumentStatus.OpinionRequestedUnallocated)
+            var responsibleHeadOfDepartmentRecord = document.IncomingDocument.WorkflowHistory
+                .Where(x => x.RecipientType == UserRole.HeadOfDepartment.Id && x.Status == DocumentStatus.OpinionRequestedUnallocated)
                 .OrderByDescending(x => x.CreationDate)
                 .FirstOrDefault();
 
+            // TODO: we have to decide weather we pass the document to the functionary or to the head department
+            //var responsibleFunctionaryRecord = document.IncomingDocument.WorkflowHistory
+            //    .Where(x => x.RecipientType == UserRole.Functionary.Id && x.Status == DocumentStatus.InWorkAllocated)
+            //    .OrderByDescending(x => x.CreationDate)
+            //    .FirstOrDefault();
+
             var newWorkflowResponsible = new WorkflowHistory();
-            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
+            TransferResponsibility(responsibleHeadOfDepartmentRecord, newWorkflowResponsible, command);
 
             newWorkflowResponsible.Status = document.Status = DocumentStatus.InWorkAllocated;
             newWorkflowResponsible.Remarks = command.Remarks;
 
             document.IncomingDocument.WorkflowHistory.Add(newWorkflowResponsible);
+            await WorkflowService.CommitChangesAsync(token);
 
             return command;
         }

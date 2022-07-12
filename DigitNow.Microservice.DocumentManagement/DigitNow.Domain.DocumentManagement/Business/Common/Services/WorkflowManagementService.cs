@@ -50,10 +50,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         public WorkflowHistory GetLastWorkflowRecord(Document document)
         {
             if (document.IncomingDocument != null)
-                return document.IncomingDocument.WorkflowHistory.OrderByDescending(x => x.CreationDate).FirstOrDefault();
+                return document.IncomingDocument.WorkflowHistory.OrderByDescending(x => x.CreatedAt).FirstOrDefault();
 
             if (document.OutgoingDocument != null)
-                return document.OutgoingDocument.WorkflowHistory.OrderByDescending(x => x.CreationDate).FirstOrDefault();
+                return document.OutgoingDocument.WorkflowHistory.OrderByDescending(x => x.CreatedAt).FirstOrDefault();
 
             return null;
         }
@@ -104,7 +104,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private WorkflowHistory ExtractResponsible(IQueryable<WorkflowHistory> history, Expression<Func<WorkflowHistory, bool>> predicate)
         {
             return history.Where(predicate)
-                   .OrderByDescending(x => x.CreationDate)
+                   .OrderByDescending(x => x.CreatedAt)
                    .FirstOrDefault();
         }
     }

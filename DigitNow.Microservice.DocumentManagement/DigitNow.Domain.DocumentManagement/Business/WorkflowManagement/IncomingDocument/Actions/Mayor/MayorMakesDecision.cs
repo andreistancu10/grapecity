@@ -15,7 +15,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
         public MayorMakesDecision(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
         private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkMayorReview };
-        private enum Decision { Declined, Approved };
+        private enum Decision { Approved = 1, Declined = 2  };
         private Document _document;
 
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
@@ -51,6 +51,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
             TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 
             newWorkflowResponsible.Status = _document.Status = DocumentStatus.InWorkCountersignature;
+            newWorkflowResponsible.Remarks = command.Remarks;
 
             _document.IncomingDocument.WorkflowHistory.Add(newWorkflowResponsible);
         }
@@ -63,6 +64,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
             TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 
             newWorkflowResponsible.Status = _document.Status = DocumentStatus.InWorkMayorDeclined;
+            newWorkflowResponsible.Remarks = command.Remarks;
 
             _document.IncomingDocument.WorkflowHistory.Add(newWorkflowResponsible);
         }
@@ -75,7 +77,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
                 return false;
             }
 
-            if (command.Decision != (int)Decision.Approved || command.Decision != (int)Decision.Declined)
+            if (!Enum.IsDefined(typeof(Decision), command.Decision))
             {
                 command.Result = ResultObject.Error(new ErrorMessage
                 {

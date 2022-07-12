@@ -13,6 +13,6 @@ namespace DigitNow.Domain.DocumentManagement.Public.Documents.Models
         public long? RecipientId { get; set; }
         public int? Resolution { get; set; }
         public int? Decision { get; set; }
-        public DateTime? OpionionRequestedUntil { get; set; }
+        public DateTime? OpinionRequestedUntil { get; set; }
     }
 }
