@@ -322,7 +322,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         #region [ Utils ]
 
         private bool IsRole(UserModel userModel, UserRole role) =>
-            userModel.Roles.Contains((long)role);
+            userModel.Roles.Contains(role.Code);
 
         #endregion
 

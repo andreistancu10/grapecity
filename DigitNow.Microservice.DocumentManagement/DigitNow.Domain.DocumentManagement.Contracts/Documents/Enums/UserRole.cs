@@ -1,11 +1,13 @@
 ﻿
 namespace DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums
 {
-    // TODO:(!) Map UserRole to Code not by identifier. Should be fixed with priority.
-    public enum UserRole
+    public class UserRole
     {
-        HeadOfDepartment = 1,
-        Functionary = 2,
-        Mayor = 5
+        public int Id { get; set; }
+        public string Code { get; set; }
+
+        public static UserRole HeadOfDepartment => new UserRole { Code = "headOfDepartment", Id = 1 };
+        public static UserRole Functionary => new UserRole { Code = "functionary", Id = 2 };
+        public static UserRole Mayor => new UserRole { Code = "mayor", Id = 3 };
     }
 }
