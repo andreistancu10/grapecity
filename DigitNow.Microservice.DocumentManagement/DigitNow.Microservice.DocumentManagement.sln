@@ -25,7 +25,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Adapters", "Adapters", "{81
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitNow.Adapters.MS.Identity", "DigitNow.Adapters.MS.Identity\DigitNow.Adapters.MS.Identity.csproj", "{C565CDAB-702D-4C5A-8FBC-7E0D040B7840}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitNow.Adapters.MS.Catalog", "DigitNow.Adapters.MS.Catalog\DigitNow.Adapters.MS.Catalog.csproj", "{1FF67AA6-702A-4CB3-9A7C-561F5B86B95E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitNow.Adapters.MS.Catalog", "DigitNow.Adapters.MS.Catalog\DigitNow.Adapters.MS.Catalog.csproj", "{1FF67AA6-702A-4CB3-9A7C-561F5B86B95E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Sdk", "Sdk", "{FD4B2AD2-5ED2-496A-87B0-6DDEC4288822}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -70,6 +72,9 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
+		{F0330068-BFB2-414B-8ED6-4A8146308108} = {FD4B2AD2-5ED2-496A-87B0-6DDEC4288822}
+		{0373EC6F-CE27-4D92-993E-61AFAD5466BC} = {FD4B2AD2-5ED2-496A-87B0-6DDEC4288822}
+		{8CD2E5C9-7AD1-4C85-9AAA-F3F1961C9676} = {FD4B2AD2-5ED2-496A-87B0-6DDEC4288822}
 		{C565CDAB-702D-4C5A-8FBC-7E0D040B7840} = {81607CBB-9C6E-4ED4-8132-FB3C329D28C9}
 		{1FF67AA6-702A-4CB3-9A7C-561F5B86B95E} = {81607CBB-9C6E-4ED4-8132-FB3C329D28C9}
 	EndGlobalSection
