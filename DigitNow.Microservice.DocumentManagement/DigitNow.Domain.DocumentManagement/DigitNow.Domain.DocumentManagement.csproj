@@ -105,6 +105,7 @@
 
 	<ItemGroup>
 		<Folder Include="Business\Reports\Queries\" />
+		<Folder Include="Data\Filters\ConcreteFiltersData\" />
 		<Folder Include="Public\Maintenance\" />
 		<Folder Include="Migrations\" />
 		<Folder Include="Public\Maintenance\" />
