@@ -86,7 +86,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
 
             document.IncomingDocument.WorkflowHistory
                 .Add(WorkflowHistoryFactory
-                .Create(document, UserRole.Functionary, creator, DocumentStatus.NewDeclinedCompetence, command.DeclineReason, command.Remarks));
+                .Create(UserRole.Functionary, creator, DocumentStatus.NewDeclinedCompetence, command.DeclineReason, command.Remarks));
         }
 
         protected void PassDocumentToFunctionary(Document document, ICreateWorkflowHistoryCommand command)

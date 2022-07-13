@@ -44,7 +44,7 @@ public class GetDocumentsMappings : Profile
         {
             return
                 (int)source.WorkflowHistory
-                    .OrderByDescending(c => c.CreationDate)
+                    .OrderByDescending(c => c.CreatedAt)
                     .First()
                     .Status;
         }
@@ -55,7 +55,7 @@ public class GetDocumentsMappings : Profile
         public string Resolve(OutgoingDocument source, GetDocumentResponse destination, string destMember, ResolutionContext context)
         {
             var workflowStatus = source.WorkflowHistory
-                .OrderByDescending(c => c.CreationDate)
+                .OrderByDescending(c => c.CreatedAt)
                 .First()
                 .Status;
 
@@ -75,7 +75,7 @@ public class GetDocumentsMappings : Profile
         {
             return
                 (int)source.WorkflowHistory
-                    .OrderByDescending(c => c.CreationDate)
+                    .OrderByDescending(c => c.CreatedAt)
                     .First()
                     .Status;
         }
@@ -86,7 +86,7 @@ public class GetDocumentsMappings : Profile
         public string Resolve(IncomingDocument source, GetDocumentResponse destination, string destMember, ResolutionContext context)
         {
             var workflowStatus = source.WorkflowHistory
-                .OrderByDescending(c => c.CreationDate)
+                .OrderByDescending(c => c.CreatedAt)
                 .First()
                 .Status;
 

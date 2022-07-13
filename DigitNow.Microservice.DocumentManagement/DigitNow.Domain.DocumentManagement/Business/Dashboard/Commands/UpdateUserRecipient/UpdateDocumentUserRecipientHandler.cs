@@ -65,7 +65,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                 outgoingDocument.RecipientId = (int)_user.Id;
                 outgoingDocument.Document.Status = _status;
 
-                outgoingDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(outgoingDocument.Document, _isHeadOfDepartment ? UserRole.HeadOfDepartment : UserRole.Functionary, _user, _status));
+                outgoingDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(_isHeadOfDepartment ? UserRole.HeadOfDepartment : UserRole.Functionary, _user, _status));
             }
         }
 
@@ -94,7 +94,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                 incomingDocument.RecipientId = (int)_user.Id;
                 incomingDocument.Document.Status = _status;
 
-                incomingDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(incomingDocument.Document, _isHeadOfDepartment ? UserRole.HeadOfDepartment : UserRole.Functionary, _user, _status));
+                incomingDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(_isHeadOfDepartment ? UserRole.HeadOfDepartment : UserRole.Functionary, _user, _status));
             }
         }
     }

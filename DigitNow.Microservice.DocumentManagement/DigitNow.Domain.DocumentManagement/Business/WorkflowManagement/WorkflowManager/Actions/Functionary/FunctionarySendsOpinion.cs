@@ -24,7 +24,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             var responsibleHeadOfDepartmentRecord = document.IncomingDocument.WorkflowHistory
                 .Where(x => x.RecipientType == UserRole.HeadOfDepartment.Id && x.Status == DocumentStatus.OpinionRequestedUnallocated)
-                .OrderByDescending(x => x.CreationDate)
+                .OrderByDescending(x => x.CreatedAt)
                 .FirstOrDefault();
 
             // TODO: we have to decide weather we pass the document to the functionary or to the head department

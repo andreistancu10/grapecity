@@ -17,7 +17,7 @@ using DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetWorkflowH
 
 namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments;
 
-//[Authorize]
+[Authorize]
 [ApiController]
 [Route("api/documents")]
 public class DocumentsController : ApiController

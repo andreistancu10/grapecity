@@ -34,7 +34,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             document.IncomingDocument.WorkflowHistory
                 .Add(WorkflowHistoryFactory
-                .Create(document, UserRole.Functionary, user, newDocumentStatus));
+                .Create(UserRole.Functionary, user, newDocumentStatus));
 
             document.Status = newDocumentStatus;
 

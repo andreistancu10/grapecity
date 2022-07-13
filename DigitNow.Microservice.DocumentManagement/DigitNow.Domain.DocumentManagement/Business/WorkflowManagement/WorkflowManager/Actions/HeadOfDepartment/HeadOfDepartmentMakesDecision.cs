@@ -53,7 +53,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             document.IncomingDocument.WorkflowHistory
                 .Add(WorkflowHistoryFactory
-                .Create(document, UserRole.Mayor, user, DocumentStatus.InWorkMayorReview, command.DeclineReason, command.Remarks));
+                .Create(UserRole.Mayor, user, DocumentStatus.InWorkMayorReview, command.DeclineReason, command.Remarks));
 
             document.Status = DocumentStatus.InWorkMayorReview;
 
