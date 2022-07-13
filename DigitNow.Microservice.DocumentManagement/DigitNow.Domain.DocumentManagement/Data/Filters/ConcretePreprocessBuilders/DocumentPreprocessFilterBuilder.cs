@@ -1,5 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
+using System.Linq;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders.Preprocess
 {
@@ -15,15 +16,27 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders.Prepr
 
     internal class DocumentPreprocessFilterBuilder : ExpressionFilterBuilder<Document, DocumentPreprocessFilter>, IDocumentPreprocessFilterBuilder
     {
-        public DocumentPreprocessFilterBuilder(DocumentPreprocessFilter documentFilterModel)
-            : base(documentFilterModel) { }
+        private readonly DocumentManagementDbContext _dbContext;
+
+        public DocumentPreprocessFilterBuilder(DocumentManagementDbContext dbContext, DocumentPreprocessFilter documentFilterModel)
+            : base(documentFilterModel) 
+        {
+            _dbContext = dbContext;
+        }
 
         public void BuildFilterByRegistryType()
         {
             if (EntityFilter.RegistryTypeFilter != null)
             {
-                //TODO: Ask about this
-                GeneratedFilters.Add(document => document != null);
+                var foundSpecialRegistrerIds = _dbContext.SpecialRegisters
+                    .Where(x => EntityFilter.RegistryTypeFilter.RegistryTypes.Contains(x.Name))
+                    .Select(x => x.Id);
+
+                var targetDocumentIds = _dbContext.SpecialRegisterMappings
+                    .Where(x => foundSpecialRegistrerIds.Contains(x.SpecialRegisterId))
+                    .Select(x => x.DocumentId);
+
+                GeneratedFilters.Add(document => targetDocumentIds.Contains(document.Id));
             }
         }
 

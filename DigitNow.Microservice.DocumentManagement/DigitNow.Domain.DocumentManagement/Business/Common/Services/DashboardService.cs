@@ -273,7 +273,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             PredicateFactory.CreatePredicatesList<Document>(x => x.CreatedAt.Year >= PreviousYear);
 
         private IList<Expression<Func<Document, bool>>> GetDocumentsPreprocessPredicates(DocumentPreprocessFilter preprocessFilter) =>
-            ExpressionFilterBuilderRegistry.GetDocumentPreprocessFilterBuilder(preprocessFilter).Build();
+            ExpressionFilterBuilderRegistry.GetDocumentPreprocessFilterBuilder(_dbContext, preprocessFilter).Build();
 
         private IList<Expression<Func<Document, bool>>> GetPreprocessPredicates(DocumentPreprocessFilter preprocessFilter)
         {
@@ -312,7 +312,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             if (!postprocessFilter.IsEmpty())
             {
-                return ExpressionFilterBuilderRegistry.GetDocumentPostprocessFilterBuilder<T>(postprocessFilter).Build();
+                return ExpressionFilterBuilderRegistry.GetDocumentPostprocessFilterBuilder<T>(_dbContext, postprocessFilter).Build();
             }
             return new List<Expression<Func<T, bool>>>();
         }

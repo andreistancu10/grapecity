@@ -35,7 +35,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
 
     public class DocumentRegistryTypeFilter
     {
-        public string RegistryType { get; set; }
+        public List<string> RegistryTypes { get; set; }
     }
 
     public class DocumentRegistrationNoFilter

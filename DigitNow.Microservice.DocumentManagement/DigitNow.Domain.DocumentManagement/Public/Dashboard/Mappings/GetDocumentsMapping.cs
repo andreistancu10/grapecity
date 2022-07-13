@@ -6,7 +6,6 @@ using System;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Mappings
 {
-    //TODO: Mappings do not work properly
     public class GetDocumentsMapping : Profile
     {
         public GetDocumentsMapping()
@@ -25,7 +24,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Mappings
 
             {
                 CreateMap<DocumentRegistyTypeFilterDto, DocumentRegistryTypeFilter>()
-                    .ForMember(m => m.RegistryType, opt => opt.MapFrom(src => src.RegistryType));
+                    .ForMember(m => m.RegistryTypes, opt => opt.MapFrom(src => src.RegistryTypes));
 
                 CreateMap<DocumentRegistrationNoFilterDto, DocumentRegistrationNoFilter>()
                     .ForMember(m => m.From, opt => opt.MapFrom(src => src.From))

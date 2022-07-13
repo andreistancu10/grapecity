@@ -260,6 +260,39 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SpecialRegisterMappings",
+                schema: "DocumentMangement",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<long>(type: "bigint", nullable: false),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
+                    DocumentId = table.Column<long>(type: "bigint", nullable: false),
+                    SpecialRegisterId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SpecialRegisterMappings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SpecialRegisterMappings_Document_DocumentId",
+                        column: x => x.DocumentId,
+                        principalSchema: "DocumentMangement",
+                        principalTable: "Document",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SpecialRegisterMappings_SpecialRegister_SpecialRegisterId",
+                        column: x => x.SpecialRegisterId,
+                        principalSchema: "DocumentMangement",
+                        principalTable: "SpecialRegister",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DocumentUploadedFile",
                 schema: "DocumentMangement",
                 columns: table => new
@@ -288,39 +321,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         column: x => x.UploadedFileId,
                         principalSchema: "DocumentMangement",
                         principalTable: "UploadedFile",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SpecialRegisterMappings",
-                schema: "DocumentMangement",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<long>(type: "bigint", nullable: false),
-                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
-                    DocumentId = table.Column<int>(type: "int", nullable: false),
-                    SpecialRegisterId = table.Column<long>(type: "bigint", nullable: false),
-                    IncomingDocumentId = table.Column<long>(type: "bigint", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SpecialRegisterMappings", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_SpecialRegisterMappings_IncomingDocument_IncomingDocumentId",
-                        column: x => x.IncomingDocumentId,
-                        principalSchema: "DocumentMangement",
-                        principalTable: "IncomingDocument",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_SpecialRegisterMappings_SpecialRegister_SpecialRegisterId",
-                        column: x => x.SpecialRegisterId,
-                        principalSchema: "DocumentMangement",
-                        principalTable: "SpecialRegister",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -461,10 +461,10 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_SpecialRegisterMappings_IncomingDocumentId",
+                name: "IX_SpecialRegisterMappings_DocumentId",
                 schema: "DocumentMangement",
                 table: "SpecialRegisterMappings",
-                column: "IncomingDocumentId");
+                column: "DocumentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SpecialRegisterMappings_SpecialRegisterId",

@@ -7,10 +7,10 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters
 {
     internal static class ExpressionFilterBuilderRegistry
     {
-        public static IExpressionGenericFilterBuilder<Document> GetDocumentPreprocessFilterBuilder(DocumentPreprocessFilter preprocessFilter) =>
-            new DocumentPreprocessFilterBuilder(preprocessFilter);
+        public static IExpressionGenericFilterBuilder<Document> GetDocumentPreprocessFilterBuilder(DocumentManagementDbContext dbContext, DocumentPreprocessFilter preprocessFilter) =>
+            new DocumentPreprocessFilterBuilder(dbContext, preprocessFilter);
 
-        public static IExpressionGenericFilterBuilder<T> GetDocumentPostprocessFilterBuilder<T>(DocumentPostprocessFilter postprocessFilter)
-                where T : VirtualDocument => new DocumentPostprocessFilterBuilder<T>(postprocessFilter);            
+        public static IExpressionGenericFilterBuilder<T> GetDocumentPostprocessFilterBuilder<T>(DocumentManagementDbContext dbContext, DocumentPostprocessFilter postprocessFilter)
+                where T : VirtualDocument => new DocumentPostprocessFilterBuilder<T>(dbContext, postprocessFilter);            
     }
 }

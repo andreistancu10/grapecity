@@ -6,7 +6,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders
     internal class DocumentPostprocessFilterBuilder<T> : ExpressionFilterBuilder<T, DocumentPostprocessFilter>
         where T : VirtualDocument
     {
-        public DocumentPostprocessFilterBuilder(DocumentPostprocessFilter filter)
+        public DocumentPostprocessFilterBuilder(DocumentManagementDbContext dbContext, DocumentPostprocessFilter filter)
             : base(filter) { }
 
         private void BuildFilterByCategory()
