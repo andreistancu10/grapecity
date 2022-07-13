@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+using System.Reflection;
+using DigitNow.Domain.Catalog.Client.configurations;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generators;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
@@ -14,7 +15,7 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using ShiftIn.Domain.Authentication.Client;
+using DigitNow.Domain.Authentication.Client;
 
 namespace DigitNow.Domain.DocumentManagement.configurations
 {
@@ -47,8 +48,9 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddServices();
 
             services.AddScoped<RouteParameterAccessor>();
-            services.AddAuthenticationClientDomainServices(configuration);
+            services.AddAuthenticationClientDomainServices(configuration);            
             services.AddLocalizationMQServices();
+            services.AddCatalogClientDomainServices(configuration);            
 
             return services;
         }
@@ -74,6 +76,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<IOutgoingDocumentService, OutgoingDocumentService>();
             services.AddTransient<IVirtualDocumentService, VirtualDocumentService>();
             services.AddTransient<IDocumentResolutionService, DocumentResolutionService>();
+            services.AddTransient<IDashboardService, DashboardService>();
             services.AddTransient<ISpecialRegisterMappingService, SpecialRegisterMappingService>();
             services.AddTransient<ISpecialRegisterService, SpecialRegisterService>();
             services.AddTransient<IFileService, FileService>();

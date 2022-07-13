@@ -18,7 +18,7 @@ public static class ConfigureMassTransitExtensions
 {
     private const string MassTransitSection = "MassTransit";
     private static string CurrentMicroservice => typeof(ConfigureMassTransitExtensions).Assembly.GetName().Name;
-    private static Assembly TenantNotificationDomain => typeof(DomainServiceExtensions).Assembly;
+    private static Assembly DocumentManagementDomain => typeof(DomainServiceExtensions).Assembly;
 
     public static IServiceCollection AddMassTransitConfigurations(this IServiceCollection services,
         IConfiguration configuration)
@@ -38,7 +38,7 @@ public static class ConfigureMassTransitExtensions
 
         void AddServiceConfigurations(IServiceCollectionBusConfigurator serviceCollection)
         {
-            serviceCollection.AddTenantNotificationMassTransitServiceConfigurations();
+            serviceCollection.AddDocumentManagementMassTransitServiceConfigurations();
         }
 
         void AddFactoryConfigurations(IBusRegistrationContext context, IRabbitMqBusFactoryConfigurator rabbit)
@@ -70,7 +70,7 @@ public static class ConfigureMassTransitExtensions
                 rabbit.UsePublishFilter(typeof(TenantPublishFilter<>), context);
             }
 
-            rabbit.AddTenantNotificationMassTransitRabbitConfigurations(context, (registerConfig) =>
+            rabbit.AddDocumentManagementMassTransitRabbitConfigurations(context, (registerConfig) =>
             {
                 if (enableMultiTenant)
                 {
@@ -82,7 +82,7 @@ public static class ConfigureMassTransitExtensions
         return services.AddMassTransitServices<ConfigureApiBusHostedService>(AddOptions, AddServiceConfigurations,
             AddFactoryConfigurations, new[]
             {
-                TenantNotificationDomain
+                DocumentManagementDomain
             });
     }
 }
