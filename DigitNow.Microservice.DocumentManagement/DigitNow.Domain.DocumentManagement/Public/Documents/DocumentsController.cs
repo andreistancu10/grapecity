@@ -10,9 +10,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetWorkflowInformation;
-using DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
 using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Commands.Create;
-using System;
 using DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetWorkflowHistoryByDocumentId;
 
 namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments;
@@ -24,13 +22,11 @@ public class DocumentsController : ApiController
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
-    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public DocumentsController(IMediator mediator, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+    public DocumentsController(IMediator mediator, IMapper mapper)
     {
         _mediator = mediator;
         _mapper = mapper;
-        _httpContextAccessor = httpContextAccessor;
     }
 
     [HttpGet("resolution/{documentId}")]
