@@ -43,6 +43,9 @@
 		<Compile Include=".extensions\Validators\RuleBuilderExtensions.cs" />
 		<Compile Include=".utils\DevOnlyActionFilter.cs" />
 		<Compile Include=".utils\FilterDescriptor.cs" />
+		<Compile Include="Migrations\20220713095504_InitialCreate.cs" />
+		<Compile Include="Migrations\20220713095504_InitialCreate.Designer.cs" />
+		<Compile Include="Migrations\DocumentManagementDbContextModelSnapshot.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="DigitNow.Domain.Authentication.Client" Version="6.0.6" />
@@ -107,7 +110,6 @@
 		<Folder Include="Business\Reports\Queries\" />
 		<Folder Include="Data\Filters\ConcreteFiltersData\" />
 		<Folder Include="Public\Maintenance\" />
-		<Folder Include="Migrations\" />
 		<Folder Include="Public\Maintenance\" />
 		<Folder Include="Public\SpecialRegisters\Validators\" />
 	</ItemGroup>
