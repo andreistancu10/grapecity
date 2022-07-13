@@ -1,6 +1,6 @@
 ﻿namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.WorkflowEditors
 {
-    using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions.Functionary;
+    using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.WorkflowManager.Actions.Functionary;
     using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
     using HTSS.Platform.Core.CQRS;
     using HTSS.Platform.Core.Errors;

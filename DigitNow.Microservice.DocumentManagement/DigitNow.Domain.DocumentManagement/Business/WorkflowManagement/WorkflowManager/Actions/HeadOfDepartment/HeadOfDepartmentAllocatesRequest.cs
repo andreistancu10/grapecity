@@ -8,7 +8,7 @@ using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement
 using System;
 using DigitNow.Adapters.MS.Identity.Poco;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.Actions.HeadOfDepartment
+namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.WorkflowManager.Actions.HeadOfDepartment
 {
     public class HeadOfDepartmentAllocatesRequest : BaseWorkflowManager, IWorkflowHandler
     {
