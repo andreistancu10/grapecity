@@ -62,7 +62,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
 
             foreach (var outgoingDocument in outgoingDocuments)
             {
-                outgoingDocument.RecipientId = (int)_user.Id;
+                outgoingDocument.Document.RecipientId = (int)_user.Id;
                 outgoingDocument.Document.Status = _status;
 
                 outgoingDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(_isHeadOfDepartment ? UserRole.HeadOfDepartment : UserRole.Functionary, _user, _status));
@@ -91,7 +91,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
 
             foreach (var incomingDocument in incomingDocuments)
             {
-                incomingDocument.RecipientId = (int)_user.Id;
+                incomingDocument.Document.RecipientId = (int)_user.Id;
                 incomingDocument.Document.Status = _status;
 
                 incomingDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(_isHeadOfDepartment ? UserRole.HeadOfDepartment : UserRole.Functionary, _user, _status));

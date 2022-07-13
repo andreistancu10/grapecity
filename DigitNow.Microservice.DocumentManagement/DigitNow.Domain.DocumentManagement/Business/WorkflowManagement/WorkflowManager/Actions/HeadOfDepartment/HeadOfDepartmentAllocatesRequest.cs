@@ -6,19 +6,18 @@ using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using System;
-using DigitNow.Adapters.MS.Identity.Poco;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.WorkflowManager.Actions.HeadOfDepartment
 {
     public class HeadOfDepartmentAllocatesRequest : BaseWorkflowManager, IWorkflowHandler
     {
         public HeadOfDepartmentAllocatesRequest(IServiceProvider serviceProvider) : base(serviceProvider) { }
+        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkUnallocated, (int)DocumentStatus.OpinionRequestedUnallocated, (int)DocumentStatus.InWorkDelegatedUnallocated };
 
-        private readonly int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkUnallocated, (int)DocumentStatus.OpinionRequestedUnallocated, (int)DocumentStatus.InWorkDelegatedUnallocated };
-        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            var document = await WorkflowService.GetDocumentById(command.DocumentId, token);
-            var lastWorkFlowRecord = WorkflowService.GetLastWorkflowRecord(document);
+            var virtualDocument = await GetVirtualDocumentWorkflowHistoryByIdAsync(command.DocumentId, token);
+            var lastWorkFlowRecord = GetLastWorkflowRecord(virtualDocument);
 
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
@@ -32,20 +31,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 ? DocumentStatus.OpinionRequestedAllocated
                 : DocumentStatus.InWorkAllocated;
 
-            document.IncomingDocument.WorkflowHistory
+            virtualDocument.WorkflowHistory
                 .Add(WorkflowHistoryFactory
                 .Create(UserRole.Functionary, user, newDocumentStatus));
 
-            document.Status = newDocumentStatus;
-
-            await WorkflowService.CommitChangesAsync(token);
+            SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, user.Id, newDocumentStatus);
 
             return command;
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
         {
-            if (command.RecipientId <= 0 || !WorkflowService.IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
+            if (command.RecipientId <= 0 || !IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
             {
                 TransitionNotAllowed(command);
                 return false;

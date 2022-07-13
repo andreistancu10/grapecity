@@ -1,5 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
+﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
@@ -17,12 +16,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         public HeadOfDepartmentDeclines(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
         private ICreateWorkflowHistoryCommand _command;
-        private readonly int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkUnallocated, (int)DocumentStatus.OpinionRequestedUnallocated, (int)DocumentStatus.InWorkDelegatedUnallocated };
-        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
+        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkUnallocated, (int)DocumentStatus.OpinionRequestedUnallocated, (int)DocumentStatus.InWorkDelegatedUnallocated };
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
             _command = command;
-            var document = await WorkflowService.GetDocumentById(command.DocumentId, token);
-            var lastWorkFlowRecord = WorkflowService.GetLastWorkflowRecord(document);
+            var virtualDocument = await GetVirtualDocumentWorkflowHistoryByIdAsync(command.DocumentId, token);
+            var lastWorkFlowRecord = GetLastWorkflowRecord(virtualDocument);
 
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
@@ -31,18 +30,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 ? DocumentStatus.InWorkAllocated
                 : DocumentStatus.NewDeclinedCompetence;
 
-            document.Status = newDocumentStatus;
-
-            await SetResponsibleBasedOnStatus(document, token);
-
-            await WorkflowService.CommitChangesAsync(token);
+            await SetResponsibleBasedOnStatus(virtualDocument, newDocumentStatus, token);
 
             return command;
         }
 
-        private async Task SetResponsibleBasedOnStatus(Document document, CancellationToken token)
+        private async Task SetResponsibleBasedOnStatus(VirtualDocument document, DocumentStatus status, CancellationToken token)
         {
-            if (document.Status == DocumentStatus.InWorkAllocated)
+            if (status == DocumentStatus.InWorkAllocated)
                 PassDocumentToFunctionary(document, _command);
             else
                 await PassDocumentToRegistry(document, _command, token);

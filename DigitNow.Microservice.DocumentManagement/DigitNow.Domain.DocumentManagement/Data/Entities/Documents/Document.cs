@@ -13,6 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public DocumentStatus Status { get; set; }
         public int RegistrationNumber { get; set; }
         public DateTime RegistrationDate { get; set; }
+        public long RecipientId { get; set; }
 
         #region [ References ]
 

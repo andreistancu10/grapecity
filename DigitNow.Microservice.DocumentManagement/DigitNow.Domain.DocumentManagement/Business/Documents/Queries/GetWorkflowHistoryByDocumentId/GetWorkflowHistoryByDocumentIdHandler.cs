@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+using DigitNow.Domain.DocumentManagement.Data;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
+using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -11,26 +14,37 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetWorkf
     public class GetWorkflowHistoryByDocumentIdHandler : IQueryHandler<GetWorkflowHistoryByDocumentIdQuery, List<GetWorkflowHistoryByDocumentIdResponse>>
     {
         private readonly IMapper _mapper;
-        private readonly IWorkflowManagementService _workflowManagementService;
+        private readonly DocumentManagementDbContext _dbContext;
 
-        public GetWorkflowHistoryByDocumentIdHandler(IMapper mapper, IWorkflowManagementService workflowManagementService)
+        public GetWorkflowHistoryByDocumentIdHandler(IMapper mapper, DocumentManagementDbContext dbContext)
         {
             _mapper = mapper;
-            _workflowManagementService = workflowManagementService;
+            _dbContext = dbContext;
         }
 
         public async Task<List<GetWorkflowHistoryByDocumentIdResponse>> Handle(GetWorkflowHistoryByDocumentIdQuery request, CancellationToken cancellationToken)
         {
-            var document = await _workflowManagementService.GetDocumentById(request.DocumentId, cancellationToken);
+            var document = await _dbContext.Documents.FirstAsync(x => x.Id == request.DocumentId);
+            VirtualDocument virtualDocument = null;
 
-            if (document.IncomingDocument != null)
+            switch (document.DocumentType)
             {
-                return _mapper.Map<List<GetWorkflowHistoryByDocumentIdResponse>>(document.IncomingDocument.WorkflowHistory);
+                case DocumentType.Incoming:
+                    virtualDocument = await _dbContext.IncomingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.Id == request.DocumentId);
+                    break;
+                case DocumentType.Internal:
+                    virtualDocument =  await _dbContext.InternalDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.Id == request.DocumentId);
+                    break;
+                case DocumentType.Outgoing:
+                    virtualDocument = await _dbContext.OutgoingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.Id == request.DocumentId);
+                    break;
+                default:
+                    return null;
             }
 
-            if (document.OutgoingDocument != null)
+            if (virtualDocument != null)
             {
-                return _mapper.Map<List<GetWorkflowHistoryByDocumentIdResponse>>(document.OutgoingDocument.WorkflowHistory);
+                return _mapper.Map<List<GetWorkflowHistoryByDocumentIdResponse>>(virtualDocument.WorkflowHistory);
             }
 
             return new List<GetWorkflowHistoryByDocumentIdResponse>();

@@ -4,12 +4,16 @@ using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
+using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,12 +23,61 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
     {
         protected BaseWorkflowManager(IServiceProvider serviceProvider)
         {
-            WorkflowService = serviceProvider.GetService<IWorkflowManagementService>();
             IdentityAdapterClient = serviceProvider.GetService<IIdentityAdapterClient>();
+            DbContext = serviceProvider.GetService<DocumentManagementDbContext>();
         }
 
-        public readonly IWorkflowManagementService WorkflowService;
         public readonly IIdentityAdapterClient IdentityAdapterClient;
+        public readonly DocumentManagementDbContext DbContext;
+        protected abstract int[] allowedTransitionStatuses { get; }
+        protected abstract Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, CancellationToken token);
+
+        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
+        {
+            await CreateWorkflowRecordInternal(command, token);
+            await DbContext.SaveChangesAsync(token);
+
+            return command;
+        }
+
+        public WorkflowHistory GetLastWorkflowRecord(VirtualDocument document)
+        {
+            return document.WorkflowHistory.OrderByDescending(x => x.CreatedAt).FirstOrDefault();
+        }
+
+        public static bool IsTransitionAllowed(WorkflowHistory lastWorkFlowRecord, int[] allowedTransitionStatuses)
+        {
+            if (lastWorkFlowRecord == null || !allowedTransitionStatuses.Contains((int)lastWorkFlowRecord.Status))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        protected async Task<VirtualDocument> GetVirtualDocumentWorkflowHistoryByIdAsync(long documentId, CancellationToken cancellationToken)
+        {
+            var document = await DbContext.Documents.FirstAsync(x => x.Id == documentId);
+
+            switch (document.DocumentType)
+            {
+                case DocumentType.Incoming:
+                    return await DbContext.IncomingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.Id == documentId);
+                case DocumentType.Internal:
+                    return await DbContext.InternalDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.Id == documentId);
+                case DocumentType.Outgoing:
+                    return await DbContext.OutgoingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.Id == documentId);
+                default:
+                    return null;
+            }
+        }
+
+        public async void SetStatusAndRecipientBasedOnWorkflowDecision(long documentId, long recipientId, DocumentStatus status)
+        {
+            var document = await DbContext.Documents.FirstAsync(x => x.Id == documentId);
+
+            document.RecipientId = recipientId;
+            document.Status = status;
+        }
 
         public async Task<User> FetchHeadOfDepartmentByDepartmentId(long departmentId, CancellationToken token)
         {
@@ -50,6 +103,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             newRecord.RecipientId = oldRecord.RecipientId;
             newRecord.RecipientType = oldRecord.RecipientType;
             newRecord.RecipientName = oldRecord.RecipientName;
+
+            SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, newRecord.RecipientId, newRecord.Status);
         }
 
         protected virtual void TransitionNotAllowed(ICreateWorkflowHistoryCommand command)
@@ -77,28 +132,42 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             return true;
         }
 
-        protected async Task PassDocumentToRegistry(Document document, ICreateWorkflowHistoryCommand command, CancellationToken token)
+        protected async Task PassDocumentToRegistry(VirtualDocument document, ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
             var creator = await IdentityAdapterClient.GetUserByIdAsync(document.CreatedBy, token);
 
-            document.IncomingDocument.WorkflowHistory
+            document.WorkflowHistory
                 .Add(WorkflowHistoryFactory
                 .Create(UserRole.Functionary, creator, DocumentStatus.NewDeclinedCompetence, command.DeclineReason, command.Remarks));
+
+            SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, creator.Id, DocumentStatus.NewDeclinedCompetence);
         }
 
-        protected void PassDocumentToFunctionary(Document document, ICreateWorkflowHistoryCommand command)
+        protected void PassDocumentToFunctionary(VirtualDocument document, ICreateWorkflowHistoryCommand command)
         {
-            var oldWorkflowResponsible = WorkflowService
-                .GetOldWorkflowResponsible(document, x => x.RecipientType == UserRole.Functionary.Id);
+            var oldWorkflowResponsible = GetOldWorkflowResponsible(document, x => x.RecipientType == UserRole.Functionary.Id);
 
             var newWorkflowResponsible = new WorkflowHistory();
-            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
-
             newWorkflowResponsible.Status = DocumentStatus.InWorkAllocated;
             newWorkflowResponsible.DeclineReason = command.DeclineReason;
             newWorkflowResponsible.Remarks = command.Remarks;
 
-            document.IncomingDocument.WorkflowHistory.Add(newWorkflowResponsible);
+            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
+
+            document.WorkflowHistory.Add(newWorkflowResponsible);
+        }
+
+        public WorkflowHistory GetOldWorkflowResponsible(VirtualDocument document, Expression<Func<WorkflowHistory, bool>> predicate)
+        {
+            return ExtractResponsible(document.WorkflowHistory, predicate);
+        }
+
+        private static WorkflowHistory ExtractResponsible(List<WorkflowHistory> history, Expression<Func<WorkflowHistory, bool>> predicate)
+        {
+            return history.AsQueryable()
+                          .Where(predicate)
+                          .OrderByDescending(x => x.CreatedAt)
+                          .FirstOrDefault();
         }
     }
 }

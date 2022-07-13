@@ -11,31 +11,30 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
     public class FunctionaryFinalizes : BaseWorkflowManager, IWorkflowHandler
     {
         public FunctionaryFinalizes(IServiceProvider serviceProvider) : base(serviceProvider) { }
-
-        private readonly int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated };
-        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
+        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated };
+        
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            var document = await WorkflowService.GetDocumentById(command.DocumentId, token);
-            var oldWorkflowResponsible = WorkflowService.GetLastWorkflowRecord(document);
+            var virtualDocument = await GetVirtualDocumentWorkflowHistoryByIdAsync(command.DocumentId, token);
+            var oldWorkflowResponsible = GetLastWorkflowRecord(virtualDocument);
 
             if (!Validate(command, oldWorkflowResponsible))
                 return command;
 
             var newWorkflowResponsible = new WorkflowHistory();
-            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
-
-            newWorkflowResponsible.Status = document.Status = DocumentStatus.Finalized;
+            newWorkflowResponsible.Status = DocumentStatus.Finalized;
             newWorkflowResponsible.Remarks = command.Remarks;
 
-            document.IncomingDocument.WorkflowHistory.Add(newWorkflowResponsible);
-            await WorkflowService.CommitChangesAsync(token);
+            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
+
+            virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
 
             return command;
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
         {
-            if (!WorkflowService.IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
+            if (!IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
             {
                 TransitionNotAllowed(command);
                 return false;

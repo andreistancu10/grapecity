@@ -11,12 +11,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
     public class FunctionaryDeclines : BaseWorkflowManager, IWorkflowHandler
     {
         public FunctionaryDeclines(IServiceProvider serviceProvider) : base(serviceProvider) { }
-
-        private readonly int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.OpinionRequestedAllocated };
-        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
+        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.OpinionRequestedAllocated };
+        
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            var document = await WorkflowService.GetDocumentById(command.DocumentId, token);
-            var lastWorkFlowRecord = WorkflowService.GetLastWorkflowRecord(document);
+            var virtualDocument = await GetVirtualDocumentWorkflowHistoryByIdAsync(command.DocumentId, token);
+            var lastWorkFlowRecord = GetLastWorkflowRecord(virtualDocument);
 
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
@@ -26,20 +26,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 : DocumentStatus.NewDeclinedCompetence;
 
             if (newDocumentStatus == DocumentStatus.InWorkAllocated)
-                PassDocumentToFunctionary(document, command);
+                PassDocumentToFunctionary(virtualDocument, command);
             else
-                await PassDocumentToRegistry(document, command, token);
-
-            document.Status = newDocumentStatus;
-
-            await WorkflowService.CommitChangesAsync(token);
+                await PassDocumentToRegistry(virtualDocument, command, token);
 
             return command;
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
         {
-            if (string.IsNullOrWhiteSpace(command.DeclineReason) || !WorkflowService.IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
+            if (string.IsNullOrWhiteSpace(command.DeclineReason) || !IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
             {
                 TransitionNotAllowed(command);
                 return false;

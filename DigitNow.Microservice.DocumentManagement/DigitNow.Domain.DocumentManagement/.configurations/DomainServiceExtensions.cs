@@ -78,7 +78,6 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<ISpecialRegisterService, SpecialRegisterService>();
             services.AddTransient<IFileService, FileService>();
             services.AddTransient<IUploadedFileService, UploadedFileService>();
-            services.AddTransient<IWorkflowManagementService, WorkflowManagementService>();
 
             return services;
         }

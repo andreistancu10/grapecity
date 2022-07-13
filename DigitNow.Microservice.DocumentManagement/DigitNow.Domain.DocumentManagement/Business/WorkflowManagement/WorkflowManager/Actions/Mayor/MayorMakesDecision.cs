@@ -14,14 +14,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
     {
         public MayorMakesDecision(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
-        private readonly int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkMayorReview };
+        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkMayorReview };
         private enum Decision { Approved = 1, Declined = 2  };
-        private Document _document;
+        private VirtualDocument _virtualDocument;
 
-        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            _document = await WorkflowService.GetDocumentById(command.DocumentId, token);
-            var lastWorkFlowRecord = WorkflowService.GetLastWorkflowRecord(_document);
+            _virtualDocument = await GetVirtualDocumentWorkflowHistoryByIdAsync(command.DocumentId, token);
+            var lastWorkFlowRecord = GetLastWorkflowRecord(_virtualDocument);
 
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
@@ -38,40 +38,38 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                     break;
             }
 
-            await WorkflowService.CommitChangesAsync(token);
-
             return command;
         }
 
         private void MayorApproved(ICreateWorkflowHistoryCommand command)
         {
-            var oldWorkflowResponsible = WorkflowService.GetOldWorkflowResponsible(_document, x => x.RecipientType == UserRole.Functionary.Id);
+            var oldWorkflowResponsible = GetOldWorkflowResponsible(_virtualDocument, x => x.RecipientType == UserRole.Functionary.Id);
 
             var newWorkflowResponsible = new WorkflowHistory();
-            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
-
-            newWorkflowResponsible.Status = _document.Status = DocumentStatus.InWorkCountersignature;
+            newWorkflowResponsible.Status = DocumentStatus.InWorkCountersignature;
             newWorkflowResponsible.Remarks = command.Remarks;
 
-            _document.IncomingDocument.WorkflowHistory.Add(newWorkflowResponsible);
+            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
+
+            _virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
         }
 
         private void MayorDeclined(ICreateWorkflowHistoryCommand command)
         {
-            var oldWorkflowResponsible = WorkflowService.GetOldWorkflowResponsible(_document, x => x.RecipientType == UserRole.HeadOfDepartment.Id);
+            var oldWorkflowResponsible = GetOldWorkflowResponsible(_virtualDocument, x => x.RecipientType == UserRole.HeadOfDepartment.Id);
 
             var newWorkflowResponsible = new WorkflowHistory();
-            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
-
-            newWorkflowResponsible.Status = _document.Status = DocumentStatus.InWorkMayorDeclined;
+            newWorkflowResponsible.Status = DocumentStatus.InWorkMayorDeclined;
             newWorkflowResponsible.Remarks = command.Remarks;
 
-            _document.IncomingDocument.WorkflowHistory.Add(newWorkflowResponsible);
+            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
+
+            _virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
         {
-            if (!WorkflowService.IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
+            if (!IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
             {
                 TransitionNotAllowed(command);
                 return false;

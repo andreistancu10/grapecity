@@ -67,7 +67,8 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             var newDocument = new Document
             {
                 DocumentType = DocumentType.Incoming,
-                IncomingDocument = newIncomingDocument
+                IncomingDocument = newIncomingDocument,
+                RecipientId = headOfDepartment.Id
             };
 
             await _documentService.AddDocument(newDocument, cancellationToken);

@@ -14,34 +14,32 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
     {
         public FunctionaryAsksForApproval(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
-        private readonly int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.OpinionRequestedAllocated };
-        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
+        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.OpinionRequestedAllocated };
+
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            var document = await WorkflowService.GetDocumentById(command.DocumentId, token);
-            var lastWorkFlowRecord = WorkflowService.GetLastWorkflowRecord(document);
+            var virtualDocument = await GetVirtualDocumentWorkflowHistoryByIdAsync(command.DocumentId, token);
+            var lastWorkFlowRecord = GetLastWorkflowRecord(virtualDocument);
 
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
 
-            var oldWorkflowResponsible = WorkflowService.GetOldWorkflowResponsible(document, x => x.RecipientType == UserRole.HeadOfDepartment.Id);
+            var oldWorkflowResponsible = GetOldWorkflowResponsible(virtualDocument, x => x.RecipientType == UserRole.HeadOfDepartment.Id);
 
             var newWorkflowResponsible = new WorkflowHistory();
-            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 
-            newWorkflowResponsible.Status = document.Status = DocumentStatus.InWorkApprovalRequested;
+            newWorkflowResponsible.Status = DocumentStatus.InWorkApprovalRequested;
             newWorkflowResponsible.Resolution = command.Resolution;
 
-            WorkflowService.AddWorkflowRecord(document, newWorkflowResponsible);
-            WorkflowService.SetNewRecipientBasedOnWorkflowDecision(document, newWorkflowResponsible.RecipientId);
-            
-            await WorkflowService.CommitChangesAsync(token);
+            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
+            virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
 
             return command;
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
         {
-            if (!WorkflowService.IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
+            if (!IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
             {
                 TransitionNotAllowed(command);
                 return false;

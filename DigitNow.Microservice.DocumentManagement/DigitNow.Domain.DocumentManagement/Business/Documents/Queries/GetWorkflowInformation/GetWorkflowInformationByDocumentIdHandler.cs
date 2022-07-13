@@ -19,7 +19,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetWorkf
         public async Task<GetWorkflowInformationByDocumentIdResponse> Handle(GetWorkflowInformationByDocumentIdQuery request, CancellationToken cancellationToken)
         {
             var document = await _documentService.FindAsync(x => x.Id == request.DocumentId, cancellationToken);
-            var userRole = await _identityService.GetCurrentUserRoleAsync(cancellationToken);
+            var userRole = await _identityService.GetCurrentUserFirstRoleAsync(cancellationToken);
 
             var response = new GetWorkflowInformationByDocumentIdResponse { DocumentStatus = document.Status, UserRole = userRole.Id };
             

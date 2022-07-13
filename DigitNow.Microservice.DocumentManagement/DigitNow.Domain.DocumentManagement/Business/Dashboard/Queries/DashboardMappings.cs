@@ -12,7 +12,6 @@ public class GetDocumentsMappings : Profile
         CreateMap<IncomingDocument, GetDocumentResponse>()
             .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.Document.RegistrationDate))
             .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.Document.RegistrationNumber))
-            .ForMember(c => c.RecipientName, opt => opt.MapFrom(src => src.RecipientId))
             .ForMember(c => c.IssuerName, opt => opt.MapFrom(src => src.CreatedBy))
             .ForMember(c => c.Status, opt => opt.MapFrom<GetDocumentResponseIncomingStatusValueResolver>())
             .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.DocumentTypeId))

@@ -12,17 +12,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
     public class FunctionarySendsOpinion : BaseWorkflowManager, IWorkflowHandler
     {
         public FunctionarySendsOpinion(IServiceProvider serviceProvider) : base(serviceProvider) { }
+        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.OpinionRequestedAllocated };
 
-        private readonly int[] allowedTransitionStatuses = { (int)DocumentStatus.OpinionRequestedAllocated };
-        public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            var document = await WorkflowService.GetDocumentById(command.DocumentId, token);
-            var oldWorkflowResponsible = WorkflowService.GetLastWorkflowRecord(document);
+            var document = await GetVirtualDocumentWorkflowHistoryByIdAsync(command.DocumentId, token);
+            var oldWorkflowResponsible = GetLastWorkflowRecord(document);
             
             if (!Validate(command, oldWorkflowResponsible))
                 return command;
 
-            var responsibleHeadOfDepartmentRecord = document.IncomingDocument.WorkflowHistory
+            var responsibleHeadOfDepartmentRecord = document.WorkflowHistory
                 .Where(x => x.RecipientType == UserRole.HeadOfDepartment.Id && x.Status == DocumentStatus.OpinionRequestedUnallocated)
                 .OrderByDescending(x => x.CreatedAt)
                 .FirstOrDefault();
@@ -34,20 +34,19 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             //    .FirstOrDefault();
 
             var newWorkflowResponsible = new WorkflowHistory();
-            TransferResponsibility(responsibleHeadOfDepartmentRecord, newWorkflowResponsible, command);
-
-            newWorkflowResponsible.Status = document.Status = DocumentStatus.InWorkAllocated;
+            newWorkflowResponsible.Status = DocumentStatus.InWorkAllocated;
             newWorkflowResponsible.Remarks = command.Remarks;
 
-            document.IncomingDocument.WorkflowHistory.Add(newWorkflowResponsible);
-            await WorkflowService.CommitChangesAsync(token);
+            TransferResponsibility(responsibleHeadOfDepartmentRecord, newWorkflowResponsible, command);
+
+            document.WorkflowHistory.Add(newWorkflowResponsible);
 
             return command;
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
         {
-            if (string.IsNullOrWhiteSpace(command.Remarks) || !WorkflowService.IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
+            if (string.IsNullOrWhiteSpace(command.Remarks) || !IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
             {
                 TransitionNotAllowed(command);
                 return false;

@@ -9,7 +9,6 @@ public class OutgoingDocument : VirtualDocument
     public string ContentSummary { get; set; }
     public int NumberOfPages { get; set; }
 
-    public int RecipientId { get; set; }
     public string RecipientName { get; set; }
     public int RecipientTypeId { get; set; }
 
@@ -20,7 +19,6 @@ public class OutgoingDocument : VirtualDocument
 
     public Document Document { get; set; }
     public ContactDetail ContactDetail { get; set; }
-    public List<WorkflowHistory> WorkflowHistory { get; set; } = new();
     public List<ConnectedDocument>? ConnectedDocuments { get; set; } = new();
 
     #endregion

@@ -15,7 +15,6 @@ public class OutgoingDocumentConfiguration : IEntityTypeConfiguration<OutgoingDo
         builder.Property(p => p.ContactDetailId).IsRequired();
         builder.Property(p => p.ContentSummary).IsRequired();
         builder.Property(p => p.NumberOfPages).IsRequired();
-        builder.Property(p => p.RecipientId).IsRequired();
         builder.Property(p => p.DocumentTypeId).IsRequired();
 
         builder.HasOne(item => item.Document)
