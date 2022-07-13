@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using DigitNow.Adapters.MS.Identity;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generators;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
@@ -16,7 +15,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ShiftIn.Domain.Authentication.Client;
-using System.Reflection;
 
 namespace DigitNow.Domain.DocumentManagement.configurations
 {
