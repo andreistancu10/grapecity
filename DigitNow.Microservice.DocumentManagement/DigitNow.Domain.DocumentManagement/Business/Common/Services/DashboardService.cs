@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Adapters.MS.Identity;
 using DigitNow.Domain.Authentication.Client;
-using DigitNow.Domain.Catalog.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
@@ -23,11 +22,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IDashboardService
     {
-        Task<long> CountAllDocumentsAsync(CancellationToken cancellationToken);
-        Task<long> CountAllDocumentsAsync(DocumentFilter documentFilter, CancellationToken cancellationToken);
+        Task<long> CountAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken);
 
-        Task<List<Document>> GetAllDocumentsAsync(int page, int count, CancellationToken cancellationToken);
-        Task<List<Document>> GetAllDocumentsAsync(DocumentFilter documentFilter, int page, int count, CancellationToken cancellationToken);
+        Task<List<VirtualDocument>> GetAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken cancellationToken);
     }
 
     public class DashboardService : IDashboardService
@@ -67,46 +64,71 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         #region [ IDashboardService ]
 
-        public Task<long> CountAllDocumentsAsync(CancellationToken cancellationToken) =>
-            CountAllInternalDocumentsAsync(GetDocumentsBuiltinPredicates(), cancellationToken);
-        
-        public Task<long> CountAllDocumentsAsync(DocumentFilter documentFilter, CancellationToken cancellationToken) =>
-            CountAllInternalDocumentsAsync(GetJoinedPredicates(documentFilter), cancellationToken);
-        
+        public Task<long> CountAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken) =>
+            CountAllInternalDocumentsAsync(preprocessFilter, postprocessFilter, cancellationToken);
 
-        public Task<List<Document>> GetAllDocumentsAsync(int page, int count, CancellationToken cancellationToken) =>
-            GetAllInternalDocumentsAsync(GetDocumentsBuiltinPredicates(), page, count, cancellationToken);
-        
-        public Task<List<Document>> GetAllDocumentsAsync(DocumentFilter documentFilter, int page, int count, CancellationToken cancellationToken) =>
-            GetAllInternalDocumentsAsync(GetJoinedPredicates(documentFilter), page, count, cancellationToken);
-        
+        public Task<List<VirtualDocument>> GetAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken cancellationToken) =>
+            GetAllInternalDocumentsAsync(preprocessFilter, postprocessFilter, page, count, cancellationToken);
+
 
         #endregion
 
         #region [ IDashboardService Internal ]
 
-        private async Task<long> CountAllInternalDocumentsAsync(IList<Expression<Func<Document, bool>>> predicates, CancellationToken cancellationToken)
+        private async Task<long> CountAllInternalDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
         {
-            var documentsCountQuery = _dbContext.Documents
-                .WhereAll(predicates);
+            var documentsQuery = await BuildPreprocessDocumentsQueryAsync(preprocessFilter, cancellationToken);
+            if (postprocessFilter.IsEmpty())
+                return await documentsQuery.CountAsync(cancellationToken);
 
-            var userModel = await GetCurrentUserAsync(cancellationToken);
+            var lightweightDocuments = await documentsQuery
+                .Select(x => new Document { Id = x.Id, DocumentType = x.DocumentType })
+                .ToListAsync(cancellationToken);
 
-            if (!IsRole(userModel, UserRole.Mayor))
-            {
-                var relatedUserIds = await GetRelatedUserIdsAsync(userModel, cancellationToken);
-
-                documentsCountQuery = documentsCountQuery
-                    .Where(x => relatedUserIds.Contains(x.CreatedBy));
-            }
-
-            return await documentsCountQuery.CountAsync(cancellationToken);
+            return await CountVirtualDocuments(lightweightDocuments, postprocessFilter, cancellationToken);
         }
 
-        private async Task<List<Document>> GetAllInternalDocumentsAsync(IList<Expression<Func<Document, bool>>> predicates, int page, int count, CancellationToken cancellationToken)
+        private async Task<List<VirtualDocument>> GetAllInternalDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken cancellationToken)
+        {
+            var documentsQuery = await BuildPreprocessDocumentsQueryAsync(preprocessFilter, cancellationToken);
+
+            var documents = await documentsQuery.OrderByDescending(x => x.CreatedAt)
+                 .Skip((page - 1) * count)
+                 .Take(count)
+                 .Select(x => new Document { Id = x.Id, DocumentType = x.DocumentType })
+                 .ToListAsync(cancellationToken);
+
+            var virtualDocuments = await FetchVirtualDocuments(documents, postprocessFilter, cancellationToken);
+
+            return virtualDocuments
+                .OrderByDescending(x => x.CreatedAt)
+                .ToList();
+        }
+
+        #endregion
+
+        #region [ Utils - Preprocessing Filters ]
+
+        private IList<Expression<Func<Document, bool>>> GetDocumentsPreprocessBuiltinPredicates() =>
+            PredicateFactory.CreatePredicatesList<Document>(x => x.CreatedAt.Year >= PreviousYear);
+
+        private IList<Expression<Func<Document, bool>>> GetDocumentsPreprocessPredicates(DocumentPreprocessFilter preprocessFilter) =>
+            ExpressionFilterBuilderRegistry.GetDocumentPreprocessFilterBuilder(preprocessFilter).Build();
+
+        private IList<Expression<Func<Document, bool>>> GetPreprocessPredicates(DocumentPreprocessFilter preprocessFilter)
+        {
+            var preprocessPredicates = GetDocumentsPreprocessBuiltinPredicates();
+            if (!preprocessFilter.IsEmpty())
+            {
+                GetDocumentsPreprocessPredicates(preprocessFilter).ForEach(predicate => preprocessPredicates.Add(predicate));
+            }
+            return preprocessPredicates;
+        }
+
+        private async Task<IQueryable<Document>> BuildPreprocessDocumentsQueryAsync(DocumentPreprocessFilter documentFilter, CancellationToken cancellationToken)
         {
             var documentsQuery = _dbContext.Documents
-                .WhereAll(predicates);
+                .WhereAll(GetPreprocessPredicates(documentFilter));
 
             var userModel = await GetCurrentUserAsync(cancellationToken);
 
@@ -118,30 +140,21 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                     .Where(x => relatedUserIds.Contains(x.CreatedBy));
             }
 
-            return await documentsQuery.OrderByDescending(x => x.RegistrationDate)
-                 .Skip((page - 1) * count)
-                 .Take(count)
-                 .ToListAsync(cancellationToken);
+            return documentsQuery;
         }
 
         #endregion
 
-        #region [ Utils - Predicates ]
+        #region [ Utils - Postprocessing Filters ]
 
-        private IList<Expression<Func<Document, bool>>> GetDocumentsBuiltinPredicates() =>        
-            PredicateFactory.CreatePredicatesList<Document>(x => x.CreatedAt.Year >= PreviousYear);        
-
-        private IList<Expression<Func<Document, bool>>> GetDocumentsCustomPredicates(DocumentFilter documentFilter) =>
-            ExpressionFilterBuilderRegistry.GetDocumentPredicatesByFilter(documentFilter).Build();
-
-        private IList<Expression<Func<Document, bool>>> GetJoinedPredicates(DocumentFilter documentFilter = null)
+        private IList<Expression<Func<T, bool>>> GetPostprocessPredicates<T>(DocumentPostprocessFilter postprocessFilter)
+                    where T : VirtualDocument
         {
-            var joinedPredicates = GetDocumentsBuiltinPredicates();
-            if (documentFilter != null)
+            if (!postprocessFilter.IsEmpty())
             {
-                GetDocumentsCustomPredicates(documentFilter).ForEach(predicate => joinedPredicates.Add(predicate));
+                return ExpressionFilterBuilderRegistry.GetDocumentPostprocessFilterBuilder<T>(postprocessFilter).Build();
             }
-            return joinedPredicates;
+            return new List<Expression<Func<T, bool>>>();
         }
 
         #endregion
@@ -169,7 +182,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private async Task<UserModel> GetCurrentUserAsync(CancellationToken cancellationToken)
         {
             var userId = _identityService.GetCurrentUserId();
-            
+
             var getUserByIdResponse = await _authenticationClient.GetUserById(userId, cancellationToken);
             if (getUserByIdResponse == null)
                 throw new InvalidOperationException(); //TODO: Add not found exception
@@ -183,6 +196,163 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         private bool IsRole(UserModel userModel, UserRole role) =>
             userModel.Roles.Contains((long)role);
+
+        #endregion
+
+        #region [ Internal - Count ]
+
+        private async Task<long> CountVirtualDocuments(IList<Document> documents, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
+        {
+            var result = default(long);
+
+            result += await CountIncomingDocumentsAsync(documents, postprocessFilter, cancellationToken);
+            result += await CountInternalDocumentsAsync(documents, postprocessFilter, cancellationToken);
+            result += await CountOutgoingDocumentsAsync(documents, postprocessFilter, cancellationToken);
+
+            return result;
+        }
+
+        private async Task<long> CountIncomingDocumentsAsync(IList<Document> documents, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
+        {
+            var incomingDocumentsIds = documents
+                    .Where(x => x.DocumentType == DocumentType.Incoming)
+                    .Select(x => x.Id)
+                    .ToList();
+            if (!incomingDocumentsIds.Any())
+                return default(long);
+
+            var incomingDocumentsIncludes = PredicateFactory.CreateIncludesList<IncomingDocument>(x => x.WorkflowHistory);
+            return await CountChildDocumentsAsync(incomingDocumentsIds, postprocessFilter, incomingDocumentsIncludes, cancellationToken);
+        }
+
+        private async Task<long> CountInternalDocumentsAsync(IList<Document> documents, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
+        {
+            var internalDocumentsIds = documents
+                .Where(x => x.DocumentType == DocumentType.Internal)
+                .Select(x => x.Id)
+                .ToList();
+            if (!internalDocumentsIds.Any())
+                return default(long);
+
+            //TODO: Add workflow history once is implemented
+            return await CountChildDocumentsAsync<InternalDocument>(internalDocumentsIds, postprocessFilter, null, cancellationToken);
+        }
+
+        private async Task<long> CountOutgoingDocumentsAsync(IList<Document> documents, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
+        {
+            var outgoingDocumentsIds = documents
+                .Where(x => x.DocumentType == DocumentType.Outgoing)
+                .Select(x => x.Id)
+                .ToList();
+            if (!outgoingDocumentsIds.Any())
+                return default(long);
+
+            var outgoingDocumentsIncludes = PredicateFactory.CreateIncludesList<OutgoingDocument>(x => x.WorkflowHistory);
+            return await CountChildDocumentsAsync(outgoingDocumentsIds, postprocessFilter, outgoingDocumentsIncludes, cancellationToken);
+        }
+
+        private async Task<long> CountChildDocumentsAsync<T>(IList<long> childDocumentIds, DocumentPostprocessFilter postprocessFilter, IList<Expression<Func<T, object>>> includes, CancellationToken cancellationToken)
+            where T : VirtualDocument
+        {
+            return await BuildChildDocumentsFetchQuery<T>(childDocumentIds, postprocessFilter, includes)
+                .CountAsync(cancellationToken);
+        }
+
+        #endregion
+
+        #region [ Internal - Get ]
+
+        private async Task<List<VirtualDocument>> FetchVirtualDocuments(IList<Document> documents, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
+        {
+            var result = new List<VirtualDocument>();
+
+            var incomingDocuments = await FetchIncomingDocumentsAsync(documents, postprocessFilter, cancellationToken);
+            if (incomingDocuments.Any())
+            {
+                result.AddRange(incomingDocuments);
+            }
+
+            var internalDocuments = await FetchInternalDocumentsAsync(documents, postprocessFilter, cancellationToken);
+            if (internalDocuments.Any())
+            {
+                result.AddRange(internalDocuments);
+            }
+
+            var outgoingDocuments = await FetchOutgoingDocumentsAsync(documents, postprocessFilter, cancellationToken);
+            if (outgoingDocuments.Any())
+            {
+                result.AddRange(outgoingDocuments);
+            }
+
+            return result;
+        }
+
+        private async Task<IList<IncomingDocument>> FetchIncomingDocumentsAsync(IList<Document> documents, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
+        {
+            var incomingDocumentsIds = documents
+                    .Where(x => x.DocumentType == DocumentType.Incoming)
+                    .Select(x => x.Id)
+                    .ToList();
+            if (!incomingDocumentsIds.Any())
+                return new List<IncomingDocument>();
+
+            var incomingDocumentsIncludes = PredicateFactory.CreateIncludesList<IncomingDocument>(x => x.Document, x => x.WorkflowHistory);
+            return await FetchChildDocumentsAsync(incomingDocumentsIds, postprocessFilter, incomingDocumentsIncludes, cancellationToken);
+        }
+
+        private async Task<IList<InternalDocument>> FetchInternalDocumentsAsync(IList<Document> documents, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
+        {
+            var internalDocumentsIds = documents
+                .Where(x => x.DocumentType == DocumentType.Internal)
+                .Select(x => x.Id)
+                .ToList();
+            if (!internalDocumentsIds.Any())
+                return new List<InternalDocument>();
+
+            //TODO: Add workflow history once is implemented
+            var internalDocumentsIncludes = PredicateFactory.CreateIncludesList<InternalDocument>(x => x.Document);
+            return await FetchChildDocumentsAsync(internalDocumentsIds, postprocessFilter, internalDocumentsIncludes, cancellationToken);
+        }
+
+        private async Task<IList<OutgoingDocument>> FetchOutgoingDocumentsAsync(IList<Document> documents, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
+        {
+            var outgoingDocumentsIds = documents
+                .Where(x => x.DocumentType == DocumentType.Outgoing)
+                .Select(x => x.Id)
+                .ToList();
+            if (!outgoingDocumentsIds.Any())
+                return new List<OutgoingDocument>();
+
+            var outgoingDocumentsIncludes = PredicateFactory.CreateIncludesList<OutgoingDocument>(x => x.Document, x => x.WorkflowHistory);
+            return await FetchChildDocumentsAsync(outgoingDocumentsIds, postprocessFilter, outgoingDocumentsIncludes, cancellationToken);
+        }
+
+        private async Task<IList<T>> FetchChildDocumentsAsync<T>(IList<long> childDocumentIds, DocumentPostprocessFilter postprocessFilter, IList<Expression<Func<T, object>>> includes, CancellationToken cancellationToken)
+            where T : VirtualDocument
+        {
+            
+            return await BuildChildDocumentsFetchQuery(childDocumentIds, postprocessFilter, includes)
+                .ToListAsync(cancellationToken);
+        }
+
+        #endregion
+
+        #region [ Helpers ]
+
+        private IQueryable<T> BuildChildDocumentsFetchQuery<T>(IList<long> childDocumentIds, DocumentPostprocessFilter postprocessFilter, IList<Expression<Func<T, object>>> includes)
+            where T : VirtualDocument
+        {
+            var virtualDocumentsQuery = _dbContext.Set<T>().AsQueryable();
+
+            if (includes != null)
+            {
+                virtualDocumentsQuery = virtualDocumentsQuery.Includes(includes);
+            }
+
+            return virtualDocumentsQuery
+                .WhereAll(GetPostprocessPredicates<T>(postprocessFilter))
+                .Where(x => childDocumentIds.Contains(x.DocumentId));
+        }
 
         #endregion
     }

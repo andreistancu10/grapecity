@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
 using HTSS.Platform.Core.CQRS;
 using System.Collections.Generic;
 using System.Threading;
@@ -25,7 +26,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, GetDocuments
 
     public Task<GetDocumentsResponse> Handle(GetDocumentsQuery query, CancellationToken cancellationToken)
     {
-        if (query.Filter == null)
+        if (query.PreprocessFilter.IsEmpty() && query.PostprocessFilter.IsEmpty())
         {
             return GetSimpleResponseAsync(query, cancellationToken);
         }
@@ -34,9 +35,9 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, GetDocuments
 
     private async Task<GetDocumentsResponse> GetSimpleResponseAsync(GetDocumentsQuery query, CancellationToken cancellationToken)
     {
-        var totalItems = await _dashboardService.CountAllDocumentsAsync(cancellationToken);
+        var totalItems = await _dashboardService.CountAllDocumentsAsync(DocumentPreprocessFilter.Empty, DocumentPostprocessFilter.Empty, cancellationToken);
 
-        var documents = await _dashboardService.GetAllDocumentsAsync(
+        var documents = await _dashboardService.GetAllDocumentsAsync(DocumentPreprocessFilter.Empty, DocumentPostprocessFilter.Empty,
                 query.Page,
                 query.Count,
             cancellationToken);
@@ -48,14 +49,14 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, GetDocuments
 
     private async Task<GetDocumentsResponse> GetComplexResponseAsync(GetDocumentsQuery query, CancellationToken cancellationToken)
     {
-        var totalItems = await _dashboardService.CountAllDocumentsAsync(query.Filter, cancellationToken);
+        var totalItems = await _dashboardService.CountAllDocumentsAsync(query.PreprocessFilter, query.PostprocessFilter, cancellationToken);
 
-        var documents = await _dashboardService.GetAllDocumentsAsync(query.Filter,
+        var documents = await _dashboardService.GetAllDocumentsAsync(query.PreprocessFilter, query.PostprocessFilter,
             query.Page,
             query.Count,
             cancellationToken);
 
-        var viewModels = await _documentMappingService.MapToDocumentViewModelAsync(documents, query.Filter, cancellationToken);
+        var viewModels = await _documentMappingService.MapToDocumentViewModelAsync(documents, cancellationToken);
 
         return BuildDocumentResponse(query, totalItems, viewModels);
     }

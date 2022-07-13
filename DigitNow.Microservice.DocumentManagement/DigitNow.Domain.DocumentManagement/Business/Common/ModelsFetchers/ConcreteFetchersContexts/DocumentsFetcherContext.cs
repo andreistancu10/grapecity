@@ -9,9 +9,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers
 {
     internal class DocumentsFetcherContext : ModelFetcherContext
     {
-        public IList<Document> Documents
+        public IList<VirtualDocument> Documents
         {
-            get => this[nameof(Documents)] as IList<Document>;
+            get => this[nameof(Documents)] as IList<VirtualDocument>;
             set => this[nameof(Documents)] = value;
         }
     }

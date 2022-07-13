@@ -11,14 +11,18 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Mappings
     {
         public GetDocumentsMapping()
         {
-            CreateMap<DocumentFilterDto, DocumentFilter>()
+            CreateMap<DocumentFilterDto, DocumentPreprocessFilter>()
                 .ForMember(m => m.RegistryTypeFilter, opt => opt.MapFrom(src => src.RegistryTypeFilter))
                 .ForMember(m => m.RegistrationNoFilter, opt => opt.MapFrom(src => src.RegistrationNoFilter))
                 .ForMember(m => m.RegistrationDateFilter, opt => opt.MapFrom(src => src.RegistrationDateFilter))
                 .ForMember(m => m.TypeFilter, opt => opt.MapFrom(src => src.DocumentTypeFilter))
-                .ForMember(m => m.CategoryFilter, opt => opt.MapFrom(src => src.DocumentCategoryFilter))
+                
                 .ForMember(m => m.StatusFilter, opt => opt.MapFrom(src => src.DocumentStatusFilter))
                 .ForMember(m => m.IdentifiersFilter, opt => opt.MapFrom(src => src.DocumentIdentifiersFilter));
+
+            CreateMap<DocumentFilterDto, DocumentPostprocessFilter>()
+                .ForMember(m => m.CategoryFilter, opt => opt.MapFrom(src => src.DocumentCategoryFilter));
+
             {
                 CreateMap<DocumentRegistyTypeFilterDto, DocumentRegistryTypeFilter>()
                     .ForMember(m => m.RegistryType, opt => opt.MapFrom(src => src.RegistryType));
@@ -43,7 +47,9 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Mappings
                 CreateMap<DocumentIdentifiersFilterDto, DocumentIdentifiersFilter>()
                     .ForMember(m => m.Identifiers, opt => opt.MapFrom(src => src.Identifiers));
             }
-            CreateMap<GetDocumentsRequest, GetDocumentsQuery>();
+            CreateMap<GetDocumentsRequest, GetDocumentsQuery>()
+                .ForMember(m => m.PreprocessFilter, opt => opt.MapFrom(src => src.Filter ?? new DocumentFilterDto()))                
+                .ForMember(m => m.PostprocessFilter, opt => opt.MapFrom(src => src.Filter ?? new DocumentFilterDto()));
         }
     }
 }

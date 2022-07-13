@@ -1,30 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
-using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
+﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers;
-using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Extensions;
-using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders;
-using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
-using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IDocumentMappingService
     {
-        Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<Document> documents, CancellationToken cancellationToken);
-        Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken);
-
-        Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<Document> documents, CancellationToken cancellationToken);
-        Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken);
+        Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<VirtualDocument> documents, CancellationToken cancellationToken);
+        Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<VirtualDocument> documents, CancellationToken cancellationToken);
     }
 
     public class DocumentMappingService : IDocumentMappingService
@@ -53,101 +43,51 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         #region [ IDocumentMappingService ]
 
-        public async Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<Document> documents, CancellationToken cancellationToken)
+        public async Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
         {
-            await _documentRelationsFetcher.FetchRelationshipsAsync(new DocumentsFetcherContext { Documents = documents }, cancellationToken);
-            return await MapDocumentsAsync<DocumentViewModel>(documents, null, cancellationToken);
+            await _documentRelationsFetcher.FetchRelationshipsAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
+            return MapDocuments<DocumentViewModel>(virtualDocuments)
+                .OrderByDescending(x => x.RegistrationDate)
+                .ToList();
         }
 
-        public async Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken)
+        public async Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
         {
-            await _documentRelationsFetcher.FetchRelationshipsAsync(new DocumentsFetcherContext { Documents = documents }, cancellationToken);
-            return await MapDocumentsAsync<DocumentViewModel>(documents, documentFilter, cancellationToken);
-        }
-
-
-        public async Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken)
-        {
-            await _documentRelationsFetcher.FetchRelationshipsAsync(new DocumentsFetcherContext { Documents = documents }, cancellationToken);
-            return await MapDocumentsAsync<ReportViewModel>(documents, documentFilter, cancellationToken);
-        }
-
-        public async Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<Document> documents, CancellationToken cancellationToken)
-        {
-            await _documentRelationsFetcher.FetchRelationshipsAsync(new DocumentsFetcherContext { Documents = documents }, cancellationToken);
-            return await MapDocumentsAsync<ReportViewModel>(documents, null, cancellationToken);
+            await _documentRelationsFetcher.FetchRelationshipsAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
+            return MapDocuments<ReportViewModel>(virtualDocuments)
+                .OrderByDescending(x => x.RegistrationDate)
+                .ToList();
         }
 
         #endregion
 
-        #region [ Internal ]
-
-        private async Task<List<TViewModel>> MapDocumentsAsync<TViewModel>(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken)
+        private List<TViewModel> MapDocuments<TViewModel>(IList<VirtualDocument> documents)
             where TViewModel : class, new()
         {
             var result = new List<TViewModel>();
 
-            var incomingDocuments = await FetchIncomingDocumentsAsync(documents, documentFilter, cancellationToken);
+            var incomingDocuments = documents.Where(x => x is IncomingDocument).Cast<IncomingDocument>();
             if (incomingDocuments.Any())
             {
                 result.AddRange(MapChildDocument<IncomingDocument, TViewModel>(incomingDocuments));
             }
 
-            var internalDocuments = await FetchInternalDocumentsAsync(documents, documentFilter, cancellationToken);
+            var internalDocuments = documents.Where(x => x is InternalDocument).Cast<InternalDocument>();
             if (internalDocuments.Any())
             {
                 result.AddRange(MapChildDocument<InternalDocument, TViewModel>(internalDocuments));
             }
 
-            var outgoingDocuments = await FetchOutgoingDocumentsAsync(documents, documentFilter, cancellationToken);
+            var outgoingDocuments = documents.Where(x => x is OutgoingDocument).Cast<OutgoingDocument>();
             if (outgoingDocuments.Any())
             {
                 result.AddRange(MapChildDocument<OutgoingDocument, TViewModel>(outgoingDocuments));
             }
-            
-            return result;            
+
+            return result;
         }
 
-        private async Task<IList<IncomingDocument>> FetchIncomingDocumentsAsync(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken)
-        {
-            var incomingDocumentsIds = documents
-                    .Where(x => x.DocumentType == DocumentType.Incoming)
-                    .Select(x => x.Id)
-                    .ToList();
-            if (!incomingDocumentsIds.Any())
-                return new List<IncomingDocument>();
-
-            var incomingDocumentsIncludes = PredicateFactory.CreateIncludesList<IncomingDocument>(x => x.WorkflowHistory);
-            return await FetchChildDocumentsAsync(incomingDocumentsIds, documentFilter, incomingDocumentsIncludes, cancellationToken);
-        }
-
-        private async Task<IList<InternalDocument>> FetchInternalDocumentsAsync(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken)
-        {
-            var internalDocumentsIds = documents
-                .Where(x => x.DocumentType == DocumentType.Internal)
-                .Select(x => x.Id)
-                .ToList();
-            if (!internalDocumentsIds.Any())
-                return new List<InternalDocument>();
-            
-            //TODO: Add workflow history once is implemented
-            return await FetchChildDocumentsAsync<InternalDocument>(internalDocumentsIds, documentFilter, null, cancellationToken);
-        }
-
-        private async Task<IList<OutgoingDocument>> FetchOutgoingDocumentsAsync(IList<Document> documents, DocumentFilter documentFilter, CancellationToken cancellationToken)
-        {
-            var outgoingDocumentsIds = documents
-                .Where(x => x.DocumentType == DocumentType.Outgoing)
-                .Select(x => x.Id)
-                .ToList();
-            if (!outgoingDocumentsIds.Any()) 
-                return new List<OutgoingDocument>();
-
-            var outgoingDocumentsIncludes = PredicateFactory.CreateIncludesList<OutgoingDocument>(x => x.WorkflowHistory);
-            return await FetchChildDocumentsAsync(outgoingDocumentsIds, documentFilter, outgoingDocumentsIncludes, cancellationToken);
-        }
-
-        private List<TResult> MapChildDocument<T, TResult>(IList<T> childDocuments)
+        private List<TResult> MapChildDocument<T, TResult>(IEnumerable<T> childDocuments)
             where T : VirtualDocument
             where TResult : class, new()
         {
@@ -156,7 +96,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             {
                 var aggregate = new VirtualDocumentAggregate<T>
                 {
-                    VirtualDocument = childDocument,                    
+                    VirtualDocument = childDocument,
                     Users = _documentRelationsFetcher.DocumentUsers,
                     Categories = _documentRelationsFetcher.DocumentCategories,
                     InternalCategories = _documentRelationsFetcher.DocumentInternalCategories
@@ -164,39 +104,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
                 result.Add(_mapper.Map<VirtualDocumentAggregate<T>, TResult>(aggregate));
             }
-            return result;            
+            return result;
         }
-
-        private async Task<IList<T>> FetchChildDocumentsAsync<T>(IList<long> childDocumentIds, DocumentFilter documentFilter, IList<Expression<Func<T, object>>> includes, CancellationToken cancellationToken)
-            where T: VirtualDocument
-        {
-            var virtualDocumentsQuery = _dbContext.Set<T>().AsQueryable();
-            
-            if (includes != null)
-            {
-                virtualDocumentsQuery = virtualDocumentsQuery.Includes(includes);
-            }
-
-            virtualDocumentsQuery = virtualDocumentsQuery
-                .Where(x => childDocumentIds.Contains(x.DocumentId));
-
-            if (documentFilter != null)
-            {
-                var categoriesIds = _documentRelationsFetcher.DocumentCategories
-                    .Select(x => x.Id).ToList();
-
-                var internalCategoriesIds = _documentRelationsFetcher.DocumentInternalCategories
-                    .Select(x => x.Id).ToList();
-
-                var categoryPredicates = new DocumentCategoryFilterBuilder<T>(documentFilter, categoriesIds, internalCategoriesIds)
-                    .Build();
-
-                virtualDocumentsQuery = virtualDocumentsQuery.WhereAll(categoryPredicates);
-            }
-
-            return await virtualDocumentsQuery.ToListAsync(cancellationToken);
-        }
-
-        #endregion
     }
 }

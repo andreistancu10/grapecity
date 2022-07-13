@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
 {
-    public class DocumentFilter
+    public class DocumentPreprocessFilter : DataFilter
     {
         public DocumentRegistryTypeFilter RegistryTypeFilter { get; set; }
 
@@ -14,11 +14,18 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
 
         public DocumentTypeFilter TypeFilter { get; set; }
 
-        public DocumentCategoryFilter CategoryFilter { get; set; }
-
         public DocumentStatusFilter StatusFilter { get; set; }
 
         public DocumentIdentifiersFilter IdentifiersFilter { get; set; }
+
+        public static DocumentPreprocessFilter Empty => new DocumentPreprocessFilter();
+    }
+
+    public class DocumentPostprocessFilter : DataFilter
+    {
+        public DocumentCategoryFilter CategoryFilter { get; set; }
+
+        public static DocumentPostprocessFilter Empty => new DocumentPostprocessFilter();
     }
 
     public class DocumentIdentifiersFilter

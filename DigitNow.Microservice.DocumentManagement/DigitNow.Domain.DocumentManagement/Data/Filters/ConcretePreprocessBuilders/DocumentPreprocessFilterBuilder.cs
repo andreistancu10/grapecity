@@ -1,9 +1,9 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders
+namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders.Preprocess
 {
-    internal interface IDocumentFilterBuilder : IExpressionFilterBuilder<Document, DocumentFilter>
+    internal interface IDocumentPreprocessFilterBuilder : IExpressionFilterBuilder<Document, DocumentPreprocessFilter>
     {
         void BuildFilterByRegistryType();
         void BuildFilterByRegistrationNo();
@@ -13,9 +13,9 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders
         void BuildFilterByIdentifiers();
     }
 
-    internal class DocumentFilterBuilder : ExpressionFilterBuilder<Document, DocumentFilter>, IDocumentFilterBuilder
+    internal class DocumentPreprocessFilterBuilder : ExpressionFilterBuilder<Document, DocumentPreprocessFilter>, IDocumentPreprocessFilterBuilder
     {
-        public DocumentFilterBuilder(DocumentFilter documentFilterModel)
+        public DocumentPreprocessFilterBuilder(DocumentPreprocessFilter documentFilterModel)
             : base(documentFilterModel) { }
 
         public void BuildFilterByRegistryType()
