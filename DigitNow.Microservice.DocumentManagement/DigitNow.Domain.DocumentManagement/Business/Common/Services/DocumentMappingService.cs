@@ -21,7 +21,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         #region [ Fields ]
 
-        private readonly DocumentManagementDbContext _dbContext;
         private readonly DocumentRelationsFetcher _documentRelationsFetcher;
         private readonly IMapper _mapper;
         
@@ -30,11 +29,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         #region [ Construction ]
 
         public DocumentMappingService(
-            DocumentManagementDbContext dbContext,
             IServiceProvider serviceProvider,
             IMapper mapper)
         {
-            _dbContext = dbContext;
             _mapper = mapper;
             _documentRelationsFetcher = new DocumentRelationsFetcher(serviceProvider);
         }
@@ -61,6 +58,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         #endregion
 
+        #region [ Helpers ]
+
         private List<TViewModel> MapDocuments<TViewModel>(IList<VirtualDocument> documents)
             where TViewModel : class, new()
         {
@@ -69,25 +68,25 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var incomingDocuments = documents.Where(x => x is IncomingDocument).Cast<IncomingDocument>();
             if (incomingDocuments.Any())
             {
-                result.AddRange(MapChildDocument<IncomingDocument, TViewModel>(incomingDocuments));
+                result.AddRange(MapChildDocuments<IncomingDocument, TViewModel>(incomingDocuments));
             }
 
             var internalDocuments = documents.Where(x => x is InternalDocument).Cast<InternalDocument>();
             if (internalDocuments.Any())
             {
-                result.AddRange(MapChildDocument<InternalDocument, TViewModel>(internalDocuments));
+                result.AddRange(MapChildDocuments<InternalDocument, TViewModel>(internalDocuments));
             }
 
             var outgoingDocuments = documents.Where(x => x is OutgoingDocument).Cast<OutgoingDocument>();
             if (outgoingDocuments.Any())
             {
-                result.AddRange(MapChildDocument<OutgoingDocument, TViewModel>(outgoingDocuments));
+                result.AddRange(MapChildDocuments<OutgoingDocument, TViewModel>(outgoingDocuments));
             }
 
             return result;
         }
 
-        private List<TResult> MapChildDocument<T, TResult>(IEnumerable<T> childDocuments)
+        private List<TResult> MapChildDocuments<T, TResult>(IEnumerable<T> childDocuments)
             where T : VirtualDocument
             where TResult : class, new()
         {
@@ -106,5 +105,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
             return result;
         }
+
+        #endregion
     }
 }
