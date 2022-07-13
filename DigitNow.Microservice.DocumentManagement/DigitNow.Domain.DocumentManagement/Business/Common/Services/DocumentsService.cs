@@ -24,7 +24,6 @@ public interface IDocumentService
 
     [Obsolete("This will be refactored in future sprints", error: false)]
     Task AddDocument(Document document, CancellationToken cancellationToken);
-    Task CommitChangesAsync(CancellationToken cancellationToken);
 }
 
 public class DocumentService : IDocumentService
@@ -116,10 +115,5 @@ public class DocumentService : IDocumentService
         {
             dbContextTransaction?.Dispose();
         }
-    }
-
-    public async Task CommitChangesAsync(CancellationToken cancellationToken)
-    {
-        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }
