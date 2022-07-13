@@ -79,7 +79,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             var documentsCountQuery = default(IQueryable<Document>);
 
-            if (userModel.Roles.ToList().Contains((long)UserRole.Mayor))
+            if (userModel.Roles.ToList().Contains(UserRole.Mayor.Code))
             {
                 documentsCountQuery = _dbContext.Documents
                     .WhereAll(predicates);
@@ -121,7 +121,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var documentsQuery = _dbContext.Documents
                 .WhereAll(predicates);
 
-            if (!userModel.Roles.Contains((long)UserRole.Mayor))
+            if (!userModel.Roles.Contains(UserRole.Mayor.Code))
             {
                 var relatedUserIds = await GetRelatedUserIdsASync(userModel, cancellationToken);
 
@@ -139,7 +139,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         private async Task<IList<UserModel>> GetRelatedUsersAsync(UserModel userModel, CancellationToken cancellationToken)
         {
-            if (userModel.Roles.ToList().Contains((long)UserRole.HeadOfDepartment))
+            if (userModel.Roles.ToList().Contains(UserRole.HeadOfDepartment.Code))
             {
                 var usersResponse = await _identityAdapterClient.GetUsersAsync(cancellationToken);
 

@@ -7,6 +7,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
     public class UpdateDocumentUserRecipientCommand : ICommand<ResultObject>
     {
         public int UserId { get; set; }
-        public List<DocumentInfoRequest> DocumentInfo { get; set; }
+        public List<long> RegistrationNumbers { get; set; }
     }
 }
