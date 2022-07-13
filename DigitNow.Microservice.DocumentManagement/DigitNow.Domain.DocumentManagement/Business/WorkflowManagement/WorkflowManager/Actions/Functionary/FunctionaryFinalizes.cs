@@ -21,9 +21,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             if (!Validate(command, oldWorkflowResponsible))
                 return command;
 
-            var newWorkflowResponsible = new WorkflowHistory();
-            newWorkflowResponsible.Status = DocumentStatus.Finalized;
-            newWorkflowResponsible.Remarks = command.Remarks;
+            var newWorkflowResponsible = new WorkflowHistory
+            {
+                Status = DocumentStatus.Finalized,
+                Remarks = command.Remarks
+            };
 
             TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 

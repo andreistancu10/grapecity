@@ -42,16 +42,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
         private async Task<ICreateWorkflowHistoryCommand> ApplicationApproved(ICreateWorkflowHistoryCommand command, VirtualDocument document, CancellationToken token)
         {
-            var user = await FetchMayorAsync(token);
+            var userResponse = await FetchMayorAsync(token);
 
-            if (!UserExists(user, command))
+            if (!UserExists(userResponse, command))
                 return command;
 
             document.WorkflowHistory
                 .Add(WorkflowHistoryFactory
-                .Create(UserRole.Mayor, user, DocumentStatus.InWorkMayorReview, command.DeclineReason, command.Remarks));
+                .Create(UserRole.Mayor, userResponse, DocumentStatus.InWorkMayorReview, command.DeclineReason, command.Remarks));
 
-            SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, user.Id, DocumentStatus.InWorkMayorReview);
+            SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, userResponse.Id, DocumentStatus.InWorkMayorReview);
 
             return command;
         }
@@ -60,10 +60,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         {
             var oldWorkflowResponsible = GetOldWorkflowResponsible(document, x => x.RecipientType == UserRole.Functionary.Id);
 
-            var newWorkflowResponsible = new WorkflowHistory();
-            newWorkflowResponsible.Status = DocumentStatus.InWorkDeclined;
-            newWorkflowResponsible.DeclineReason = command.DeclineReason;
-            newWorkflowResponsible.Remarks = command.Remarks;
+            var newWorkflowResponsible = new WorkflowHistory
+            {
+                Status = DocumentStatus.InWorkDeclined,
+                DeclineReason = command.DeclineReason,
+                Remarks = command.Remarks
+            };
 
             TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 

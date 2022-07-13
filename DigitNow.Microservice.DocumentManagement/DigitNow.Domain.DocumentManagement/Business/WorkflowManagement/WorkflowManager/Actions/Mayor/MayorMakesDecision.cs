@@ -45,9 +45,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         {
             var oldWorkflowResponsible = GetOldWorkflowResponsible(_virtualDocument, x => x.RecipientType == UserRole.Functionary.Id);
 
-            var newWorkflowResponsible = new WorkflowHistory();
-            newWorkflowResponsible.Status = DocumentStatus.InWorkCountersignature;
-            newWorkflowResponsible.Remarks = command.Remarks;
+            var newWorkflowResponsible = new WorkflowHistory
+            {
+                Status = DocumentStatus.InWorkCountersignature,
+                Remarks = command.Remarks
+            };
 
             TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 
@@ -58,9 +60,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         {
             var oldWorkflowResponsible = GetOldWorkflowResponsible(_virtualDocument, x => x.RecipientType == UserRole.HeadOfDepartment.Id);
 
-            var newWorkflowResponsible = new WorkflowHistory();
-            newWorkflowResponsible.Status = DocumentStatus.InWorkMayorDeclined;
-            newWorkflowResponsible.Remarks = command.Remarks;
+            var newWorkflowResponsible = new WorkflowHistory
+            {
+                Status = DocumentStatus.InWorkMayorDeclined,
+                Remarks = command.Remarks
+            };
 
             TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 

@@ -26,10 +26,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             var oldWorkflowResponsible = GetOldWorkflowResponsible(virtualDocument, x => x.RecipientType == UserRole.HeadOfDepartment.Id);
 
-            var newWorkflowResponsible = new WorkflowHistory();
-
-            newWorkflowResponsible.Status = DocumentStatus.InWorkApprovalRequested;
-            newWorkflowResponsible.Resolution = command.Resolution;
+            var newWorkflowResponsible = new WorkflowHistory
+            {
+                Status = DocumentStatus.InWorkApprovalRequested,
+                Resolution = command.Resolution
+            };
 
             TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
             virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);

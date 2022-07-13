@@ -33,9 +33,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             //    .OrderByDescending(x => x.CreationDate)
             //    .FirstOrDefault();
 
-            var newWorkflowResponsible = new WorkflowHistory();
-            newWorkflowResponsible.Status = DocumentStatus.InWorkAllocated;
-            newWorkflowResponsible.Remarks = command.Remarks;
+            var newWorkflowResponsible = new WorkflowHistory
+            {
+                Status = DocumentStatus.InWorkAllocated,
+                Remarks = command.Remarks
+            };
 
             TransferResponsibility(responsibleHeadOfDepartmentRecord, newWorkflowResponsible, command);
 

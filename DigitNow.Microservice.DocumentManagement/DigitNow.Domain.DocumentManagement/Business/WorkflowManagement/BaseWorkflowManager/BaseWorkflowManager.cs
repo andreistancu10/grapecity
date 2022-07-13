@@ -79,7 +79,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             document.Status = status;
         }
 
-        public async Task<User> FetchHeadOfDepartmentByDepartmentId(long departmentId, CancellationToken token)
+        public async Task<User> FetchHeadOfDepartmentByDepartmentIdAsync(long departmentId, CancellationToken token)
         {
             var response = await IdentityAdapterClient.GetUsersAsync(token);
             var departmentUsers = response.Users.Where(x => x.Departments.Contains(departmentId));
