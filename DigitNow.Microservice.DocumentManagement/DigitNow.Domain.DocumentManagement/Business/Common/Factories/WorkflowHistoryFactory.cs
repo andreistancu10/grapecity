@@ -11,9 +11,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
     {
         public static WorkflowHistory Create(Document document, UserRole role, User user, DocumentStatus documentStatus)
             => new WorkflowHistory {
-                RecipientType = (int)role,
+                RecipientType = role.Id,
                 RecipientId = user.Id,
-                RecipientName = user.FormatUserNameByRole(role),
+                RecipientName = user.FormatUserNameByRole(role.Code),
                 Status = documentStatus,
                 CreationDate = DateTime.Now,
                 RegistrationNumber = document.RegistrationNumber

@@ -49,7 +49,15 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
 
         var response = await _identityAdapterClient.GetUsersAsync(cancellationToken);
         var departmentUsers = response.Users.Where(x => x.Departments.Contains(request.RecipientId));
-        var headOfDepartment = departmentUsers.FirstOrDefault(x => x.Roles.Contains((long)UserRole.HeadOfDepartment));
+        var headOfDepartment = departmentUsers.FirstOrDefault(x => x.Roles.Contains(UserRole.HeadOfDepartment.Code));
+
+        if (headOfDepartment == null)
+            return ResultObject.Error(new ErrorMessage
+            {
+                Message = $"No responsible for department with id {request.RecipientId} was found.",
+                TranslationCode = "catalog.headOfdepartment.backend.update.validation.entityNotFound",
+                Parameters = new object[] { request.RecipientId }
+            });
 
         var newIncomingDocument = _mapper.Map<IncomingDocument>(request);
 
