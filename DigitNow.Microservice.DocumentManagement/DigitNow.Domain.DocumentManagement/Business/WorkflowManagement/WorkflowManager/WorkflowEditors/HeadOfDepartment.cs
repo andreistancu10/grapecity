@@ -13,7 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
     {
         private enum ActionType { Allocate = 1, MakeDecision = 3, Decline = 2 };
 
-        private Dictionary<ActionType, IWorkflowHandler> actionStrategy = new Dictionary<ActionType, IWorkflowHandler>();
+        private readonly Dictionary<ActionType, IWorkflowHandler> actionStrategy = new Dictionary<ActionType, IWorkflowHandler>();
 
         public HeadOfDepartment(IServiceProvider serviceProvider)
         {

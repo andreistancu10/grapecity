@@ -14,7 +14,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
     {
         public FunctionaryAsksForApproval(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
-        private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.OpinionRequestedAllocated };
+        private readonly int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.OpinionRequestedAllocated };
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
             var document = await WorkflowService.GetDocumentById(command.DocumentId, token);

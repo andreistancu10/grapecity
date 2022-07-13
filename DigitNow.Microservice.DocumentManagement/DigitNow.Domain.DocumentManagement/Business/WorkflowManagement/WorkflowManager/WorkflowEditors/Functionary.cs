@@ -13,7 +13,7 @@
     {
         private enum ActionType { AskForOpinion = 1, AsksForApproval = 2, Finalize = 3, Decline = 4, SendOpinion = 5  };
 
-        private Dictionary<ActionType, IWorkflowHandler> actionStrategy 
+        private readonly Dictionary<ActionType, IWorkflowHandler> actionStrategy 
             = new Dictionary<ActionType, IWorkflowHandler>();
 
         public Functionary(IServiceProvider serviceProvider)

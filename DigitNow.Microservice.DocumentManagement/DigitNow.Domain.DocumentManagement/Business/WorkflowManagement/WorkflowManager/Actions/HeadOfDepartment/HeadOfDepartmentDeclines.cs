@@ -17,7 +17,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         public HeadOfDepartmentDeclines(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
         private ICreateWorkflowHistoryCommand _command;
-        private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkUnallocated, (int)DocumentStatus.OpinionRequestedUnallocated, (int)DocumentStatus.InWorkDelegatedUnallocated };
+        private readonly int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkUnallocated, (int)DocumentStatus.OpinionRequestedUnallocated, (int)DocumentStatus.InWorkDelegatedUnallocated };
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
             _command = command;

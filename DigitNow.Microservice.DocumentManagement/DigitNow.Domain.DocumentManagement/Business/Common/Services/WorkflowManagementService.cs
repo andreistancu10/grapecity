@@ -101,7 +101,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 document.OutgoingDocument.RecipientId = (int)recipientId;
         }
 
-        private WorkflowHistory ExtractResponsible(IQueryable<WorkflowHistory> history, Expression<Func<WorkflowHistory, bool>> predicate)
+        private static WorkflowHistory ExtractResponsible(IQueryable<WorkflowHistory> history, Expression<Func<WorkflowHistory, bool>> predicate)
         {
             return history.Where(predicate)
                    .OrderByDescending(x => x.CreatedAt)

@@ -12,7 +12,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
     {
         public FunctionaryFinalizes(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
-        private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated };
+        private readonly int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated };
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
             var document = await WorkflowService.GetDocumentById(command.DocumentId, token);

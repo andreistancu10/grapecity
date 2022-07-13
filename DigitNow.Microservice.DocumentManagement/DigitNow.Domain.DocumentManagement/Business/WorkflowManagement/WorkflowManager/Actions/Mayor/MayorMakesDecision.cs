@@ -14,7 +14,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
     {
         public MayorMakesDecision(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
-        private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkMayorReview };
+        private readonly int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkMayorReview };
         private enum Decision { Approved = 1, Declined = 2  };
         private Document _document;
 

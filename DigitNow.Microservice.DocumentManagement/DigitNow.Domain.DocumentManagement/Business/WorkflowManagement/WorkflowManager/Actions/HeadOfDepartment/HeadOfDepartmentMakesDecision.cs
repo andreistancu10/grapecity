@@ -15,7 +15,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
     {
         public HeadOfDepartmentMakesDecision(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
-        private int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkApprovalRequested };
+        private readonly int[] allowedTransitionStatuses = { (int)DocumentStatus.InWorkApprovalRequested };
         private CancellationToken _token;
         private enum Decision { Approved = 1, Declined = 2};
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
@@ -60,7 +60,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             return command;
         }
 
-        private ICreateWorkflowHistoryCommand ApplicationDeclined(ICreateWorkflowHistoryCommand command, Document document)
+        private void ApplicationDeclined(ICreateWorkflowHistoryCommand command, Document document)
         {
             var oldWorkflowResponsible = WorkflowService.GetOldWorkflowResponsible(document, x => x.RecipientType == UserRole.Functionary.Id);
 
@@ -72,8 +72,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             newWorkflowResponsible.Remarks = command.Remarks;
 
             document.IncomingDocument.WorkflowHistory.Add(newWorkflowResponsible);
-
-            return command;
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)

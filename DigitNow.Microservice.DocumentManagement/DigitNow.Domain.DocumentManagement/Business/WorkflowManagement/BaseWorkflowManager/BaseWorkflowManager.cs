@@ -17,7 +17,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
 {
     public abstract class BaseWorkflowManager
     {
-        public BaseWorkflowManager(IServiceProvider serviceProvider)
+        protected BaseWorkflowManager(IServiceProvider serviceProvider)
         {
             WorkflowService = serviceProvider.GetService<IWorkflowManagementService>();
             IdentityAdapterClient = serviceProvider.GetService<IIdentityAdapterClient>();
@@ -70,7 +70,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
                 {
                     Message = $"No responsible User was found.",
                     TranslationCode = "catalog.user.backend.update.validation.entityNotFound",
-                    Parameters = new object[] { }
+                    Parameters = Array.Empty<object>()
                 });
                 return false;
             }
