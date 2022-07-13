@@ -1,6 +1,5 @@
 ﻿using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
-using DigitNow.Domain.Authentication.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
@@ -21,12 +20,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
         public BaseWorkflowManager(IServiceProvider serviceProvider)
         {
             WorkflowService = serviceProvider.GetService<IWorkflowManagementService>();
-            AuthenticationClient = serviceProvider.GetService<IAuthenticationClient>();
             IdentityAdapterClient = serviceProvider.GetService<IIdentityAdapterClient>();
         }
 
         public readonly IWorkflowManagementService WorkflowService;
-        public readonly IAuthenticationClient AuthenticationClient;
         public readonly IIdentityAdapterClient IdentityAdapterClient;
 
         public async Task<User> FetchHeadOfDepartmentByDepartmentId(long departmentId, CancellationToken token)
