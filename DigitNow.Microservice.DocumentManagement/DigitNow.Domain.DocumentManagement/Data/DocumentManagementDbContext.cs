@@ -79,6 +79,15 @@ namespace DigitNow.Domain.DocumentManagement.Data
                 }
             }
 
+            foreach (var entry in ChangeTracker.Entries<IDocument>())
+            {
+                if (entry.Property("Status").IsModified)
+                {
+                    entry.Entity.StatusModifiedAt = DateTime.Now;
+                    entry.Entity.StatusModifiedBy = _identityService.GetCurrentUserId();
+                }
+            }
+
             return base.SaveChangesAsync(cancellationToken);
         }
 
