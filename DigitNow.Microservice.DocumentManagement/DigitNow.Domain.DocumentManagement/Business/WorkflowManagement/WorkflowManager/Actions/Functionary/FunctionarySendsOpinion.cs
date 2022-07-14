@@ -14,15 +14,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         public FunctionarySendsOpinion(IServiceProvider serviceProvider) : base(serviceProvider) { }
         protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.OpinionRequestedAllocated };
 
-        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, CancellationToken token)
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, WorkflowHistory oldWorkflowResponsible, CancellationToken token)
         {
-            var document = await GetVirtualDocumentWorkflowHistoryByIdAsync(command.DocumentId, token);
-            var oldWorkflowResponsible = GetLastWorkflowRecord(document);
-            
             if (!Validate(command, oldWorkflowResponsible))
                 return command;
 
-            var responsibleHeadOfDepartmentRecord = document.WorkflowHistory
+            var responsibleHeadOfDepartmentRecord = virtualDocument.WorkflowHistory
                 .Where(x => x.RecipientType == UserRole.HeadOfDepartment.Id && x.Status == DocumentStatus.OpinionRequestedUnallocated)
                 .OrderByDescending(x => x.CreatedAt)
                 .FirstOrDefault();
@@ -41,7 +38,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             TransferResponsibility(responsibleHeadOfDepartmentRecord, newWorkflowResponsible, command);
 
-            document.WorkflowHistory.Add(newWorkflowResponsible);
+            virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
 
             return command;
         }

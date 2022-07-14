@@ -18,11 +18,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         private enum Decision { Approved = 1, Declined = 2  };
         private VirtualDocument _virtualDocument;
 
-        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, CancellationToken token)
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, WorkflowHistory lastWorkFlowRecord, CancellationToken token)
         {
-            _virtualDocument = await GetVirtualDocumentWorkflowHistoryByIdAsync(command.DocumentId, token);
-            var lastWorkFlowRecord = GetLastWorkflowRecord(_virtualDocument);
-
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
 

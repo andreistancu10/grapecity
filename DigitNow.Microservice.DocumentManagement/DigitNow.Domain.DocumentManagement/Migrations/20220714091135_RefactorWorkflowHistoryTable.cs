@@ -1,13 +1,24 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
-    public partial class MoveRecipientToBaseTable : Migration
+    public partial class RefactorWorkflowHistoryTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropColumn(
+                name: "CreationDate",
+                schema: "DocumentMangement",
+                table: "WorkflowHistory");
+
+            migrationBuilder.DropColumn(
+                name: "RegistrationNumber",
+                schema: "DocumentMangement",
+                table: "WorkflowHistory");
+
             migrationBuilder.DropColumn(
                 name: "RecipientId",
                 schema: "DocumentMangement",
@@ -17,6 +28,16 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 name: "RecipientId",
                 schema: "DocumentMangement",
                 table: "IncomingDocument");
+
+            migrationBuilder.AlterColumn<int>(
+                name: "Resolution",
+                schema: "DocumentMangement",
+                table: "WorkflowHistory",
+                type: "int",
+                nullable: true,
+                oldClrType: typeof(string),
+                oldType: "nvarchar(max)",
+                oldNullable: true);
 
             migrationBuilder.AddColumn<long>(
                 name: "InternalDocumentId",
@@ -70,6 +91,32 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 name: "RecipientId",
                 schema: "DocumentMangement",
                 table: "Document");
+
+            migrationBuilder.AlterColumn<string>(
+                name: "Resolution",
+                schema: "DocumentMangement",
+                table: "WorkflowHistory",
+                type: "nvarchar(max)",
+                nullable: true,
+                oldClrType: typeof(int),
+                oldType: "int",
+                oldNullable: true);
+
+            migrationBuilder.AddColumn<DateTime>(
+                name: "CreationDate",
+                schema: "DocumentMangement",
+                table: "WorkflowHistory",
+                type: "datetime2",
+                nullable: false,
+                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified));
+
+            migrationBuilder.AddColumn<int>(
+                name: "RegistrationNumber",
+                schema: "DocumentMangement",
+                table: "WorkflowHistory",
+                type: "int",
+                nullable: false,
+                defaultValue: 0);
 
             migrationBuilder.AddColumn<int>(
                 name: "RecipientId",

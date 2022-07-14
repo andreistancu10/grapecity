@@ -30,11 +30,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
         public readonly IIdentityAdapterClient IdentityAdapterClient;
         public readonly DocumentManagementDbContext DbContext;
         protected abstract int[] allowedTransitionStatuses { get; }
-        protected abstract Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, CancellationToken token);
+        protected abstract Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, WorkflowHistory lastWorkFlowRecord, CancellationToken token);
 
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            await CreateWorkflowRecordInternal(command, token);
+            var document = await DbContext.Documents.FirstAsync(x => x.Id == command.DocumentId);
+            var virtualDocument = await GetVirtualDocumentWorkflowHistoryByIdAsync(document);
+            var lastWorkFlowRecord = GetLastWorkflowRecord(virtualDocument);
+
+            await CreateWorkflowRecordInternal(command, document, virtualDocument, lastWorkFlowRecord, token);
             await DbContext.SaveChangesAsync(token);
 
             return command;
@@ -54,18 +58,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             return true;
         }
 
-        protected async Task<VirtualDocument> GetVirtualDocumentWorkflowHistoryByIdAsync(long documentId, CancellationToken cancellationToken)
+        protected async Task<VirtualDocument> GetVirtualDocumentWorkflowHistoryByIdAsync(Document document)
         {
-            var document = await DbContext.Documents.FirstAsync(x => x.Id == documentId);
-
             switch (document.DocumentType)
             {
                 case DocumentType.Incoming:
-                    return await DbContext.IncomingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.Id == documentId);
+                    return await DbContext.IncomingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.Id == document.Id);
                 case DocumentType.Internal:
-                    return await DbContext.InternalDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.Id == documentId);
+                    return await DbContext.InternalDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.Id == document.Id);
                 case DocumentType.Outgoing:
-                    return await DbContext.OutgoingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.Id == documentId);
+                    return await DbContext.OutgoingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.Id == document.Id);
                 default:
                     return null;
             }
