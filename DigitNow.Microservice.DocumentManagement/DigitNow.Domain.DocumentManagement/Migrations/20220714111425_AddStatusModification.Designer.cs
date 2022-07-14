@@ -4,6 +4,7 @@ using DigitNow.Domain.DocumentManagement.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    partial class DocumentManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220714111425_AddStatusModification")]
+    partial class AddStatusModification
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -158,9 +160,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("ModifiedBy")
                         .HasColumnOrder(5);
-
-                    b.Property<long>("RecipientId")
-                        .HasColumnType("bigint");
 
                     b.Property<DateTime>("RegistrationDate")
                         .HasColumnType("datetime2");
@@ -350,6 +349,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<int>("NumberOfPages")
                         .HasColumnType("int");
 
+                    b.Property<int>("RecipientId")
+                        .HasColumnType("int");
+
                     b.Property<double>("ResolutionPeriod")
                         .HasColumnType("float");
 
@@ -481,6 +483,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnOrder(5);
 
                     b.Property<int>("NumberOfPages")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RecipientId")
                         .HasColumnType("int");
 
                     b.Property<string>("RecipientName")
@@ -684,13 +689,13 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnName("CreatedBy")
                         .HasColumnOrder(3);
 
+                    b.Property<DateTime>("CreationDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("DeclineReason")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long?>("IncomingDocumentId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("InternalDocumentId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("ModifiedAt")
@@ -718,11 +723,14 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<int>("RecipientType")
                         .HasColumnType("int");
 
+                    b.Property<int>("RegistrationNumber")
+                        .HasColumnType("int");
+
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("Resolution")
-                        .HasColumnType("int");
+                    b.Property<string>("Resolution")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -730,8 +738,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("IncomingDocumentId");
-
-                    b.HasIndex("InternalDocumentId");
 
                     b.HasIndex("OutgoingDocumentId");
 
@@ -838,10 +844,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .WithMany("WorkflowHistory")
                         .HasForeignKey("IncomingDocumentId");
 
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.InternalDocument", null)
-                        .WithMany("WorkflowHistory")
-                        .HasForeignKey("InternalDocumentId");
-
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.OutgoingDocument", null)
                         .WithMany("WorkflowHistory")
                         .HasForeignKey("OutgoingDocumentId");
@@ -862,11 +864,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 {
                     b.Navigation("ConnectedDocuments");
 
-                    b.Navigation("WorkflowHistory");
-                });
-
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.InternalDocument", b =>
-                {
                     b.Navigation("WorkflowHistory");
                 });
 

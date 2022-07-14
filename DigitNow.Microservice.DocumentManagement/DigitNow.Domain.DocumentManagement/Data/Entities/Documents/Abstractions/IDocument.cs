@@ -6,8 +6,10 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
     public interface IDocument : IExtendedEntity
     {
         DocumentType DocumentType { get; set; }
-        DocumentStatus Status { get; set; }
         int RegistrationNumber { get; set; }
         DateTime RegistrationDate { get; set; }
+        DocumentStatus Status { get; set; }
+        DateTime StatusModifiedAt { get; set; }
+        long StatusModifiedBy { get; set; }
     }
 }
