@@ -8,5 +8,9 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public DocumentType DocumentType { get; set; }
         public int RegistrationNumber { get; set; }
         public DateTime RegistrationDate { get; set; }
+        public DocumentStatus Status { get; set; }
+        public DateTime StatusModifiedAt { get; set; }
+        public long StatusModifiedBy { get; set; }
+
     }
 }
