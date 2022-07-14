@@ -9,7 +9,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
         public long TotalPages { get; set; }
-
-        public IList<DocumentViewModel> Documents { get; set; }
+        public IList<DocumentViewModel> Items { get; set; }
     }
 }

@@ -58,7 +58,7 @@ public class DashboardController : ApiController
     {
         var command = _mapper.Map<GetDocumentsQuery>(request);
         var result = await _mediator.Send(command, cancellationToken);
-        var fileResult = await _exportService.CreateExcelFile("Documents", "DocumentsSheet", result.Documents);
+        var fileResult = await _exportService.CreateExcelFile("Documents", "DocumentsSheet", result.Items);
 
         return File(fileResult.Content, fileResult.ContentType, fileResult.Name);
     }
