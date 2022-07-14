@@ -41,7 +41,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
         _uploadedFileService = uploadedFileService;
         _specialRegisterMappingService = specialRegisterMappingService;
     }
-
+        
     public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
     {
         if (!string.IsNullOrWhiteSpace(request.IdentificationNumber))
@@ -68,7 +68,8 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             {
                 DocumentType = DocumentType.Incoming,
                 IncomingDocument = newIncomingDocument,
-                RecipientId = headOfDepartment.Id
+                RecipientId = headOfDepartment.Id,
+                Status = DocumentStatus.InWorkUnallocated
             };
 
             await _documentService.AddDocument(newDocument, cancellationToken);

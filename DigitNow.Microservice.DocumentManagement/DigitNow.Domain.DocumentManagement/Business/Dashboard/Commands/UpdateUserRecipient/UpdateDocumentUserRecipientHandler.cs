@@ -42,11 +42,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
             _isHeadOfDepartment = _user.Roles.Contains(UserRole.HeadOfDepartment.Code);
             _status = _isHeadOfDepartment ? DocumentStatus.InWorkDelegatedUnallocated : DocumentStatus.InWorkDelegated;
 
-            await UpdateRecipientForIncomingDocuments(request.RegistrationNumbers);
+            await UpdateRecipientForIncomingDocuments(request.DocumentIds);
 
-            await UpdateRecipientForInternalDocuments(request.RegistrationNumbers);
+            await UpdateRecipientForInternalDocuments(request.DocumentIds);
 
-            await UpdateRecipientForOutgoingDocuments(request.RegistrationNumbers);
+            await UpdateRecipientForOutgoingDocuments(request.DocumentIds);
 
             await _dbContext.SaveChangesAsync();
 
@@ -71,14 +71,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
 
         private async Task UpdateRecipientForInternalDocuments(List<long> documentIds)
         {
-            var documents = await _dbContext.InternalDocuments
+            var internalDocuments = await _dbContext.InternalDocuments
                     .Include(x => x.Document)
                     .Where(x => documentIds.Contains(x.DocumentId))
                     .ToListAsync();
 
-            foreach (var document in documents)
+            foreach (var internalDocument in internalDocuments)
             {
-                document.ReceiverDepartmentId = (int)_user.Id;     
+                internalDocument.Document.RecipientId = (int)_user.Id;
+                internalDocument.Document.Status = _status;
+
+                internalDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(_isHeadOfDepartment ? UserRole.HeadOfDepartment : UserRole.Functionary, _user, _status));
             }
         }
 
