@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
@@ -34,5 +35,12 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public long DocumentId { get; set; }
 
         #endregion
+
+
+        #region [ Relationship ]
+        public List<WorkflowHistory> WorkflowHistory { get; set; } = new();
+
+        #endregion
+
     }
 }

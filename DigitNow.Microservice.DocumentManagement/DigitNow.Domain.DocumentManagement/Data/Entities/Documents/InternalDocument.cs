@@ -1,5 +1,4 @@
-﻿using System;
-
+﻿
 namespace DigitNow.Domain.DocumentManagement.Data.Entities;
 
 public class InternalDocument : VirtualDocument

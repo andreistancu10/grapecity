@@ -15,7 +15,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
                 .ForMember(c => c.Id, opt => opt.MapFrom(src => src.VirtualDocument.Document.Id))
                 .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationDate))
                 .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationNumber))
-                .ForMember(c => c.Recipient, opt => opt.MapFrom(src => src.VirtualDocument.RecipientId))
+                .ForMember(c => c.Recipient, opt => opt.MapFrom(src => src.VirtualDocument.Document.RecipientId))
                 .ForMember(c => c.IssuerName, opt => opt.MapFrom(src => src.VirtualDocument.CreatedBy))
                 .ForMember(c => c.Status, opt => opt.MapFrom<MapDocumentStatus>())
                 .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.VirtualDocument.DocumentTypeId))

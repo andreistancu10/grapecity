@@ -1,6 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using DigitNow.Adapters.MS.Identity;
+using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+using Microsoft.AspNetCore.Http;
 using System;
+using System.Linq;
 using System.Security.Claims;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 {
@@ -8,15 +13,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
     {
         long GetCurrentUserId();
         bool TryGetCurrentUserId(out int userId);
+        Task<UserRole> GetCurrentUserFirstRoleAsync(CancellationToken cancellationToken);
     }
 
     public class IdentityService : IIdentityService
     {
         private readonly IHttpContextAccessor _httpContextAccesor;
+        private readonly IIdentityAdapterClient _identityAdapterClient;
 
-        public IdentityService(IHttpContextAccessor httpContextAccessor)
+        public IdentityService(IHttpContextAccessor httpContextAccessor, IIdentityAdapterClient identityAdapterClient)
         {
             _httpContextAccesor = httpContextAccessor;
+            _identityAdapterClient = identityAdapterClient;
         }
 
         public long GetCurrentUserId()
@@ -33,6 +41,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             var userIdClaim = _httpContextAccesor.HttpContext.User.FindFirstValue("htss_uid"); ;
 
             return int.TryParse(userIdClaim, out userId);
+        }
+
+        public async Task<UserRole> GetCurrentUserFirstRoleAsync(CancellationToken cancellationToken)
+        {
+            var userId = GetCurrentUserId();
+            var user = await _identityAdapterClient.GetUserByIdAsync(userId, cancellationToken);
+
+            var userRole = user.Roles.Intersect(UserRole.ListOfRoles.Select(x => x.Code)).FirstOrDefault();
+
+            return UserRole.ListOfRoles.FirstOrDefault(role => role.Code == userRole) ?? new UserRole { Id = 0 };
         }
     }
 }

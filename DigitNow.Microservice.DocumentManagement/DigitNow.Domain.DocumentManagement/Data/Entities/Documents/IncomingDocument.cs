@@ -14,7 +14,6 @@ public class IncomingDocument : VirtualDocument
     public string IdentificationNumber { get; set; }
     public string ContentSummary { get; set; }
     public int NumberOfPages { get; set; }
-    public int RecipientId { get; set; }
     public int DocumentTypeId { get; set; }
     public string Detail { get; set; }
     public double ResolutionPeriod { get; set; }
@@ -24,7 +23,6 @@ public class IncomingDocument : VirtualDocument
     #region [ References ]
 
     public Document Document { get; set; }
-    public List<WorkflowHistory> WorkflowHistory { get; set; } = new();
     public List<ConnectedDocument>? ConnectedDocuments { get; set; } = new();
 
     #endregion
