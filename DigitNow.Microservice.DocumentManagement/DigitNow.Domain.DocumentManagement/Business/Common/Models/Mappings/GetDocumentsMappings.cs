@@ -16,11 +16,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
                 .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationDate))
                 .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationNumber))
                 .ForMember(c => c.Recipient, opt => opt.MapFrom(src => src.VirtualDocument.RecipientId))
-                .ForMember(c => c.IssuerName, opt => opt.MapFrom(src => src.VirtualDocument.CreatedBy))
+                .ForMember(c => c.IssuerName, opt => opt.MapFrom(src => src.VirtualDocument.IssuerName))
                 .ForMember(c => c.Status, opt => opt.MapFrom<MapDocumentStatus>())
-                .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.VirtualDocument.DocumentTypeId))
                 .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>())
-                .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.VirtualDocument.DocumentTypeId))
                 .ForMember(c => c.ResolutionDuration, opt => opt.MapFrom(src => src.VirtualDocument.ResolutionPeriod))
                 .ForMember(c => c.User, opt => opt.MapFrom<MapUserFromAggregate>())
                 .ForMember(c => c.DocumentCategory, opt => opt.MapFrom<MapDocumentCategory>());
@@ -30,16 +28,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
                 .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationDate))
                 .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationNumber))
                 .ForMember(c => c.Recipient, opt => opt.MapFrom(src => src.VirtualDocument.RecipientName))
-                .ForMember(c => c.IssuerName, opt => opt.MapFrom(src => src.VirtualDocument.CreatedBy))
+                .ForMember(c => c.IssuerName, opt => opt.MapFrom<MapUserFromAggregate>())
                 .ForMember(c => c.Status, opt => opt.MapFrom<MapDocumentStatus>())
-                .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.VirtualDocument.DocumentTypeId))
                 .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>())
-                .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.VirtualDocument.DocumentTypeId))
                 .ForMember(c => c.User, opt => opt.MapFrom<MapUserFromAggregate>())
                 .ForMember(c => c.DocumentCategory, opt => opt.MapFrom<MapDocumentCategory>());
 
             CreateMap<VirtualDocumentAggregate<InternalDocument>, DocumentViewModel>()
                 .ForMember(c => c.Id, opt => opt.MapFrom(src => src.VirtualDocument.Document.Id))
+                .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationDate))
+                .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationNumber))
+                .ForMember(c => c.IssuerName, opt => opt.MapFrom<MapUserFromAggregate>())
                 .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>())
                 .ForMember(c => c.User, opt => opt.MapFrom<MapUserFromAggregate>())
                 .ForMember(c => c.DocumentCategory, opt => opt.MapFrom<MapDocumentCategory>());

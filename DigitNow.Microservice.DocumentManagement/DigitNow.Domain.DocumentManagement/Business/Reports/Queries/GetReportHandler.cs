@@ -74,12 +74,12 @@ public class Report : IReport
 
     public async Task<List<ReportViewModel>> GetDataAsync(GetReportQuery request, CancellationToken cancellationToken)
     {
-        var filter = new DocumentFilter
+        var filter = new DocumentPreprocessFilter
         {
             RegistrationDateFilter = request.DateFilter
         };
 
-        var documents = await _dashboardService.GetAllDocumentsAsync(filter, request.Page, request.Count, cancellationToken);
+        var documents = await _dashboardService.GetAllDocumentsAsync(filter, null, request.Page, request.Count, cancellationToken);
 
         return await _documentMappingService.MapToReportViewModelAsync(documents, cancellationToken);
     }
