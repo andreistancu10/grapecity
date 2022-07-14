@@ -80,7 +80,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
                 PageNumber = query.Page,
                 PageSize = query.Count,
                 TotalPages = pageCount,
-                Documents = items
+                Items = items
             };
         }
     }
