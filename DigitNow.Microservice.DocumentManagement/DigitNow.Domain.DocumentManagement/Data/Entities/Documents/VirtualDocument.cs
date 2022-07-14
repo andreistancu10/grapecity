@@ -38,8 +38,6 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
 
 
         #region [ Relationship ]
-
-        [Column(nameof(WorkflowHistory), Order = 7)]
         public List<WorkflowHistory> WorkflowHistory { get; set; } = new();
 
         #endregion
