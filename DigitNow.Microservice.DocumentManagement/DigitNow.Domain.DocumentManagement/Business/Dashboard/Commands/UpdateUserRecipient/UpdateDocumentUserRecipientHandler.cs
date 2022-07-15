@@ -1,6 +1,9 @@
 ﻿using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
+using DigitNow.Domain.Authentication.Client;
+using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
@@ -19,20 +22,33 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IIdentityAdapterClient _identityAdapterClient;
-        private User _user;
+        private readonly IAuthenticationClient _authenticationClient;
+        private readonly IIdentityService _identityService;
+        private readonly IMailSenderService _mailSenderService;
+        private User _currentUser;
+        private User _delegatedUser;
         private DocumentStatus _status;
         private bool _isHeadOfDepartment;
 
-        public UpdateDocumentUserRecipientHandler(DocumentManagementDbContext dbContext, IIdentityAdapterClient identityAdapterClient)
+        public UpdateDocumentUserRecipientHandler(
+            DocumentManagementDbContext dbContext,
+            IIdentityAdapterClient identityAdapterClient,
+            IAuthenticationClient authenticationClient,
+            IIdentityService identityService,
+            IMailSenderService mailSenderService)
         {
             _dbContext = dbContext;
             _identityAdapterClient = identityAdapterClient;
+            _authenticationClient = authenticationClient;
+            _identityService = identityService;
+            _mailSenderService = mailSenderService;
         }
         public async Task<ResultObject> Handle(UpdateDocumentUserRecipientCommand request, CancellationToken cancellationToken)
         {
-            _user = await _identityAdapterClient.GetUserByIdAsync(request.UserId, cancellationToken);
+            _currentUser = await _identityAdapterClient.GetUserByIdAsync(_identityService.GetCurrentUserId(), cancellationToken);
+            _delegatedUser = await _identityAdapterClient.GetUserByIdAsync(request.UserId, cancellationToken);
 
-            if (_user == null)
+            if (_delegatedUser == null)
                 return ResultObject.Error(new ErrorMessage
                 {
                     Message = $"No responsible with id {request.UserId} was found.",
@@ -40,12 +56,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                     Parameters = new object[] { request.UserId }
                 });
 
-            _isHeadOfDepartment = _user.Roles.Contains(UserRole.HeadOfDepartment.Code);
+            _isHeadOfDepartment = _delegatedUser.Roles.Contains(UserRole.HeadOfDepartment.Code);
             _status = _isHeadOfDepartment ? DocumentStatus.InWorkDelegatedUnallocated : DocumentStatus.InWorkDelegated;
 
             await UpdateDocuments(request.DocumentIds);
-
             await _dbContext.SaveChangesAsync();
+
+            await Task.WhenAll
+            (
+                _mailSenderService.SendMail_DelegateDocumentToFunctionary(_currentUser, _delegatedUser, request.DocumentIds, cancellationToken),
+                _mailSenderService.SendMail_DelegateDocumentToFunctionarySupervisor(_currentUser, _delegatedUser, cancellationToken)
+            );
 
             return new ResultObject(ResultStatusCode.Ok);
         }
@@ -67,8 +88,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                     case DocumentType.Outgoing:
                         await UpdateRecipient<OutgoingDocument>(document);
                         break;
-                    default:
-                        break;
                 }
             }
         }
@@ -78,8 +97,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                 .FirstOrDefaultAsync(x => x.DocumentId == document.Id);
 
             document.Status = _status;
-            document.RecipientId = (int)_user.Id;
-            virtualDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(_isHeadOfDepartment ? UserRole.HeadOfDepartment : UserRole.Functionary, _user, _status));
+            document.RecipientId = (int)_delegatedUser.Id;
+            virtualDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(_isHeadOfDepartment ? UserRole.HeadOfDepartment : UserRole.Functionary, _delegatedUser, _status));
         }
     }
 }

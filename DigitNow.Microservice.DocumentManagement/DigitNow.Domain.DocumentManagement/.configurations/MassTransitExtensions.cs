@@ -2,6 +2,7 @@
 using DigitNow.Domain.Authentication.Client;
 using DigitNow.Domain.Catalog.Client.configurations;
 using Domain.Localization.Client.configurations;
+using Domain.Mail.Client;
 using MassTransit;
 using MassTransit.ExtensionsDependencyInjectionIntegration;
 using MassTransit.RabbitMqTransport;
@@ -15,6 +16,7 @@ public static class MassTransitExtensions
         serviceCollection.AddAuthenticationClientMassTransitServiceConfigurations();
         serviceCollection.AddLocalizationMQServicesConfigs();
         serviceCollection.AddCatalogClientMassTransitServiceConfigurations();
+        serviceCollection.AddMailClientMassTransitServiceConfigurations();
     }
 
     public static void AddDocumentManagementMassTransitRabbitConfigurations(this IRabbitMqBusFactoryConfigurator rabbit, IBusRegistrationContext context, Action<IReceiveEndpointConfigurator> registerAction)

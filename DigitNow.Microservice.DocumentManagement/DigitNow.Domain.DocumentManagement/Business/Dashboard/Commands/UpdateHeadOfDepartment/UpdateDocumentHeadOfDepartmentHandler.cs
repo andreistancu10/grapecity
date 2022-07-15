@@ -1,6 +1,10 @@
-﻿using DigitNow.Adapters.MS.Identity;
+﻿using AutoMapper;
+using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
+using DigitNow.Domain.Authentication.Client;
+using DigitNow.Domain.Authentication.Contracts.Users.GetUsersByFilter;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
@@ -8,6 +12,7 @@ using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,19 +22,25 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
     public class UpdateDocumentHeadOfDepartmentHandler : ICommandHandler<UpdateDocumentHeadOfDepartmentCommand, ResultObject>
     {
         private readonly DocumentManagementDbContext _dbContext;
-        private readonly IIdentityAdapterClient _identityAdapterClient;
+        private readonly IMailSenderService _mailSenderService;
+        private readonly IAuthenticationClientAdapter _authenticationClientAdapter;
         private User _headOfDepartment;
 
-        public UpdateDocumentHeadOfDepartmentHandler(DocumentManagementDbContext dbContext, IIdentityAdapterClient identityAdapterClient)
+        public UpdateDocumentHeadOfDepartmentHandler(
+            DocumentManagementDbContext dbContext, 
+            IMailSenderService mailSenderService,
+            IAuthenticationClientAdapter authenticationClientAdapter)
         {
             _dbContext = dbContext;
-            _identityAdapterClient = identityAdapterClient;
+            _mailSenderService = mailSenderService;
+            _authenticationClientAdapter = authenticationClientAdapter;
         }
         public async Task<ResultObject> Handle(UpdateDocumentHeadOfDepartmentCommand request, CancellationToken cancellationToken)
         {
-            var response = await _identityAdapterClient.GetUsersAsync(cancellationToken);
-            var departmentUsers = response.Users.Where(x => x.Departments.Contains(request.DepartmentId));
-            _headOfDepartment = departmentUsers.FirstOrDefault(x => x.Roles.Contains(UserRole.HeadOfDepartment.Code));
+            var headOfDepartmentUsers = await _authenticationClientAdapter
+                .GetUsersByRoleAndDepartmentAsync(UserRole.HeadOfDepartment.Code, request.DepartmentId, cancellationToken);            
+
+            _headOfDepartment = headOfDepartmentUsers.First();
 
             if (_headOfDepartment == null)
                 return ResultObject.Error(new ErrorMessage
@@ -41,6 +52,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
 
             await UpdateDocuments(request);
             await _dbContext.SaveChangesAsync();
+
+            var documentIds = request.DocumentInfo.Select(x => x.DocumentId).ToList();
+            await _mailSenderService.SendMail_SendBulkDocumentsTemplate(_headOfDepartment, documentIds, cancellationToken);
 
             return new ResultObject(ResultStatusCode.Ok);
         }
@@ -61,8 +75,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                         break;
                     case DocumentType.Outgoing:
                         await UpdateHeadOfDepartment<OutgoingDocument>(document);
-                        break;
-                    default:
                         break;
                 }
             }
