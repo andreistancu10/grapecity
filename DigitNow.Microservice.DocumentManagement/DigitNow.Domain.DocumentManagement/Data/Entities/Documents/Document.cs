@@ -11,6 +11,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public DocumentStatus Status { get; set; }
         public int RegistrationNumber { get; set; }
         public DateTime RegistrationDate { get; set; }
+        public bool IsArchived { get; set; }
 
         #region [ References ]
 
