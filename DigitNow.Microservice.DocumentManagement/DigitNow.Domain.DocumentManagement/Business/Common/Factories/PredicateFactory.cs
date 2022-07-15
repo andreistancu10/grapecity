@@ -8,5 +8,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
     {
         public static IList<Expression<Func<T, bool>>> CreatePredicatesList<T>(params Expression<Func<T, bool>>[] predicates)
             where T : class => new List<Expression<Func<T, bool>>>(predicates);
+
+        public static IList<Expression<Func<T, object>>> CreateIncludesList<T>(params Expression<Func<T, object>>[] includes)
+            where T : class => new List<Expression<Func<T, object>>>(includes);
     }
 }

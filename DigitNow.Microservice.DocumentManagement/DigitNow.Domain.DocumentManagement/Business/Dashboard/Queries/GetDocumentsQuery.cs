@@ -7,6 +7,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
     {
         public int Page { get; set; } = 1;
         public int Count { get; set; } = 10;
-        public DocumentFilter Filter { get; set; }
+        public DocumentPreprocessFilter PreprocessFilter { get; set; }
+        public DocumentPostprocessFilter PostprocessFilter { get; set; }
     }
 }

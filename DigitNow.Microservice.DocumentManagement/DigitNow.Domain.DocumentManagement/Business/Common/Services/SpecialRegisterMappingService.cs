@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMapping;
+using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMappings;
 using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,16 +29,16 @@ public class SpecialRegisterMappingService : ISpecialRegisterMappingService
 
         if (register != null)
         {
-            await AddDocumentMappingAsync(incomingDocument, register, cancellationToken);
+            await AddDocumentMappingAsync(incomingDocument.DocumentId, register, cancellationToken);
         }
     }
 
-    private async Task AddDocumentMappingAsync(IncomingDocument incomingDocument, SpecialRegister register,
+    private async Task AddDocumentMappingAsync(long documentId, SpecialRegister register,
         CancellationToken cancellationToken)
     {
         var newMapping = new SpecialRegisterMapping
         {
-            Document = incomingDocument.Document,
+            DocumentId = documentId,
             SpecialRegister = register
         };
 

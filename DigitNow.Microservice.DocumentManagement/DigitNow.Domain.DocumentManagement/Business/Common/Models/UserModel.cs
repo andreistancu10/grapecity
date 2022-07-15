@@ -13,7 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Models
         public string Type { get; set; }
         public bool Active { get; set; }
 
-        public IList<long> Roles { get; set; } = new List<long>();
+        public IList<string> Roles { get; set; } = new List<string>();
         public IList<long> Departments { get; set; } = new List<long>();
     }
 }
