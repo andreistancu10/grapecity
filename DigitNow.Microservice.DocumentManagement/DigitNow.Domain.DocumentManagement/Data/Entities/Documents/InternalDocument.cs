@@ -8,7 +8,6 @@ public class InternalDocument : VirtualDocument
     public int DeadlineDaysNumber { get; set; }
     public string Description { get; set; }
     public string Observation { get; set; }
-    public int ReceiverDepartmentId { get; set; }
     public bool? IsUrgent { get; set; }
 
     #region [ References ]

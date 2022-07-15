@@ -16,6 +16,7 @@ namespace DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums
         InWorkDelegated = 11,
         InWorkDelegatedUnallocated = 12,
         InWorkMayorReview = 13,
-        InWorkMayorDeclined = 14
+        InWorkMayorDeclined = 14,
+        New = 15
     }
 }

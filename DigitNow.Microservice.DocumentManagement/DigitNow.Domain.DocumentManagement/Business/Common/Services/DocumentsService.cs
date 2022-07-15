@@ -93,8 +93,6 @@ public class DocumentService : IDocumentService
             if (document.InternalDocument == null && document.IncomingDocument == null && document.OutgoingDocument == null)
                 throw new InvalidOperationException(); //TODO: Add descriptive error
 
-            document.Status = DocumentStatus.InWorkUnallocated;
-
             await _dbContext.AddAsync(document, cancellationToken);
             await _dbContext.RegistrationNumberCounters.AddAsync(new RegistrationNumberCounter
             {
