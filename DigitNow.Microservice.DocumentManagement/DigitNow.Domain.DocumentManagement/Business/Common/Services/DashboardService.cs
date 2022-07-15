@@ -25,6 +25,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         Task<long> CountAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken);
 
         Task<List<VirtualDocument>> GetAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken cancellationToken);
+
+        Task<List<VirtualDocument>> FetchVirtualDocuments(IList<Document> documents, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken);
     }
 
     public class DashboardService : IDashboardService
@@ -159,7 +161,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         #region [ IDashboardService - Internal - Get ]
 
-        private async Task<List<VirtualDocument>> FetchVirtualDocuments(IList<Document> documents, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
+        public async Task<List<VirtualDocument>> FetchVirtualDocuments(IList<Document> documents, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
         {
             var result = new List<VirtualDocument>();
 
@@ -310,7 +312,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private IList<Expression<Func<T, bool>>> GetPostprocessPredicates<T>(DocumentPostprocessFilter postprocessFilter)
                     where T : VirtualDocument
         {
-            if (!postprocessFilter.IsEmpty())
+            if (postprocessFilter == null || !postprocessFilter.IsEmpty())
             {
                 return ExpressionFilterBuilderRegistry.GetDocumentPostprocessFilterBuilder<T>(_dbContext, postprocessFilter).Build();
             }

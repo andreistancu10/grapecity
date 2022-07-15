@@ -1,14 +1,14 @@
-﻿using DigitNow.Domain.Authentication.Client;
-using DigitNow.Domain.DocumentManagement.Business.Common.Models;
-using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using DigitNow.Domain.Authentication.Client;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
+using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers
+namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchers
 {
     internal class DocumentsUsersFetcher : ModelFetcher<UserModel, DocumentsFetcherContext>
     {
@@ -19,7 +19,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers
             _authenticationClient = serviceProvider.GetService<IAuthenticationClient>();
         }
 
-        public async override Task<IReadOnlyList<UserModel>> FetchAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
+        public override async Task<IReadOnlyList<UserModel>> FetchAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
         {
             var createdByUsers = context.Documents
                 .Select(x => x.CreatedBy)

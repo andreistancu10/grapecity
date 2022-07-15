@@ -20,7 +20,7 @@ public static class ReportFactory
         return type switch
         {
             ReportType.ExpiredDocuments => new ExpiredReportProcessor(dashboardService, documentMappingService, catalogClient, dbContext),
-            ReportType.DocumentsToExpire => new ToExpireReportProcessor(dashboardService, documentMappingService),
+            ReportType.DocumentsToExpire => new ToExpireReportProcessor(dashboardService, documentMappingService, catalogClient, dbContext),
             _ => throw new InvalidEnumArgumentException()
         };
     }

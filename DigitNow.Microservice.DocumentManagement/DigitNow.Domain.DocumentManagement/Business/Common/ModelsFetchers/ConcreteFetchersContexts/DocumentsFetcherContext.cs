@@ -1,11 +1,7 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers
+namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts
 {
     internal class DocumentsFetcherContext : ModelFetcherContext
     {

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Reports.Queries;
-using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
 using DigitNow.Domain.DocumentManagement.Public.Reports.Models;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Reports.Mappings;

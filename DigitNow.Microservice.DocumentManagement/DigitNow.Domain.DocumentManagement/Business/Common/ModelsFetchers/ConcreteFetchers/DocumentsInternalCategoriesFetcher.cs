@@ -1,15 +1,15 @@
-﻿using AutoMapper;
-using DigitNow.Domain.Catalog.Client;
-using DigitNow.Domain.DocumentManagement.Business.Common.Models;
-using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using AutoMapper;
+using DigitNow.Domain.Catalog.Client;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
+using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers
+namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchers
 {
     internal sealed class DocumentsInternalCategoriesFetcher : ModelFetcher<DocumentCategoryModel, DocumentsFetcherContext>
     {
@@ -22,7 +22,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers
             _mapper = serviceProvider.GetService<IMapper>();
         }
 
-        public async override Task<IReadOnlyList<DocumentCategoryModel>> FetchAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
+        public override async Task<IReadOnlyList<DocumentCategoryModel>> FetchAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
         {
             var internalDocumentTypesResponse = await _catalogClient.InternalDocumentTypes.GetInternalDocumentTypesAsync(cancellationToken);
 

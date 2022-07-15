@@ -155,7 +155,7 @@ public class GetReportMapping : Profile
             var resolutionDate = allocationDate.AddDays(source.VirtualDocument.ResolutionPeriod);
             var expired = DateTime.Now - resolutionDate;
 
-            return expired.Days;
+            return Math.Abs(expired.Days);
         }
 
         public int Resolve(VirtualDocumentAggregate<InternalDocument> source, ReportViewModel destination, int destMember, ResolutionContext context)

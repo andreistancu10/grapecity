@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    [Migration("20220712111122_Init")]
-    partial class Init
+    [Migration("20220715094619_InitCreate")]
+    partial class InitCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -518,7 +518,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("RegistrationNumberCounters", "DocumentMangement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMapping.SpecialRegisterMapping", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMappings.SpecialRegisterMapping", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -812,10 +812,10 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("Document");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMapping.SpecialRegisterMapping", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMappings.SpecialRegisterMapping", b =>
                 {
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Document", "Document")
-                        .WithMany()
+                        .WithMany("SpecialRegisterMappings")
                         .HasForeignKey("DocumentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -851,6 +851,8 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("InternalDocument");
 
                     b.Navigation("OutgoingDocument");
+
+                    b.Navigation("SpecialRegisterMappings");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", b =>
