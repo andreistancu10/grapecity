@@ -20,7 +20,7 @@ public class ExpiredReportProcessor : AbstractExpiredReportRelatedProcessor
 
     public override async Task<List<ReportViewModel>> GetDataAsync(GetReportQuery request, CancellationToken cancellationToken)
     {
-        if (request.To.ToUniversalTime() > DateTime.UtcNow)
+        if (request.ToDate.ToUniversalTime() > DateTime.UtcNow)
         {
             throw new Exception($"Date range cannot be bigger than today, {DateTime.Now.Day}/{DateTime.Now.Month}/{DateTime.Now.Year}.");
         }

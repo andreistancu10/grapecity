@@ -21,7 +21,7 @@ public class ToExpireReportProcessor : AbstractExpiredReportRelatedProcessor
 
     public override async Task<List<ReportViewModel>> GetDataAsync(GetReportQuery request, CancellationToken cancellationToken)
     {
-        if (request.To.ToUniversalTime() <= DateTime.UtcNow)
+        if (request.ToDate.ToUniversalTime() <= DateTime.UtcNow)
         {
             var tomorrowDateTime = DateTime.UtcNow.AddDays(1);
             throw new Exception($"Date range cannot be earlier than tomorrow, which is {tomorrowDateTime.Day}/{tomorrowDateTime.Month}/{tomorrowDateTime.Year}.");

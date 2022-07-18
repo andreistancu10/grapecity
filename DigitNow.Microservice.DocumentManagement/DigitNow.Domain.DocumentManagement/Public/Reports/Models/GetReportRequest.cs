@@ -7,6 +7,6 @@ namespace DigitNow.Domain.DocumentManagement.Public.Reports.Models;
 public class GetReportRequest
 {
     public ReportType Type { get; set; }
-    public DateTime From { get; set; }
-    public DateTime To { get; set; }
+    public DateTime FromDate { get; set; }
+    public DateTime ToDate { get; set; }
 }

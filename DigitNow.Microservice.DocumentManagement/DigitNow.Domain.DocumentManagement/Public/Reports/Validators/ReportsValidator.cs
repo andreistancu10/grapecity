@@ -8,7 +8,7 @@ public class ReportsValidator : AbstractValidator<GetReportRequest>
     public ReportsValidator()
     {
         RuleFor(c => c.Type).NotNull().NotEmpty();
-        RuleFor(c => c.From).NotNull().NotEmpty();
-        RuleFor(c => c.To).NotNull().NotEmpty().GreaterThan(c=>c.From);
+        RuleFor(c => c.FromDate).NotNull().NotEmpty();
+        RuleFor(c => c.ToDate).NotNull().NotEmpty().GreaterThan(c=>c.FromDate);
     }
 }

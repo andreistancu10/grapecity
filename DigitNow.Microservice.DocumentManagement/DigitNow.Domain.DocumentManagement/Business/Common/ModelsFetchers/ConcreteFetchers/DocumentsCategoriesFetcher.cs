@@ -7,8 +7,6 @@ using AutoMapper;
 using DigitNow.Domain.Catalog.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
-using DigitNow.Domain.DocumentManagement.Data;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchers
@@ -34,55 +32,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
                 .ToList();
 
             return documentCategoryModels;
-        }
-    }
-
-    internal sealed class DocumentsDepartmentsFetcher : ModelFetcher<DocumentDepartmentModel, DocumentsFetcherContext>
-    {
-        private readonly ICatalogClient _catalogClient;
-        private readonly IMapper _mapper;
-
-        public DocumentsDepartmentsFetcher(IServiceProvider serviceProvider)
-        {
-            _catalogClient = serviceProvider.GetService<ICatalogClient>();
-            _mapper = serviceProvider.GetService<IMapper>();
-        }
-
-        public override async Task<IReadOnlyList<DocumentDepartmentModel>> FetchAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
-        {
-            var departmentsResponse = await _catalogClient.Departments.GetDepartmentsAsync(cancellationToken);
-
-            var documentDepartmentModels = departmentsResponse.Departments
-                .Select(x => _mapper.Map<DocumentDepartmentModel>(x))
-                .ToList();
-
-            return documentDepartmentModels;
-        }
-    }
-
-    internal sealed class DocumentsSpecialRegisterMappingFetcher : ModelFetcher<DocumentsSpecialRegisterMappingModel, DocumentsFetcherContext>
-    {
-        private readonly IMapper _mapper;
-        private readonly DocumentManagementDbContext _dbContext;
-
-        public DocumentsSpecialRegisterMappingFetcher(IServiceProvider serviceProvider)
-        {
-            _mapper = serviceProvider.GetService<IMapper>();
-            _dbContext = serviceProvider.GetService<DocumentManagementDbContext>();
-        }
-
-        public override async Task<IReadOnlyList<DocumentsSpecialRegisterMappingModel>> FetchAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
-        {
-            var documentIds = context.Documents.Select(c => c.Id);
-            var documentsSpecialRegisterMappingModels =
-              await _dbContext.SpecialRegisterMappings
-                    .AsNoTracking()
-                    .Where(c => documentIds.Contains(c.DocumentId))
-                    .Include(c => c.SpecialRegister)
-                    .Select(c => _mapper.Map<DocumentsSpecialRegisterMappingModel>(c))
-                    .ToListAsync(cancellationToken);
-
-            return documentsSpecialRegisterMappingModels;
         }
     }
 }

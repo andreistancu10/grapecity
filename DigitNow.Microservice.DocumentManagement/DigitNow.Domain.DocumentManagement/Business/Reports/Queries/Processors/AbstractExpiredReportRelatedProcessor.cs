@@ -48,14 +48,14 @@ public abstract class AbstractExpiredReportRelatedProcessor : IReportProcessor
                 c.RegistrationDate.AddDays(
                     (c.IncomingDocument.ResolutionPeriod > 0
                         ? c.IncomingDocument.ResolutionPeriod
-                        : categories.DocumentTypes.First(d => d.Id == c.IncomingDocument.DocumentTypeId).ResolutionPeriod + 1)
-                    + 1) >= request.From
+                        : categories.DocumentTypes.First(d => d.Id == c.IncomingDocument.DocumentTypeId).ResolutionPeriod)
+                    + 1) > request.FromDate
                 &&
                 c.RegistrationDate.AddDays(
                     (c.IncomingDocument.ResolutionPeriod > 0
                         ? c.IncomingDocument.ResolutionPeriod
-                        : categories.DocumentTypes.First(d => d.Id == c.IncomingDocument.DocumentTypeId).ResolutionPeriod + 1)
-                    + 1) <= request.To);
+                        : categories.DocumentTypes.First(d => d.Id == c.IncomingDocument.DocumentTypeId).ResolutionPeriod)
+                    + 1) < request.ToDate);
 
         var internalDocuments = await _dbContext.Documents
             .AsNoTracking()
@@ -65,10 +65,10 @@ public abstract class AbstractExpiredReportRelatedProcessor : IReportProcessor
 
         var eligibleInternalDocuments = internalDocuments
             .Where(c =>
-                c.RegistrationDate.AddDays(internalCategories.InternalDocumentTypes.First(d => d.Id == c.InternalDocument.InternalDocumentTypeId).ResolutionPeriod + 1) >= request.From
+                c.RegistrationDate.AddDays(internalCategories.InternalDocumentTypes.First(d => d.Id == c.InternalDocument.InternalDocumentTypeId).ResolutionPeriod) > request.FromDate
                 &&
-                c.RegistrationDate.AddDays(internalCategories.InternalDocumentTypes.First(d => d.Id == c.InternalDocument.InternalDocumentTypeId).ResolutionPeriod + 1) <= request.To);
-        
+                c.RegistrationDate.AddDays(internalCategories.InternalDocumentTypes.First(d => d.Id == c.InternalDocument.InternalDocumentTypeId).ResolutionPeriod) < request.ToDate);
+
         var documents = new List<Document>();
         documents.AddRange(eligibleInternalDocuments);
         documents.AddRange(eligibleIncomingDocuments);
