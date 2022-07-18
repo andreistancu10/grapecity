@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,29 +7,38 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers
 {
     internal interface IModelFetcher
     {
-        bool IsInternal { get; }
+        IReadOnlyList<object> Items { get; }
 
-        Task<IReadOnlyList<object>> FetchAsync(object context, CancellationToken cancellationToken);
+        Task FetchAsync(object context, CancellationToken cancellationToken);
     }
 
     internal interface IModelFetcher<T, TContext> : IModelFetcher
         where T : class
-        where TContext : IModelFetcherContext
+        where TContext: IModelFetcherContext
     {
-        Task<IReadOnlyList<T>> FetchAsync(TContext context, CancellationToken cancellationToken);
+        IReadOnlyList<T> Models { get; }
     }
 
     internal abstract class ModelFetcher<T, TContext> : IModelFetcher<T, TContext>
         where T : class
         where TContext : IModelFetcherContext
     {
-        public abstract bool IsInternal { get; }
+        private List<T> _models = new List<T>();
 
-        public abstract Task<IReadOnlyList<T>> FetchAsync(TContext context, CancellationToken cancellationToken);
+        public IReadOnlyList<T> Models => _models;
 
-        public async Task<IReadOnlyList<object>> FetchAsync(object context, CancellationToken cancellationToken)
+        IReadOnlyList<object> IModelFetcher.Items => _models;
+
+        protected abstract Task<List<T>> FetchInternalAsync(TContext context, CancellationToken cancellationToken);
+
+        public async Task FetchAsync(TContext context, CancellationToken cancellationToken)
         {
-            return await FetchAsync((TContext)context, cancellationToken);
+            _models = await FetchInternalAsync(context, cancellationToken);
+        }
+
+        async Task IModelFetcher.FetchAsync(object context, CancellationToken cancellationToken)
+        {
+            await FetchAsync((TContext)context, cancellationToken);
         }
     }
 }

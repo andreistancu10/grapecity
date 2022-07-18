@@ -45,7 +45,7 @@ public class DocumentMappingService : IDocumentMappingService
 
     public async Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
     {
-        await _documentRelationsFetcher.FetchRelationshipsAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
+        await _documentRelationsFetcher.TriggerFetchersAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
         return MapDocuments(virtualDocuments)
             .OrderByDescending(x => x.RegistrationDate)
             .ToList();
@@ -53,7 +53,7 @@ public class DocumentMappingService : IDocumentMappingService
 
     public async Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
     {
-        await _documentRelationsFetcher.FetchRelationshipsAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
+        await _documentRelationsFetcher.TriggerFetchersAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
         return MapDocumentsReports(virtualDocuments)
             .OrderByDescending(x => x.RegistrationDate)
             .ToList();

@@ -22,9 +22,7 @@ internal sealed class DocumentsDepartmentsFetcher : ModelFetcher<DocumentDepartm
         _mapper = serviceProvider.GetService<IMapper>();
     }
 
-    public override bool IsInternal => false;
-
-    public override async Task<IReadOnlyList<DocumentDepartmentModel>> FetchAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
+    protected override async Task<List<DocumentDepartmentModel>> FetchInternalAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
     {
         var departmentsResponse = await _catalogClient.Departments.GetDepartmentsAsync(cancellationToken);
 

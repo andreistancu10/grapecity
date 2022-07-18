@@ -19,9 +19,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
             _authenticationClient = serviceProvider.GetService<IAuthenticationClient>();
         }
 
-        public override bool IsInternal => false;
-
-        public override async Task<IReadOnlyList<UserModel>> FetchAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
+        protected override async Task<List<UserModel>> FetchInternalAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
         {
             var createdByUsers = context.Documents
                 .Select(x => x.CreatedBy)

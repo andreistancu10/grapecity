@@ -8,34 +8,44 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
 {
     internal sealed class DocumentReportRelationsFetcher : RelationalAggregateFetcher<DocumentsFetcherContext>
     {
-        private readonly IModelFetcher<UserModel, DocumentsFetcherContext> _documentsUsersFetcher;
-        private readonly IModelFetcher<DocumentCategoryModel, DocumentsFetcherContext> _documentsCategoriesFetcher;
-        private readonly IModelFetcher<DocumentCategoryModel, DocumentsFetcherContext> _documentsInternalCategoriesFetcher;
-        private readonly IModelFetcher<DocumentDepartmentModel, DocumentsFetcherContext> _documentsDepartmentsFetcher;
-        private readonly IModelFetcher<DocumentsSpecialRegisterMappingModel, DocumentsFetcherContext> _documentsSpecialRegisterMappingFetcher;
+        private readonly IServiceProvider _serviceProvider;
 
-        public IReadOnlyList<UserModel> DocumentUsers { get; private set; }
-        public IReadOnlyList<DocumentCategoryModel> DocumentCategories { get; private set; }
-        public IReadOnlyList<DocumentCategoryModel> DocumentInternalCategories { get; private set; }
-        public IReadOnlyList<DocumentDepartmentModel> DocumentDepartments { get; set; }
-        public IReadOnlyList<DocumentsSpecialRegisterMappingModel> DocumentSpecialRegisterMapping { get; set; }
+        private IModelFetcher<UserModel, DocumentsFetcherContext> _documentsUsersFetcher;
+        private IModelFetcher<DocumentCategoryModel, DocumentsFetcherContext> _documentsCategoriesFetcher;
+        private IModelFetcher<DocumentCategoryModel, DocumentsFetcherContext> _documentsInternalCategoriesFetcher;
+        private IModelFetcher<DocumentDepartmentModel, DocumentsFetcherContext> _documentsDepartmentsFetcher;
+        private IModelFetcher<DocumentsSpecialRegisterMappingModel, DocumentsFetcherContext> _documentsSpecialRegisterMappingFetcher;
+
+        public IReadOnlyList<UserModel> DocumentUsers => GetItems(_documentsUsersFetcher);
+        public IReadOnlyList<DocumentCategoryModel> DocumentCategories => GetItems(_documentsCategoriesFetcher);
+        public IReadOnlyList<DocumentCategoryModel> DocumentInternalCategories => GetItems(_documentsInternalCategoriesFetcher);
+        public IReadOnlyList<DocumentDepartmentModel> DocumentDepartments => GetItems(_documentsDepartmentsFetcher);
+        public IReadOnlyList<DocumentsSpecialRegisterMappingModel> DocumentSpecialRegisterMapping => GetItems(_documentsSpecialRegisterMappingFetcher);
 
         public DocumentReportRelationsFetcher(IServiceProvider serviceProvider)
         {
-            _documentsUsersFetcher = new DocumentsUsersFetcher(serviceProvider);
-            Fetchers.Add(_documentsUsersFetcher);
+            _serviceProvider = serviceProvider;
+        }
 
-            _documentsCategoriesFetcher = new DocumentsCategoriesFetcher(serviceProvider);
-            Fetchers.Add(_documentsCategoriesFetcher);
+        protected override void AddInternalFetchers()
+        {
+            _documentsSpecialRegisterMappingFetcher = new DocumentsSpecialRegisterMappingFetcher(_serviceProvider);
+            InternalFetchers.Add(_documentsSpecialRegisterMappingFetcher);
+        }
 
-            _documentsInternalCategoriesFetcher = new DocumentsInternalCategoriesFetcher(serviceProvider);
-            Fetchers.Add(_documentsInternalCategoriesFetcher);
+        protected override void AddRemoteFetchers()
+        {
+            _documentsUsersFetcher = new DocumentsUsersFetcher(_serviceProvider);
+            RemoteFetchers.Add(_documentsUsersFetcher);
 
-            _documentsDepartmentsFetcher = new DocumentsDepartmentsFetcher(serviceProvider);
-            Fetchers.Add(_documentsDepartmentsFetcher);
+            _documentsCategoriesFetcher = new DocumentsCategoriesFetcher(_serviceProvider);
+            RemoteFetchers.Add(_documentsCategoriesFetcher);
 
-            _documentsSpecialRegisterMappingFetcher = new DocumentsSpecialRegisterMappingFetcher(serviceProvider);
-            Fetchers.Add(_documentsSpecialRegisterMappingFetcher);
+            _documentsInternalCategoriesFetcher = new DocumentsInternalCategoriesFetcher(_serviceProvider);
+            RemoteFetchers.Add(_documentsInternalCategoriesFetcher);
+
+            _documentsDepartmentsFetcher = new DocumentsDepartmentsFetcher(_serviceProvider);
+            RemoteFetchers.Add(_documentsDepartmentsFetcher);
         }
     }
 }

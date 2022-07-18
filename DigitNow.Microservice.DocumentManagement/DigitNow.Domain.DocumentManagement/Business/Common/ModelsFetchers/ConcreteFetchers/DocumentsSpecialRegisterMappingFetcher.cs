@@ -23,9 +23,7 @@ internal sealed class DocumentsSpecialRegisterMappingFetcher : ModelFetcher<Docu
         _dbContext = serviceProvider.GetService<DocumentManagementDbContext>();
     }
 
-    public override bool IsInternal => true;
-
-    public override async Task<IReadOnlyList<DocumentsSpecialRegisterMappingModel>> FetchAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
+    protected override async Task<List<DocumentsSpecialRegisterMappingModel>> FetchInternalAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
     {
         var documentIds = context.Documents.Select(c => c.Id);
         var documentsSpecialRegisterMappingModels =
