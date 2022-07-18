@@ -13,13 +13,16 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public int RegistrationNumber { get; set; }
         public DateTime RegistrationDate { get; set; }
 
-        #region [ References ]
+        #region [ Children ]
 
         public IncomingDocument IncomingDocument { get; set; }
         public InternalDocument InternalDocument { get; set; }
         public OutgoingDocument OutgoingDocument { get; set; }
 
-        //TODO: Remove this
+        #endregion
+
+        #region [ References ]
+
         public List<SpecialRegisterMapping> SpecialRegisterMappings { get; set; }
         public List<DocumentUploadedFile> DocumentUploadedFiles { get; set; }
 
