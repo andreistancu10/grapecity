@@ -16,7 +16,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
         protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkMayorReview };
         private enum Decision { Approved = 1, Declined = 2  };
-        private VirtualDocument _virtualDocument;
 
         protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, WorkflowHistory lastWorkFlowRecord, CancellationToken token)
         {
@@ -26,10 +25,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             switch ((Decision)command.Decision)
             {
                 case Decision.Declined:
-                    MayorDeclined(command);
+                    await MayorDeclined(command, virtualDocument);
                     break;
                 case Decision.Approved:
-                    MayorApproved(command);
+                    await MayorApproved(command, virtualDocument);
                     break;
                 default:
                     break;
@@ -38,9 +37,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             return command;
         }
 
-        private void MayorApproved(ICreateWorkflowHistoryCommand command)
+        private async Task MayorApproved(ICreateWorkflowHistoryCommand command, VirtualDocument virtualDocument)
         {
-            var oldWorkflowResponsible = GetOldWorkflowResponsible(_virtualDocument, x => x.RecipientType == UserRole.Functionary.Id);
+            var oldWorkflowResponsible = GetOldWorkflowResponsible(virtualDocument, x => x.RecipientType == UserRole.Functionary.Id);
 
             var newWorkflowResponsible = new WorkflowHistory
             {
@@ -48,14 +47,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 Remarks = command.Remarks
             };
 
-            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
+            await TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 
-            _virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
+            virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
         }
 
-        private void MayorDeclined(ICreateWorkflowHistoryCommand command)
+        private async Task MayorDeclined(ICreateWorkflowHistoryCommand command, VirtualDocument virtualDocument)
         {
-            var oldWorkflowResponsible = GetOldWorkflowResponsible(_virtualDocument, x => x.RecipientType == UserRole.HeadOfDepartment.Id);
+            var oldWorkflowResponsible = GetOldWorkflowResponsible(virtualDocument, x => x.RecipientType == UserRole.HeadOfDepartment.Id);
 
             var newWorkflowResponsible = new WorkflowHistory
             {
@@ -63,9 +62,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 Remarks = command.Remarks
             };
 
-            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
+            await TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 
-            _virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
+            virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)

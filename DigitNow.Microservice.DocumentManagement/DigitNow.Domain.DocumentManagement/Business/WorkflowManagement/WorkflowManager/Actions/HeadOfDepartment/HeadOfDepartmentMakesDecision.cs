@@ -25,7 +25,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             switch ((Decision)command.Decision)
             {
                 case Decision.Declined:
-                    ApplicationDeclined(command, virtualDocument);
+                    await ApplicationDeclined(command, virtualDocument);
                     break;
                 case Decision.Approved:
                     await ApplicationApproved(command, virtualDocument, token);
@@ -48,12 +48,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 .Add(WorkflowHistoryFactory
                 .Create(UserRole.Mayor, userResponse, DocumentStatus.InWorkMayorReview, command.DeclineReason, command.Remarks));
 
-            SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, userResponse.Id, DocumentStatus.InWorkMayorReview);
+            await SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, userResponse.Id, DocumentStatus.InWorkMayorReview);
 
             return command;
         }
 
-        private void ApplicationDeclined(ICreateWorkflowHistoryCommand command, VirtualDocument document)
+        private async Task ApplicationDeclined(ICreateWorkflowHistoryCommand command, VirtualDocument document)
         {
             var oldWorkflowResponsible = GetOldWorkflowResponsible(document, x => x.RecipientType == UserRole.Functionary.Id);
 
@@ -64,7 +64,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 Remarks = command.Remarks
             };
 
-            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
+            await TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 
             document.WorkflowHistory.Add(newWorkflowResponsible);
         }

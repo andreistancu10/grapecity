@@ -20,7 +20,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 return command;
 
             var responsibleFunctionaryRecord = document.IncomingDocument.WorkflowHistory
-                .Where(x => x.RecipientType == UserRole.Functionary.Id && x.Status == DocumentStatus.InWorkAllocated)
+                .Where(x => x.RecipientType == UserRole.Functionary.Id && (x.Status == DocumentStatus.InWorkAllocated || x.Status == DocumentStatus.New))
                 .OrderByDescending(x => x.CreatedAt)
                 .FirstOrDefault();
 
@@ -30,7 +30,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 Remarks = command.Remarks
             };
 
-            TransferResponsibility(responsibleFunctionaryRecord, newWorkflowResponsible, command);
+            await TransferResponsibility(responsibleFunctionaryRecord, newWorkflowResponsible, command);
 
             virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
 
