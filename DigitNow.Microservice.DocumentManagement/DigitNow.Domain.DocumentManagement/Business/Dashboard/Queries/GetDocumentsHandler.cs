@@ -51,7 +51,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, GetDocuments
             TotalPages = pageCount,
             PageNumber = query.Page,
             PageSize = query.Count,
-            Documents = items
+            Items = items
         };
     }
 }

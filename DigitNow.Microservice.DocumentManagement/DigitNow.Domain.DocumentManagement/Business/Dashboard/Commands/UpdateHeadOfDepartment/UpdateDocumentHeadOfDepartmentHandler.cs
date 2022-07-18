@@ -3,6 +3,7 @@ using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
@@ -38,81 +39,43 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                     Parameters = new object[] { request.DepartmentId }
                 });
 
-            await UpdateDocumentHeadOfDepartment(request);
+            await UpdateDocuments(request);
             await _dbContext.SaveChangesAsync();
 
             return new ResultObject(ResultStatusCode.Ok);
         }
 
-        private async Task UpdateDocumentHeadOfDepartment(UpdateDocumentHeadOfDepartmentCommand request)
+        private async Task UpdateDocuments(UpdateDocumentHeadOfDepartmentCommand request)
         {
-            await UpdateHeadOfDepartmentForIncomingDocuments(request);
-            await UpdateHeadOfDepartmentForInternalDocuments(request);
-            await UpdateHeadOfDepartmentForOutgoingDocuments(request);
-        }
-
-        private async Task UpdateHeadOfDepartmentForOutgoingDocuments(UpdateDocumentHeadOfDepartmentCommand request)
-        {
-            var outgoingDocIds = request.DocumentInfo
-                                        .Where(doc => doc.DocType == (int)DocumentType.Outgoing)
-                                        .Select(doc => doc.RegistrationNumber)
-                                        .ToList();
-
-            foreach (var registrationNo in outgoingDocIds)
+            foreach (var docInfo in request.DocumentInfo)
             {
-                var outgoingDoc = await _dbContext.OutgoingDocuments
-                    .Include(x => x.Document)
-                    .FirstOrDefaultAsync(x => x.Document.RegistrationNumber == registrationNo);
+                var document = await _dbContext.Documents.FirstAsync(x => x.Id == docInfo.DocumentId);
 
-                if (outgoingDoc != null)
+                switch (document.DocumentType)
                 {
-                    outgoingDoc.Document.Status = DocumentStatus.InWorkUnallocated;
-                    outgoingDoc.RecipientId = (int)_headOfDepartment.Id;
-                    outgoingDoc.WorkflowHistory.Add(WorkflowHistoryFactory.Create(outgoingDoc.Document, UserRole.HeadOfDepartment, _headOfDepartment, DocumentStatus.InWorkUnallocated));
+                    case DocumentType.Incoming:
+                        await UpdateHeadOfDepartment<IncomingDocument>(document);
+                        break;
+                    case DocumentType.Internal:
+                        await UpdateHeadOfDepartment<InternalDocument>(document);
+                        break;
+                    case DocumentType.Outgoing:
+                        await UpdateHeadOfDepartment<OutgoingDocument>(document);
+                        break;
+                    default:
+                        break;
                 }
             }
         }
 
-        private async Task UpdateHeadOfDepartmentForInternalDocuments(UpdateDocumentHeadOfDepartmentCommand request)
+        private async Task UpdateHeadOfDepartment<T>(Document document) where T : VirtualDocument
         {
-            var internalDocIds = request.DocumentInfo
-                                        .Where(doc => doc.DocType == (int)DocumentType.Internal)
-                                        .Select(doc => doc.RegistrationNumber)
-                                        .ToList();
+            var virtualDocument = await _dbContext.Set<T>().AsQueryable()
+                .FirstOrDefaultAsync(x => x.DocumentId == document.Id);
 
-            foreach (var registrationNo in internalDocIds)
-            {
-                var internalDoc = await _dbContext.InternalDocuments
-                    .Include(x => x.Document)
-                    .FirstOrDefaultAsync(x => x.Document.RegistrationNumber == registrationNo);
-
-                if (internalDoc != null)
-                {
-                    internalDoc.ReceiverDepartmentId = (int)_headOfDepartment.Id;
-                }
-            }
-        }
-
-        private async Task UpdateHeadOfDepartmentForIncomingDocuments(UpdateDocumentHeadOfDepartmentCommand request)
-        {
-            var incomingDocIds = request.DocumentInfo
-                                        .Where(doc => doc.DocType == (int)DocumentType.Incoming)
-                                        .Select(doc => doc.RegistrationNumber)
-                                        .ToList();
-
-            foreach (var registrationNo in incomingDocIds)
-            {
-                var foundIncomingDocument = await _dbContext.IncomingDocuments
-                    .Include(x => x.Document)
-                    .FirstOrDefaultAsync(x => x.Document.RegistrationNumber == registrationNo);
-
-                if (foundIncomingDocument != null)
-                {
-                    foundIncomingDocument.Document.Status = DocumentStatus.InWorkUnallocated;
-                    foundIncomingDocument.RecipientId = (int)_headOfDepartment.Id;
-                    foundIncomingDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(foundIncomingDocument.Document, UserRole.HeadOfDepartment, _headOfDepartment, DocumentStatus.InWorkUnallocated));
-                }
-            }
+            document.Status = DocumentStatus.InWorkUnallocated;
+            document.RecipientId = (int)_headOfDepartment.Id;
+            virtualDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(UserRole.HeadOfDepartment, _headOfDepartment, DocumentStatus.InWorkUnallocated));
         }
     }
 }

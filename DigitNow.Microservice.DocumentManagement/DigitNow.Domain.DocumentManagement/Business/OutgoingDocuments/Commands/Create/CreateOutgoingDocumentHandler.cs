@@ -51,10 +51,8 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
             new WorkflowHistory
             {
                 RecipientType = UserRole.HeadOfDepartment.Id,
-                RecipientId = newOutgoingDocument.RecipientId,
+                RecipientId = newOutgoingDocument.Document.RecipientId,
                 Status = DocumentStatus.InWorkUnallocated,
-                CreationDate = DateTime.Now,
-                RegistrationNumber = newOutgoingDocument.Document.RegistrationNumber
             });
 
         await _dbContext.SingleUpdateAsync(newOutgoingDocument, cancellationToken);

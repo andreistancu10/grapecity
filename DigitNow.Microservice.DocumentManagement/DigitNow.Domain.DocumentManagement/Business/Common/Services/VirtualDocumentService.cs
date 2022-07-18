@@ -186,7 +186,6 @@ public class VirtualDocumentService : IVirtualDocumentService
     private async Task<IList<T>> FetchChildDocumentsAsync<T>(IList<long> childDocumentIds, DocumentPostprocessFilter postprocessFilter, IList<Expression<Func<T, object>>> includes, CancellationToken cancellationToken)
         where T : VirtualDocument
     {
-
         return await BuildChildDocumentsFetchQuery(childDocumentIds, postprocessFilter, includes)
             .ToListAsync(cancellationToken);
     }
@@ -205,7 +204,8 @@ public class VirtualDocumentService : IVirtualDocumentService
             virtualDocumentsQuery = virtualDocumentsQuery.Includes(includes);
         }
 
-        return virtualDocumentsQuery
+        return virtualDocumentsQuery            
+            .Include(x => x.Document)
             .WhereAll(GetPostprocessPredicates<T>(postprocessFilter))
             .Where(x => childDocumentIds.Contains(x.DocumentId));
     }

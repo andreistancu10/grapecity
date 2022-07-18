@@ -2,7 +2,6 @@
 using System.Linq;
 using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
-using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 
@@ -216,7 +215,7 @@ public class ReportViewModelMappings : Profile
         public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember,
             ResolutionContext context)
         {
-            var foundUser = source.Users.FirstOrDefault(x => x.Id == source.VirtualDocument.RecipientId);
+            var foundUser = source.Users.FirstOrDefault(x => x.Id == source.VirtualDocument.Document.RecipientId);
 
             return foundUser != null ?
                 new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}") :
@@ -226,11 +225,14 @@ public class ReportViewModelMappings : Profile
         public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember,
             ResolutionContext context)
         {
-            var foundDepartment = source.Departments.FirstOrDefault(x => x.Id == source.VirtualDocument.ReceiverDepartmentId);
+            //TODO: Fix this
+            return new BasicViewModel(0, string.Empty);
 
-            return foundDepartment != null ?
-                new BasicViewModel(foundDepartment.Id, foundDepartment.Name) :
-                null;
+            //var foundDepartment = source.Departments.FirstOrDefault(x => x.Id == source.VirtualDocument.ReceiverDepartmentId);
+
+            //return foundDepartment != null ?
+            //    new BasicViewModel(foundDepartment.Id, foundDepartment.Name) :
+            //    null;
         }
     }
 }

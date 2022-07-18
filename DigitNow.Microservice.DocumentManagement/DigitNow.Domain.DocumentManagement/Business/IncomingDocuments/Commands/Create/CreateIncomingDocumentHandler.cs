@@ -41,7 +41,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
         _uploadedFileService = uploadedFileService;
         _specialRegisterMappingService = specialRegisterMappingService;
     }
-
+        
     public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
     {
         if (!string.IsNullOrWhiteSpace(request.IdentificationNumber))
@@ -67,14 +67,16 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             var newDocument = new Document
             {
                 DocumentType = DocumentType.Incoming,
-                IncomingDocument = newIncomingDocument
+                IncomingDocument = newIncomingDocument,
+                RecipientId = headOfDepartment.Id,
+                Status = DocumentStatus.InWorkUnallocated
             };
 
             await _documentService.AddDocument(newDocument, cancellationToken);
             await _uploadedFileService.CreateDocumentUploadedFilesAsync(request.UploadedFileIds, newDocument, cancellationToken);
 
             newIncomingDocument.WorkflowHistory.Add(WorkflowHistoryFactory
-                .Create(newDocument, UserRole.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkUnallocated));
+                .Create(UserRole.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkUnallocated));
 
             await _dbContext.SaveChangesAsync(cancellationToken);
             await _specialRegisterMappingService.MapDocumentAsync(newIncomingDocument, cancellationToken);
