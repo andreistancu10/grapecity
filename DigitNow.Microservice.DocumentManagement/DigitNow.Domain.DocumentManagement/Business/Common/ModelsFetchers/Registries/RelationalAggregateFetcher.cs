@@ -11,7 +11,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
     internal class RelationalAggregateFetcher<TContext>
         where TContext : IModelFetcherContext
     {
-        protected List<IModelFetcher> Fetchers { get; }
+        protected List<IModelFetcher> Fetchers { get; } = new();
 
         public virtual async Task FetchRelationshipsAsync(TContext context, CancellationToken cancellationToken)
         {
