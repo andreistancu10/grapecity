@@ -18,6 +18,8 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public IncomingDocument IncomingDocument { get; set; }
         public InternalDocument InternalDocument { get; set; }
         public OutgoingDocument OutgoingDocument { get; set; }
+
+        //TODO: Remove this
         public List<SpecialRegisterMapping> SpecialRegisterMappings { get; set; }
         public List<DocumentUploadedFile> DocumentUploadedFiles { get; set; }
 

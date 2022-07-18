@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.Models;
+using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateUserRecipient;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;

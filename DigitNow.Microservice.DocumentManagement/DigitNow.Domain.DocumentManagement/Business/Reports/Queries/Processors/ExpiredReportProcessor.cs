@@ -1,30 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using DigitNow.Domain.Catalog.Client;
-using DigitNow.Domain.DocumentManagement.Business.Common.Models;
-using DigitNow.Domain.DocumentManagement.Business.Common.Services;
-using DigitNow.Domain.DocumentManagement.Data;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors;
-
-public class ExpiredReportProcessor : AbstractExpiredReportRelatedProcessor
+namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors
 {
-    public ExpiredReportProcessor(IDashboardService dashboardService,
-        IDocumentMappingService documentMappingService,
-        ICatalogClient catalogClient,
-        DocumentManagementDbContext dbContext) : base(dashboardService, documentMappingService, catalogClient, dbContext)
+    public class ExpiredReportProcessor : ReportRelatedProcessor
     {
-    }
+        public ExpiredReportProcessor(IServiceProvider serviceProvider)
+            : base(serviceProvider) { }
 
-    public override async Task<List<ReportViewModel>> GetDataAsync(GetReportQuery request, CancellationToken cancellationToken)
-    {
-        if (request.ToDate.ToUniversalTime() > DateTime.UtcNow)
+        protected override void Validate(DateTime fromDate, DateTime toDate)
         {
-            throw new Exception($"Date range cannot be bigger than today, {DateTime.Now.Day}/{DateTime.Now.Month}/{DateTime.Now.Year}.");
+            if (toDate.ToUniversalTime() > DateTime.UtcNow)
+            {
+                throw new Exception($"Date range cannot be bigger than today, {DateTime.Now.Day}/{DateTime.Now.Month}/{DateTime.Now.Year}.");
+            }
         }
-
-        return await base.GetDataAsync(request, cancellationToken);
     }
 }

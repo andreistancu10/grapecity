@@ -4,7 +4,14 @@ using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers
 {
-    internal interface IModelFetcher<T, TContext>
+    internal interface IModelFetcher
+    {
+        bool IsInternal { get; }
+
+        Task<IReadOnlyList<object>> FetchAsync(object context, CancellationToken cancellationToken);
+    }
+
+    internal interface IModelFetcher<T, TContext> : IModelFetcher
         where T : class
         where TContext : IModelFetcherContext
     {
@@ -15,6 +22,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers
         where T : class
         where TContext : IModelFetcherContext
     {
+        public abstract bool IsInternal { get; }
+
         public abstract Task<IReadOnlyList<T>> FetchAsync(TContext context, CancellationToken cancellationToken);
+
+        public async Task<IReadOnlyList<object>> FetchAsync(object context, CancellationToken cancellationToken)
+        {
+            return await FetchAsync((TContext)context, cancellationToken);
+        }
     }
 }

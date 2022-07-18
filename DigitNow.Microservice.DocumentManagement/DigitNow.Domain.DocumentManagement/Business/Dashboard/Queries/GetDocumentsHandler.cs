@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
 using HTSS.Platform.Core.CQRS;
 using System.Collections.Generic;

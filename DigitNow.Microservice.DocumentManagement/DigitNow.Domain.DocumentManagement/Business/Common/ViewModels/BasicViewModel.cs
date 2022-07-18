@@ -1,4 +1,4 @@
-﻿namespace DigitNow.Domain.DocumentManagement.Business.Common.Models;
+﻿namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 
 public class BasicViewModel
 {

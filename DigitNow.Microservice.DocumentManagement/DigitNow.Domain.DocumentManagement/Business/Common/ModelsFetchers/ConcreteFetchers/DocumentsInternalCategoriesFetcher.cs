@@ -22,6 +22,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
             _mapper = serviceProvider.GetService<IMapper>();
         }
 
+        public override bool IsInternal => false;
+
         public override async Task<IReadOnlyList<DocumentCategoryModel>> FetchAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
         {
             var internalDocumentTypesResponse = await _catalogClient.InternalDocumentTypes.GetInternalDocumentTypesAsync(cancellationToken);

@@ -1,16 +1,18 @@
 ﻿using System;
 using System.Linq;
 using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
+using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings;
+namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings;
 
-public class GetReportMapping : Profile
+public class ReportViewModelMappings : Profile
 {
-    public GetReportMapping()
+    public ReportViewModelMappings()
     {
-        CreateMap<VirtualDocumentAggregate<IncomingDocument>, ReportViewModel>()
+        CreateMap<VirtualReportAggregate<IncomingDocument>, ReportViewModel>()
             .ForMember(c => c.Id, opt => opt.MapFrom(src => src.VirtualDocument.Document.Id))
             .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationDate))
             .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationNumber))
@@ -25,7 +27,7 @@ public class GetReportMapping : Profile
             .ForMember(c => c.Expired, opt => opt.MapFrom<MapExpired>())
             .ForMember(c => c.SpecialRegister, opt => opt.MapFrom<MapSpecialRegister>());
 
-        CreateMap<VirtualDocumentAggregate<InternalDocument>, ReportViewModel>()
+        CreateMap<VirtualReportAggregate<InternalDocument>, ReportViewModel>()
             .ForMember(c => c.Id, opt => opt.MapFrom(src => src.VirtualDocument.Document.Id))
             .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationDate))
             .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationNumber))
@@ -42,10 +44,10 @@ public class GetReportMapping : Profile
     }
 
     private class MapFunctionary :
-        IValueResolver<VirtualDocumentAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
-        IValueResolver<VirtualDocumentAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
+        IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
+        IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
     {
-        public BasicViewModel Resolve(VirtualDocumentAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
+        public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
         {
             var lastWorkflowHistory = source.VirtualDocument.WorkflowHistory.LastOrDefault(c => c.Status == DocumentStatus.InWorkAllocated);
 
@@ -54,7 +56,7 @@ public class GetReportMapping : Profile
              null;
         }
 
-        public BasicViewModel Resolve(VirtualDocumentAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
+        public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
         {
             //TODO: should Internal doc have WorkflowHistory?
             var foundUser = source.Users.FirstOrDefault(x => x.Id == source.VirtualDocument.Document.CreatedBy);
@@ -66,25 +68,25 @@ public class GetReportMapping : Profile
     }
 
     private class MapAllocationDate :
-        IValueResolver<VirtualDocumentAggregate<IncomingDocument>, ReportViewModel, DateTime?>,
-        IValueResolver<VirtualDocumentAggregate<InternalDocument>, ReportViewModel, DateTime?>
+        IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, DateTime?>,
+        IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, DateTime?>
     {
-        public DateTime? Resolve(VirtualDocumentAggregate<IncomingDocument> source, ReportViewModel destination, DateTime? destMember, ResolutionContext context)
+        public DateTime? Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, DateTime? destMember, ResolutionContext context)
         {
             return source.VirtualDocument.Document.RegistrationDate;
         }
 
-        public DateTime? Resolve(VirtualDocumentAggregate<InternalDocument> source, ReportViewModel destination, DateTime? destMember, ResolutionContext context)
+        public DateTime? Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, DateTime? destMember, ResolutionContext context)
         {
             return source.VirtualDocument.Document.RegistrationDate;
         }
     }
 
     private class MapResolutionDate :
-        IValueResolver<VirtualDocumentAggregate<IncomingDocument>, ReportViewModel, DateTime?>,
-        IValueResolver<VirtualDocumentAggregate<InternalDocument>, ReportViewModel, DateTime?>
+        IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, DateTime?>,
+        IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, DateTime?>
     {
-        public DateTime? Resolve(VirtualDocumentAggregate<IncomingDocument> source, ReportViewModel destination, DateTime? destMember, ResolutionContext context)
+        public DateTime? Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, DateTime? destMember, ResolutionContext context)
         {
             var allocationDate = source.VirtualDocument.Document.RegistrationDate;
             var resolutionDate = allocationDate.AddDays(source.VirtualDocument.ResolutionPeriod);
@@ -92,7 +94,7 @@ public class GetReportMapping : Profile
             return resolutionDate;
         }
 
-        public DateTime? Resolve(VirtualDocumentAggregate<InternalDocument> source, ReportViewModel destination, DateTime? destMember, ResolutionContext context)
+        public DateTime? Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, DateTime? destMember, ResolutionContext context)
         {
             var allocationDate = source.VirtualDocument.Document.RegistrationDate;
             var resolutionPeriod = source.InternalCategories.First(c => c.Id == source.VirtualDocument.InternalDocumentTypeId).ResolutionPeriod;
@@ -103,10 +105,10 @@ public class GetReportMapping : Profile
     }
 
     private class MapExpired :
-        IValueResolver<VirtualDocumentAggregate<IncomingDocument>, ReportViewModel, int>,
-        IValueResolver<VirtualDocumentAggregate<InternalDocument>, ReportViewModel, int>
+        IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, int>,
+        IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, int>
     {
-        public int Resolve(VirtualDocumentAggregate<IncomingDocument> source, ReportViewModel destination, int destMember, ResolutionContext context)
+        public int Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, int destMember, ResolutionContext context)
         {
             var allocationDate = source.VirtualDocument.Document.RegistrationDate;
             var resolutionDate = allocationDate.AddDays(source.VirtualDocument.ResolutionPeriod);
@@ -115,7 +117,7 @@ public class GetReportMapping : Profile
             return Math.Abs(expired.Days);
         }
 
-        public int Resolve(VirtualDocumentAggregate<InternalDocument> source, ReportViewModel destination, int destMember, ResolutionContext context)
+        public int Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, int destMember, ResolutionContext context)
         {
             var resolutionPeriod = source.InternalCategories.First(c => c.Id == source.VirtualDocument.InternalDocumentTypeId).ResolutionPeriod;
             var allocationDate = source.VirtualDocument.Document.RegistrationDate;
@@ -127,17 +129,17 @@ public class GetReportMapping : Profile
     }
 
     private class MapSpecialRegister :
-        IValueResolver<VirtualDocumentAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
-        IValueResolver<VirtualDocumentAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
+        IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
+        IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
     {
-        public BasicViewModel Resolve(VirtualDocumentAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
+        public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
         {
             return source.SpecialRegisterMapping != null ?
                 new BasicViewModel(source.SpecialRegisterMapping.SpecialRegisterId, source.SpecialRegisterMapping?.SpecialRegister.Name) :
                 null;
         }
 
-        public BasicViewModel Resolve(VirtualDocumentAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
+        public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
         {
             return source.SpecialRegisterMapping != null ?
                 new BasicViewModel(source.SpecialRegisterMapping.SpecialRegisterId, source.SpecialRegisterMapping?.SpecialRegister.Name) :
@@ -146,32 +148,32 @@ public class GetReportMapping : Profile
     }
 
     private class MapDocumentType :
-        IValueResolver<VirtualDocumentAggregate<IncomingDocument>, ReportViewModel, int>,
-        IValueResolver<VirtualDocumentAggregate<InternalDocument>, ReportViewModel, int>
+        IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, int>,
+        IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, int>
     {
-        public int Resolve(VirtualDocumentAggregate<IncomingDocument> source, ReportViewModel destination, int destMember, ResolutionContext context) =>
+        public int Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, int destMember, ResolutionContext context) =>
             (int)DocumentType.Incoming;
 
-        public int Resolve(VirtualDocumentAggregate<InternalDocument> source, ReportViewModel destination, int destMember, ResolutionContext context) =>
+        public int Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, int destMember, ResolutionContext context) =>
             (int)DocumentType.Internal;
     }
 
     private class MapDocumentCurrentStatus :
-        IValueResolver<VirtualDocumentAggregate<IncomingDocument>, ReportViewModel, int?>,
-        IValueResolver<VirtualDocumentAggregate<InternalDocument>, ReportViewModel, int?>
+        IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, int?>,
+        IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, int?>
     {
-        public int? Resolve(VirtualDocumentAggregate<IncomingDocument> source, ReportViewModel destination, int? destMember, ResolutionContext context) =>
+        public int? Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, int? destMember, ResolutionContext context) =>
             (int)source.VirtualDocument.Document.Status;
 
-        public int? Resolve(VirtualDocumentAggregate<InternalDocument> source, ReportViewModel destination, int? destMember, ResolutionContext context) =>
+        public int? Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, int? destMember, ResolutionContext context) =>
             null;
     }
 
     private class MapUserFromAggregate :
-        IValueResolver<VirtualDocumentAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
-        IValueResolver<VirtualDocumentAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
+        IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
+        IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
     {
-        public BasicViewModel Resolve(VirtualDocumentAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
+        public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
         {
             var foundUser = source.Users.FirstOrDefault(x => x.Id == source.VirtualDocument.Document.CreatedBy);
 
@@ -180,7 +182,7 @@ public class GetReportMapping : Profile
                 null;
         }
 
-        public BasicViewModel Resolve(VirtualDocumentAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
+        public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
         {
             var foundUser = source.Users.FirstOrDefault(x => x.Id == source.VirtualDocument.Document.CreatedBy);
 
@@ -191,16 +193,16 @@ public class GetReportMapping : Profile
     }
 
     private class MapDocumentCategory :
-        IValueResolver<VirtualDocumentAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
-        IValueResolver<VirtualDocumentAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
+        IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
+        IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
     {
-        public BasicViewModel Resolve(VirtualDocumentAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
+        public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
         {
             var foundCategory = source.Categories.FirstOrDefault(x => x.Id == source.VirtualDocument.DocumentTypeId);
             return new BasicViewModel(foundCategory.Id, foundCategory.Name);
         }
 
-        public BasicViewModel Resolve(VirtualDocumentAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
+        public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
         {
             var foundCategory = source.InternalCategories.FirstOrDefault(x => x.Id == source.VirtualDocument.InternalDocumentTypeId);
             return new BasicViewModel(foundCategory.Id, foundCategory.Name);
@@ -208,10 +210,10 @@ public class GetReportMapping : Profile
     }
 
     private class MapRecipient :
-        IValueResolver<VirtualDocumentAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
-        IValueResolver<VirtualDocumentAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
+        IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
+        IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
     {
-        public BasicViewModel Resolve(VirtualDocumentAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember,
+        public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember,
             ResolutionContext context)
         {
             var foundUser = source.Users.FirstOrDefault(x => x.Id == source.VirtualDocument.RecipientId);
@@ -221,7 +223,7 @@ public class GetReportMapping : Profile
                 null;
         }
 
-        public BasicViewModel Resolve(VirtualDocumentAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember,
+        public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember,
             ResolutionContext context)
         {
             var foundDepartment = source.Departments.FirstOrDefault(x => x.Id == source.VirtualDocument.ReceiverDepartmentId);

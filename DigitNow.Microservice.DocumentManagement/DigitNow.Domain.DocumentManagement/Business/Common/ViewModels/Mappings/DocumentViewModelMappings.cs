@@ -2,14 +2,16 @@
 using System.Linq;
 using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
+using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
+using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
+namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
 {
-    public class GetDocumentsMappings : Profile
+    public class DocumentViewModelMappings : Profile
     {
-        public GetDocumentsMappings()
+        public DocumentViewModelMappings()
         {
             CreateMap<VirtualDocumentAggregate<IncomingDocument>, DocumentViewModel>()
                 .ForMember(c => c.Id, opt => opt.MapFrom(src => src.VirtualDocument.Document.Id))
@@ -84,7 +86,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
                 {
                     return $"{foundUser.FirstName} {foundUser.LastName}";
                 }
-                return default(string);
+                return default;
             }
 
             public string Resolve(VirtualDocumentAggregate<InternalDocument> source, DocumentViewModel destination, string destMember, ResolutionContext context)
@@ -94,7 +96,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
                 {
                     return $"{foundUser.FirstName} {foundUser.LastName}";
                 }
-                return default(string);
+                return default;
             }
 
             public string Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, string destMember, ResolutionContext context)
@@ -104,7 +106,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
                 {
                     return $"{foundUser.FirstName} {foundUser.LastName}";
                 }
-                return default(string);
+                return default;
             }
         }
 
@@ -120,7 +122,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
                 {
                     return foundCategory.Name;
                 }
-                return default(string);
+                return default;
             }
 
             public string Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, string destMember, ResolutionContext context)
@@ -130,7 +132,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
                 {
                     return foundCategory.Name;
                 }
-                return default(string);
+                return default;
             }
 
             public string Resolve(VirtualDocumentAggregate<InternalDocument> source, DocumentViewModel destination, string destMember, ResolutionContext context)
@@ -140,7 +142,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
                 {
                     return foundCategory.Name;
                 }
-                return default(string);
+                return default;
             }
         }
     }

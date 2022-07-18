@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-using DigitNow.Domain.DocumentManagement.Business.Common.Models;
+using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
 using DigitNow.Domain.DocumentManagement.Business.Reports.Queries;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;

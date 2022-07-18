@@ -6,17 +6,21 @@ using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Concrete
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries
 {
-    internal sealed class DocumentRelationsFetcher : RelationalAggregateFetcher<DocumentsFetcherContext>
+    internal sealed class DocumentReportRelationsFetcher : RelationalAggregateFetcher<DocumentsFetcherContext>
     {
         private readonly IModelFetcher<UserModel, DocumentsFetcherContext> _documentsUsersFetcher;
         private readonly IModelFetcher<DocumentCategoryModel, DocumentsFetcherContext> _documentsCategoriesFetcher;
         private readonly IModelFetcher<DocumentCategoryModel, DocumentsFetcherContext> _documentsInternalCategoriesFetcher;
+        private readonly IModelFetcher<DocumentDepartmentModel, DocumentsFetcherContext> _documentsDepartmentsFetcher;
+        private readonly IModelFetcher<DocumentsSpecialRegisterMappingModel, DocumentsFetcherContext> _documentsSpecialRegisterMappingFetcher;
 
         public IReadOnlyList<UserModel> DocumentUsers { get; private set; }
         public IReadOnlyList<DocumentCategoryModel> DocumentCategories { get; private set; }
         public IReadOnlyList<DocumentCategoryModel> DocumentInternalCategories { get; private set; }
+        public IReadOnlyList<DocumentDepartmentModel> DocumentDepartments { get; set; }
+        public IReadOnlyList<DocumentsSpecialRegisterMappingModel> DocumentSpecialRegisterMapping { get; set; }
 
-        public DocumentRelationsFetcher(IServiceProvider serviceProvider)
+        public DocumentReportRelationsFetcher(IServiceProvider serviceProvider)
         {
             _documentsUsersFetcher = new DocumentsUsersFetcher(serviceProvider);
             Fetchers.Add(_documentsUsersFetcher);
@@ -26,6 +30,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
 
             _documentsInternalCategoriesFetcher = new DocumentsInternalCategoriesFetcher(serviceProvider);
             Fetchers.Add(_documentsInternalCategoriesFetcher);
+
+            _documentsDepartmentsFetcher = new DocumentsDepartmentsFetcher(serviceProvider);
+            Fetchers.Add(_documentsDepartmentsFetcher);
+
+            _documentsSpecialRegisterMappingFetcher = new DocumentsSpecialRegisterMappingFetcher(serviceProvider);
+            Fetchers.Add(_documentsSpecialRegisterMappingFetcher);
         }
     }
 }
