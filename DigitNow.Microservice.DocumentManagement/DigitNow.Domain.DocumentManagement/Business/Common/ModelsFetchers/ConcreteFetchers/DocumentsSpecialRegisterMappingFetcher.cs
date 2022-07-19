@@ -23,18 +23,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
             _dbContext = serviceProvider.GetService<DocumentManagementDbContext>();
         }
 
-        public override bool IsInternal => true;
-
-        public override async Task<IReadOnlyList<DocumentsSpecialRegisterMappingModel>> FetchAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
-        {
-            var documentIds = context.Documents.Select(c => c.Id);
-            var documentsSpecialRegisterMappingModels =
-                await _dbContext.SpecialRegisterMappings
-                    .AsNoTracking()
-                    .Where(c => documentIds.Contains(c.DocumentId))
-                    .Include(c => c.SpecialRegister)
-                    .Select(c => _mapper.Map<DocumentsSpecialRegisterMappingModel>(c))
-                    .ToListAsync(cancellationToken);
+    protected override async Task<List<DocumentsSpecialRegisterMappingModel>> FetchInternalAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
+    {
+        var documentIds = context.Documents.Select(c => c.Id);
+        var documentsSpecialRegisterMappingModels =
+            await _dbContext.SpecialRegisterMappings
+                .AsNoTracking()
+                .Where(c => documentIds.Contains(c.DocumentId))
+                .Include(c => c.SpecialRegister)
+                .Select(c => _mapper.Map<DocumentsSpecialRegisterMappingModel>(c))
+                .ToListAsync(cancellationToken);
 
             return documentsSpecialRegisterMappingModels;
         }

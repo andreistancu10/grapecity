@@ -22,11 +22,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
             _mapper = serviceProvider.GetService<IMapper>();
         }
 
-        public override bool IsInternal => false;
-
-        public override async Task<IReadOnlyList<DocumentDepartmentModel>> FetchAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
-        {
-            var departmentsResponse = await _catalogClient.Departments.GetDepartmentsAsync(cancellationToken);
+    protected override async Task<List<DocumentDepartmentModel>> FetchInternalAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
+    {
+        var departmentsResponse = await _catalogClient.Departments.GetDepartmentsAsync(cancellationToken);
 
             var documentDepartmentModels = departmentsResponse.Departments
                 .Select(x => _mapper.Map<DocumentDepartmentModel>(x))

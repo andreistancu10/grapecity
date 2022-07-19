@@ -1,40 +1,57 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries
 {
-    internal class RelationalAggregateFetcher<TContext>
+    internal abstract class RelationalAggregateFetcher<TContext>
         where TContext : IModelFetcherContext
     {
-        protected List<IModelFetcher> Fetchers { get; } = new();
+        protected List<IModelFetcher> RemoteFetchers = new List<IModelFetcher>();
+        protected List<IModelFetcher> InternalFetchers = new List<IModelFetcher>();
 
-        public virtual async Task FetchRelationshipsAsync(TContext context, CancellationToken cancellationToken)
+        private void InitializeFetchers()
         {
-            var internalFetchTasks = new List<Task>();
+            RemoteFetchers.Clear();
+            AddRemoteFetchers();
+
+            InternalFetchers.Clear();            
+            AddInternalFetchers();
+        }
+
+        protected virtual void AddRemoteFetchers() { }
+        protected virtual void AddInternalFetchers() { }
+
+        public virtual async Task TriggerFetchersAsync(TContext context, CancellationToken cancellationToken)
+        {
+            InitializeFetchers();
+
+            await Task.WhenAll(
+                TriggerRemoteFetchersAsync(context, cancellationToken),
+                TriggerInternalFetchersAsync(context, cancellationToken)
+            );
+        }
+
+        protected virtual async Task TriggerRemoteFetchersAsync(TContext context, CancellationToken cancellationToken)
+        {
             var externalFetchTasks = new List<Task>();
-            foreach (var item in Fetchers)
+            foreach (var remoteFetcher in RemoteFetchers)
             {
-                if (item.IsInternal)
-                {
-                    internalFetchTasks.Add(item.FetchAsync(context, cancellationToken));
-                }
-                else
-                {
-                    externalFetchTasks.Add(item.FetchAsync(context, cancellationToken));
-                }
+                externalFetchTasks.Add(remoteFetcher.FetchAsync(context, cancellationToken));
             }
-
             await Task.WhenAll(externalFetchTasks);
+        }
 
-            foreach (var internalFetchTask in internalFetchTasks)
+        protected virtual async Task TriggerInternalFetchersAsync(TContext context, CancellationToken cancellationToken)
+        {
+            foreach (var internalFetcher in InternalFetchers)
             {
-                await internalFetchTask;
+                await internalFetcher.FetchAsync(context, cancellationToken);
             }
         }
+
+        protected virtual List<T> GetItems<T>(IModelFetcher<T, TContext> modelFetcher)
+            where T : class => modelFetcher.Items.Cast<T>().ToList();
     }
 }
