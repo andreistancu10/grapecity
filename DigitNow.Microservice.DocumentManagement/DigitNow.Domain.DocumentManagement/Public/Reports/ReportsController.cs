@@ -45,7 +45,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Reports
             {
                 ReportType.ExpiredDocuments => "Documente expirate",
                 ReportType.DocumentsToExpire => "Documente ce urmeaza sa expire",
-                _ => throw new ArgumentOutOfRangeException("Unknown report type provided!")
+                _ => throw new ArgumentOutOfRangeException($"Unknown report type '{request.Type}' provided!")
             }, "DocumentsSheet", reportResult);
 
             return File(fileResult.Content, fileResult.ContentType, fileResult.Name);

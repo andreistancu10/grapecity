@@ -30,7 +30,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(c => c.Id, opt => opt.MapFrom(src => src.VirtualDocument.Document.Id))
                 .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationDate))
                 .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationNumber))
-                .ForMember(c => c.Recipient, opt => opt.MapFrom<MapRecipient>())
                 .ForMember(c => c.Issuer, opt => opt.MapFrom<MapUserFromAggregate>())
                 .ForMember(c => c.CurrentStatus, opt => opt.MapFrom<MapDocumentCurrentStatus>())
                 .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>())
@@ -137,7 +136,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
                 GetSpecialRegister(source);
 
-            private BasicViewModel GetSpecialRegister<T>(VirtualReportAggregate<T> reportAggregate)
+            private static BasicViewModel GetSpecialRegister<T>(VirtualReportAggregate<T> reportAggregate)
                 where T: VirtualDocument
             {
                 if (reportAggregate.SpecialRegisterMapping == null) 
@@ -179,7 +178,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
                 GetUserViewModel(source, source.VirtualDocument);
 
-            private BasicViewModel GetUserViewModel<T>(VirtualReportAggregate<T> documentAggregate, VirtualDocument virtualDocument)
+            private static BasicViewModel GetUserViewModel<T>(VirtualReportAggregate<T> documentAggregate, VirtualDocument virtualDocument)
                 where T: VirtualDocument
             {
                 var foundUser = documentAggregate.Users.FirstOrDefault(x => x.Id == virtualDocument.Document.CreatedBy);
@@ -207,8 +206,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
         }
 
         private class MapRecipient :
-            IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
-            IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
+            IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>
         {
             public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember,
                 ResolutionContext context)
@@ -218,19 +216,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 return foundUser != null ?
                     new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}") :
                     null;
-            }
-
-            public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember,
-                ResolutionContext context)
-            {
-                //TODO: Fix this
-                return new BasicViewModel(0, string.Empty);
-
-                //var foundDepartment = source.Departments.FirstOrDefault(x => x.Id == source.VirtualDocument.ReceiverDepartmentId);
-
-                //return foundDepartment != null ?
-                //    new BasicViewModel(foundDepartment.Id, foundDepartment.Name) :
-                //    null;
             }
         }
     }
