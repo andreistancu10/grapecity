@@ -1,5 +1,7 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles;
 using System;
+using System.Collections.Generic;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.GetById
 {
@@ -25,5 +27,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.
         public double ResolutionPeriod { get; set; }
         public bool? IsUrgent { get; set; }
         public bool? IsGDPRAgreed { get; set; }
+        public List<WorkflowHistory> WorkflowHistory { get; set; } = new();
+        public List<ConnectedDocument> ConnectedDocuments { get; set; } = new();
+        public List<DocumentUploadedFile> DocumentUploadedFiles { get; set; } = new();
     }
 }
