@@ -9,29 +9,30 @@ using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchers;
-
-internal sealed class DocumentsDepartmentsFetcher : ModelFetcher<DocumentDepartmentModel, DocumentsFetcherContext>
+namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchers
 {
-    private readonly ICatalogClient _catalogClient;
-    private readonly IMapper _mapper;
-
-    public DocumentsDepartmentsFetcher(IServiceProvider serviceProvider)
+    internal sealed class DocumentsDepartmentsFetcher : ModelFetcher<DocumentDepartmentModel, DocumentsFetcherContext>
     {
-        _catalogClient = serviceProvider.GetService<ICatalogClient>();
-        _mapper = serviceProvider.GetService<IMapper>();
-    }
+        private readonly ICatalogClient _catalogClient;
+        private readonly IMapper _mapper;
 
-    public override bool IsInternal => false;
+        public DocumentsDepartmentsFetcher(IServiceProvider serviceProvider)
+        {
+            _catalogClient = serviceProvider.GetService<ICatalogClient>();
+            _mapper = serviceProvider.GetService<IMapper>();
+        }
 
-    public override async Task<IReadOnlyList<DocumentDepartmentModel>> FetchAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
-    {
-        var departmentsResponse = await _catalogClient.Departments.GetDepartmentsAsync(cancellationToken);
+        public override bool IsInternal => false;
 
-        var documentDepartmentModels = departmentsResponse.Departments
-            .Select(x => _mapper.Map<DocumentDepartmentModel>(x))
-            .ToList();
+        public override async Task<IReadOnlyList<DocumentDepartmentModel>> FetchAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
+        {
+            var departmentsResponse = await _catalogClient.Departments.GetDepartmentsAsync(cancellationToken);
 
-        return documentDepartmentModels;
+            var documentDepartmentModels = departmentsResponse.Departments
+                .Select(x => _mapper.Map<DocumentDepartmentModel>(x))
+                .ToList();
+
+            return documentDepartmentModels;
+        }
     }
 }

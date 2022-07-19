@@ -1,13 +1,14 @@
-﻿namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
-
-public class BasicViewModel
+﻿namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
 {
-    public long Id { get; set; }
-    public string Name { get; set; }
-
-    public BasicViewModel(long id, string name)
+    public class BasicViewModel
     {
-        Id = id;
-        Name = name;
+        public long Id { get; set; }
+        public string Name { get; set; }
+
+        public BasicViewModel(long id, string name)
+        {
+            Id = id;
+            Name = name;
+        }
     }
 }

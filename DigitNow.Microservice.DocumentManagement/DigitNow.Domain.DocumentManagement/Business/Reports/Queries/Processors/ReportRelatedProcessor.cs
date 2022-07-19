@@ -34,21 +34,21 @@ namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors
             _dbContext = serviceProvider.GetService<DocumentManagementDbContext>();
         }
 
-        protected virtual void Validate(DateTime toDate, DateTime fromDate)
+        protected virtual void Validate(DateTime fromDate, DateTime toDate)
         {
         }
 
-        public async Task<List<ReportViewModel>> GetDataAsync(DateTime toDate, DateTime fromDate, CancellationToken cancellationToken)
+        public async Task<List<ReportViewModel>> GetDataAsync(DateTime fromDate, DateTime toDate, CancellationToken cancellationToken)
         {
-            Validate(toDate, fromDate);
-            return await GetDataInternalAsync(toDate, fromDate, cancellationToken);
+            Validate(fromDate, toDate);
+            return await GetDataInternalAsync(fromDate, toDate, cancellationToken);
         }
 
-        protected virtual async Task<List<ReportViewModel>> GetDataInternalAsync(DateTime toDate, DateTime fromDate, CancellationToken cancellationToken)
+        protected virtual async Task<List<ReportViewModel>> GetDataInternalAsync(DateTime fromDate, DateTime toDate, CancellationToken cancellationToken)
         {
             var documents = new List<Document>();
-            documents.AddRange(await GetEligibleInternalDocumentsAsync(toDate, fromDate, cancellationToken));
-            documents.AddRange(await GetEligibleIncomingDocumentsAsync(toDate, fromDate, cancellationToken));
+            documents.AddRange(await GetEligibleInternalDocumentsAsync(fromDate, toDate, cancellationToken));
+            documents.AddRange(await GetEligibleIncomingDocumentsAsync(fromDate, toDate, cancellationToken));
 
             if (!documents.Any())
             {
@@ -60,7 +60,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors
             return await _documentMappingService.MapToReportViewModelAsync(vDocuments, cancellationToken);
         }
 
-        private async Task<IEnumerable<Document>> GetEligibleIncomingDocumentsAsync(DateTime toDate, DateTime fromDate, CancellationToken cancellationToken)
+        private async Task<IEnumerable<Document>> GetEligibleIncomingDocumentsAsync(DateTime fromDate, DateTime toDate, CancellationToken cancellationToken)
         {
             var categories = await _catalogClient.DocumentTypes.GetDocumentTypesAsync(cancellationToken);
 
@@ -88,7 +88,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors
             return eligibleDocuments;
         }
 
-        private async Task<IEnumerable<Document>> GetEligibleInternalDocumentsAsync(DateTime toDate, DateTime fromDate, CancellationToken cancellationToken)
+        private async Task<IEnumerable<Document>> GetEligibleInternalDocumentsAsync(DateTime fromDate, DateTime toDate, CancellationToken cancellationToken)
         {
             var internalCategories = await _catalogClient.InternalDocumentTypes.GetInternalDocumentTypesAsync(cancellationToken);
 

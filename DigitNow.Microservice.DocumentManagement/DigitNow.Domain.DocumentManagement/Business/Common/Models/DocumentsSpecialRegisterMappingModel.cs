@@ -1,15 +1,16 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Common.Models;
-
-public class DocumentsSpecialRegisterMappingModel
+namespace DigitNow.Domain.DocumentManagement.Business.Common.Models
 {
-    public long DocumentId { get; set; }
-    public long SpecialRegisterId { get; set; }
+    public class DocumentsSpecialRegisterMappingModel
+    {
+        public long DocumentId { get; set; }
+        public long SpecialRegisterId { get; set; }
 
-    #region [ References ]
+        #region [ References ]
 
-    public SpecialRegister SpecialRegister { get; set; }
+        public SpecialRegister SpecialRegister { get; set; }
 
-    #endregion
+        #endregion
+    }
 }

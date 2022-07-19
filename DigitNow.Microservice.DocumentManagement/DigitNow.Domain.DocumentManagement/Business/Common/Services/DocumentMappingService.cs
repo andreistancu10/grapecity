@@ -10,156 +10,157 @@ using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registri
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Common.Services;
-
-public interface IDocumentMappingService
+namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
-    Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<VirtualDocument> documents, CancellationToken cancellationToken);
-    Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<VirtualDocument> documents, CancellationToken cancellationToken);
-}
+    public interface IDocumentMappingService
+    {
+        Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<VirtualDocument> documents, CancellationToken cancellationToken);
+        Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<VirtualDocument> documents, CancellationToken cancellationToken);
+    }
 
-public class DocumentMappingService : IDocumentMappingService
-{
-    #region [ Fields ]
+    public class DocumentMappingService : IDocumentMappingService
+    {
+        #region [ Fields ]
     
-    private readonly IMapper _mapper;
-    private readonly DocumentRelationsFetcher _documentRelationsFetcher;
-    private readonly DocumentReportRelationsFetcher _documentReportRelationsFetcher;
+        private readonly IMapper _mapper;
+        private readonly DocumentRelationsFetcher _documentRelationsFetcher;
+        private readonly DocumentReportRelationsFetcher _documentReportRelationsFetcher;
 
-    #endregion
+        #endregion
 
-    #region [ Construction ]
+        #region [ Construction ]
 
-    public DocumentMappingService(
-        IServiceProvider serviceProvider,
-        IMapper mapper)
-    {
-        _mapper = mapper;
-        _documentRelationsFetcher = new DocumentRelationsFetcher(serviceProvider);
-        _documentReportRelationsFetcher = new DocumentReportRelationsFetcher(serviceProvider);
-    }
-
-    #endregion
-
-    #region [ IDocumentMappingService ]
-
-    public async Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
-    {
-        await _documentRelationsFetcher.FetchRelationshipsAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
-        return MapDocuments(virtualDocuments)
-            .OrderByDescending(x => x.RegistrationDate)
-            .ToList();
-    }
-
-    public async Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
-    {
-        await _documentRelationsFetcher.FetchRelationshipsAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
-        return MapDocumentsReports(virtualDocuments)
-            .OrderByDescending(x => x.RegistrationDate)
-            .ToList();
-    }
-
-    #endregion
-
-    #region [ Documents - Utils ]
-
-    private List<DocumentViewModel> MapDocuments(IList<VirtualDocument> documents)
-    {
-        var result = new List<DocumentViewModel>();
-
-        var incomingDocuments = documents.Where(x => x is IncomingDocument).Cast<IncomingDocument>();
-        if (incomingDocuments.Any())
+        public DocumentMappingService(
+            IServiceProvider serviceProvider,
+            IMapper mapper)
         {
-            result.AddRange(MapChildDocuments(incomingDocuments));
+            _mapper = mapper;
+            _documentRelationsFetcher = new DocumentRelationsFetcher(serviceProvider);
+            _documentReportRelationsFetcher = new DocumentReportRelationsFetcher(serviceProvider);
         }
 
-        var internalDocuments = documents.Where(x => x is InternalDocument).Cast<InternalDocument>();
-        if (internalDocuments.Any())
+        #endregion
+
+        #region [ IDocumentMappingService ]
+
+        public async Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
         {
-            result.AddRange(MapChildDocuments(internalDocuments));
+            await _documentRelationsFetcher.FetchRelationshipsAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
+            return MapDocuments(virtualDocuments)
+                .OrderByDescending(x => x.RegistrationDate)
+                .ToList();
         }
 
-        var outgoingDocuments = documents.Where(x => x is OutgoingDocument).Cast<OutgoingDocument>();
-        if (outgoingDocuments.Any())
+        public async Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
         {
-            result.AddRange(MapChildDocuments(outgoingDocuments));
+            await _documentRelationsFetcher.FetchRelationshipsAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
+            return MapDocumentsReports(virtualDocuments)
+                .OrderByDescending(x => x.RegistrationDate)
+                .ToList();
         }
 
-        return result;
-    }
+        #endregion
 
-    private List<DocumentViewModel> MapChildDocuments<T>(IEnumerable<T> childDocuments)
-        where T : VirtualDocument
-    {
-        var result = new List<DocumentViewModel>();
+        #region [ Documents - Utils ]
+
+        private List<DocumentViewModel> MapDocuments(IList<VirtualDocument> documents)
+        {
+            var result = new List<DocumentViewModel>();
+
+            var incomingDocuments = documents.Where(x => x is IncomingDocument).Cast<IncomingDocument>();
+            if (incomingDocuments.Any())
+            {
+                result.AddRange(MapChildDocuments(incomingDocuments));
+            }
+
+            var internalDocuments = documents.Where(x => x is InternalDocument).Cast<InternalDocument>();
+            if (internalDocuments.Any())
+            {
+                result.AddRange(MapChildDocuments(internalDocuments));
+            }
+
+            var outgoingDocuments = documents.Where(x => x is OutgoingDocument).Cast<OutgoingDocument>();
+            if (outgoingDocuments.Any())
+            {
+                result.AddRange(MapChildDocuments(outgoingDocuments));
+            }
+
+            return result;
+        }
+
+        private List<DocumentViewModel> MapChildDocuments<T>(IEnumerable<T> childDocuments)
+            where T : VirtualDocument
+        {
+            var result = new List<DocumentViewModel>();
         
-        foreach (var childDocument in childDocuments)
-        {
-            var aggregate = new VirtualDocumentAggregate<T>
+            foreach (var childDocument in childDocuments)
             {
-                VirtualDocument = childDocument,
-                Users = _documentRelationsFetcher.DocumentUsers,
-                Categories = _documentRelationsFetcher.DocumentCategories,
-                InternalCategories = _documentRelationsFetcher.DocumentInternalCategories
-            };
+                var aggregate = new VirtualDocumentAggregate<T>
+                {
+                    VirtualDocument = childDocument,
+                    Users = _documentRelationsFetcher.DocumentUsers,
+                    Categories = _documentRelationsFetcher.DocumentCategories,
+                    InternalCategories = _documentRelationsFetcher.DocumentInternalCategories
+                };
 
-            result.Add(_mapper.Map<VirtualDocumentAggregate<T>, DocumentViewModel>(aggregate));
+                result.Add(_mapper.Map<VirtualDocumentAggregate<T>, DocumentViewModel>(aggregate));
+            }
+
+            return result;
         }
 
-        return result;
-    }
+        #endregion
 
-    #endregion
+        #region [ Documents Reports - Utils ]
 
-    #region [ Documents Reports - Utils ]
-
-    private List<ReportViewModel> MapDocumentsReports(IList<VirtualDocument> documents)
-    {
-        var result = new List<ReportViewModel>();
-
-        var incomingDocuments = documents.Where(x => x is IncomingDocument).Cast<IncomingDocument>();
-        if (incomingDocuments.Any())
+        private List<ReportViewModel> MapDocumentsReports(IList<VirtualDocument> documents)
         {
-            result.AddRange(MapChildReportDocuments(incomingDocuments));
-        }
+            var result = new List<ReportViewModel>();
 
-        var internalDocuments = documents.Where(x => x is InternalDocument).Cast<InternalDocument>();
-        if (internalDocuments.Any())
-        {
-            result.AddRange(MapChildReportDocuments(internalDocuments));
-        }
-
-        var outgoingDocuments = documents.Where(x => x is OutgoingDocument).Cast<OutgoingDocument>();
-        if (outgoingDocuments.Any())
-        {
-            result.AddRange(MapChildReportDocuments(outgoingDocuments));
-        }
-
-        return result;
-    }
-
-    private List<ReportViewModel> MapChildReportDocuments<T>(IEnumerable<T> childDocuments)
-        where T : VirtualDocument
-    {
-        var result = new List<ReportViewModel>();
-
-        foreach (var childDocument in childDocuments)
-        {
-            var aggregate = new VirtualReportAggregate<T>
+            var incomingDocuments = documents.Where(x => x is IncomingDocument).Cast<IncomingDocument>();
+            if (incomingDocuments.Any())
             {
-                VirtualDocument = childDocument,
-                Users = _documentReportRelationsFetcher.DocumentUsers,
-                Categories = _documentReportRelationsFetcher.DocumentCategories,
-                InternalCategories = _documentReportRelationsFetcher.DocumentInternalCategories,
-                Departments = _documentReportRelationsFetcher.DocumentDepartments,
-                SpecialRegisterMapping = _documentReportRelationsFetcher.DocumentSpecialRegisterMapping.FirstOrDefault(c => c.DocumentId == childDocument.DocumentId)
-            };
+                result.AddRange(MapChildReportDocuments(incomingDocuments));
+            }
 
-            result.Add(_mapper.Map<VirtualReportAggregate<T>, ReportViewModel>(aggregate));
+            var internalDocuments = documents.Where(x => x is InternalDocument).Cast<InternalDocument>();
+            if (internalDocuments.Any())
+            {
+                result.AddRange(MapChildReportDocuments(internalDocuments));
+            }
+
+            var outgoingDocuments = documents.Where(x => x is OutgoingDocument).Cast<OutgoingDocument>();
+            if (outgoingDocuments.Any())
+            {
+                result.AddRange(MapChildReportDocuments(outgoingDocuments));
+            }
+
+            return result;
         }
 
-        return result;
-    }
+        private List<ReportViewModel> MapChildReportDocuments<T>(IEnumerable<T> childDocuments)
+            where T : VirtualDocument
+        {
+            var result = new List<ReportViewModel>();
 
-    #endregion
+            foreach (var childDocument in childDocuments)
+            {
+                var aggregate = new VirtualReportAggregate<T>
+                {
+                    VirtualDocument = childDocument,
+                    Users = _documentReportRelationsFetcher.DocumentUsers,
+                    Categories = _documentReportRelationsFetcher.DocumentCategories,
+                    InternalCategories = _documentReportRelationsFetcher.DocumentInternalCategories,
+                    Departments = _documentReportRelationsFetcher.DocumentDepartments,
+                    SpecialRegisterMapping = _documentReportRelationsFetcher.DocumentSpecialRegisterMapping.FirstOrDefault(c => c.DocumentId == childDocument.DocumentId)
+                };
+
+                result.Add(_mapper.Map<VirtualReportAggregate<T>, ReportViewModel>(aggregate));
+            }
+
+            return result;
+        }
+
+        #endregion
+    }
 }
