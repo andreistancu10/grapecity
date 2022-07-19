@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
-using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
 using DigitNow.Domain.DocumentManagement.Business.Reports.Queries;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Public.Reports.Models;
@@ -38,18 +36,16 @@ namespace DigitNow.Domain.DocumentManagement.Public.Reports
         public async Task<IActionResult> GetReportAsync([FromBody] GetReportRequest request)
         {
             var getReportQuery = _mapper.Map<GetReportQuery>(request);
+
             var reportResult = await _mediator.Send(getReportQuery);
+            if (reportResult == null) return NotFound();
 
-            if (reportResult == null)
-            {
-                return NotFound();
-            }
-
+            //TODO: Use translations for file name
             var fileResult = await _exportService.CreateExcelFile(request.Type switch
             {
-                ReportType.ExpiredDocuments => "Report_Expired",
-                ReportType.DocumentsToExpire => "Report_AboutToExpire",
-                _ => throw new ArgumentOutOfRangeException()
+                ReportType.ExpiredDocuments => "Documente expirate",
+                ReportType.DocumentsToExpire => "Documente ce urmeaza sa expire",
+                _ => throw new ArgumentOutOfRangeException("Unknown report type provided!")
             }, "DocumentsSheet", reportResult);
 
             return File(fileResult.Content, fileResult.ContentType, fileResult.Name);

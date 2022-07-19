@@ -22,21 +22,21 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, GetDocuments
         _documentMappingService = documentMappingService;
     }
 
-    public async Task<GetDocumentsResponse> Handle(GetDocumentsQuery query, CancellationToken cancellationToken)
+    public async Task<GetDocumentsResponse> Handle(GetDocumentsQuery request, CancellationToken cancellationToken)
     {
-        var totalItems = await _dashboardService.CountAllDocumentsAsync(query.PreprocessFilter, query.PostprocessFilter, cancellationToken);
+        var totalItems = await _dashboardService.CountAllDocumentsAsync(request.PreprocessFilter, request.PostprocessFilter, cancellationToken);
 
-        var documents = await _dashboardService.GetAllDocumentsAsync(query.PreprocessFilter, query.PostprocessFilter,
-            query.Page,
-            query.Count,
+        var documents = await _dashboardService.GetAllDocumentsAsync(request.PreprocessFilter, request.PostprocessFilter,
+            request.Page,
+            request.Count,
             cancellationToken);
 
         var viewModels = await _documentMappingService.MapToDocumentViewModelAsync(documents, cancellationToken);
 
-        return BuildFirstPageDocumentResponse(query, totalItems, viewModels);
+        return BuildFirstPageDocumentResponse(request, totalItems, viewModels);
     }
 
-    private GetDocumentsResponse BuildFirstPageDocumentResponse(GetDocumentsQuery query, long totalItems, IList<DocumentViewModel> items)
+    private static GetDocumentsResponse BuildFirstPageDocumentResponse(GetDocumentsQuery query, long totalItems, IList<DocumentViewModel> items)
     {
         var pageCount = totalItems / query.Count;
 

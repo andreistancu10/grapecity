@@ -15,23 +15,19 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders
                 return;
 
             var categoriesIds = EntityFilter.CategoryFilter.CategoryIds;
+            var targetType = typeof(T);
 
-            if (typeof(T) == typeof(InternalDocument))
+            if (targetType == typeof(InternalDocument))
             {
-                GeneratedFilters.Add(x => categoriesIds.Contains(((InternalDocument)(object)x).InternalDocumentTypeId));
-                return;
+                GeneratedFilters.Add(x => categoriesIds.Contains(((InternalDocument)(object)x).InternalDocumentTypeId));                
             }
-
-            if (typeof(T) == typeof(IncomingDocument))
+            else if (targetType == typeof(IncomingDocument))
             {
                 GeneratedFilters.Add(x => categoriesIds.Contains(((IncomingDocument)(object)x).DocumentTypeId));
-                return;
             }
-
-            if (typeof(T) == typeof(OutgoingDocument))
+            else if (targetType == typeof(OutgoingDocument))
             {
                 GeneratedFilters.Add(x => categoriesIds.Contains(((OutgoingDocument)(object)x).DocumentTypeId));
-                return;
             }
         }
 

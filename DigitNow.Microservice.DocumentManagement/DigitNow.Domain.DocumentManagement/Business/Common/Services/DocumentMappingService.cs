@@ -14,8 +14,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IDocumentMappingService
     {
-        Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<VirtualDocument> documents, CancellationToken cancellationToken);
-        Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<VirtualDocument> documents, CancellationToken cancellationToken);
+        Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken);
+        Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken);
     }
 
     public class DocumentMappingService : IDocumentMappingService

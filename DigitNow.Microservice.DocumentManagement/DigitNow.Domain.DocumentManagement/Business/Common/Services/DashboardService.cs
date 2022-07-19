@@ -42,7 +42,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         #region [ Properties ]
 
-        private int PreviousYear => DateTime.UtcNow.Year - 1;
+        private static int PreviousYear => DateTime.UtcNow.Year - 1;
 
         #endregion
 
@@ -125,7 +125,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             var getUserByIdResponse = await _authenticationClient.GetUserById(userId, cancellationToken);
             if (getUserByIdResponse == null)
-                throw new InvalidOperationException(); //TODO: Add not found exception
+                throw new InvalidOperationException($"User with identifier '{userId}' was not found!");
 
             return _mapper.Map<UserModel>(getUserByIdResponse);
         }
@@ -172,7 +172,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         #region [ Utils ]
 
-        private bool IsRole(UserModel userModel, UserRole role) =>
+        private static bool IsRole(UserModel userModel, UserRole role) =>
             userModel.Roles.Contains(role.Code);
 
         #endregion

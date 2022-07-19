@@ -131,18 +131,19 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
             IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
         {
-            public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
-            {
-                return source.SpecialRegisterMapping != null ?
-                    new BasicViewModel(source.SpecialRegisterMapping.SpecialRegisterId, source.SpecialRegisterMapping?.SpecialRegister.Name) :
-                    null;
-            }
+            public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
+                GetSpecialRegister(source);
 
-            public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
+            public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
+                GetSpecialRegister(source);
+
+            private BasicViewModel GetSpecialRegister<T>(VirtualReportAggregate<T> reportAggregate)
+                where T: VirtualDocument
             {
-                return source.SpecialRegisterMapping != null ?
-                    new BasicViewModel(source.SpecialRegisterMapping.SpecialRegisterId, source.SpecialRegisterMapping?.SpecialRegister.Name) :
-                    null;
+                if (reportAggregate.SpecialRegisterMapping == null) 
+                    return null;
+
+                return new BasicViewModel(reportAggregate.SpecialRegisterMapping.SpecialRegisterId, reportAggregate.SpecialRegisterMapping.SpecialRegister.Name);
             }
         }
 
@@ -172,22 +173,19 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
             IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
         {
-            public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
+            public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
+                GetUserViewModel(source, source.VirtualDocument);
+
+            public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
+                GetUserViewModel(source, source.VirtualDocument);
+
+            private BasicViewModel GetUserViewModel<T>(VirtualReportAggregate<T> documentAggregate, VirtualDocument virtualDocument)
+                where T: VirtualDocument
             {
-                var foundUser = source.Users.FirstOrDefault(x => x.Id == source.VirtualDocument.Document.CreatedBy);
+                var foundUser = documentAggregate.Users.FirstOrDefault(x => x.Id == virtualDocument.Document.CreatedBy);
+                if (foundUser == null) return null;
 
-                return foundUser != null ?
-                    new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}") :
-                    null;
-            }
-
-            public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
-            {
-                var foundUser = source.Users.FirstOrDefault(x => x.Id == source.VirtualDocument.Document.CreatedBy);
-
-                return foundUser != null ?
-                    new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}") :
-                    null;
+                return new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
             }
         }
 

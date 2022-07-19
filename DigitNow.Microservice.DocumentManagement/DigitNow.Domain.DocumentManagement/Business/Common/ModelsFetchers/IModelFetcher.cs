@@ -12,11 +12,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers
         Task FetchAsync(object context, CancellationToken cancellationToken);
     }
 
-    internal interface IModelFetcher<T, TContext> : IModelFetcher
+    internal interface IModelFetcher<out T, TContext> : IModelFetcher
         where T : class
         where TContext: IModelFetcherContext
     {
         IReadOnlyList<T> Models { get; }
+
+        Task FetchAsync(TContext context, CancellationToken cancellationToken);
     }
 
     internal abstract class ModelFetcher<T, TContext> : IModelFetcher<T, TContext>

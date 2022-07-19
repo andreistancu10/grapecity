@@ -11,7 +11,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors
         {
             if (toDate.ToUniversalTime() > DateTime.UtcNow)
             {
-                throw new Exception($"Date range cannot be bigger than today, {DateTime.Now.Day}/{DateTime.Now.Month}/{DateTime.Now.Year}.");
+                throw new ArgumentException($"Date range cannot be bigger than today, {DateTime.Now.Day}/{DateTime.Now.Month}/{DateTime.Now.Year}.");
             }
         }
     }
