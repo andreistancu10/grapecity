@@ -24,6 +24,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             virtualDocument.WorkflowHistory.Add(WorkflowHistoryFactory
                 .Create(UserRole.HeadOfDepartment, currentUser, DocumentStatus.Finalized, string.Empty, command.Remarks));
 
+            document.Status = DocumentStatus.Finalized;
+
             return command;
         }
 
