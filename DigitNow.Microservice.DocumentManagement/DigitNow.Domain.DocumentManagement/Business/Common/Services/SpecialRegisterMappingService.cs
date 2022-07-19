@@ -2,55 +2,56 @@
 using System.Threading.Tasks;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMapping;
+using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMappings;
 using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
 using Microsoft.EntityFrameworkCore;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Common.Services;
-
-public interface ISpecialRegisterMappingService
+namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
-    Task MapDocumentAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken);
-}
-
-public class SpecialRegisterMappingService : ISpecialRegisterMappingService
-{
-    private readonly DocumentManagementDbContext _dbContext;
-
-    public SpecialRegisterMappingService(
-        DocumentManagementDbContext dbContext)
+    public interface ISpecialRegisterMappingService
     {
-        _dbContext = dbContext;
+        Task MapDocumentAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken);
     }
 
-    public async Task MapDocumentAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken)
+    public class SpecialRegisterMappingService : ISpecialRegisterMappingService
     {
-        var register = await GetDocumentSpecialRegisterAsync(incomingDocument.DocumentTypeId, cancellationToken);
+        private readonly DocumentManagementDbContext _dbContext;
 
-        if (register != null)
+        public SpecialRegisterMappingService(
+            DocumentManagementDbContext dbContext)
         {
-            await AddDocumentMappingAsync(incomingDocument, register, cancellationToken);
+            _dbContext = dbContext;
         }
-    }
 
-    private async Task AddDocumentMappingAsync(IncomingDocument incomingDocument, SpecialRegister register,
-        CancellationToken cancellationToken)
-    {
-        var newMapping = new SpecialRegisterMapping
+        public async Task MapDocumentAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken)
         {
-            IncomingDocument = incomingDocument,
-            SpecialRegister = register
-        };
+            var register = await GetDocumentSpecialRegisterAsync(incomingDocument.DocumentTypeId, cancellationToken);
 
-        await _dbContext.SpecialRegisterMappings.AddAsync(newMapping, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-    }
+            if (register != null)
+            {
+                await AddDocumentMappingAsync(incomingDocument.DocumentId, register, cancellationToken);
+            }
+        }
 
-    private async Task<SpecialRegister> GetDocumentSpecialRegisterAsync(int documentType,
-        CancellationToken cancellationToken)
-    {
-        return await _dbContext.SpecialRegisters
-            .AsNoTracking()
-            .FirstOrDefaultAsync(c => c.DocumentCategoryId == documentType, cancellationToken);
+        private async Task AddDocumentMappingAsync(long documentId, SpecialRegister register,
+            CancellationToken cancellationToken)
+        {
+            var newMapping = new SpecialRegisterMapping
+            {
+                DocumentId = documentId,
+                SpecialRegister = register
+            };
+
+            await _dbContext.SpecialRegisterMappings.AddAsync(newMapping, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        private async Task<SpecialRegister> GetDocumentSpecialRegisterAsync(int documentType,
+            CancellationToken cancellationToken)
+        {
+            return await _dbContext.SpecialRegisters
+                .AsNoTracking()
+                .FirstOrDefaultAsync(c => c.DocumentCategoryId == documentType, cancellationToken);
+        }
     }
 }

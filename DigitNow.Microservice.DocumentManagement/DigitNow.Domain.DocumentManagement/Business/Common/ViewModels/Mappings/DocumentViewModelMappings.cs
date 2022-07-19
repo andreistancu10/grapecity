@@ -1,15 +1,15 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.Models;
+using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
+using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
+namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
 {
-    public class GetDocumentsMappings : Profile
+    public class DocumentViewModelMappings : Profile
     {
-        public GetDocumentsMappings()
+        public DocumentViewModelMappings()
         {
             CreateMap<VirtualDocumentAggregate<IncomingDocument>, DocumentViewModel>()
                 .ForMember(c => c.DocumentId, opt => opt.MapFrom(src => src.VirtualDocument.Document.Id))
@@ -17,11 +17,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
                 .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationDate))
                 .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationNumber))
                 .ForMember(c => c.Recipient, opt => opt.MapFrom(src => src.VirtualDocument.Document.RecipientId))
-                .ForMember(c => c.IssuerName, opt => opt.MapFrom(src => src.VirtualDocument.CreatedBy))
+                .ForMember(c => c.IssuerName, opt => opt.MapFrom(src => src.VirtualDocument.IssuerName))
                 .ForMember(c => c.Status, opt => opt.MapFrom<MapDocumentStatus>())
-                .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.VirtualDocument.DocumentTypeId))
                 .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>())
-                .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.VirtualDocument.DocumentTypeId))
                 .ForMember(c => c.ResolutionDuration, opt => opt.MapFrom(src => src.VirtualDocument.ResolutionPeriod))
                 .ForMember(c => c.User, opt => opt.MapFrom<MapUserFromAggregate>())
                 .ForMember(c => c.DocumentCategory, opt => opt.MapFrom<MapDocumentCategory>());
@@ -32,17 +30,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
                 .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationDate))
                 .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationNumber))
                 .ForMember(c => c.Recipient, opt => opt.MapFrom(src => src.VirtualDocument.RecipientName))
-                .ForMember(c => c.IssuerName, opt => opt.MapFrom(src => src.VirtualDocument.CreatedBy))
+                .ForMember(c => c.IssuerName, opt => opt.MapFrom<MapUserFromAggregate>())
                 .ForMember(c => c.Status, opt => opt.MapFrom<MapDocumentStatus>())
-                .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.VirtualDocument.DocumentTypeId))
                 .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>())
-                .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.VirtualDocument.DocumentTypeId))
                 .ForMember(c => c.User, opt => opt.MapFrom<MapUserFromAggregate>())
                 .ForMember(c => c.DocumentCategory, opt => opt.MapFrom<MapDocumentCategory>());
 
             CreateMap<VirtualDocumentAggregate<InternalDocument>, DocumentViewModel>()
                 .ForMember(c => c.DocumentId, opt => opt.MapFrom(src => src.VirtualDocument.Document.Id))
                 .ForMember(c => c.VirtualDocumentId, opt => opt.MapFrom(src => src.VirtualDocument.Id))
+                .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationDate))
+                .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.VirtualDocument.Document.RegistrationNumber))
+                .ForMember(c => c.IssuerName, opt => opt.MapFrom<MapUserFromAggregate>())
                 .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>())
                 .ForMember(c => c.User, opt => opt.MapFrom<MapUserFromAggregate>())
                 .ForMember(c => c.DocumentCategory, opt => opt.MapFrom<MapDocumentCategory>());
@@ -88,7 +87,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
                 {
                     return $"{foundUser.FirstName} {foundUser.LastName}";
                 }
-                return default(string);
+                return default;
             }
 
             public string Resolve(VirtualDocumentAggregate<InternalDocument> source, DocumentViewModel destination, string destMember, ResolutionContext context)
@@ -98,7 +97,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
                 {
                     return $"{foundUser.FirstName} {foundUser.LastName}";
                 }
-                return default(string);
+                return default;
             }
 
             public string Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, string destMember, ResolutionContext context)
@@ -108,7 +107,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
                 {
                     return $"{foundUser.FirstName} {foundUser.LastName}";
                 }
-                return default(string);
+                return default;
             }
         }
 
@@ -124,7 +123,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
                 {
                     return foundCategory.Name;
                 }
-                return default(string);
+                return default;
             }
 
             public string Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, string destMember, ResolutionContext context)
@@ -134,7 +133,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
                 {
                     return foundCategory.Name;
                 }
-                return default(string);
+                return default;
             }
 
             public string Resolve(VirtualDocumentAggregate<InternalDocument> source, DocumentViewModel destination, string destMember, ResolutionContext context)
@@ -144,7 +143,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
                 {
                     return foundCategory.Name;
                 }
-                return default(string);
+                return default;
             }
         }
     }

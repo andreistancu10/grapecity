@@ -17,7 +17,6 @@ public class OutgoingDocument : VirtualDocument
 
     #region [ References ]
 
-    public Document Document { get; set; }
     public ContactDetail ContactDetail { get; set; }
     public List<ConnectedDocument>? ConnectedDocuments { get; set; } = new();
 

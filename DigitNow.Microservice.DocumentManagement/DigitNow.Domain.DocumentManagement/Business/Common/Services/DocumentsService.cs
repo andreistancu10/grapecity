@@ -11,107 +11,108 @@ using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-
-public interface IDocumentService
+namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 {
-    Task<Document> AddAsync(Document newDocument, CancellationToken cancellationToken);
-    Task<Document> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken, params Expression<Func<Document, object>>[] includes);
-    Task<List<Document>> FindAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken);
-
-    IQueryable<Document> FindAllQueryable(Expression<Func<Document, bool>> predicate);
-    Task<int> CountAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken);
-
-    [Obsolete("This will be refactored in future sprints", error: false)]
-    Task AddDocument(Document document, CancellationToken cancellationToken);
-}
-
-public class DocumentService : IDocumentService
-{
-    protected readonly DocumentManagementDbContext _dbContext;
-    private readonly IIdentityService _identityService;
-
-    public DocumentService(DocumentManagementDbContext dbContext,
-        IIdentityService identityService)
+    public interface IDocumentService
     {
-        _dbContext = dbContext;
-        _identityService = identityService;
+        Task<Document> AddAsync(Document newDocument, CancellationToken cancellationToken);
+        Task<Document> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken, params Expression<Func<Document, object>>[] includes);
+        Task<List<Document>> FindAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken);
+
+        IQueryable<Document> FindAllQueryable(Expression<Func<Document, bool>> predicate);
+        Task<int> CountAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken);
+
+        [Obsolete("This will be refactored in future sprints", error: false)]
+        Task AddDocument(Document document, CancellationToken cancellationToken);
     }
 
-    public async Task<Document> AddAsync(Document newDocument, CancellationToken cancellationToken)
+    public class DocumentService : IDocumentService
     {
-        await _dbContext.AddAsync(newDocument, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return newDocument;
-    }
+        protected readonly DocumentManagementDbContext _dbContext;
+        private readonly IIdentityService _identityService;
 
-    public Task<Document> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken, params Expression<Func<Document, object>>[] includes)
-    {
-        return _dbContext.Documents
-            .Includes(includes)
-            .FirstOrDefaultAsync(predicate);
-    }
-
-    public Task<List<Document>> FindAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken)
-    {
-        return _dbContext.Documents
-            .Where(predicate)
-            .AsNoTracking()
-            .ToListAsync(cancellationToken);
-    }
-
-    public IQueryable<Document> FindAllQueryable(Expression<Func<Document, bool>> predicate)
-    {
-        return _dbContext.Documents
-            .Where(predicate);
-    }
-
-    public Task<int> CountAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken)
-    {
-        return _dbContext.Documents
-            .Where(predicate)
-            .CountAsync(cancellationToken);
-    }
-
-    // TODO: Use RegistrationNumberCounterService
-    public async Task AddDocument(Document document, CancellationToken cancellationToken)
-    {
-        var dbContextTransaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable);
-        try
+        public DocumentService(DocumentManagementDbContext dbContext,
+            IIdentityService identityService)
         {
-            var maxRegNumber = await _dbContext.RegistrationNumberCounters
-                .Where(reg => reg.RegistrationDate.Year == DateTime.Now.Year)
-                .Select(reg => reg.RegistrationNumber)
-                .DefaultIfEmpty()
-                .MaxAsync();
+            _dbContext = dbContext;
+            _identityService = identityService;
+        }
 
-            var newRegNumber = ++maxRegNumber;
-
-            document.RegistrationNumber = newRegNumber;
-            document.RegistrationDate = DateTime.Now;
-
-            if (document.InternalDocument == null && document.IncomingDocument == null && document.OutgoingDocument == null)
-                throw new InvalidOperationException(); //TODO: Add descriptive error
-
-            await _dbContext.AddAsync(document, cancellationToken);
-            await _dbContext.RegistrationNumberCounters.AddAsync(new RegistrationNumberCounter
-            {
-                RegistrationNumber = newRegNumber,
-                RegistrationDate = DateTime.Now
-            });
-
+        public async Task<Document> AddAsync(Document newDocument, CancellationToken cancellationToken)
+        {
+            await _dbContext.AddAsync(newDocument, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
-            await dbContextTransaction.CommitAsync(cancellationToken);
+            return newDocument;
         }
-        catch
+
+        public Task<Document> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken, params Expression<Func<Document, object>>[] includes)
         {
-            //TODO: Log error
-            await dbContextTransaction.RollbackAsync();
-            throw;
+            return _dbContext.Documents
+                .Includes(includes)
+                .FirstOrDefaultAsync(predicate);
         }
-        finally
+
+        public Task<List<Document>> FindAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken)
         {
-            dbContextTransaction?.Dispose();
+            return _dbContext.Documents
+                .Where(predicate)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+        }
+
+        public IQueryable<Document> FindAllQueryable(Expression<Func<Document, bool>> predicate)
+        {
+            return _dbContext.Documents
+                .Where(predicate);
+        }
+
+        public Task<int> CountAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken)
+        {
+            return _dbContext.Documents
+                .Where(predicate)
+                .CountAsync(cancellationToken);
+        }
+
+        // TODO: Use RegistrationNumberCounterService
+        public async Task AddDocument(Document document, CancellationToken cancellationToken)
+        {
+            var dbContextTransaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+            try
+            {
+                var maxRegNumber = await _dbContext.RegistrationNumberCounters
+                    .Where(reg => reg.RegistrationDate.Year == DateTime.Now.Year)
+                    .Select(reg => reg.RegistrationNumber)
+                    .DefaultIfEmpty()
+                    .MaxAsync();
+
+                var newRegNumber = ++maxRegNumber;
+
+                document.RegistrationNumber = newRegNumber;
+                document.RegistrationDate = DateTime.Now;
+
+                if (document.InternalDocument == null && document.IncomingDocument == null && document.OutgoingDocument == null)
+                    throw new InvalidOperationException(); //TODO: Add descriptive error
+
+                await _dbContext.AddAsync(document, cancellationToken);
+                await _dbContext.RegistrationNumberCounters.AddAsync(new RegistrationNumberCounter
+                {
+                    RegistrationNumber = newRegNumber,
+                    RegistrationDate = DateTime.Now
+                });
+
+                await _dbContext.SaveChangesAsync(cancellationToken);
+                await dbContextTransaction.CommitAsync(cancellationToken);
+            }
+            catch
+            {
+                //TODO: Log error
+                await dbContextTransaction.RollbackAsync();
+                throw;
+            }
+            finally
+            {
+                dbContextTransaction?.Dispose();
+            }
         }
     }
 }

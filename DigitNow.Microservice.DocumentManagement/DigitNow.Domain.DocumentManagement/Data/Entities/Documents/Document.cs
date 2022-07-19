@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles;
+using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMappings;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
@@ -12,7 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public DateTime RegistrationDate { get; set; }
         public long RecipientId { get; set; }
 
-        #region [IDocument]
+        #region [ IDocument ]
 
         public DocumentStatus Status { get; set; }
         public DateTime StatusModifiedAt { get; set; }
@@ -20,11 +21,17 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
 
         #endregion
 
-        #region [ References ]
+        #region [ Children ]
 
         public IncomingDocument IncomingDocument { get; set; }
         public InternalDocument InternalDocument { get; set; }
         public OutgoingDocument OutgoingDocument { get; set; }
+
+        #endregion
+
+        #region [ References ]
+
+        public List<SpecialRegisterMapping> SpecialRegisterMappings { get; set; }
         public List<DocumentUploadedFile> DocumentUploadedFiles { get; set; }
 
         #endregion

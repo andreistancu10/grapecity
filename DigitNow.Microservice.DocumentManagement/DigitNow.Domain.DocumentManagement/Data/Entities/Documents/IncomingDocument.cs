@@ -22,7 +22,6 @@ public class IncomingDocument : VirtualDocument
 
     #region [ References ]
 
-    public Document Document { get; set; }
     public List<ConnectedDocument>? ConnectedDocuments { get; set; } = new();
 
     #endregion

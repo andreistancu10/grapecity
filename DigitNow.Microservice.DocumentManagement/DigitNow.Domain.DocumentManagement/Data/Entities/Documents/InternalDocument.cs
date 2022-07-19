@@ -9,10 +9,4 @@ public class InternalDocument : VirtualDocument
     public string Description { get; set; }
     public string Observation { get; set; }
     public bool? IsUrgent { get; set; }
-
-    #region [ References ]
-
-    public Document Document { get; set; }
-
-    #endregion
 }
