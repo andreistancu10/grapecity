@@ -45,6 +45,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
     public async Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
     {
+        if (!virtualDocuments.Any()) return new List<DocumentViewModel>();
+
         await _documentRelationsFetcher.TriggerFetchersAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
         return MapDocuments(virtualDocuments)
             .OrderByDescending(x => x.RegistrationDate)
@@ -53,6 +55,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
     public async Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
     {
+        if (!virtualDocuments.Any()) return new List<ReportViewModel>();
+
         await _documentRelationsFetcher.TriggerFetchersAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
         return MapDocumentsReports(virtualDocuments)
             .OrderByDescending(x => x.RegistrationDate)
