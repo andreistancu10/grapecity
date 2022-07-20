@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Data;
 using HTSS.Platform.Core.CQRS;
-using HTSS.Platform.Core.Files.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetFiles
@@ -25,9 +25,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetFil
             _fileService = fileService;
         }
 
-        public async Task<List<GetFilesResponse>> Handle(GetFilesQuery request, CancellationToken cancellationToken)
+        public async Task<List<GetFilesResponse>> Handle(GetFilesQuery query, CancellationToken cancellationToken)
         {
-            return null;
+            var uploadedFiles = await _dbContext.DocumentUploadedFiles
+                .AsNoTracking()
+                .Where(c => c.DocumentId == query.DocumentId)
+                .Select(c => c.UploadedFile)
+                .ToListAsync(cancellationToken);
+
+            return uploadedFiles.Select(c => _mapper.Map<GetFilesResponse>(c)).ToList();
         }
     }
 }

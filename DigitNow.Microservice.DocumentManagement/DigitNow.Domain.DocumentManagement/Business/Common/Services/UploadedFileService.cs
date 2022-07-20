@@ -21,6 +21,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         Task UpdateDocumentUploadedFilesAsync(List<long> uploadedFileIds, Document document,
             CancellationToken cancellationToken);
         Task<List<UploadedFile>> GetUploadedFilesAsync(IEnumerable<long> ids, CancellationToken cancellationToken);
+        Task<List<VirtualDocument>> FetchUploadedFiles(IList<Document> documents, CancellationToken cancellationToken);
+
     }
 
     public class UploadedFileService : IUploadedFileService
