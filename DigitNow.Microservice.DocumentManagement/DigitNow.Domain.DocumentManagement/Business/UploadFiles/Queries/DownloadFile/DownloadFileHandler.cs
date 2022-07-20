@@ -26,10 +26,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.Downlo
 
         public async Task<DownloadFileResponse> Handle(DownloadFileQuery request, CancellationToken cancellationToken)
         {
-            var uploadedFile = await _dbContext.UploadedFiles.FirstAsync(c=>c.Id==request.FileId, cancellationToken);
+            var uploadedFile = await _dbContext.UploadedFiles.FirstAsync(c => c.Id == request.FileId, cancellationToken);
             var fileBytes = _fileService.DownloadFileAsync(uploadedFile.RelativePath, uploadedFile.Guid.ToString());
 
-            return 
+            return
                 new DownloadFileResponse(new FileContent(uploadedFile.Name, uploadedFile.ContentType, fileBytes));
         }
     }

@@ -21,8 +21,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         Task UpdateDocumentUploadedFilesAsync(List<long> uploadedFileIds, Document document,
             CancellationToken cancellationToken);
         Task<List<UploadedFile>> GetUploadedFilesAsync(IEnumerable<long> ids, CancellationToken cancellationToken);
-        Task<List<VirtualDocument>> FetchUploadedFiles(IList<Document> documents, CancellationToken cancellationToken);
-
+        Task<List<UploadedFile>> FetchUploadedFiles(long documentId, CancellationToken cancellationToken);
     }
 
     public class UploadedFileService : IUploadedFileService
@@ -68,7 +67,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             var currentlyPresentIds = document.DocumentUploadedFiles.Select(c => c.UploadedFileId).ToList();
             var uploadedFileIdsToRemove = currentlyPresentIds.Where(c => !uploadedFileIds.Contains(c));
-            var documentUploadedFilesToRemove = document.DocumentUploadedFiles.Where(c=> uploadedFileIdsToRemove.Contains(c.UploadedFileId));
+            var documentUploadedFilesToRemove = document.DocumentUploadedFiles.Where(c => uploadedFileIdsToRemove.Contains(c.UploadedFileId));
             var idsToAdd = uploadedFileIds.Where(c => !currentlyPresentIds.Contains(c));
             _dbContext.DocumentUploadedFiles.RemoveRange(documentUploadedFilesToRemove);
 
@@ -78,6 +77,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         public async Task<List<UploadedFile>> GetUploadedFilesAsync(IEnumerable<long> ids, CancellationToken cancellationToken)
         {
             return await _dbContext.UploadedFiles.Where(c => ids.Contains(c.Id)).ToListAsync(cancellationToken);
+        }
+
+        public Task<List<UploadedFile>> FetchUploadedFiles(long documentId, CancellationToken cancellationToken)
+        {
+            return _dbContext.DocumentUploadedFiles
+                .AsNoTracking()
+                .Where(c => c.DocumentId == documentId)
+                .Select(c=>c.UploadedFile)
+                .ToListAsync(cancellationToken);
         }
     }
 }

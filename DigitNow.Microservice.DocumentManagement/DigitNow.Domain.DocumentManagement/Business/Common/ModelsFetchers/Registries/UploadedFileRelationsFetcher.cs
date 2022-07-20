@@ -14,6 +14,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
         private IModelFetcher<UserModel, UploadedFilesFetcherContext> _uploadedFilesUsersFetcher;
 
         public IReadOnlyList<UserModel> UploadedFileUsers => GetItems(_uploadedFilesUsersFetcher);
+        public IReadOnlyList<UploadedFileCategoryModel> UploadedFileCategoryModels => GetItems(_uploadedFilesCategoriesFetcher);
 
         public UploadedFileRelationsFetcher(IServiceProvider serviceProvider)
         {
@@ -23,10 +24,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
         protected override void AddRemoteFetchers()
         {
             _uploadedFilesUsersFetcher = new UploadedFilesUsersFetcher(_serviceProvider);
-            RemoteFetchers.Add(_uploadedFilesCategoriesFetcher);
+            RemoteFetchers.Add(_uploadedFilesUsersFetcher);
 
             _uploadedFilesCategoriesFetcher = new UploadedFilesCategoriesFetcher(_serviceProvider);
-            RemoteFetchers.Add(_uploadedFilesUsersFetcher);
+            RemoteFetchers.Add(_uploadedFilesCategoriesFetcher);
         }
     }
 }
