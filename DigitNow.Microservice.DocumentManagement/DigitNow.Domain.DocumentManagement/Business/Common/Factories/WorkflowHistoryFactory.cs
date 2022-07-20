@@ -18,7 +18,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
                 DeclineReason = declineReason,
                 Remarks = remarks,
                 OpinionRequestedUntil = opinionRequestedUntil,
-                Resolution = resoution
+                Resolution = resolution
             };
     }
 }

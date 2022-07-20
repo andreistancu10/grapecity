@@ -42,7 +42,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 return false;
             }
 
-            if (command.OpinionRequestedUntil == null || command.OpinionRequestedUntil < DateTime.Now )
+            if (command.OpinionRequestedUntil != null && command.OpinionRequestedUntil < DateTime.Now )
             {
                 command.Result = ResultObject.Error(new ErrorMessage
                 {
