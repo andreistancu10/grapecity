@@ -519,7 +519,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("RegistrationNumberCounters", "DocumentMangement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMapping.SpecialRegisterMapping", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMappings.SpecialRegisterMapping", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -539,10 +539,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnName("CreatedBy")
                         .HasColumnOrder(3);
 
-                    b.Property<int>("DocumentId")
-                        .HasColumnType("int");
-
-                    b.Property<long?>("IncomingDocumentId")
+                    b.Property<long>("DocumentId")
                         .HasColumnType("bigint");
 
                     b.Property<DateTime>("ModifiedAt")
@@ -560,7 +557,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IncomingDocumentId");
+                    b.HasIndex("DocumentId");
 
                     b.HasIndex("SpecialRegisterId");
 
@@ -815,11 +812,13 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("Document");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMapping.SpecialRegisterMapping", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMappings.SpecialRegisterMapping", b =>
                 {
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", "IncomingDocument")
-                        .WithMany()
-                        .HasForeignKey("IncomingDocumentId");
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Document", "Document")
+                        .WithMany("SpecialRegisterMappings")
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters.SpecialRegister", "SpecialRegister")
                         .WithMany()
@@ -827,7 +826,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("IncomingDocument");
+                    b.Navigation("Document");
 
                     b.Navigation("SpecialRegister");
                 });
@@ -856,6 +855,8 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("InternalDocument");
 
                     b.Navigation("OutgoingDocument");
+
+                    b.Navigation("SpecialRegisterMappings");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", b =>
