@@ -8,6 +8,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates
     {
         public UploadedFile UploadedFile { get; set; }
         internal IReadOnlyList<UserModel> Users { get; set; }
-        internal IReadOnlyList<UploadedFileCategoryModel> Categories { get; set; }
+        internal IReadOnlyList<DocumentCategoryModel> Categories { get; set; }
     }
 }

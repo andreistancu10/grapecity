@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
+using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
@@ -36,6 +37,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetFil
         public async Task<List<FileViewModel>> Handle(GetFilesQuery query, CancellationToken cancellationToken)
         {
             var uploadedFiles = await _uploadedFileService.FetchUploadedFiles(query.DocumentId, cancellationToken);
+
+            await _uploadedFileRelationsFetcher
+                .TriggerFetchersAsync(new UploadedFilesFetcherContext
+                {
+                    UploadFiles = uploadedFiles
+                }, cancellationToken);
 
             return uploadedFiles.Select(file =>
                 new VirtualFileAggregate
