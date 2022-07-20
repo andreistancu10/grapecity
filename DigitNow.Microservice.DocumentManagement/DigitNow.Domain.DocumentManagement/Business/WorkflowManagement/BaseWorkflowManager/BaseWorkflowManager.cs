@@ -72,11 +72,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             switch (document.DocumentType)
             {
                 case DocumentType.Incoming:
-                    return await DbContext.IncomingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.Id == document.Id);
+                    return await DbContext.IncomingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.DocumentId == document.Id);
                 case DocumentType.Internal:
-                    return await DbContext.InternalDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.Id == document.Id);
+                    return await DbContext.InternalDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.DocumentId == document.Id);
                 case DocumentType.Outgoing:
-                    return await DbContext.OutgoingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.Id == document.Id);
+                    return await DbContext.OutgoingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.DocumentId == document.Id);
                 default:
                     return null;
             }

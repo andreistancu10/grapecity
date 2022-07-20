@@ -30,13 +30,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetWorkf
             switch (document.DocumentType)
             {
                 case DocumentType.Incoming:
-                    virtualDocument = await _dbContext.IncomingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.Id == request.DocumentId);
+                    virtualDocument = await _dbContext.IncomingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.DocumentId == request.DocumentId);
                     break;
                 case DocumentType.Internal:
-                    virtualDocument =  await _dbContext.InternalDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.Id == request.DocumentId);
+                    virtualDocument =  await _dbContext.InternalDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.DocumentId == request.DocumentId);
                     break;
                 case DocumentType.Outgoing:
-                    virtualDocument = await _dbContext.OutgoingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.Id == request.DocumentId);
+                    virtualDocument = await _dbContext.OutgoingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.DocumentId == request.DocumentId);
                     break;
                 default:
                     return null;
