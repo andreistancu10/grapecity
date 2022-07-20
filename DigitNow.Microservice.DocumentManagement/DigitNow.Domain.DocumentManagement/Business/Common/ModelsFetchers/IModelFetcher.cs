@@ -35,7 +35,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers
 
         public async Task FetchAsync(TContext context, CancellationToken cancellationToken)
         {
-            _models = await FetchInternalAsync(context, cancellationToken);
+            try
+            {
+                _models = await FetchInternalAsync(context, cancellationToken);
+            } catch { }
         }
 
         async Task IModelFetcher.FetchAsync(object context, CancellationToken cancellationToken)
