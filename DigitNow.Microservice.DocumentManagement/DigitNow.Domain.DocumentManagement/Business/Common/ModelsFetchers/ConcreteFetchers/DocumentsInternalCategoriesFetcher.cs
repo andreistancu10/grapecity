@@ -22,16 +22,19 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
             _mapper = serviceProvider.GetService<IMapper>();
         }
 
-        protected override async Task<List<DocumentCategoryModel>> FetchInternalAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
+        protected override Task<List<DocumentCategoryModel>> FetchInternalAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
         {
-            var internalDocumentTypesResponse = await _catalogClient.InternalDocumentTypes.GetInternalDocumentTypesAsync(cancellationToken);
+            return Task.FromResult(new List<DocumentCategoryModel>());
 
-            // Note: DocumentTypes is actual DocumentCategory
-            var internalDocumentCategoryModels = internalDocumentTypesResponse.InternalDocumentTypes
-                .Select(x => _mapper.Map<DocumentCategoryModel>(x))
-                .ToList();
+			//TODO: Investigate further the RabbitMQ issue
+            //var internalDocumentTypesResponse = await _catalogClient.InternalDocumentTypes.GetInternalDocumentTypesAsync(cancellationToken);
 
-            return internalDocumentCategoryModels;
+            //// Note: DocumentTypes is actual DocumentCategory
+            //var internalDocumentCategoryModels = internalDocumentTypesResponse.InternalDocumentTypes
+            //    .Select(x => _mapper.Map<DocumentCategoryModel>(x))
+            //    .ToList();
+
+            //return internalDocumentCategoryModels;
         }
     }
 }
