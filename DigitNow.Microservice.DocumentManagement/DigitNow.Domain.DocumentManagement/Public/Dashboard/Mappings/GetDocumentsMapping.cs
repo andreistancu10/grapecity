@@ -23,7 +23,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Mappings
                 .ForMember(m => m.CategoryFilter, opt => opt.MapFrom(src => src.DocumentCategoryFilter));
 
             {
-                CreateMap<DocumentRegistyTypeFilterDto, DocumentRegistryTypeFilter>()
+                CreateMap<DocumentRegistryTypeFilterDto, DocumentRegistryTypeFilter>()
                     .ForMember(m => m.RegistryTypes, opt => opt.MapFrom(src => src.RegistryTypes));
 
                 CreateMap<DocumentRegistrationNoFilterDto, DocumentRegistrationNoFilter>()
