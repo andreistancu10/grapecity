@@ -5,6 +5,7 @@ using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,10 +26,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             switch ((Decision)command.Decision)
             {
                 case Decision.Declined:
-                    await MayorDeclined(command, virtualDocument);
+                    await MayorDeclined(command, virtualDocument, document);
                     break;
                 case Decision.Approved:
-                    await MayorApproved(command, virtualDocument);
+                    await MayorApproved(command, virtualDocument, document);
                     break;
                 default:
                     break;
@@ -37,9 +38,47 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             return command;
         }
 
-        private async Task MayorApproved(ICreateWorkflowHistoryCommand command, VirtualDocument virtualDocument)
+        private async Task MayorApproved(ICreateWorkflowHistoryCommand command, VirtualDocument virtualDocument, Document document)
         {
-            var oldWorkflowResponsible = GetOldWorkflowResponsible(virtualDocument, x => x.RecipientType == UserRole.Functionary.Id);
+            switch (document.DocumentType)
+            {
+                case DocumentType.Incoming:
+                    await MayorApprovedIncomingDocument(command, virtualDocument);
+                    break;
+                case DocumentType.Internal:
+                case DocumentType.Outgoing:
+                    MayorApprovedInternalOutgoingDocument(command, virtualDocument, document);
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void MayorApprovedInternalOutgoingDocument(ICreateWorkflowHistoryCommand command, VirtualDocument virtualDocument, Document document)
+        {
+            var departmentToReceiveDocument = virtualDocument.WorkflowHistory
+                .Where(x => x.RecipientType == RecipientType.Department.Id)
+                .OrderBy(x => x.CreatedAt)
+                .First().RecipientId;
+
+            var newWorkflowResponsible = new WorkflowHistory
+            {
+                Status = DocumentStatus.InWorkCountersignature,
+                Remarks = command.Remarks,
+                RecipientType = RecipientType.Department.Id,
+                RecipientId = departmentToReceiveDocument,
+                RecipientName = $"Departamentul {departmentToReceiveDocument}!"
+            };
+
+            document.RecipientIsDepartment = true;
+            document.RecipientId = departmentToReceiveDocument;
+
+            virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
+        }
+
+        private async Task MayorApprovedIncomingDocument(ICreateWorkflowHistoryCommand command, VirtualDocument virtualDocument)
+        {
+            var oldWorkflowResponsible = GetOldWorkflowResponsible(virtualDocument, x => x.RecipientType == RecipientType.Functionary.Id);
 
             var newWorkflowResponsible = new WorkflowHistory
             {
@@ -52,9 +91,48 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
         }
 
-        private async Task MayorDeclined(ICreateWorkflowHistoryCommand command, VirtualDocument virtualDocument)
+        private async Task MayorDeclined(ICreateWorkflowHistoryCommand command, VirtualDocument virtualDocument, Document document)
         {
-            var oldWorkflowResponsible = GetOldWorkflowResponsible(virtualDocument, x => x.RecipientType == UserRole.HeadOfDepartment.Id);
+            switch (document.DocumentType)
+            {
+                case DocumentType.Incoming:
+                    await MayorDeclinedIncomingDocument(command, virtualDocument);
+                    break;
+                case DocumentType.Internal:
+                case DocumentType.Outgoing:
+                    MayorDeclinedIncomingDocumentInternalOutgoingDocument(command, virtualDocument, document);
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+        private void MayorDeclinedIncomingDocumentInternalOutgoingDocument(ICreateWorkflowHistoryCommand command, VirtualDocument virtualDocument, Document document)
+        {
+            var departmentToReceiveDocument = virtualDocument.WorkflowHistory
+                .Where(x => x.RecipientType == RecipientType.Department.Id)
+                .OrderBy(x => x.CreatedAt)
+                .First().RecipientId;
+
+            var newWorkflowResponsible = new WorkflowHistory
+            {
+                Status = DocumentStatus.InWorkMayorDeclined,
+                Remarks = command.Remarks,
+                RecipientType = RecipientType.Department.Id,
+                RecipientId = departmentToReceiveDocument,
+                RecipientName = $"Departamentul {departmentToReceiveDocument}!"
+            };
+
+            document.RecipientIsDepartment = true;
+            document.RecipientId = departmentToReceiveDocument;
+
+            virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
+        }
+
+        private async Task MayorDeclinedIncomingDocument(ICreateWorkflowHistoryCommand command, VirtualDocument virtualDocument)
+        {
+            var oldWorkflowResponsible = GetOldWorkflowResponsible(virtualDocument, x => x.RecipientType == RecipientType.HeadOfDepartment.Id);
 
             var newWorkflowResponsible = new WorkflowHistory
             {

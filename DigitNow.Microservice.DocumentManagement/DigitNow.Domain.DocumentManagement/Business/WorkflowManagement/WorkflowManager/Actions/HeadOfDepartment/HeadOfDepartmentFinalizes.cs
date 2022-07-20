@@ -4,6 +4,7 @@ using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -19,12 +20,25 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             if (!Validate(command, lastWorkFlowRecord, document))
                 return command;
 
-            var currentUser = await GetCurrentUser(token);
+            var departmentToReceiveDocument = virtualDocument.WorkflowHistory
+                    .Where(x => x.RecipientType == RecipientType.Department.Id)
+                    .OrderBy(x => x.CreatedAt)
+                    .First().RecipientId;
 
-            virtualDocument.WorkflowHistory.Add(WorkflowHistoryFactory
-                .Create(UserRole.HeadOfDepartment, currentUser, DocumentStatus.Finalized, string.Empty, command.Remarks));
+            var newWorkflowResponsible = new WorkflowHistory
+            {
+                Status = DocumentStatus.Finalized,
+                Remarks = command.Remarks,
+                RecipientType = RecipientType.Department.Id,
+                RecipientId = departmentToReceiveDocument,
+                RecipientName = $"Departamentul {departmentToReceiveDocument}!"
+            };
 
+            document.RecipientIsDepartment = true;
+            document.RecipientId = departmentToReceiveDocument;
             document.Status = DocumentStatus.Finalized;
+
+            virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
 
             return command;
         }

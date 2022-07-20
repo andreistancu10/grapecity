@@ -88,6 +88,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
 
             document.RecipientId = recipientId;
             document.Status = status;
+
+            if (document.DocumentType == DocumentType.Outgoing || document.DocumentType == DocumentType.Internal)
+            {
+                document.RecipientIsDepartment = false;
+            }
         }
 
         public async Task<User> FetchHeadOfDepartmentByDepartmentIdAsync(long departmentId, CancellationToken token)
@@ -95,13 +100,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             var response = await IdentityAdapterClient.GetUsersAsync(token);
             var departmentUsers = response.Users.Where(x => x.Departments.Contains(departmentId));
             
-            return departmentUsers.FirstOrDefault(x => x.Roles.Contains(UserRole.HeadOfDepartment.Code));
+            return departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
         }
 
         public async Task<User> FetchMayorAsync(CancellationToken token)
         {
             var response = await IdentityAdapterClient.GetUsersAsync(token);
-            return response.Users.FirstOrDefault(x => x.Roles.Contains(UserRole.Mayor.Code));
+            return response.Users.FirstOrDefault(x => x.Roles.Contains(RecipientType.Mayor.Code));
         }
 
         protected async virtual Task TransferResponsibility(WorkflowHistory oldRecord, WorkflowHistory newRecord, ICreateWorkflowHistoryCommand command)
@@ -149,14 +154,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
 
             document.WorkflowHistory
                 .Add(WorkflowHistoryFactory
-                .Create(UserRole.Functionary, creator, DocumentStatus.NewDeclinedCompetence, command.DeclineReason, command.Remarks));
+                .Create(RecipientType.Functionary, creator, DocumentStatus.NewDeclinedCompetence, command.DeclineReason, command.Remarks));
 
             await SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, creator.Id, DocumentStatus.NewDeclinedCompetence);
         }
 
         protected async Task PassDocumentToFunctionary(VirtualDocument document, WorkflowHistory newWorkflowResponsible, ICreateWorkflowHistoryCommand command)
         {
-            var oldWorkflowResponsible = GetOldWorkflowResponsible(document, x => x.RecipientType == UserRole.Functionary.Id);
+            var oldWorkflowResponsible = GetOldWorkflowResponsible(document, x => x.RecipientType == RecipientType.Functionary.Id);
 
             await TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 

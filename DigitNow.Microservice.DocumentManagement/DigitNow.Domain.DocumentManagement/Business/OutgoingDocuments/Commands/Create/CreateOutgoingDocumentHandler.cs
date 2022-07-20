@@ -47,7 +47,7 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
 
         var newDocument = new Document
         {
-            DocumentType = DocumentType.Internal,
+            DocumentType = DocumentType.Outgoing,
             OutgoingDocument = newOutgoingDocument,
             RecipientId = request.RecipientId,
             Status = DocumentStatus.New,
@@ -62,15 +62,16 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
         newOutgoingDocument.WorkflowHistory.Add(
             new WorkflowHistory
             {
-                RecipientType = UserRole.Department.Id,
+                RecipientType = RecipientType.Department.Id,
                 RecipientId = request.RecipientId,
                 Status = DocumentStatus.New,
+                RecipientName = $"Departamentul {request.RecipientId}!"
             });
 
         await _dbContext.SingleUpdateAsync(newOutgoingDocument, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return ResultObject.Created(newOutgoingDocument.Id);
+        return ResultObject.Created(newOutgoingDocument.DocumentId);
     }
 
     private async Task AttachConnectedDocumentsAsync(CreateOutgoingDocumentCommand request, OutgoingDocument

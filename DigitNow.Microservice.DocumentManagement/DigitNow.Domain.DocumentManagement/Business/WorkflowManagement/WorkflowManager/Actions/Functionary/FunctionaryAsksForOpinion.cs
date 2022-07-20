@@ -27,7 +27,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 return command;
 
             virtualDocument.WorkflowHistory.Add(WorkflowHistoryFactory
-                .Create(UserRole.HeadOfDepartment, headOfDepartment, DocumentStatus.OpinionRequestedUnallocated, string.Empty, command.Remarks, command.OpinionRequestedUntil));
+                .Create(RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.OpinionRequestedUnallocated, string.Empty, command.Remarks, command.OpinionRequestedUntil));
 
             await SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, headOfDepartment.Id, DocumentStatus.OpinionRequestedUnallocated);
             
@@ -42,17 +42,20 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 return false;
             }
 
-            if (command.OpinionRequestedUntil != null && command.OpinionRequestedUntil < DateTime.Now )
+            if (command.OpinionRequestedUntil.HasValue)
             {
-                command.Result = ResultObject.Error(new ErrorMessage
+                var comparer = DateTime.Compare(command.OpinionRequestedUntil.Value, DateTime.Today);
+                if (comparer < 0)
                 {
-                    Message = $"The entered date is invalid!",
-                    TranslationCode = "dms.date.backend.update.validation.invalidDate",
-                    Parameters = new object[] { command.OpinionRequestedUntil }
-                });
-                return false;
+                    command.Result = ResultObject.Error(new ErrorMessage
+                    {
+                        Message = $"The entered date is invalid!",
+                        TranslationCode = "dms.date.backend.update.validation.invalidDate",
+                        Parameters = new object[] { command.OpinionRequestedUntil }
+                    });
+                    return false;
+                }
             }
-
             return true;
         }
     }

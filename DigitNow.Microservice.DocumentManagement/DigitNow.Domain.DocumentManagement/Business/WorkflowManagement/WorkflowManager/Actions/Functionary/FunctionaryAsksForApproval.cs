@@ -23,13 +23,21 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
 
-            if (document.DocumentType == DocumentType.Internal || document.DocumentType == DocumentType.Outgoing)
+            switch (document.DocumentType)
             {
-                await CreateWorkflowRecordForInternalOrOutgoing(command, document, virtualDocument, token);
-                return command;
+                case DocumentType.Incoming:
+                    return await CreateWorkflowRecordForInternalOrOutgoing(command, virtualDocument);
+                case DocumentType.Internal:
+                case DocumentType.Outgoing:
+                    return await CreateWorkflowRecordForInternalOrOutgoing(command, document, virtualDocument, token);
+                default:
+                    return command;
             }
+        }
 
-            var oldWorkflowResponsible = GetOldWorkflowResponsible(virtualDocument, x => x.RecipientType == UserRole.HeadOfDepartment.Id);
+        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordForInternalOrOutgoing(ICreateWorkflowHistoryCommand command, VirtualDocument virtualDocument)
+        {
+            var oldWorkflowResponsible = GetOldWorkflowResponsible(virtualDocument, x => x.RecipientType == RecipientType.HeadOfDepartment.Id);
 
             var newWorkflowResponsible = new WorkflowHistory
             {
@@ -43,13 +51,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             return command;
         }
 
-        private async Task CreateWorkflowRecordForInternalOrOutgoing(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, CancellationToken token)
+        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordForInternalOrOutgoing(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, CancellationToken token)
         {
             var response = await IdentityAdapterClient.GetUsersAsync(token);
             var departmentUsers = response.Users.Where(x => x.Departments.Contains(document.RecipientId));
-            var headOfDepartment = departmentUsers.FirstOrDefault(x => x.Roles.Contains(UserRole.HeadOfDepartment.Code));
+            var headOfDepartment = departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
 
             if (headOfDepartment == null)
+            {
                 command.Result = ResultObject.Error(new ErrorMessage
                 {
                     Message = $"No responsible for department with id {document.RecipientId} was found.",
@@ -57,8 +66,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                     Parameters = new object[] { document.RecipientId }
                 });
 
+                return command;
+            }
+
             virtualDocument.WorkflowHistory.Add(WorkflowHistoryFactory
-            .Create(UserRole.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkApprovalRequested));
+            .Create(RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkApprovalRequested));
+
+            document.Status = DocumentStatus.InWorkApprovalRequested;
+            document.RecipientId = headOfDepartment.Id;
+            document.RecipientIsDepartment = false;
+
+            return command;
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)

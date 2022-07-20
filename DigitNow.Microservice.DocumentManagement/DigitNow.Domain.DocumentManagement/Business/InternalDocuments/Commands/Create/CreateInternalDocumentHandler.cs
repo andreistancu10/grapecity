@@ -51,10 +51,10 @@ public class CreateInternalDocumentHandler : ICommandHandler<CreateInternalDocum
         await _documentService.AddDocument(newDocument, cancellationToken);
         await _uploadedFileService.CreateDocumentUploadedFilesAsync(request.UploadedFileIds, internalDocumentForCreation.Document, cancellationToken);
 
-        internalDocumentForCreation.WorkflowHistory.Add(new WorkflowHistory { RecipientId = request.ReceiverDepartmentId, RecipientType = UserRole.Department.Id, Status = DocumentStatus.New });
+        internalDocumentForCreation.WorkflowHistory.Add(new WorkflowHistory { RecipientId = request.ReceiverDepartmentId, RecipientType = RecipientType.Department.Id, Status = DocumentStatus.New, RecipientName = $"Departamentul {request.ReceiverDepartmentId}" });
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return ResultObject.Created(internalDocumentForCreation.Id);
+        return ResultObject.Created(internalDocumentForCreation.DocumentId);
     }
 }

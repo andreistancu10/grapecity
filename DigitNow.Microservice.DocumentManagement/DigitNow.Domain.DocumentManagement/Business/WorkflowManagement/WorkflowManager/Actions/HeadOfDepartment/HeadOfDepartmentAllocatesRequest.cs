@@ -30,7 +30,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             virtualDocument.WorkflowHistory
                 .Add(WorkflowHistoryFactory
-                .Create(UserRole.Functionary, user, newDocumentStatus));
+                .Create(RecipientType.Functionary, user, newDocumentStatus));
 
             await SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, user.Id, newDocumentStatus);
 

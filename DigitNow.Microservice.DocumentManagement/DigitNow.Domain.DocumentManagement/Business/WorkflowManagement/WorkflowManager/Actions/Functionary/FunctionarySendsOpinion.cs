@@ -20,7 +20,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 return command;
 
             var responsibleFunctionaryRecord = document.IncomingDocument.WorkflowHistory
-                .Where(x => x.RecipientType == UserRole.Functionary.Id && (x.Status == DocumentStatus.InWorkAllocated || x.Status == DocumentStatus.New))
+                .Where(x => x.RecipientType == RecipientType.Functionary.Id && (x.Status == DocumentStatus.InWorkAllocated || x.Status == DocumentStatus.New))
                 .OrderByDescending(x => x.CreatedAt)
                 .FirstOrDefault();
 
