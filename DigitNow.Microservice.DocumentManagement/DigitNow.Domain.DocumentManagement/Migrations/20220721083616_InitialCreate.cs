@@ -56,6 +56,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     RegistrationNumber = table.Column<int>(type: "int", nullable: false),
                     RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     RecipientId = table.Column<long>(type: "bigint", nullable: false),
+                    RecipientIsDepartment = table.Column<bool>(type: "bit", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     StatusModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     StatusModifiedBy = table.Column<long>(type: "bigint", nullable: false)
