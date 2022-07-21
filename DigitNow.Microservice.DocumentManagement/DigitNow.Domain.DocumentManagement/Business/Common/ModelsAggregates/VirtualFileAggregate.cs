@@ -4,9 +4,9 @@ using DigitNow.Domain.DocumentManagement.Data.Entities.UploadedFiles;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates
 {
-    public class VirtualFileAggregate
+    internal class VirtualFileAggregate
     {
-        public UploadedFile UploadedFile { get; set; }
+        internal UploadedFile UploadedFile { get; set; }
         internal IReadOnlyList<UserModel> Users { get; set; }
         internal IReadOnlyList<DocumentCategoryModel> Categories { get; set; }
     }
