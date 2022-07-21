@@ -29,7 +29,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
         {
             var response = await _identityAdapterClient.GetUsersAsync(cancellationToken);
             var departmentUsers = response.Users.Where(x => x.Departments.Contains(request.DepartmentId));
-            _headOfDepartment = departmentUsers.FirstOrDefault(x => x.Roles.Contains(UserRole.HeadOfDepartment.Code));
+            _headOfDepartment = departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
 
             if (_headOfDepartment == null)
                 return ResultObject.Error(new ErrorMessage
@@ -75,7 +75,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
 
             document.Status = DocumentStatus.InWorkUnallocated;
             document.RecipientId = (int)_headOfDepartment.Id;
-            virtualDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(UserRole.HeadOfDepartment, _headOfDepartment, DocumentStatus.InWorkUnallocated));
+            virtualDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(RecipientType.HeadOfDepartment, _headOfDepartment, DocumentStatus.InWorkUnallocated));
         }
     }
 }

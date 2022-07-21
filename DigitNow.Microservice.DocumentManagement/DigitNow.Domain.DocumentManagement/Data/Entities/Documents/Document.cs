@@ -12,6 +12,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public int RegistrationNumber { get; set; }
         public DateTime RegistrationDate { get; set; }
         public long RecipientId { get; set; }
+        public bool RecipientIsDepartment { get; set; }
 
         #region [ IDocument ]
 

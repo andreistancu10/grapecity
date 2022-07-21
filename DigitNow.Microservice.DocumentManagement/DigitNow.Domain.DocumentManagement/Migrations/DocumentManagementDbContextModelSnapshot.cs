@@ -162,6 +162,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<long>("RecipientId")
                         .HasColumnType("bigint");
 
+                    b.Property<bool>("RecipientIsDepartment")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("RegistrationDate")
                         .HasColumnType("datetime2");
 

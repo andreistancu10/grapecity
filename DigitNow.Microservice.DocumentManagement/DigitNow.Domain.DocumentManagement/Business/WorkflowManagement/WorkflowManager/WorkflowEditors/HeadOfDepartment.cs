@@ -11,7 +11,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 {
     public class HeadOfDepartment : IWorkflowHandler
     {
-        private enum ActionType { Allocate = 1, MakeDecision = 3, Decline = 2 };
+        private enum ActionType { Allocate = 1, Decline = 2, MakeDecision = 3, AsksForOpinion = 4, Finalizes = 5, AsksForApproval = 6 };
 
         private readonly Dictionary<ActionType, IWorkflowHandler> actionStrategy = new Dictionary<ActionType, IWorkflowHandler>();
 
@@ -20,6 +20,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
             actionStrategy.Add(ActionType.Allocate, new HeadOfDepartmentAllocatesRequest(serviceProvider));
             actionStrategy.Add(ActionType.Decline, new HeadOfDepartmentDeclines(serviceProvider));
             actionStrategy.Add(ActionType.MakeDecision, new HeadOfDepartmentMakesDecision(serviceProvider));
+            actionStrategy.Add(ActionType.AsksForOpinion, new HeadOfDepartmentAsksForOpinion(serviceProvider));
+            actionStrategy.Add(ActionType.Finalizes, new HeadOfDepartmentFinalizes(serviceProvider));
+            actionStrategy.Add(ActionType.AsksForApproval, new HeadOfDepartmentAsksForApproval(serviceProvider));
         }
 
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)

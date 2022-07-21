@@ -21,6 +21,34 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
 
+            switch (document.DocumentType)
+            {
+                case DocumentType.Incoming:
+                    return await CreateWorkflowForIncoming(command, virtualDocument, lastWorkFlowRecord, token);
+                case DocumentType.Internal:
+                case DocumentType.Outgoing:
+                    return await CreateWorkflowForOutgoingAndInternal(command, virtualDocument, lastWorkFlowRecord, token);
+                default:
+                    return command;
+            }
+        }
+
+        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowForOutgoingAndInternal(ICreateWorkflowHistoryCommand command, VirtualDocument virtualDocument, WorkflowHistory lastWorkFlowRecord, CancellationToken token)
+        {
+            var newWorkflowResponsible = new WorkflowHistory
+            {
+                Status = DocumentStatus.New,
+                DeclineReason = command.DeclineReason,
+                Remarks = command.Remarks
+            };
+
+            await PassDocumentToFunctionary(virtualDocument, newWorkflowResponsible, command);
+
+            return command;
+        }
+
+        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowForIncoming(ICreateWorkflowHistoryCommand command, VirtualDocument virtualDocument, WorkflowHistory lastWorkFlowRecord, CancellationToken token)
+        {
             var newDocumentStatus = lastWorkFlowRecord.Status == DocumentStatus.OpinionRequestedUnallocated
                 ? DocumentStatus.InWorkAllocated
                 : DocumentStatus.NewDeclinedCompetence;
@@ -33,7 +61,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         private async Task SetResponsibleBasedOnStatus(ICreateWorkflowHistoryCommand command, VirtualDocument document, DocumentStatus status, CancellationToken token)
         {
             if (status == DocumentStatus.InWorkAllocated)
-                PassDocumentToFunctionary(document, command);
+            {
+                var newWorkflowResponsible = new WorkflowHistory
+                {
+                    Status = DocumentStatus.InWorkAllocated,
+                    DeclineReason = command.DeclineReason,
+                    Remarks = command.Remarks
+                };
+
+                await PassDocumentToFunctionary(document, newWorkflowResponsible, command);
+            }
             else
                 await PassDocumentToRegistry(document, command, token);
         }

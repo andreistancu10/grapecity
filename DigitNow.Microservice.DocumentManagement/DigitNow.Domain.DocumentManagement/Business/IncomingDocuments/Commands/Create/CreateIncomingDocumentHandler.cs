@@ -49,7 +49,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
 
         var response = await _identityAdapterClient.GetUsersAsync(cancellationToken);
         var departmentUsers = response.Users.Where(x => x.Departments.Contains(request.RecipientId));
-        var headOfDepartment = departmentUsers.FirstOrDefault(x => x.Roles.Contains(UserRole.HeadOfDepartment.Code));
+        var headOfDepartment = departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
 
         if (headOfDepartment == null)
             return ResultObject.Error(new ErrorMessage
@@ -76,7 +76,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             await _uploadedFileService.CreateDocumentUploadedFilesAsync(request.UploadedFileIds, newDocument, cancellationToken);
 
             newIncomingDocument.WorkflowHistory.Add(WorkflowHistoryFactory
-                .Create(UserRole.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkUnallocated));
+                .Create(RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkUnallocated));
 
             await _dbContext.SaveChangesAsync(cancellationToken);
             await _specialRegisterMappingService.MapDocumentAsync(newIncomingDocument, cancellationToken);
@@ -89,7 +89,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             });
         }
 
-        return ResultObject.Created(newIncomingDocument.Id);
+        return ResultObject.Created(newIncomingDocument.DocumentId);
     }
 
     private async Task AttachConnectedDocumentsAsync(CreateIncomingDocumentCommand request, IncomingDocument incomingDocumentForCreation, CancellationToken cancellationToken)
