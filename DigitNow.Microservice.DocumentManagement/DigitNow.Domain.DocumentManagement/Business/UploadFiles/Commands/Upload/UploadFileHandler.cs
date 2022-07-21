@@ -29,11 +29,24 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Uploa
             _uploadedFileRelationsFetcher = new UploadedFileRelationsFetcher(serviceProvider);
         }
 
-        public async Task<FileViewModel> Handle(UploadFileCommand request, CancellationToken cancellationToken)
+        public async Task<FileViewModel> Handle(UploadFileCommand command, CancellationToken cancellationToken)
         {
             var newGuid = Guid.NewGuid();
-            var filePath = await _fileService.UploadFileAsync(request.File, newGuid.ToString());
-            var newUploadedFile = await _uploadedFileService.CreateAsync(request, newGuid, filePath, cancellationToken);
+            var filePath = await _fileService.UploadFileAsync(command.File, newGuid.ToString());
+            var newUploadedFile = await _uploadedFileService.CreateAsync(command, newGuid, filePath, cancellationToken);
+
+            if (command.DocumentId != null)
+            {
+                var associationResult = await _uploadedFileService.AssociateUploadedFileToDocumentAsync(
+                    newUploadedFile.Id, 
+                    (long) command.DocumentId,
+                    cancellationToken);
+
+                if (!associationResult)
+                {
+                    return null;
+                }
+            }
 
             var uploadedFiles = new List<UploadedFile>
             {

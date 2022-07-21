@@ -6,7 +6,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Uploa
 {
     public class UploadFileCommand : ICommand<FileViewModel>
     {
-        //public long? DocumentId { get; set; }
+        public long? DocumentId { get; set; }
         public long DocumentCategoryId { get; set; }
         public string  Name { get; set; }
         public IFormFile File{ get; set; }
