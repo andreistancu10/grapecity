@@ -14,12 +14,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         public FunctionarySendsOpinion(IServiceProvider serviceProvider) : base(serviceProvider) { }
         protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.OpinionRequestedAllocated };
 
-        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, WorkflowHistory oldWorkflowResponsible, CancellationToken token)
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, WorkflowHistory lastWorkflowRecord, CancellationToken token)
         {
-            if (!Validate(command, oldWorkflowResponsible))
+            if (!Validate(command, lastWorkflowRecord))
                 return command;
 
-            var responsibleFunctionaryRecord = virtualDocument.WorkflowHistory
+            var oldWorkflowResponsible = virtualDocument.WorkflowHistory
                 .Where(x => (x.RecipientType == RecipientType.Functionary.Id && (x.Status == DocumentStatus.InWorkAllocated || x.Status == DocumentStatus.New)) 
                           || x.RecipientType == RecipientType.HeadOfDepartment.Id && x.Status == DocumentStatus.OpinionRequestedUnallocated)
                 .OrderByDescending(x => x.CreatedAt)
@@ -31,7 +31,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 Remarks = command.Remarks
             };
 
-            await TransferResponsibility(responsibleFunctionaryRecord, newWorkflowResponsible, command);
+            await TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 
             virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
 

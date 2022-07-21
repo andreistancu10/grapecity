@@ -1,8 +1,6 @@
 ﻿using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
-using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
-using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data;
@@ -26,12 +24,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
         {
             IdentityAdapterClient = serviceProvider.GetService<IIdentityAdapterClient>();
             DbContext = serviceProvider.GetService<DocumentManagementDbContext>();
-            IdentityService = serviceProvider.GetService<IdentityService>();
         }
 
         public readonly IIdentityAdapterClient IdentityAdapterClient;
         public readonly DocumentManagementDbContext DbContext;
-        public readonly IdentityService IdentityService;
         protected abstract int[] allowedTransitionStatuses { get; }
         protected abstract Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, WorkflowHistory lastWorkFlowRecord, CancellationToken token);
 
@@ -45,12 +41,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             await DbContext.SaveChangesAsync(token);
 
             return command;
-        }
-
-        protected async Task<User> GetCurrentUser(CancellationToken token)
-        {
-            var currentUserId = IdentityService.GetCurrentUserId();
-            return await IdentityAdapterClient.GetUserByIdAsync(currentUserId, token);
         }
 
         public WorkflowHistory GetLastWorkflowRecord(VirtualDocument document)
