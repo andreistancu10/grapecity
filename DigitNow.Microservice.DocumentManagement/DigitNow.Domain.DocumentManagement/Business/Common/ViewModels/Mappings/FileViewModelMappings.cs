@@ -1,9 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
-using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
 {
@@ -14,9 +11,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             CreateMap<VirtualFileAggregate, FileViewModel>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.UploadedFile.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.UploadedFile.Name))
-                .ForMember(dest => dest.Category, opt => opt.MapFrom<MapCategory>())
                 .ForMember(dest => dest.UploadDate, opt => opt.MapFrom(src => src.UploadedFile.CreatedAt))
-                .ForMember(dest => dest.UploadedBy, opt => opt.MapFrom<MapUploadedBy>());
+                .ForMember(dest => dest.UploadedBy, opt => opt.MapFrom<MapUploadedBy>())
+                .ForMember(dest => dest.Category, opt => opt.MapFrom<MapCategory>());
         }
 
         private class MapUploadedBy :

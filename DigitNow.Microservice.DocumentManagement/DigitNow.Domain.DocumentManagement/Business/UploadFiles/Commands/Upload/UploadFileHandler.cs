@@ -37,15 +37,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Uploa
 
             if (command.DocumentId != null)
             {
-                var associationResult = await _uploadedFileService.AssociateUploadedFileToDocumentAsync(
+               await _uploadedFileService.AssociateUploadedFileToDocumentAsync(
                     newUploadedFile.Id, 
                     (long) command.DocumentId,
                     cancellationToken);
-
-                if (!associationResult)
-                {
-                    return null;
-                }
             }
 
             var uploadedFiles = new List<UploadedFile>
