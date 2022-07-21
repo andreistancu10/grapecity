@@ -29,6 +29,5 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.
         public bool? IsGDPRAgreed { get; set; }
         public List<WorkflowHistory> WorkflowHistory { get; set; } = new();
         public List<ConnectedDocument> ConnectedDocuments { get; set; } = new();
-        public List<DocumentUploadedFile> DocumentUploadedFiles { get; set; } = new();
     }
 }
