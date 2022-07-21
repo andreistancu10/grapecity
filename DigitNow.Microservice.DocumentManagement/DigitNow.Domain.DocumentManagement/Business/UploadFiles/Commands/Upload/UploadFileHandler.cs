@@ -32,15 +32,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Uploa
         public async Task<FileViewModel> Handle(UploadFileCommand command, CancellationToken cancellationToken)
         {
             var newGuid = Guid.NewGuid();
-            var filePath = await _fileService.UploadFileAsync(command.File, newGuid.ToString());
-            var newUploadedFile = await _uploadedFileService.CreateAsync(command, newGuid, filePath, cancellationToken);
+            var (relativePath, absolutePath) = await _fileService.UploadFileAsync(command.File, newGuid.ToString());
+            var newUploadedFile = await _uploadedFileService.CreateAsync(command, newGuid, relativePath, absolutePath, cancellationToken);
 
             if (command.DocumentId != null)
             {
-               await _uploadedFileService.AssociateUploadedFileToDocumentAsync(
-                    newUploadedFile.Id, 
-                    (long) command.DocumentId,
-                    cancellationToken);
+                await _uploadedFileService.AssociateUploadedFileToDocumentAsync(
+                     newUploadedFile.Id,
+                     (long)command.DocumentId,
+                     cancellationToken);
             }
 
             var uploadedFiles = new List<UploadedFile>
