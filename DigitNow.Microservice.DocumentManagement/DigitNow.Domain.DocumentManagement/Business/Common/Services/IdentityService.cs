@@ -13,7 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
     {
         long GetCurrentUserId();
         bool TryGetCurrentUserId(out int userId);
-        Task<UserRole> GetCurrentUserFirstRoleAsync(CancellationToken cancellationToken);
+        Task<RecipientType> GetCurrentUserFirstRoleAsync(CancellationToken cancellationToken);
     }
 
     public class IdentityService : IIdentityService
@@ -43,14 +43,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             return int.TryParse(userIdClaim, out userId);
         }
 
-        public async Task<UserRole> GetCurrentUserFirstRoleAsync(CancellationToken cancellationToken)
+        public async Task<RecipientType> GetCurrentUserFirstRoleAsync(CancellationToken cancellationToken)
         {
             var userId = GetCurrentUserId();
             var user = await _identityAdapterClient.GetUserByIdAsync(userId, cancellationToken);
 
-            var userRole = user.Roles.Intersect(UserRole.ListOfRoles.Select(x => x.Code)).FirstOrDefault();
+            var userRole = user.Roles.Intersect(RecipientType.ListOfTypes.Select(x => x.Code)).FirstOrDefault();
 
-            return UserRole.ListOfRoles.FirstOrDefault(role => role.Code == userRole) ?? new UserRole { Id = 0 };
+            return RecipientType.ListOfTypes.FirstOrDefault(role => role.Code == userRole) ?? new RecipientType { Id = 0 };
         }
     }
 }

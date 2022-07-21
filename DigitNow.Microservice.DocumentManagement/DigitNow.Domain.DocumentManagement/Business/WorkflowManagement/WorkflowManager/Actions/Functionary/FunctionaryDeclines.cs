@@ -11,21 +11,58 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
     public class FunctionaryDeclines : BaseWorkflowManager, IWorkflowHandler
     {
         public FunctionaryDeclines(IServiceProvider serviceProvider) : base(serviceProvider) { }
-        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.OpinionRequestedAllocated };
+        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.OpinionRequestedAllocated, (int)DocumentStatus.InWorkDeclined };
         
         protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, WorkflowHistory lastWorkFlowRecord, CancellationToken token)
         {
             if (!Validate(command, lastWorkFlowRecord))
                 return command;
 
+            switch (document.DocumentType)
+            {
+                case DocumentType.Incoming:
+                    return await CreateWorkflowHistoryForIncoming(command, virtualDocument, lastWorkFlowRecord, token);
+                case DocumentType.Internal:
+                case DocumentType.Outgoing:
+                    return await CreateWorkflowHistoryForOutgoingAndInternal(command, virtualDocument, lastWorkFlowRecord, token);
+                default:
+                    return command;
+            }
+        }
+
+        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowHistoryForIncoming(ICreateWorkflowHistoryCommand command, VirtualDocument virtualDocument, WorkflowHistory lastWorkFlowRecord, CancellationToken token)
+        {
             var newDocumentStatus = lastWorkFlowRecord.Status == DocumentStatus.OpinionRequestedAllocated
                 ? DocumentStatus.InWorkAllocated
                 : DocumentStatus.NewDeclinedCompetence;
 
             if (newDocumentStatus == DocumentStatus.InWorkAllocated)
-                PassDocumentToFunctionary(virtualDocument, command);
+            {
+                var newWorkflowResponsible = new WorkflowHistory
+                {
+                    Status = DocumentStatus.InWorkAllocated,
+                    DeclineReason = command.DeclineReason,
+                    Remarks = command.Remarks
+                };
+
+                await PassDocumentToFunctionary(virtualDocument, newWorkflowResponsible, command);
+            }
             else
                 await PassDocumentToRegistry(virtualDocument, command, token);
+
+            return command;
+        }
+
+        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowHistoryForOutgoingAndInternal(ICreateWorkflowHistoryCommand command, VirtualDocument virtualDocument, WorkflowHistory lastWorkFlowRecord, CancellationToken token)
+        {
+            var newWorkflowResponsible = new WorkflowHistory
+            {
+                Status = DocumentStatus.New,
+                DeclineReason = command.DeclineReason,
+                Remarks = command.Remarks
+            };
+
+            await PassDocumentToFunctionary(virtualDocument, newWorkflowResponsible, command);
 
             return command;
         }

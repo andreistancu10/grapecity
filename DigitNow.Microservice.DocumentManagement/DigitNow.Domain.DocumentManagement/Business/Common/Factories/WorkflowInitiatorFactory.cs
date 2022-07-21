@@ -13,9 +13,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
         {
             factory.Clear();
 
-            factory.Add(UserRole.HeadOfDepartment.Id, () => new HeadOfDepartment(serviceProvider));
-            factory.Add(UserRole.Functionary.Id, () => new Functionary(serviceProvider));
-            factory.Add(UserRole.Mayor.Id, () => new Mayor(serviceProvider));
+            factory.Add(RecipientType.HeadOfDepartment.Id, () => new HeadOfDepartment(serviceProvider));
+            factory.Add(RecipientType.Functionary.Id, () => new Functionary(serviceProvider));
+            factory.Add(RecipientType.Mayor.Id, () => new Mayor(serviceProvider));
         }
 
         public IWorkflowHandler Create(int userRole)

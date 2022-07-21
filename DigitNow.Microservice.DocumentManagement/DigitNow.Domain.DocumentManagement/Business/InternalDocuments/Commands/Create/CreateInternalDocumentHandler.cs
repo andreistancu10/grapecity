@@ -37,36 +37,24 @@ public class CreateInternalDocumentHandler : ICommandHandler<CreateInternalDocum
 
     public async Task<ResultObject> Handle(CreateInternalDocumentCommand request, CancellationToken cancellationToken)
     {
-        var response = await _identityAdapterClient.GetUsersAsync(cancellationToken);
-        var departmentUsers = response.Users.Where(x => x.Departments.Contains(request.ReceiverDepartmentId));
-        var headOfDepartment = departmentUsers.FirstOrDefault(x => x.Roles.Contains(UserRole.HeadOfDepartment.Code));
-
-        if (headOfDepartment == null)
-            return ResultObject.Error(new ErrorMessage
-            {
-                Message = $"No responsible for department with id {request.ReceiverDepartmentId} was found.",
-                TranslationCode = "catalog.headOfdepartment.backend.update.validation.entityNotFound",
-                Parameters = new object[] { request.ReceiverDepartmentId }
-            });
-
         var internalDocumentForCreation = _mapper.Map<InternalDocument>(request);
 
         var newDocument = new Document
         {
             DocumentType = DocumentType.Internal,
             InternalDocument = internalDocumentForCreation,
-            RecipientId = headOfDepartment.Id,
-            Status = DocumentStatus.New
+            RecipientId = request.ReceiverDepartmentId,
+            Status = DocumentStatus.New,
+            RecipientIsDepartment = true
         };
 
         await _documentService.AddDocument(newDocument, cancellationToken);
         await _uploadedFileService.CreateDocumentUploadedFilesAsync(request.UploadedFileIds, internalDocumentForCreation.Document, cancellationToken);
 
-        internalDocumentForCreation.WorkflowHistory.Add(WorkflowHistoryFactory
-            .Create(UserRole.HeadOfDepartment, headOfDepartment, DocumentStatus.New));
+        internalDocumentForCreation.WorkflowHistory.Add(new WorkflowHistory { RecipientId = request.ReceiverDepartmentId, RecipientType = RecipientType.Department.Id, Status = DocumentStatus.New, RecipientName = $"Departamentul {request.ReceiverDepartmentId}" });
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return ResultObject.Created(internalDocumentForCreation.Id);
+        return ResultObject.Created(internalDocumentForCreation.DocumentId);
     }
 }

@@ -26,7 +26,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.
                 .Include(x=>x.ConnectedDocuments)
                 .Include(x=>x.Document)
                 .ThenInclude(x => x.DocumentUploadedFiles)
-                .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
+                .FirstOrDefaultAsync(c => c.DocumentId == request.Id, cancellationToken);
             
             if (foundIncomingDocument == null) return null;
 

@@ -106,7 +106,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         private async Task<IList<UserModel>> GetRelatedUsersAsync(UserModel userModel, CancellationToken cancellationToken)
         {
-            if (IsRole(userModel, UserRole.HeadOfDepartment))
+            if (IsRole(userModel, RecipientType.HeadOfDepartment))
             {
                 var usersResponse = await _identityAdapterClient.GetUsersAsync(cancellationToken);
 
@@ -157,7 +157,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             var userModel = await GetCurrentUserAsync(cancellationToken);
 
-            if (!IsRole(userModel, UserRole.Mayor))
+            if (!IsRole(userModel, RecipientType.Mayor))
             {
                 var relatedUserIds = await GetRelatedUserIdsAsync(userModel, cancellationToken);
 
@@ -172,7 +172,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         #region [ Utils ]
 
-        private static bool IsRole(UserModel userModel, UserRole role) =>
+        private static bool IsRole(UserModel userModel, RecipientType role) =>
             userModel.Roles.Contains(role.Code);
 
         #endregion

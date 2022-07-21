@@ -14,33 +14,35 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         public FunctionarySendsOpinion(IServiceProvider serviceProvider) : base(serviceProvider) { }
         protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.OpinionRequestedAllocated };
 
-        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, WorkflowHistory oldWorkflowResponsible, CancellationToken token)
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, WorkflowHistory lastWorkflowRecord, CancellationToken token)
         {
-            if (!Validate(command, oldWorkflowResponsible))
+            if (!Validate(command, lastWorkflowRecord))
                 return command;
 
-            var responsibleHeadOfDepartmentRecord = virtualDocument.WorkflowHistory
-                .Where(x => x.RecipientType == UserRole.HeadOfDepartment.Id && x.Status == DocumentStatus.OpinionRequestedUnallocated)
+            var oldWorkflowResponsible = virtualDocument.WorkflowHistory
+                .Where(x => (x.RecipientType == RecipientType.Functionary.Id && (x.Status == DocumentStatus.InWorkAllocated || x.Status == DocumentStatus.New)) 
+                          || x.RecipientType == RecipientType.HeadOfDepartment.Id && x.Status == DocumentStatus.OpinionRequestedUnallocated)
                 .OrderByDescending(x => x.CreatedAt)
                 .FirstOrDefault();
 
-            // TODO: we have to decide weather we pass the document to the functionary or to the head department
-            //var responsibleFunctionaryRecord = document.IncomingDocument.WorkflowHistory
-            //    .Where(x => x.RecipientType == UserRole.Functionary.Id && x.Status == DocumentStatus.InWorkAllocated)
-            //    .OrderByDescending(x => x.CreationDate)
-            //    .FirstOrDefault();
-
             var newWorkflowResponsible = new WorkflowHistory
             {
-                Status = DocumentStatus.InWorkAllocated,
+                Status = document.DocumentType == DocumentType.Incoming ? DocumentStatus.InWorkAllocated : DocumentStatus.New,
                 Remarks = command.Remarks
             };
 
-            TransferResponsibility(responsibleHeadOfDepartmentRecord, newWorkflowResponsible, command);
+            await TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 
             virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
 
+            ResetDateAsOpinionWasSent(virtualDocument);
+
             return command;
+        }
+
+        private static void ResetDateAsOpinionWasSent(VirtualDocument virtualDocument)
+        {
+            virtualDocument.WorkflowHistory.ForEach(x => x.OpinionRequestedUntil = null);
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)

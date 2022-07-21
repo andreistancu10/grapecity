@@ -3,6 +3,8 @@ using System.Threading.Tasks;
 using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries;
+using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.DownloadFile;
+using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetFiles;
 using DigitNow.Domain.DocumentManagement.Public.UploadFiles.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
@@ -47,5 +49,19 @@ namespace DigitNow.Domain.DocumentManagement.Public.UploadFiles
                 _ => File(result.FileContent.Content, result.FileContent.ContentType, result.FileContent.Name)
             };
         }
+
+        [HttpGet("get-files/{documentId:int}")]
+        public async Task<IActionResult> GetFilesAsync([FromRoute] int documentId)
+        {
+            var result = await _mediator.Send(new GetFilesQuery(documentId));
+
+            return result switch
+            {
+                null => NotFound(),
+                _ => Ok(result)
+            };
+        }
+
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
+﻿
+using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
@@ -9,16 +10,16 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.WorkflowManager.Actions.Functionary
+namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.WorkflowManager.Actions.HeadOfDepartment
 {
-    public class FunctionaryAsksForOpinion : BaseWorkflowManager, IWorkflowHandler
+    public class HeadOfDepartmentAsksForOpinion : BaseWorkflowManager, IWorkflowHandler
     {
-        public FunctionaryAsksForOpinion(IServiceProvider serviceProvider) : base(serviceProvider) { }
-        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.New, (int)DocumentStatus.InWorkDeclined };
-        
+        public HeadOfDepartmentAsksForOpinion(IServiceProvider serviceProvider) : base(serviceProvider) {}
+        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.New };
+
         protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, WorkflowHistory lastWorkFlowRecord, CancellationToken token)
         {
-            if (!Validate(command, lastWorkFlowRecord))
+            if (!Validate(command, lastWorkFlowRecord, document))
                 return command;
 
             var headOfDepartment = await FetchHeadOfDepartmentByDepartmentIdAsync((long)command.RecipientId, token);
@@ -30,13 +31,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 .Create(RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.OpinionRequestedUnallocated, string.Empty, command.Remarks, command.OpinionRequestedUntil));
 
             await SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, headOfDepartment.Id, DocumentStatus.OpinionRequestedUnallocated);
-            
+
             return command;
         }
 
-        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
+        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord, Document document)
         {
-            if (command.RecipientId <= 0 || !IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
+            if (command.RecipientId <= 0 || !IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses) || document.DocumentType == DocumentType.Incoming)
             {
                 TransitionNotAllowed(command);
                 return false;
@@ -56,6 +57,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                     return false;
                 }
             }
+
             return true;
         }
     }

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    [Migration("20220718115951_InitialCreate")]
+    [Migration("20220721083616_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -163,6 +163,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.Property<long>("RecipientId")
                         .HasColumnType("bigint");
+
+                    b.Property<bool>("RecipientIsDepartment")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("RegistrationDate")
                         .HasColumnType("datetime2");

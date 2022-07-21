@@ -16,11 +16,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     public interface IUploadedFileService
     {
         Task<UploadedFile> CreateAsync(UploadFileCommand request, Guid newGuid, string filePath, CancellationToken cancellationToken);
-        Task CreateDocumentUploadedFilesAsync(IEnumerable<long> uploadedFileIds, Document document,
-            CancellationToken cancellationToken);
-        Task UpdateDocumentUploadedFilesAsync(List<long> uploadedFileIds, Document document,
-            CancellationToken cancellationToken);
+        Task CreateDocumentUploadedFilesAsync(IEnumerable<long> uploadedFileIds, Document document, CancellationToken cancellationToken);
+        Task UpdateDocumentUploadedFilesAsync(List<long> uploadedFileIds, Document document, CancellationToken cancellationToken);
         Task<List<UploadedFile>> GetUploadedFilesAsync(IEnumerable<long> ids, CancellationToken cancellationToken);
+        Task<List<UploadedFile>> FetchUploadedFiles(long documentId, CancellationToken cancellationToken);
+
+        Task<bool> AssociateUploadedFileToDocumentAsync(long uploadedFileId, long documentId,
+            CancellationToken cancellationToken);
     }
 
     public class UploadedFileService : IUploadedFileService
@@ -66,7 +68,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             var currentlyPresentIds = document.DocumentUploadedFiles.Select(c => c.UploadedFileId).ToList();
             var uploadedFileIdsToRemove = currentlyPresentIds.Where(c => !uploadedFileIds.Contains(c));
-            var documentUploadedFilesToRemove = document.DocumentUploadedFiles.Where(c=> uploadedFileIdsToRemove.Contains(c.UploadedFileId));
+            var documentUploadedFilesToRemove = document.DocumentUploadedFiles.Where(c => uploadedFileIdsToRemove.Contains(c.UploadedFileId));
             var idsToAdd = uploadedFileIds.Where(c => !currentlyPresentIds.Contains(c));
             _dbContext.DocumentUploadedFiles.RemoveRange(documentUploadedFilesToRemove);
 
@@ -76,6 +78,39 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         public async Task<List<UploadedFile>> GetUploadedFilesAsync(IEnumerable<long> ids, CancellationToken cancellationToken)
         {
             return await _dbContext.UploadedFiles.Where(c => ids.Contains(c.Id)).ToListAsync(cancellationToken);
+        }
+
+        public Task<List<UploadedFile>> FetchUploadedFiles(long documentId, CancellationToken cancellationToken)
+        {
+            return _dbContext.DocumentUploadedFiles
+                .AsNoTracking()
+                .Where(c => c.DocumentId == documentId)
+                .Select(c => c.UploadedFile)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<bool> AssociateUploadedFileToDocumentAsync(long uploadedFileId, long documentId,
+            CancellationToken cancellationToken)
+        {
+            var uploadedFileExist = await _dbContext.UploadedFiles.AnyAsync(c => c.Id == uploadedFileId, cancellationToken);
+            var documentExist = await _dbContext.Documents.AnyAsync(c => c.Id == documentId, cancellationToken);
+
+
+            if (!(uploadedFileExist && documentExist))
+            {
+                return false;
+            }
+
+            var newDocumentUploadedFile = new DocumentUploadedFile
+            {
+                UploadedFileId = uploadedFileId,
+                DocumentId = documentId
+            };
+
+            await _dbContext.DocumentUploadedFiles.AddAsync(newDocumentUploadedFile, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return true;
         }
     }
 }

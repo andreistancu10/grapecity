@@ -1,7 +1,6 @@
 ﻿using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
-using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data;
@@ -63,22 +62,27 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             switch (document.DocumentType)
             {
                 case DocumentType.Incoming:
-                    return await DbContext.IncomingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.Id == document.Id);
+                    return await DbContext.IncomingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.DocumentId == document.Id);
                 case DocumentType.Internal:
-                    return await DbContext.InternalDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.Id == document.Id);
+                    return await DbContext.InternalDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.DocumentId == document.Id);
                 case DocumentType.Outgoing:
-                    return await DbContext.OutgoingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.Id == document.Id);
+                    return await DbContext.OutgoingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.DocumentId == document.Id);
                 default:
                     return null;
             }
         }
 
-        public async void SetStatusAndRecipientBasedOnWorkflowDecision(long documentId, long recipientId, DocumentStatus status)
+        public async Task SetStatusAndRecipientBasedOnWorkflowDecision(long documentId, long recipientId, DocumentStatus status)
         {
             var document = await DbContext.Documents.FirstAsync(x => x.Id == documentId);
 
             document.RecipientId = recipientId;
             document.Status = status;
+
+            if (document.DocumentType == DocumentType.Outgoing || document.DocumentType == DocumentType.Internal)
+            {
+                document.RecipientIsDepartment = false;
+            }
         }
 
         public async Task<User> FetchHeadOfDepartmentByDepartmentIdAsync(long departmentId, CancellationToken token)
@@ -86,16 +90,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             var response = await IdentityAdapterClient.GetUsersAsync(token);
             var departmentUsers = response.Users.Where(x => x.Departments.Contains(departmentId));
             
-            return departmentUsers.FirstOrDefault(x => x.Roles.Contains(UserRole.HeadOfDepartment.Code));
+            return departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
         }
 
         public async Task<User> FetchMayorAsync(CancellationToken token)
         {
             var response = await IdentityAdapterClient.GetUsersAsync(token);
-            return response.Users.FirstOrDefault(x => x.Roles.Contains(UserRole.Mayor.Code));
+            return response.Users.FirstOrDefault(x => x.Roles.Contains(RecipientType.Mayor.Code));
         }
 
-        protected virtual void TransferResponsibility(WorkflowHistory oldRecord, WorkflowHistory newRecord, ICreateWorkflowHistoryCommand command)
+        protected async virtual Task TransferResponsibility(WorkflowHistory oldRecord, WorkflowHistory newRecord, ICreateWorkflowHistoryCommand command)
         {
             if (oldRecord == null)
             {
@@ -106,7 +110,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             newRecord.RecipientType = oldRecord.RecipientType;
             newRecord.RecipientName = oldRecord.RecipientName;
 
-            SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, newRecord.RecipientId, newRecord.Status);
+            await SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, newRecord.RecipientId, newRecord.Status);
         }
 
         protected virtual void TransitionNotAllowed(ICreateWorkflowHistoryCommand command)
@@ -140,21 +144,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
 
             document.WorkflowHistory
                 .Add(WorkflowHistoryFactory
-                .Create(UserRole.Functionary, creator, DocumentStatus.NewDeclinedCompetence, command.DeclineReason, command.Remarks));
+                .Create(RecipientType.Functionary, creator, DocumentStatus.NewDeclinedCompetence, command.DeclineReason, command.Remarks));
 
-            SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, creator.Id, DocumentStatus.NewDeclinedCompetence);
+            await SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, creator.Id, DocumentStatus.NewDeclinedCompetence);
         }
 
-        protected void PassDocumentToFunctionary(VirtualDocument document, ICreateWorkflowHistoryCommand command)
+        protected async Task PassDocumentToFunctionary(VirtualDocument document, WorkflowHistory newWorkflowResponsible, ICreateWorkflowHistoryCommand command)
         {
-            var oldWorkflowResponsible = GetOldWorkflowResponsible(document, x => x.RecipientType == UserRole.Functionary.Id);
+            var oldWorkflowResponsible = GetOldWorkflowResponsible(document, x => x.RecipientType == RecipientType.Functionary.Id);
 
-            var newWorkflowResponsible = new WorkflowHistory();
-            newWorkflowResponsible.Status = DocumentStatus.InWorkAllocated;
-            newWorkflowResponsible.DeclineReason = command.DeclineReason;
-            newWorkflowResponsible.Remarks = command.Remarks;
-
-            TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
+            await TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 
             document.WorkflowHistory.Add(newWorkflowResponsible);
         }

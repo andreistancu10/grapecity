@@ -40,7 +40,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                     Parameters = new object[] { request.UserId }
                 });
 
-            _isHeadOfDepartment = _user.Roles.Contains(UserRole.HeadOfDepartment.Code);
+            _isHeadOfDepartment = _user.Roles.Contains(RecipientType.HeadOfDepartment.Code);
             _status = _isHeadOfDepartment ? DocumentStatus.InWorkDelegatedUnallocated : DocumentStatus.InWorkDelegated;
 
             await UpdateDocuments(request.DocumentIds);
@@ -79,7 +79,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
 
             document.Status = _status;
             document.RecipientId = (int)_user.Id;
-            virtualDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(_isHeadOfDepartment ? UserRole.HeadOfDepartment : UserRole.Functionary, _user, _status));
+            virtualDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(_isHeadOfDepartment ? RecipientType.HeadOfDepartment : RecipientType.Functionary, _user, _status));
         }
     }
 }
