@@ -22,8 +22,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.InternalDocuments.Queries.
         {
             var foundInternalDocument = await _dbContext.InternalDocuments
                 .Include(x => x.WorkflowHistory)
-                .Include(x => x.Document)
-                .ThenInclude(x => x.DocumentUploadedFiles)
                 .FirstOrDefaultAsync(c => c.DocumentId == request.Id, cancellationToken);
             
             if (foundInternalDocument == null) return null;
