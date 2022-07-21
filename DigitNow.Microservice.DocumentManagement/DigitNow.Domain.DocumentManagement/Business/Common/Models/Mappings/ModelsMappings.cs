@@ -1,5 +1,6 @@
 ﻿using System;
 using AutoMapper;
+using DigitNow.Adapters.MS.Catalog.Poco;
 using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.Catalog.Contracts.Departments.GetDepartments;
 using DigitNow.Domain.Catalog.Contracts.DocumentTypes.GetDocumentTypes;
@@ -22,6 +23,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings
             CreateMap<IInternalDocumentTypeResponse, DocumentCategoryModel>();
             CreateMap<SpecialRegisterMapping, SpecialRegisterMappingModel>();
             CreateMap<SpecialRegisterMapping, DocumentsSpecialRegisterMappingModel>();
+
+            CreateMap<DocumentType, DocumentCategoryModel>();
+            CreateMap<DocumentType, InternalDocumentCategoryModel>();
         }
     }
 }
