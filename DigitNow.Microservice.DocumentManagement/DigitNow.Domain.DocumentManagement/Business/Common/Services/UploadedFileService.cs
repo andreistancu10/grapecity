@@ -16,10 +16,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     public interface IUploadedFileService
     {
         Task<UploadedFile> CreateAsync(UploadFileCommand request, Guid newGuid, string filePath, CancellationToken cancellationToken);
-        Task CreateDocumentUploadedFilesAsync(IEnumerable<long> uploadedFileIds, Document document,
-            CancellationToken cancellationToken);
-        Task UpdateDocumentUploadedFilesAsync(List<long> uploadedFileIds, Document document,
-            CancellationToken cancellationToken);
+        Task CreateDocumentUploadedFilesAsync(IEnumerable<long> uploadedFileIds, Document document, CancellationToken cancellationToken);
+        Task UpdateDocumentUploadedFilesAsync(List<long> uploadedFileIds, Document document, CancellationToken cancellationToken);
         Task<List<UploadedFile>> GetUploadedFilesAsync(IEnumerable<long> ids, CancellationToken cancellationToken);
         Task<List<UploadedFile>> FetchUploadedFiles(long documentId, CancellationToken cancellationToken);
     }
@@ -84,7 +82,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return _dbContext.DocumentUploadedFiles
                 .AsNoTracking()
                 .Where(c => c.DocumentId == documentId)
-                .Select(c=>c.UploadedFile)
+                .Select(c => c.UploadedFile)
                 .ToListAsync(cancellationToken);
         }
     }
