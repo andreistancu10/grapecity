@@ -28,6 +28,20 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetWorkf
         {
             var document = await _documentService.FindAsync(x => x.Id == request.DocumentId, cancellationToken);
             var userRole = await _identityService.GetCurrentUserFirstRoleAsync(cancellationToken);
+
+            DateTime? opinionRequestedUntil = null;
+            if (document.Status == DocumentStatus.OpinionRequestedAllocated)
+            {
+                opinionRequestedUntil = await ExtractDeadline(document);
+            }
+
+            var response = new GetWorkflowInformationByDocumentIdResponse { DocumentStatus = document.Status, UserRole = userRole.Id, OpinionRequestedUntil = opinionRequestedUntil };
+
+            return response;
+        }
+
+        private async Task<DateTime?> ExtractDeadline(Document document)
+        {
             DateTime? opinionRequestedUntil = null;
 
             switch (document.DocumentType)
@@ -45,9 +59,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetWorkf
                     break;
             }
 
-            var response = new GetWorkflowInformationByDocumentIdResponse { DocumentStatus = document.Status, UserRole = userRole.Id, OpinionRequestedUntil = opinionRequestedUntil };
-            
-            return response;
+            return opinionRequestedUntil;
         }
 
         private async Task<DateTime?> ExtractDeadlineForSendingOpinion<T>(Document document) where T : VirtualDocument

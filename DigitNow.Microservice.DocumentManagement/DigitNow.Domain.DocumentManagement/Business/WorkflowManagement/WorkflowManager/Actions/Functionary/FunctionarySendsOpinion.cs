@@ -19,8 +19,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             if (!Validate(command, oldWorkflowResponsible))
                 return command;
 
-            var responsibleFunctionaryRecord = document.IncomingDocument.WorkflowHistory
-                .Where(x => x.RecipientType == RecipientType.Functionary.Id && (x.Status == DocumentStatus.InWorkAllocated || x.Status == DocumentStatus.New))
+            var responsibleFunctionaryRecord = virtualDocument.WorkflowHistory
+                .Where(x => (x.RecipientType == RecipientType.Functionary.Id && (x.Status == DocumentStatus.InWorkAllocated || x.Status == DocumentStatus.New)) 
+                          || x.RecipientType == RecipientType.HeadOfDepartment.Id && x.Status == DocumentStatus.OpinionRequestedUnallocated)
                 .OrderByDescending(x => x.CreatedAt)
                 .FirstOrDefault();
 
@@ -34,7 +35,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
 
+            ResetDateAsOpinionWasSent(virtualDocument);
+
             return command;
+        }
+
+        private static void ResetDateAsOpinionWasSent(VirtualDocument virtualDocument)
+        {
+            virtualDocument.WorkflowHistory.ForEach(x => x.OpinionRequestedUntil = null);
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)

@@ -48,7 +48,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 await PassDocumentToFunctionary(virtualDocument, newWorkflowResponsible, command);
             }
             else
-                await PassDocumentToRegistry(virtualDocument, command, token); //TODO pass doc to Registratura
+                await PassDocumentToRegistry(virtualDocument, command, token);
 
             return command;
         }
