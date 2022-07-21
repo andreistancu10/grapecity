@@ -48,9 +48,9 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddServices();
 
             services.AddScoped<RouteParameterAccessor>();
-            services.AddAuthenticationClientDomainServices(configuration);            
+            services.AddAuthenticationClientDomainServices(configuration);
             services.AddLocalizationMQServices();
-            services.AddCatalogClientDomainServices(configuration);            
+            services.AddCatalogClientDomainServices(configuration);
 
             return services;
         }
@@ -64,7 +64,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations
         {
             return services;
         }
-        
+
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             services.AddScoped<IPdfGenerator, PdfGenerator>();
@@ -80,7 +80,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<IDocumentMappingService, DocumentMappingService>();
             services.AddTransient<ISpecialRegisterMappingService, SpecialRegisterMappingService>();
             services.AddTransient<ISpecialRegisterService, SpecialRegisterService>();
-            services.AddTransient<IFileService, FileService>();
+            services.AddTransient<IFileService, FileService>(c => new FileService());
             services.AddTransient<IUploadedFileService, UploadedFileService>();
 
             return services;

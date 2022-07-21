@@ -9,50 +9,53 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IFileService
     {
-        Task<string> UploadFileAsync(IFormFile formFileStream, string fileGuid);
-        byte[] DownloadFileAsync(string relativePath, string fileGuid);
+        Task<Tuple<string, string>> UploadFileAsync(IFormFile formFileStream, string fileGuid);
+        byte[] DownloadFileAsync(string path, string fileGuid);
     }
 
     public class FileService : IFileService
     {
         private readonly int _filesPerDirectory;
-        private readonly string _completeRootPath;
-        private readonly string _partition;
+        private readonly string _rootPath;
+        private readonly string _pathDirectorySeparator;
 
         public FileService(
-            string rootPath = "DigitNow_Documents",
-            int filesPerDirectory = 1000,
-            string partition = "C")
+            bool isLinuxTypePath = false,
+            string rootDirectory = "DigitNow_Documents",
+            int filesPerDirectory = 1000
+            //string partition = "/home",
+            )
         {
             _filesPerDirectory = filesPerDirectory;
-            _completeRootPath = $"{partition}:\\{rootPath}";
-            _partition = partition;
+            var partition = isLinuxTypePath ? "/home" : "C:";
+            _pathDirectorySeparator = isLinuxTypePath ? "/" : "\\";
+            _rootPath = $"{partition}{_pathDirectorySeparator}{rootDirectory}";
         }
 
-        public async Task<string> UploadFileAsync(IFormFile formFileStream, string fileGuid)
+        public async Task<Tuple<string, string>> UploadFileAsync(IFormFile formFileStream, string fileGuid)
         {
             var relativePath = GenerateRelativePath();
             relativePath = EnsureEligibilityOfPath(relativePath);
             var fullPath = GenerateFullPath(relativePath);
-            fileGuid = EnsureEligibilityOfFilename(fileGuid: fileGuid, fullPath: fullPath);
+            fileGuid = EnsureEligibilityOfFilename(fileGuid, fullPath);
 
             CheckOrCreateDirectoryTree(fullPath);
             await SaveFileOnDiskAsync(fullPath, fileGuid, formFileStream);
 
-            return relativePath;
+            return new Tuple<string, string>(relativePath, fullPath);
         }
 
-        public byte[] DownloadFileAsync(string relativePath, string fileGuid)
+        public byte[] DownloadFileAsync(string path, string fileGuid)
         {
-            if (!DoesFileExist(GenerateFullPath(relativePath), fileGuid))
+            if (!DoesFileExist(path, fileGuid))
             {
-                throw new FileNotFoundException();
+                throw new FileNotFoundException($"FilePath: {path}{_pathDirectorySeparator}{fileGuid}");
             }
 
-            return File.ReadAllBytes($"{_completeRootPath}\\{relativePath}\\{fileGuid}");
+            return File.ReadAllBytes($"{path}{_pathDirectorySeparator}{fileGuid}");
         }
 
-        private static string EnsureEligibilityOfFilename(string fileGuid, string fullPath)
+        private string EnsureEligibilityOfFilename(string fileGuid, string fullPath)
         {
             var isFilenameEligible = false;
             var newFilename = fileGuid;
@@ -93,14 +96,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return newRelativePath;
         }
 
-        private static bool DoesFileExist(string path, string fileGuid)
+        private bool DoesFileExist(string path, string fileGuid)
         {
             if (!Directory.Exists(path))
             {
                 return false;
             }
 
-            var fileGuidWithPath = $"{path}\\{fileGuid}";
+            var fileGuidWithPath = $"{path}{_pathDirectorySeparator}{fileGuid}";
             return Directory.EnumerateFiles(path).Any(c => c == fileGuidWithPath);
         }
 
@@ -114,14 +117,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return Directory.EnumerateFiles(path).Count() < _filesPerDirectory;
         }
 
-        private static async Task SaveFileOnDiskAsync(string fullPath, string fileGuid, IFormFile formFileStream)
+        private async Task SaveFileOnDiskAsync(string fullPath, string fileGuid, IFormFile formFileStream)
         {
             if (formFileStream.Length <= 0)
             {
                 throw new EndOfStreamException();
             }
 
-            await using Stream fileStream = new FileStream($"{fullPath}\\{fileGuid}", FileMode.Create, FileAccess.Write);
+            await using Stream fileStream = new FileStream($"{fullPath}{_pathDirectorySeparator}{fileGuid}", FileMode.Create, FileAccess.Write);
             await formFileStream.CopyToAsync(fileStream);
         }
 
@@ -131,12 +134,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var month = DateTime.UtcNow.Month;
             var day = DateTime.UtcNow.Day;
 
-            return $"{year}\\{month}\\{day}";
+            return $"{year}{_pathDirectorySeparator}{month}{_pathDirectorySeparator}{day}";
         }
 
         private string GenerateFullPath(string relativePath)
         {
-            return $"{_completeRootPath}\\{relativePath}";
+            return $"{_rootPath}{_pathDirectorySeparator}{relativePath}";
         }
 
         private static void CheckOrCreateDirectoryTree(string path)
