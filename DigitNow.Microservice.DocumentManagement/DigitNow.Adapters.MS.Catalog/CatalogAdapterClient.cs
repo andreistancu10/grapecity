@@ -5,6 +5,9 @@ namespace DigitNow.Adapters.MS.Catalog
     public interface ICatalogAdapterClient
     {
         Task<DocumentType> GetDocumentTypeByIdAsync(int id, CancellationToken cancellationToken);
+        
+        Task<IList<DocumentType>> GetDocumentTypesAsync(CancellationToken cancellationToken);
+        Task<IList<DocumentType>> GetInternalDocumentTypesAsync(CancellationToken cancellationToken);
     }
     public class CatalogAdapterClient : ICatalogAdapterClient
     {
@@ -16,5 +19,32 @@ namespace DigitNow.Adapters.MS.Catalog
         }
         public Task<DocumentType> GetDocumentTypeByIdAsync(int id, CancellationToken cancellationToken) => _catalogHttpClient.GetAsync<DocumentType>($"DocumentTypes/{id}", cancellationToken);
         
+        public async Task<IList<DocumentType>> GetDocumentTypesAsync(CancellationToken cancellationToken)
+        {
+            var pagedResult = await _catalogHttpClient.GetAsync<ResultPagedList<DocumentType>>("DocumentTypes/filter", cancellationToken);
+
+            var items = new List<DocumentType>(pagedResult.Items);
+            while (pagedResult.PagingHeader.PageNumber < pagedResult.PagingHeader.TotalPages)
+            {
+                pagedResult = await _catalogHttpClient.GetAsync<ResultPagedList<DocumentType>>("DocumentTypes/filter", cancellationToken);
+                items.AddRange(pagedResult.Items);
+            }
+
+            return items;
+        }
+        
+        public async Task<IList<DocumentType>> GetInternalDocumentTypesAsync(CancellationToken cancellationToken)
+        {
+            var pagedResult = await _catalogHttpClient.GetAsync<ResultPagedList<DocumentType>>("internalDocumentTypes/filter", cancellationToken);
+
+            var items = new List<DocumentType>(pagedResult.Items);
+            while(pagedResult.PagingHeader.PageNumber < pagedResult.PagingHeader.TotalPages)
+            {
+                pagedResult = await _catalogHttpClient.GetAsync<ResultPagedList<DocumentType>>("internalDocumentTypes/filter", cancellationToken);
+                items.AddRange(pagedResult.Items);
+            }
+
+            return items;
+        }
     }
 }
