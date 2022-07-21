@@ -80,7 +80,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<IDocumentMappingService, DocumentMappingService>();
             services.AddTransient<ISpecialRegisterMappingService, SpecialRegisterMappingService>();
             services.AddTransient<ISpecialRegisterService, SpecialRegisterService>();
-            services.AddTransient<IFileService, FileService>(c => new FileService());
+            services.AddTransient<IFileService, FileService>(c => new FileService(true));
             services.AddTransient<IUploadedFileService, UploadedFileService>();
 
             return services;
