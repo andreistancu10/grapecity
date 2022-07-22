@@ -115,8 +115,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             if (!internalDocumentsIds.Any())
                 return default(long);
 
-            //TODO: Add workflow history once is implemented
-            return await CountChildDocumentsAsync<InternalDocument>(internalDocumentsIds, postprocessFilter, null, cancellationToken);
+            var internalDocumentsIncludes = PredicateFactory.CreateIncludesList<InternalDocument>(x => x.WorkflowHistory);
+            return await CountChildDocumentsAsync<InternalDocument>(internalDocumentsIds, postprocessFilter, internalDocumentsIncludes, cancellationToken);
         }
 
         private async Task<long> CountOutgoingDocumentsAsync(IList<Document> documents, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
@@ -165,8 +165,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             if (!internalDocumentsIds.Any())
                 return new List<InternalDocument>();
 
-            //TODO: Add workflow history once is implemented
-            var internalDocumentsIncludes = PredicateFactory.CreateIncludesList<InternalDocument>(x => x.Document);
+            var internalDocumentsIncludes = PredicateFactory.CreateIncludesList<InternalDocument>(x => x.Document, x => x.WorkflowHistory);
             return await FetchChildDocumentsAsync(internalDocumentsIds, postprocessFilter, internalDocumentsIncludes, cancellationToken);
         }
 
