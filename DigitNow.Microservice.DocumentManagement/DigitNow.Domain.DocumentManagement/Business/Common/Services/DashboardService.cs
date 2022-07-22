@@ -162,7 +162,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 var relatedUserIds = await GetRelatedUserIdsAsync(userModel, cancellationToken);
 
                 documentsQuery = documentsQuery
-                    .Where(x => relatedUserIds.Contains(x.CreatedBy));
+                    .Where(x => relatedUserIds.Contains(x.CreatedBy) || relatedUserIds.Contains(x.RecipientId));
             }
 
             return documentsQuery;
