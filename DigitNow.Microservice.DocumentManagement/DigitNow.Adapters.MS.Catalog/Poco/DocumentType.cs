@@ -10,7 +10,7 @@ namespace DigitNow.Adapters.MS.Catalog.Poco
         [JsonProperty("name")]
         public string Name { get; set; }
 
-        [JsonProperty("resolutionProperty")]
+        [JsonProperty("resolutionPeriod")]
         public int ResolutionPeriod { get; set; }
     }
 }
