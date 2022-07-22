@@ -12,9 +12,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
         public string IssuerName { get; set; }
         public string Recipient { get; set; }
         public string DocumentCategory { get; set; }
-        public int ResolutionDuration { get; set; }
+        public int ResolutionPeriod { get; set; }
         public int Status { get; set; }
-        public string DispatchBy { get; set; }
+        public bool IsDispatched { get; set; }
         public string User { get; set; }
     }
 }
