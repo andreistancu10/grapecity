@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using DigitNow.Domain.DocumentManagement.Data.Entities.DeliveryDetails;
+using System.Collections.Generic;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities;
 
@@ -17,8 +18,9 @@ public class OutgoingDocument : VirtualDocument
 
     #region [ References ]
 
-    public ContactDetail ContactDetail { get; set; }
     public List<ConnectedDocument>? ConnectedDocuments { get; set; } = new();
+    public ContactDetail ContactDetail { get; set; }
+    public DeliveryDetail DeliveryDetails { get; set ; }
 
     #endregion
 }

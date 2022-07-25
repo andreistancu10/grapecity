@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateDocumentDeliveryDetails;
 using DigitNow.Domain.DocumentManagement.Business.Documents.Commands.SetDocumentsResolution;
 using DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetByRegistrationNumber;
 using DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetWorkflowHistoryByDocumentId;
@@ -14,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Documents
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("api/documents")]
     public class DocumentsController : ApiController
@@ -93,6 +94,15 @@ namespace DigitNow.Domain.DocumentManagement.Public.Documents
                     null => NotFound(),
                     var result => Ok(result)
                 };
+        }
+
+        [HttpPost("delivery-details/{documentId}")]
+        public async Task<IActionResult> CreateDeliveryDetails([FromRoute] long documentId, [FromBody] CreateDeliveryDetailsRequest request)
+        {
+            var command = _mapper.Map<CreateDocumentDeliveryDetailsCommand>(request);
+            command.DocumentId = documentId;
+
+            return CreateResponse(await _mediator.Send(command));
         }
     }
 }

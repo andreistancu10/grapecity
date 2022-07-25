@@ -19,6 +19,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.InternalDocuments.Queries.
         public string Observation { get; set; }
         public int ReceiverDepartmentId { get; set; }
         public bool? IsUrgent { get; set; }
+        public long RegistrationNumber { get; set; }
         public List<WorkflowHistory> WorkflowHistory { get; set; } = new();
         public List<DocumentUploadedFile> DocumentUploadedFiles { get; set; } = new();
     }
