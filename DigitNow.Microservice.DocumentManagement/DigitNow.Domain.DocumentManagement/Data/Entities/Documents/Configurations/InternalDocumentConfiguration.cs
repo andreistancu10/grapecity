@@ -14,7 +14,6 @@ public class InternalDocumentConfiguration : IEntityTypeConfiguration<InternalDo
         builder.Property(p => p.DeadlineDaysNumber).IsRequired();
         builder.Property(p => p.Description).IsRequired();
         builder.Property(p => p.Observation);
-        builder.Property(p => p.ReceiverDepartmentId).IsRequired();
         builder.Property(p => p.IsUrgent);
 
         builder.HasOne(item => item.Document)

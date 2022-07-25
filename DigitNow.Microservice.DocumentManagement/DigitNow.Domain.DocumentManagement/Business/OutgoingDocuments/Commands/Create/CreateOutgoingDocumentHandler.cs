@@ -19,6 +19,7 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
 {
     private readonly DocumentManagementDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly IDocumentService _documentService;
     private readonly IOutgoingDocumentService _outgoingDocumentService;
     private readonly IIdentityAdapterClient _identityAdapterClient;
     private readonly IUploadedFileService _uploadedFileService;
@@ -31,6 +32,7 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _documentService = service;
         _outgoingDocumentService = outgoingDocumentService;
         _identityAdapterClient = identityAdapterClient;
         _uploadedFileService = uploadedFileService;
@@ -43,24 +45,33 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
 
         var newOutgoingDocument = _mapper.Map<OutgoingDocument>(request);
 
-        await _outgoingDocumentService.CreateAsync(newOutgoingDocument, cancellationToken);
+        var newDocument = new Document
+        {
+            DocumentType = DocumentType.Outgoing,
+            OutgoingDocument = newOutgoingDocument,
+            RecipientId = request.RecipientId,
+            Status = DocumentStatus.New,
+            RecipientIsDepartment = true
+        };
+
+        await _documentService.AddDocument(newDocument, cancellationToken);
+
         await AttachConnectedDocumentsAsync(request, newOutgoingDocument, cancellationToken);
         await _uploadedFileService.CreateDocumentUploadedFilesAsync(request.UploadedFileIds, newOutgoingDocument.Document, cancellationToken);
 
         newOutgoingDocument.WorkflowHistory.Add(
             new WorkflowHistory
             {
-                RecipientType = (int)UserRole.HeadOfDepartment,
-                RecipientId = newOutgoingDocument.RecipientId,
-                Status = DocumentStatus.InWorkUnallocated,
-                CreationDate = DateTime.Now,
-                RegistrationNumber = newOutgoingDocument.Document.RegistrationNumber
+                RecipientType = RecipientType.Department.Id,
+                RecipientId = request.RecipientId,
+                Status = DocumentStatus.New,
+                RecipientName = $"Departamentul {request.RecipientId}!"
             });
 
         await _dbContext.SingleUpdateAsync(newOutgoingDocument, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return ResultObject.Created(newOutgoingDocument.Id);
+        return ResultObject.Created(newOutgoingDocument.DocumentId);
     }
 
     private async Task AttachConnectedDocumentsAsync(CreateOutgoingDocumentCommand request, OutgoingDocument

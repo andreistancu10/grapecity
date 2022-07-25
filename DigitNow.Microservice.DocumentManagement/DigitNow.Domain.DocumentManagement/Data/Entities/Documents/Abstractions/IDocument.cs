@@ -5,8 +5,11 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
     public interface IDocument : IExtendedEntity
     {
-        public DocumentType DocumentType { get; set; }
-        public int RegistrationNumber { get; set; }
-        public DateTime RegistrationDate { get; set; }
+        DocumentType DocumentType { get; set; }
+        int RegistrationNumber { get; set; }
+        DateTime RegistrationDate { get; set; }
+        DocumentStatus Status { get; set; }
+        DateTime StatusModifiedAt { get; set; }
+        long StatusModifiedBy { get; set; }
     }
 }

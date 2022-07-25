@@ -20,7 +20,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries.
         
         public async Task<GetOutgoingDocumentByIdResponse> Handle(GetOutgoingDocumentByIdQuery request, CancellationToken cancellationToken)
         {
-            var foundOutgoingDocument = await _dbContext.OutgoingDocuments.FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
+            var foundOutgoingDocument = await _dbContext.OutgoingDocuments
+                .Include(x => x.ContactDetail)
+                .Include(x => x.ConnectedDocuments)
+                .Include(x => x.WorkflowHistory)
+                .FirstOrDefaultAsync(c => c.DocumentId == request.Id, cancellationToken);
+            
             if (foundOutgoingDocument == null) return null;
 
             return _mapper.Map<GetOutgoingDocumentByIdResponse>(foundOutgoingDocument);

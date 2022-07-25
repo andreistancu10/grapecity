@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.Models;
+using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateUserRecipient;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
@@ -54,11 +54,11 @@ public class DashboardController : ApiController
     }
 
     [HttpPost("export-excel")]
-    public async Task<ActionResult<FileContentResult>> ExportExcelAsync([FromBody] GetDocumentsRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> ExportExcelAsync([FromBody] GetDocumentsRequest request, CancellationToken cancellationToken)
     {
         var command = _mapper.Map<GetDocumentsQuery>(request);
         var result = await _mediator.Send(command, cancellationToken);
-        var fileResult = await _exportService.CreateExcelFile("Documents", "DocumentsSheet", result.Documents);
+        var fileResult = await _exportService.CreateExcelFile("Documents", "DocumentsSheet", result.Items);
 
         return File(fileResult.Content, fileResult.ContentType, fileResult.Name);
     }

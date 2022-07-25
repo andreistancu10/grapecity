@@ -14,6 +14,9 @@ namespace DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums
         InWorkCountersignature = 9,
         Finalized = 10,
         InWorkDelegated = 11,
-        InWorkDelegatedUnallocated = 12
+        InWorkDelegatedUnallocated = 12,
+        InWorkMayorReview = 13,
+        InWorkMayorDeclined = 14,
+        New = 15
     }
 }

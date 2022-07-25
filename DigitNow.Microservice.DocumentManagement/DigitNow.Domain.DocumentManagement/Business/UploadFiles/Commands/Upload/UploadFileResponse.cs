@@ -1,6 +1,7 @@
-﻿namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload;
-
-public class UploadFileResponse
+﻿namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload
 {
-    public long FileId { get; set; }
+    public class UploadFileResponse
+    {
+        public long FileId { get; set; }
+    }
 }
