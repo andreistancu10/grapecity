@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Documents
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     [Route("api/documents")]
     public class DocumentsController : ApiController
