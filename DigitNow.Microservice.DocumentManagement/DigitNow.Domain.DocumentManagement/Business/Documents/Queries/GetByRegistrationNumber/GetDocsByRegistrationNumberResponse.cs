@@ -5,10 +5,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetByReg
 {
     public class GetDocsByRegistrationNumberResponse
     {
-        public int Id { get; set; }
-
+        public int DocumentId { get; set; }
         public int RegistrationNumber { get; set; }
-
         public DocumentType DocumentType { get; set; }
     }
 }

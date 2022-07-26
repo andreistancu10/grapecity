@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Create;
-using DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries.GetRegistrationProof;
 using DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries.GetById;
 using DigitNow.Domain.DocumentManagement.Public.OutgoingDocuments.Models;
@@ -47,15 +46,6 @@ public class OutgoingDocumentsController : ApiController
         var command = _mapper.Map<CreateOutgoingDocumentCommand>(request);
 
         return CreateResponse(await _mediator.Send(command));
-    }
-
-    [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateOutgoingDocument([FromRoute] int id, [FromBody] UpdateOutgoingDocumentRequest request, CancellationToken cancellationToken)
-    {
-        var updateOutgoingDocumentCommand = _mapper.Map<UpdateOutgoingDocumentCommand>(request);
-        updateOutgoingDocumentCommand.Id = id;
-
-        return CreateResponse(await _mediator.Send(updateOutgoingDocumentCommand, cancellationToken));
     }
 
     [HttpGet("generate-registration-proof/{id}")]
