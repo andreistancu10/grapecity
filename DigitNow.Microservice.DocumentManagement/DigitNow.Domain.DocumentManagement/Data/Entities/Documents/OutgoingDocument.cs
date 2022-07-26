@@ -1,9 +1,10 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data.Entities.DeliveryDetails;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Documents.Abstractions;
 using System.Collections.Generic;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities;
 
-public class OutgoingDocument : VirtualDocument
+public class OutgoingDocument : VirtualDocument, IShippable
 {
     public string? IdentificationNumber { get; set; }
     public long ContactDetailId { get; set; }

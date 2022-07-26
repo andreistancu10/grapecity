@@ -1,13 +1,14 @@
-﻿
-using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+﻿using AutoMapper;
+using DigitNow.Adapters.MS.Catalog;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Entities.DeliveryDetails;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Documents.Abstractions;
 using HTSS.Platform.Core.CQRS;
-using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,15 +18,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateD
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IMapper _mapper;
-        private readonly IIncomingDocumentService _incomingDocumentService;
-        private readonly IOutgoingDocumentService _outgoingDocumentService;
+        private readonly ICatalogAdapterClient _catalogAdapterClient;
 
-        public CreateDocumentDeliveryDetailsHandler(DocumentManagementDbContext dbContext, IMapper mapper, IIncomingDocumentService incomingDocumentService, IOutgoingDocumentService outgoingDocumentService)
+        public CreateDocumentDeliveryDetailsHandler(DocumentManagementDbContext dbContext, IMapper mapper, ICatalogAdapterClient catalogAdapterClient)
         {
             _dbContext = dbContext;
             _mapper = mapper;
-            _incomingDocumentService = incomingDocumentService;
-            _outgoingDocumentService = outgoingDocumentService;
+            _catalogAdapterClient = catalogAdapterClient;
         }
 
         public async Task<ResultObject> Handle(CreateDocumentDeliveryDetailsCommand request, CancellationToken cancellationToken)
@@ -36,11 +35,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateD
             switch (document.DocumentType)
             {
                 case DocumentType.Incoming:
-                case DocumentType.Outgoing:
-                    CreateDeliveryDetails(document, deliveryDetails, request, cancellationToken);
+                    await CreateDeliveryDetails<IncomingDocument>(document, deliveryDetails, cancellationToken);
                     break;
-                case DocumentType.Internal:
-                    return InvalidActionForInternalDocuments(request);
+                case DocumentType.Outgoing:
+                    await CreateDeliveryDetails<OutgoingDocument>(document, deliveryDetails, cancellationToken);
+                    break;
+                default:
+                    return new ResultObject(ResultStatusCode.Error);
             }
 
             await _dbContext.SaveChangesAsync(cancellationToken);
@@ -48,29 +49,53 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateD
             return new ResultObject(ResultStatusCode.Ok);
         }
 
-        private async void CreateDeliveryDetails(Document document, DeliveryDetail deliveryDetails, CreateDocumentDeliveryDetailsCommand request, CancellationToken cancellationToken)
+        private async Task CreateDeliveryDetails<T>(Document document, DeliveryDetail deliveryDetails, CancellationToken token) where T : VirtualDocument
         {
+            var virtualDocument = await _dbContext.Set<T>().AsQueryable()
+                .FirstOrDefaultAsync(x => x.DocumentId == document.Id);
+
+            var shippableDocument = virtualDocument as IShippable;
+            if (shippableDocument == null) throw new InvalidCastException($"Cannot convert from {nameof(VirtualDocument)} to {nameof(IShippable)}");
+
+            shippableDocument.DeliveryDetails = deliveryDetails;
+
+            // TODO: Refactor this part after DestinationDepartmentId will be added on DocumentBase
+            document.RecipientId = 0;
             document.Status = DocumentStatus.Finalized;
 
-            if (document.DocumentType == DocumentType.Incoming)
+            var departmentToReceiveDocument = default(long);
+
+            if (virtualDocument.Document.DocumentType == DocumentType.Outgoing)
             {
-                var foundIncomingDocument = await _incomingDocumentService.FindFirstAsync(request.DocumentId, cancellationToken);
-                foundIncomingDocument.DeliveryDetails = deliveryDetails;
-                return;
+                departmentToReceiveDocument = GetDestinationDepartmentFromHistory(virtualDocument, token);
+            }
+            else
+            {
+                departmentToReceiveDocument = await GetDestinationDepartmentByCodeAsync("registratura", token);
             }
 
-            var foundOutgoingDocument = await _outgoingDocumentService.FindFirstAsync(request.DocumentId, cancellationToken);
-            foundOutgoingDocument.DeliveryDetails = deliveryDetails;
+            var newWorkflowResponsible = new WorkflowHistory
+            {
+                Status = DocumentStatus.Finalized,
+                RecipientType = RecipientType.Department.Id,
+                RecipientId = departmentToReceiveDocument,
+                RecipientName = $"Departamentul {departmentToReceiveDocument}!"
+            };
+            
+            virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
         }
 
-        private static ResultObject InvalidActionForInternalDocuments(CreateDocumentDeliveryDetailsCommand request)
+        private long GetDestinationDepartmentFromHistory(VirtualDocument virtualDocument, CancellationToken token)
         {
-            return ResultObject.Error(new ErrorMessage
-            {
-                Message = $"Action not possible for internal document with id: {request.DocumentId}",
-                TranslationCode = "catalog.backend.update.validation.invalidAction",
-                Parameters = new object[] { request.DocumentId }
-            });
+            return virtualDocument.WorkflowHistory
+                                   .Where(x => x.RecipientType == RecipientType.Department.Id)
+                                   .OrderBy(x => x.CreatedAt)
+                                   .First().RecipientId;
+        }
+        private async Task<long> GetDestinationDepartmentByCodeAsync(string code, CancellationToken token)
+        {
+            var department = await _catalogAdapterClient.GetDepartmentByCodeAsync(code, token);
+            return department.Id;
         }
     }
 }
