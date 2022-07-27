@@ -101,7 +101,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             public BasicViewModel Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
                 ExtractDepartment(source);
 
-            private BasicViewModel ExtractDepartment<T>(VirtualDocumentAggregate<T> source)
+            private static BasicViewModel ExtractDepartment<T>(VirtualDocumentAggregate<T> source)
                 where T: VirtualDocument
             {
                 var foundDepartment = source.Departments.FirstOrDefault(x => x.Id == source.VirtualDocument.Document.DestinationDepartmentId);
@@ -127,7 +127,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             public BasicViewModel Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
                 ExtractUser(source);
 
-            private BasicViewModel ExtractUser<T>(VirtualDocumentAggregate<T> source)
+            private static BasicViewModel ExtractUser<T>(VirtualDocumentAggregate<T> source)
                 where T: VirtualDocument
             {
                 var foundUser = source.Users.FirstOrDefault(x => x.Id == source.VirtualDocument.Document.CreatedBy);
@@ -153,7 +153,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             public BasicViewModel Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
                 ExtractUser(source);
 
-            private BasicViewModel ExtractUser<T>(VirtualDocumentAggregate<T> source)
+            private static BasicViewModel ExtractUser<T>(VirtualDocumentAggregate<T> source)
                 where T : VirtualDocument
             {
                 var foundUser = source.Users.FirstOrDefault(x => x.Id == source.VirtualDocument.Document.CreatedBy);

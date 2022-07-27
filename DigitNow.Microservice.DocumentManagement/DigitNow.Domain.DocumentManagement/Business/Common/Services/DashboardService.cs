@@ -8,12 +8,7 @@ using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Data.Filters;
 using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
@@ -22,9 +17,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IDashboardService
     {
-        Task<long> CountAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken);
+        Task<long> CountAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken token);
 
-        Task<List<VirtualDocument>> GetAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken cancellationToken);
+        Task<List<VirtualDocument>> GetAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken token);
     }
 
     public class DashboardService : IDashboardService
@@ -67,30 +62,30 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         #region [ IDashboardService ]
 
-        public async Task<long> CountAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
+        public async Task<long> CountAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken token)
         {
-            var documentsQuery = await BuildPreprocessDocumentsQueryAsync(preprocessFilter, cancellationToken);
+            var documentsQuery = await BuildPreprocessDocumentsQueryAsync(preprocessFilter, token);
             if (postprocessFilter.IsEmpty())
-                return await documentsQuery.CountAsync(cancellationToken);
+                return await documentsQuery.CountAsync(token);
 
             var lightweightDocuments = await documentsQuery
                 .Select(x => new Document { Id = x.Id, DocumentType = x.DocumentType })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(token);
 
-            return await _virtualDocumentService.CountVirtualDocuments(lightweightDocuments, postprocessFilter, cancellationToken);
+            return await _virtualDocumentService.CountVirtualDocuments(lightweightDocuments, postprocessFilter, token);
         }
 
-        public async Task<List<VirtualDocument>> GetAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken cancellationToken)
+        public async Task<List<VirtualDocument>> GetAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken token)
         {
-            var documentsQuery = await BuildPreprocessDocumentsQueryAsync(preprocessFilter, cancellationToken);
+            var documentsQuery = await BuildPreprocessDocumentsQueryAsync(preprocessFilter, token);
 
             var documents = await documentsQuery.OrderByDescending(x => x.CreatedAt)
                  .Skip((page - 1) * count)
                  .Take(count)
                  .Select(x => new Document { Id = x.Id, DocumentType = x.DocumentType })
-                 .ToListAsync(cancellationToken);
+                 .ToListAsync(token);
 
-            var virtualDocuments = await _virtualDocumentService.FetchVirtualDocuments(documents, postprocessFilter, cancellationToken);
+            var virtualDocuments = await _virtualDocumentService.FetchVirtualDocuments(documents, postprocessFilter, token);
 
             return virtualDocuments
                 .OrderByDescending(x => x.CreatedAt)

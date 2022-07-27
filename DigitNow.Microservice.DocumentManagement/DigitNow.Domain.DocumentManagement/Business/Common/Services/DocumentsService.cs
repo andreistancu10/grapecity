@@ -15,12 +15,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 {
     public interface IDocumentService
     {
-        Task<Document> AddAsync(Document newDocument, CancellationToken cancellationToken);
-        Task<Document> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken, params Expression<Func<Document, object>>[] includes);
-        Task<List<Document>> FindAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken);
+        Task<Document> AddAsync(Document newDocument, CancellationToken token);
+        Task<Document> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken token, params Expression<Func<Document, object>>[] includes);
+        Task<List<Document>> FindAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken token);
 
         IQueryable<Document> FindAllQueryable(Expression<Func<Document, bool>> predicate);
-        Task<int> CountAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken);
+        Task<int> CountAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken token);
     }
 
     public class DocumentService : IDocumentService
@@ -32,22 +32,22 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             _dbContext = dbContext;
         }
 
-        public async Task<Document> AddAsync(Document newDocument, CancellationToken cancellationToken)
+        public async Task<Document> AddAsync(Document newDocument, CancellationToken token)
         {
-            var dbContextTransaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+            var dbContextTransaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, token);
             try
             {
                 // Insert the entity without relationships
                 _dbContext.Entry(newDocument).State = EntityState.Added;
-                await SetRegistrationNumberAsync(newDocument, cancellationToken);
-                await _dbContext.SaveChangesAsync(cancellationToken);
+                await SetRegistrationNumberAsync(newDocument, token);
+                await _dbContext.SaveChangesAsync(token);
 
-                await dbContextTransaction.CommitAsync(cancellationToken);
+                await dbContextTransaction.CommitAsync(token);
             }
             catch
             {
                 //TODO: Log error
-                await dbContextTransaction.RollbackAsync();
+                await dbContextTransaction.RollbackAsync(token);
                 throw;
             }
             finally
@@ -58,19 +58,19 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             return newDocument;
         }
 
-        public Task<Document> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken, params Expression<Func<Document, object>>[] includes)
+        public Task<Document> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken token, params Expression<Func<Document, object>>[] includes)
         {
             return _dbContext.Documents
                 .Includes(includes)
-                .FirstOrDefaultAsync(predicate);
+                .FirstOrDefaultAsync(predicate, token);
         }
 
-        public Task<List<Document>> FindAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken)
+        public Task<List<Document>> FindAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken token)
         {
             return _dbContext.Documents
                 .Where(predicate)
                 .AsNoTracking()
-                .ToListAsync(cancellationToken);
+                .ToListAsync(token);
         }
 
         public IQueryable<Document> FindAllQueryable(Expression<Func<Document, bool>> predicate)
@@ -79,20 +79,20 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
                 .Where(predicate);
         }
 
-        public Task<int> CountAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken)
+        public Task<int> CountAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken token)
         {
             return _dbContext.Documents
                 .Where(predicate)
-                .CountAsync(cancellationToken);
+                .CountAsync(token);
         }
 
-        private async Task SetRegistrationNumberAsync(Document document, CancellationToken cancellationToken)
+        private async Task SetRegistrationNumberAsync(Document document, CancellationToken token)
         {
             var maxRegNumber = await _dbContext.Documents
                 .Where(reg => reg.RegistrationDate.Year == DateTime.Now.Year)
                 .Select(reg => reg.RegistrationNumber)
                 .DefaultIfEmpty()
-                .MaxAsync();
+                .MaxAsync(token);
 
             document.RegistrationNumber = ++maxRegNumber;
             document.RegistrationDate = DateTime.Now;
