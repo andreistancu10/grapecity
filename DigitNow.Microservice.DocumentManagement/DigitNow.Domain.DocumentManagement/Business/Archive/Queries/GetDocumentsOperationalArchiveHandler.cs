@@ -23,8 +23,6 @@ public class GetDocumentsOperationalArchiveHandler : IQueryHandler<GetDocumentsO
     public async Task<GetDocumentsOperationalArchiveResponse> Handle(GetDocumentsOperationalArchiveQuery request, CancellationToken cancellationToken)
     {
         var totalItems = await _dashboardService.CountAllArchiveDocumentsAsync(request.PreprocessFilter, request.PostprocessFilter, cancellationToken);
-        if (totalItems == 0)
-            return null;
 
         var documents = await _dashboardService.GetAllArchiveDocumentsAsync(request.PreprocessFilter, request.PostprocessFilter,
             request.Page,

@@ -25,7 +25,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
     {
         public DocumentCategoryFilter CategoryFilter { get; set; }
 
-        public DocumentIdentificationNumber IdentificationNumber { get; set; }
+        public DocumentIdentificationNumber IdentificationNumberFilter { get; set; }
 
         public static DocumentPostprocessFilter Empty => new DocumentPostprocessFilter();
     }
