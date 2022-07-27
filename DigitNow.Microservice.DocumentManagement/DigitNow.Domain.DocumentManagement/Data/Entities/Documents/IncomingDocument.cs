@@ -1,16 +1,18 @@
-﻿using System;
+﻿using DigitNow.Domain.DocumentManagement.Data.Entities.DeliveryDetails;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Documents.Abstractions;
+using System;
 using System.Collections.Generic;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities;
 
-public class IncomingDocument : VirtualDocument
+
+public class IncomingDocument : VirtualDocument, IShippable
 {
     public int InputChannelId { get; set; }
     public int IssuerTypeId { get; set; }
     public string IssuerName { get; set; }
     public int ExternalNumber { get; set; }
     public DateTime? ExternalNumberDate { get; set; }
-    public ContactDetail ContactDetail { get; set; }
     public string IdentificationNumber { get; set; }
     public string ContentSummary { get; set; }
     public int NumberOfPages { get; set; }
@@ -23,6 +25,8 @@ public class IncomingDocument : VirtualDocument
     #region [ References ]
 
     public List<ConnectedDocument>? ConnectedDocuments { get; set; } = new();
+    public ContactDetail ContactDetail { get; set; }
+    public DeliveryDetail DeliveryDetails { get; set; }
 
     #endregion
 }

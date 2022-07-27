@@ -21,7 +21,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.
         public async Task<GetIncomingDocumentByIdResponse> Handle(GetIncomingDocumentByIdQuery request, CancellationToken cancellationToken)
         {
             var foundIncomingDocument = await _dbContext.IncomingDocuments
+                .AsNoTracking()
+                .Include(x=>x.Document)
                 .Include(x=>x.ContactDetail)
+                .Include(x=>x.DeliveryDetails)
                 .Include(x=>x.WorkflowHistory)
                 .Include(x=>x.ConnectedDocuments)
                 .FirstOrDefaultAsync(c => c.DocumentId == request.Id, cancellationToken);

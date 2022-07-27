@@ -15,6 +15,7 @@ using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles;
 using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMappings;
 using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
 using DigitNow.Domain.DocumentManagement.Data.Entities.UploadedFiles;
+using DigitNow.Domain.DocumentManagement.Data.Entities.DeliveryDetails;
 
 namespace DigitNow.Domain.DocumentManagement.Data
 {
@@ -45,6 +46,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<SpecialRegisterMapping> SpecialRegisterMappings { get; set; }
         public DbSet<UploadedFile> UploadedFiles { get; set; }
         public DbSet<DocumentUploadedFile> DocumentUploadedFiles { get; set; }
+        public DbSet<DeliveryDetail> DeliveryDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
