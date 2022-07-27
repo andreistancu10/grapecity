@@ -14,12 +14,10 @@ namespace DigitNow.Domain.DocumentManagement.Public.OperationalArchive
     public class OperationalArchiveController : ApiController
     {
         private readonly IMediator _mediator;
-        private readonly IMapper _mapper;
 
         public OperationalArchiveController(IMediator mediator, IMapper mapper)
         {
             _mediator = mediator;
-            _mapper = mapper;
         }
 
 
