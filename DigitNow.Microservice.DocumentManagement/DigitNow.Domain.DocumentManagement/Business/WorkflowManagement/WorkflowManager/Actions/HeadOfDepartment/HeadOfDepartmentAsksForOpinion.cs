@@ -30,7 +30,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             document.WorkflowHistories.Add(WorkflowHistoryLogFactory
                 .Create(document.Id, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.OpinionRequestedUnallocated, string.Empty, command.Remarks, command.OpinionRequestedUntil));
 
-            await SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, headOfDepartment.Id, DocumentStatus.OpinionRequestedUnallocated);
+            await SetStatusAndRecipientBasedOnWorkflowDecisionAsync(command.DocumentId, headOfDepartment.Id, DocumentStatus.OpinionRequestedUnallocated, token);
 
             return command;
         }

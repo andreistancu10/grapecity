@@ -25,16 +25,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             switch (document.DocumentType)
             {
                 case DocumentType.Incoming:
-                    return await CreateWorkflowForIncoming(command, document, lastWorkFlowRecord, token);
+                    return await CreateWorkflowForIncomingAsync(command, document, lastWorkFlowRecord, token);
                 case DocumentType.Internal:
                 case DocumentType.Outgoing:
-                    return await CreateWorkflowForOutgoingAndInternal(command, document, lastWorkFlowRecord, token);
+                    return await CreateWorkflowForOutgoingAndInternalAsync(command, document, lastWorkFlowRecord, token);
                 default:
                     return command;
             }
         }
 
-        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowForOutgoingAndInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token)
+        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowForOutgoingAndInternalAsync(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token)
         {
             var newWorkflowResponsible = new WorkflowHistoryLog
             {
@@ -43,12 +43,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 Remarks = command.Remarks
             };
 
-            await PassDocumentToFunctionary(document, newWorkflowResponsible, command);
+            await PassDocumentToFunctionaryAsync(document, newWorkflowResponsible, command, token);
 
             return command;
         }
 
-        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowForIncoming(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token)
+        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowForIncomingAsync(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token)
         {
             var newDocumentStatus = lastWorkFlowRecord.DocumentStatus == DocumentStatus.OpinionRequestedUnallocated
                 ? DocumentStatus.InWorkAllocated
@@ -70,10 +70,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                     Remarks = command.Remarks
                 };
 
-                await PassDocumentToFunctionary(document, newWorkflowResponsible, command);
+                await PassDocumentToFunctionaryAsync(document, newWorkflowResponsible, command, token);
             }
             else
-                await PassDocumentToRegistry(document, command, token);
+                await PassDocumentToRegistryAsync(document, command, token);
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord)

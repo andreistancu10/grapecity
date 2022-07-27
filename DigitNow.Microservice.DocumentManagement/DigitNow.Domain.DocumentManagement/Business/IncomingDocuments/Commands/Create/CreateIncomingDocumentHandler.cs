@@ -21,29 +21,23 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
 {
     private readonly DocumentManagementDbContext _dbContext;
     private readonly IMapper _mapper;
-    private readonly IDocumentService _documentService;
     private readonly IIdentityAdapterClient _identityAdapterClient;
     private readonly ISpecialRegisterMappingService _specialRegisterMappingService;
-    private readonly IIdentityService _identityService;
     private readonly IIncomingDocumentService _incomingDocumentService;
     private readonly IUploadedFileService _uploadedFileService;
 
     public CreateIncomingDocumentHandler(DocumentManagementDbContext dbContext,
         IMapper mapper,
-        IDocumentService documentService,
         IIdentityAdapterClient identityAdapterClient,
         ISpecialRegisterMappingService specialRegisterMappingService,
         IUploadedFileService uploadedFileService,
-        IIdentityService identityService, 
         IIncomingDocumentService incomingDocumentService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
-        _documentService = documentService;
         _identityAdapterClient = identityAdapterClient;
         _uploadedFileService = uploadedFileService;
         _specialRegisterMappingService = specialRegisterMappingService;
-        _identityService = identityService;
         _incomingDocumentService = incomingDocumentService;
     }
         

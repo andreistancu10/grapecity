@@ -39,19 +39,19 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                     Parameters = new object[] { request.DepartmentId }
                 });
 
-            await UpdateDocuments(request, headOfDepartment);            
+            await UpdateDocuments(request, headOfDepartment, cancellationToken);            
 
             return new ResultObject(ResultStatusCode.Ok);
         }
 
-        private async Task UpdateDocuments(UpdateDocumentHeadOfDepartmentCommand request, User headOfDepartment)
+        private async Task UpdateDocuments(UpdateDocumentHeadOfDepartmentCommand request, User headOfDepartment, CancellationToken token)
         {
             var requestedDocumentIds = request.DocumentInfo.Select(x => x.DocumentId);
 
             var foundDocuments = await _dbContext.Documents
                     .Include(x => x.WorkflowHistories)
                     .Where(x => requestedDocumentIds.Contains(x.Id))
-                    .ToListAsync(); //TODO: Add token
+                    .ToListAsync(token);
             
             foreach (var foundDocument in foundDocuments)
             {

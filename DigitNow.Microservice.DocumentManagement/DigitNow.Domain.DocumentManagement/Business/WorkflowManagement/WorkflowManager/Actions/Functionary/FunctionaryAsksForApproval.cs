@@ -36,10 +36,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             switch (document.DocumentType)
             {
                 case DocumentType.Incoming:
-                    return await CreateWorkflowRecordForInternalOrOutgoing(command, document);
+                    return await CreateWorkflowRecordForIncomingAsync(command, document, token);
                 case DocumentType.Internal:
                 case DocumentType.Outgoing:
-                    return await CreateWorkflowRecordForInternalOrOutgoing(command, document, token);
+                    return await CreateWorkflowRecordForInternalOrOutgoingAsync(command, document, token);
                 default:
                     return command;
             }
@@ -47,9 +47,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
         #endregion
 
-        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordForInternalOrOutgoing(ICreateWorkflowHistoryCommand command, Document document)
+        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordForIncomingAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
         {
-            var oldWorkflowResponsible = GetOldWorkflowResponsible(document, x => x.RecipientType == RecipientType.HeadOfDepartment.Id);
+            var oldWorkflowResponsible = await GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.HeadOfDepartment.Id, token);
 
             var newWorkflowResponsible = new WorkflowHistoryLog
             {
@@ -57,13 +57,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 Resolution = command.Resolution
             };
 
-            await TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
+            await TransferResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
             document.WorkflowHistories.Add(newWorkflowResponsible);
 
             return command;
         }
 
-        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordForInternalOrOutgoing(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
+        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordForInternalOrOutgoingAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
         {
             var response = await IdentityAdapterClient.GetUsersAsync(token);
             var departmentUsers = response.Users.Where(x => x.Departments.Contains(document.DestinationDepartmentId));

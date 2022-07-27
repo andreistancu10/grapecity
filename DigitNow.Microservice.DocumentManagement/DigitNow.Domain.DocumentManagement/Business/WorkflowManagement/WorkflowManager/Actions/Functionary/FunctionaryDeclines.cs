@@ -45,10 +45,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                     Remarks = command.Remarks
                 };
 
-                await PassDocumentToFunctionary(document, newWorkflowResponsible, command);
+                await PassDocumentToFunctionaryAsync(document, newWorkflowResponsible, command, token);
             }
             else
-                await PassDocumentToRegistry(document, command, token);
+                await PassDocumentToRegistryAsync(document, command, token);
 
             return command;
         }
@@ -62,7 +62,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 Remarks = command.Remarks
             };
 
-            await PassDocumentToFunctionary(document, newWorkflowResponsible, command);
+            await PassDocumentToFunctionaryAsync(document, newWorkflowResponsible, command, token);
 
             return command;
         }

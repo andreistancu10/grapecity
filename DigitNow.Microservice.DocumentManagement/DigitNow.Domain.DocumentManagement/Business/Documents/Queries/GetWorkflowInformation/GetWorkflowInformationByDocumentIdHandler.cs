@@ -43,7 +43,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetWorkf
             return response;
         }
 
-        private DateTime? ExtractDeadline(Document document)
+        private static DateTime? ExtractDeadline(Document document)
         {
             var workflowEntry = document.WorkflowHistories
                 .Where(x => x.OpinionRequestedUntil != null)
