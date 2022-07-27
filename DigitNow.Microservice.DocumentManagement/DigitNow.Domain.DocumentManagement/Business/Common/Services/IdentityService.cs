@@ -1,4 +1,5 @@
 ﻿using DigitNow.Adapters.MS.Identity;
+using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using Microsoft.AspNetCore.Http;
 using System;
@@ -11,6 +12,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 {
     public interface IIdentityService
     {
+        Task<User> GetCurrentUserAsync(CancellationToken cancellationToken);
         long GetCurrentUserId();
         bool TryGetCurrentUserId(out int userId);
         Task<RecipientType> GetCurrentUserFirstRoleAsync(CancellationToken cancellationToken);
@@ -25,6 +27,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
         {
             _httpContextAccesor = httpContextAccessor;
             _identityAdapterClient = identityAdapterClient;
+        }
+
+        public Task<User> GetCurrentUserAsync(CancellationToken token)
+        {
+            return _identityAdapterClient.GetUserByIdAsync(GetCurrentUserId(), token);
         }
 
         public long GetCurrentUserId()

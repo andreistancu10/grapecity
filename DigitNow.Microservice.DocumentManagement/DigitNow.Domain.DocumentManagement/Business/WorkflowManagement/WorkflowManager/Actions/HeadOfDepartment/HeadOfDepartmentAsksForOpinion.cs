@@ -17,7 +17,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         public HeadOfDepartmentAsksForOpinion(IServiceProvider serviceProvider) : base(serviceProvider) {}
         protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.New };
 
-        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, WorkflowHistory lastWorkFlowRecord, CancellationToken token)
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token)
         {
             if (!Validate(command, lastWorkFlowRecord, document))
                 return command;
@@ -27,15 +27,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             if (!UserExists(headOfDepartment, command))
                 return command;
 
-            virtualDocument.WorkflowHistory.Add(WorkflowHistoryFactory
-                .Create(RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.OpinionRequestedUnallocated, string.Empty, command.Remarks, command.OpinionRequestedUntil));
+            document.WorkflowHistories.Add(WorkflowHistoryLogFactory
+                .Create(document.Id, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.OpinionRequestedUnallocated, string.Empty, command.Remarks, command.OpinionRequestedUntil));
 
             await SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, headOfDepartment.Id, DocumentStatus.OpinionRequestedUnallocated);
 
             return command;
         }
 
-        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord, Document document)
+        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord, Document document)
         {
             if (command.RecipientId <= 0 || !IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses) || document.DocumentType == DocumentType.Incoming)
             {

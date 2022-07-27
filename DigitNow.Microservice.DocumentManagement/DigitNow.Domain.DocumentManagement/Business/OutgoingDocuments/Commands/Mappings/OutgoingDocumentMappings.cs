@@ -9,7 +9,9 @@ public class OutgoingDocumentMappings : Profile
 {
     public OutgoingDocumentMappings()
     {
-        CreateMap<CreateOutgoingDocumentCommand, OutgoingDocument>();
+        CreateMap<CreateOutgoingDocumentCommand, OutgoingDocument>()
+            .ForPath(c => c.Document.DestinationDepartmentId, opt => opt.MapFrom(src => src.RecipientId));
+
         CreateMap<OutgoingDocument, ConnectedDocument>();
         CreateMap<CreateContactDetailCommand, ContactDetail>();
         CreateMap<CreateContactDetailCommand, ContactDetailDto>();

@@ -16,12 +16,12 @@ public class CreateIncomingDocumentCommand : ICommand<ResultObject>
     public CreateContactDetailCommand ContactDetail { get; set; }
     public string ContentSummary { get; set; }
     public int NumberOfPages { get; set; }
-    public int RecipientId { get; set; }
+    public int RecipientId { get; set; } //TODO: Rename this
     public int DocumentTypeId { get; set; }
     public string Detail { get; set; }
     public double ResolutionPeriod { get; set; }
     public bool? IsUrgent { get; set; }
     public bool? IsGDPRAgreed { get; set; }
-    public List<int> ConnectedDocumentIds { get; set; }
+    public List<long> ConnectedDocumentIds { get; set; }
     public List<long> UploadedFileIds { get; set; }
 }

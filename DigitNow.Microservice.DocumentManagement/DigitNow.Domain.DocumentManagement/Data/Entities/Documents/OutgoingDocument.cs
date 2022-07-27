@@ -10,10 +10,7 @@ public class OutgoingDocument : VirtualDocument, IShippable
     public long ContactDetailId { get; set; }
     public string ContentSummary { get; set; }
     public int NumberOfPages { get; set; }
-
     public string RecipientName { get; set; }
-    public int RecipientTypeId { get; set; }
-
     public int DocumentTypeId { get; set; }
     public string DocumentTypeDetail { get; set; }
 

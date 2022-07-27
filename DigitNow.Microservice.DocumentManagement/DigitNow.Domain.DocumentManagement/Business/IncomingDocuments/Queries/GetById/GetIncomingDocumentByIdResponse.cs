@@ -30,7 +30,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.
         public bool? IsGDPRAgreed { get; set; }
         public int RegistrationNumber { get; set; }
         public DeliveryDetail DeliveryDetails { get; set; }
-        public List<WorkflowHistory> WorkflowHistory { get; set; } = new();
+        public List<WorkflowHistoryLog> WorkflowHistory { get; set; } = new();
         public List<ConnectedDocument> ConnectedDocuments { get; set; } = new();
     }
 }

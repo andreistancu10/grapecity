@@ -24,15 +24,18 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
     private readonly IDocumentService _documentService;
     private readonly IIdentityAdapterClient _identityAdapterClient;
     private readonly ISpecialRegisterMappingService _specialRegisterMappingService;
+    private readonly IIdentityService _identityService;
+    private readonly IIncomingDocumentService _incomingDocumentService;
     private readonly IUploadedFileService _uploadedFileService;
 
     public CreateIncomingDocumentHandler(DocumentManagementDbContext dbContext,
         IMapper mapper,
         IDocumentService documentService,
         IIdentityAdapterClient identityAdapterClient,
-        IIncomingDocumentService incomingDocumentService,
         ISpecialRegisterMappingService specialRegisterMappingService,
-        IUploadedFileService uploadedFileService)
+        IUploadedFileService uploadedFileService,
+        IIdentityService identityService, 
+        IIncomingDocumentService incomingDocumentService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
@@ -40,6 +43,8 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
         _identityAdapterClient = identityAdapterClient;
         _uploadedFileService = uploadedFileService;
         _specialRegisterMappingService = specialRegisterMappingService;
+        _identityService = identityService;
+        _incomingDocumentService = incomingDocumentService;
     }
         
     public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
@@ -47,36 +52,34 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
         if (!string.IsNullOrWhiteSpace(request.IdentificationNumber))
             await CreateContactDetailsAsync(request, cancellationToken);
 
-        var response = await _identityAdapterClient.GetUsersAsync(cancellationToken);
-        var departmentUsers = response.Users.Where(x => x.Departments.Contains(request.RecipientId));
-        var headOfDepartment = departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
-
+        var headOfDepartment = await GetHeadOfDepartmentUserAsync(request.RecipientId, cancellationToken);
         if (headOfDepartment == null)
             return ResultObject.Error(new ErrorMessage
             {
-                Message = $"No responsible for department with id {request.RecipientId} was found.",
+                Message = $"The responsible for department with id '{request.RecipientId}' was not found.",
                 TranslationCode = "catalog.headOfdepartment.backend.update.validation.entityNotFound",
                 Parameters = new object[] { request.RecipientId }
             });
+
 
         var newIncomingDocument = _mapper.Map<IncomingDocument>(request);
 
         try
         {
             await AttachConnectedDocumentsAsync(request, newIncomingDocument, cancellationToken);
-            var newDocument = new Document
+
+            newIncomingDocument.Document = new Document
             {
                 DocumentType = DocumentType.Incoming,
                 IncomingDocument = newIncomingDocument,
-                RecipientId = headOfDepartment.Id,
-                Status = DocumentStatus.InWorkUnallocated
+                DestinationDepartmentId = request.RecipientId
             };
+            
+            await _incomingDocumentService.AddAsync(newIncomingDocument, cancellationToken);
+            await _uploadedFileService.CreateDocumentUploadedFilesAsync(request.UploadedFileIds, newIncomingDocument.Document, cancellationToken);
 
-            await _documentService.AddDocument(newDocument, cancellationToken);
-            await _uploadedFileService.CreateDocumentUploadedFilesAsync(request.UploadedFileIds, newDocument, cancellationToken);
-
-            newIncomingDocument.WorkflowHistory.Add(WorkflowHistoryFactory
-                .Create(RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkUnallocated));
+            var newWorkflowHistroryLog = WorkflowHistoryLogFactory.Create(newIncomingDocument.DocumentId, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkUnallocated);
+            await _dbContext.WorkflowHistoryLogs.AddAsync(newWorkflowHistroryLog, cancellationToken);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
             await _specialRegisterMappingService.MapDocumentAsync(newIncomingDocument, cancellationToken);
@@ -90,6 +93,13 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
         }
 
         return ResultObject.Created(newIncomingDocument.DocumentId);
+    }
+
+    private async Task<User> GetHeadOfDepartmentUserAsync(long departmentId, CancellationToken token)
+    {
+        var response = await _identityAdapterClient.GetUsersAsync(token);
+        var departmentUsers = response.Users.Where(x => x.Departments.Contains(departmentId));
+        return departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
     }
 
     private async Task AttachConnectedDocumentsAsync(CreateIncomingDocumentCommand request, IncomingDocument incomingDocumentForCreation, CancellationToken cancellationToken)

@@ -103,6 +103,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 {
                     VirtualDocument = childDocument,
                     Users = _documentRelationsFetcher.DocumentUsers,
+                    Departments = _documentRelationsFetcher.DocumentDepartments,
                     Categories = _documentRelationsFetcher.DocumentCategories,
                     InternalCategories = _documentRelationsFetcher.DocumentInternalCategories
                 };

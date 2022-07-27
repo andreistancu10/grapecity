@@ -42,6 +42,26 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "DeliveryDetails",
+                schema: "DocumentMangement",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<long>(type: "bigint", nullable: false),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
+                    DeliveryMode = table.Column<int>(type: "int", nullable: false),
+                    DirectShipping = table.Column<int>(type: "int", nullable: false),
+                    Post = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DeliveryDetails", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Document",
                 schema: "DocumentMangement",
                 columns: table => new
@@ -53,10 +73,10 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
                     DocumentType = table.Column<int>(type: "int", nullable: false),
-                    RegistrationNumber = table.Column<int>(type: "int", nullable: false),
+                    RegistrationNumber = table.Column<long>(type: "bigint", nullable: false),
                     RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    RecipientId = table.Column<long>(type: "bigint", nullable: false),
-                    RecipientIsDepartment = table.Column<bool>(type: "bit", nullable: false),
+                    RecipientId = table.Column<long>(type: "bigint", nullable: true),
+                    DestinationDepartmentId = table.Column<long>(type: "bigint", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     StatusModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     StatusModifiedBy = table.Column<long>(type: "bigint", nullable: false)
@@ -85,21 +105,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DocumentResolution", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RegistrationNumberCounters",
-                schema: "DocumentMangement",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RegistrationNumber = table.Column<int>(type: "int", nullable: false),
-                    RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RegistrationNumberCounters", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -137,6 +142,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ContentType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     RelativePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    AbsolutePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Guid = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
@@ -161,7 +167,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     IssuerName = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     ExternalNumber = table.Column<int>(type: "int", nullable: false),
                     ExternalNumberDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ContactDetailId = table.Column<long>(type: "bigint", nullable: true),
                     IdentificationNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ContentSummary = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NumberOfPages = table.Column<int>(type: "int", nullable: false),
@@ -169,7 +174,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     Detail = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ResolutionPeriod = table.Column<double>(type: "float", nullable: false),
                     IsUrgent = table.Column<bool>(type: "bit", nullable: true),
-                    IsGDPRAgreed = table.Column<bool>(type: "bit", nullable: true)
+                    IsGDPRAgreed = table.Column<bool>(type: "bit", nullable: true),
+                    ContactDetailId = table.Column<long>(type: "bigint", nullable: true),
+                    DeliveryDetailsId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -179,6 +186,12 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         column: x => x.ContactDetailId,
                         principalSchema: "DocumentMangement",
                         principalTable: "ContactDetail",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_IncomingDocument_DeliveryDetails_DeliveryDetailsId",
+                        column: x => x.DeliveryDetailsId,
+                        principalSchema: "DocumentMangement",
+                        principalTable: "DeliveryDetails",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_IncomingDocument_Document_DocumentId",
@@ -201,7 +214,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
                     DocumentId = table.Column<long>(type: "bigint", nullable: false),
-                    DepartmentId = table.Column<int>(type: "int", nullable: false),
+                    SourceDepartmentId = table.Column<int>(type: "int", nullable: false),
                     InternalDocumentTypeId = table.Column<int>(type: "int", nullable: false),
                     DeadlineDaysNumber = table.Column<int>(type: "int", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -237,9 +250,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     ContentSummary = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     NumberOfPages = table.Column<int>(type: "int", nullable: false),
                     RecipientName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RecipientTypeId = table.Column<int>(type: "int", nullable: false),
                     DocumentTypeId = table.Column<int>(type: "int", nullable: false),
-                    DocumentTypeDetail = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    DocumentTypeDetail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeliveryDetailsId = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -252,7 +265,46 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_OutgoingDocument_DeliveryDetails_DeliveryDetailsId",
+                        column: x => x.DeliveryDetailsId,
+                        principalSchema: "DocumentMangement",
+                        principalTable: "DeliveryDetails",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_OutgoingDocument_Document_DocumentId",
+                        column: x => x.DocumentId,
+                        principalSchema: "DocumentMangement",
+                        principalTable: "Document",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "WorkflowHistoryLog",
+                schema: "DocumentMangement",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<long>(type: "bigint", nullable: false),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
+                    DocumentId = table.Column<long>(type: "bigint", nullable: false),
+                    DocumentStatus = table.Column<int>(type: "int", nullable: false),
+                    RecipientType = table.Column<int>(type: "int", nullable: false),
+                    RecipientId = table.Column<long>(type: "bigint", nullable: false),
+                    RecipientName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DeclineReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Resolution = table.Column<int>(type: "int", nullable: true),
+                    OpinionRequestedUntil = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkflowHistoryLog", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_WorkflowHistoryLog_Document_DocumentId",
                         column: x => x.DocumentId,
                         principalSchema: "DocumentMangement",
                         principalTable: "Document",
@@ -356,52 +408,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         principalColumn: "Id");
                 });
 
-            migrationBuilder.CreateTable(
-                name: "WorkflowHistory",
-                schema: "DocumentMangement",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<long>(type: "bigint", nullable: false),
-                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
-                    RecipientType = table.Column<int>(type: "int", nullable: false),
-                    RecipientId = table.Column<long>(type: "bigint", nullable: false),
-                    RecipientName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Remarks = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    DeclineReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Resolution = table.Column<int>(type: "int", nullable: true),
-                    OpinionRequestedUntil = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    IncomingDocumentId = table.Column<long>(type: "bigint", nullable: true),
-                    InternalDocumentId = table.Column<long>(type: "bigint", nullable: true),
-                    OutgoingDocumentId = table.Column<long>(type: "bigint", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_WorkflowHistory", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_WorkflowHistory_IncomingDocument_IncomingDocumentId",
-                        column: x => x.IncomingDocumentId,
-                        principalSchema: "DocumentMangement",
-                        principalTable: "IncomingDocument",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_WorkflowHistory_InternalDocument_InternalDocumentId",
-                        column: x => x.InternalDocumentId,
-                        principalSchema: "DocumentMangement",
-                        principalTable: "InternalDocument",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_WorkflowHistory_OutgoingDocument_OutgoingDocumentId",
-                        column: x => x.OutgoingDocumentId,
-                        principalSchema: "DocumentMangement",
-                        principalTable: "OutgoingDocument",
-                        principalColumn: "Id");
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_ConnectedDocument_IncomingDocumentId",
                 schema: "DocumentMangement",
@@ -433,6 +439,12 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 column: "ContactDetailId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_IncomingDocument_DeliveryDetailsId",
+                schema: "DocumentMangement",
+                table: "IncomingDocument",
+                column: "DeliveryDetailsId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_IncomingDocument_DocumentId",
                 schema: "DocumentMangement",
                 table: "IncomingDocument",
@@ -451,6 +463,12 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 schema: "DocumentMangement",
                 table: "OutgoingDocument",
                 column: "ContactDetailId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_OutgoingDocument_DeliveryDetailsId",
+                schema: "DocumentMangement",
+                table: "OutgoingDocument",
+                column: "DeliveryDetailsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OutgoingDocument_DocumentId",
@@ -479,22 +497,10 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 column: "SpecialRegisterId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WorkflowHistory_IncomingDocumentId",
+                name: "IX_WorkflowHistoryLog_DocumentId",
                 schema: "DocumentMangement",
-                table: "WorkflowHistory",
-                column: "IncomingDocumentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WorkflowHistory_InternalDocumentId",
-                schema: "DocumentMangement",
-                table: "WorkflowHistory",
-                column: "InternalDocumentId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_WorkflowHistory_OutgoingDocumentId",
-                schema: "DocumentMangement",
-                table: "WorkflowHistory",
-                column: "OutgoingDocumentId");
+                table: "WorkflowHistoryLog",
+                column: "DocumentId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -512,7 +518,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 schema: "DocumentMangement");
 
             migrationBuilder.DropTable(
-                name: "RegistrationNumberCounters",
+                name: "InternalDocument",
                 schema: "DocumentMangement");
 
             migrationBuilder.DropTable(
@@ -520,7 +526,15 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 schema: "DocumentMangement");
 
             migrationBuilder.DropTable(
-                name: "WorkflowHistory",
+                name: "WorkflowHistoryLog",
+                schema: "DocumentMangement");
+
+            migrationBuilder.DropTable(
+                name: "IncomingDocument",
+                schema: "DocumentMangement");
+
+            migrationBuilder.DropTable(
+                name: "OutgoingDocument",
                 schema: "DocumentMangement");
 
             migrationBuilder.DropTable(
@@ -532,19 +546,11 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 schema: "DocumentMangement");
 
             migrationBuilder.DropTable(
-                name: "IncomingDocument",
-                schema: "DocumentMangement");
-
-            migrationBuilder.DropTable(
-                name: "InternalDocument",
-                schema: "DocumentMangement");
-
-            migrationBuilder.DropTable(
-                name: "OutgoingDocument",
-                schema: "DocumentMangement");
-
-            migrationBuilder.DropTable(
                 name: "ContactDetail",
+                schema: "DocumentMangement");
+
+            migrationBuilder.DropTable(
+                name: "DeliveryDetails",
                 schema: "DocumentMangement");
 
             migrationBuilder.DropTable(

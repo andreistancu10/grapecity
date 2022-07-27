@@ -13,7 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 {
     public interface IOutgoingDocumentService
     {
-        Task<OutgoingDocument> CreateAsync(OutgoingDocument outgoingDocument, CancellationToken cancellationToken);
+        Task<OutgoingDocument> AddAsync(OutgoingDocument outgoingDocument, CancellationToken cancellationToken);
         Task<List<OutgoingDocument>> FindAllAsync(Expression<Func<OutgoingDocument, bool>> predicate, CancellationToken cancellationToken);
         Task<OutgoingDocument> FindFirstAsync(long id, CancellationToken cancellationToken);
     }
@@ -31,13 +31,21 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             _documentService = documentService;
         }
 
-        public async Task<OutgoingDocument> CreateAsync(OutgoingDocument outgoingDocument, CancellationToken cancellationToken)
+        public async Task<OutgoingDocument> AddAsync(OutgoingDocument outgoingDocument, CancellationToken cancellationToken)
         {
-            await _documentService.AddDocument(new Document
+            if (outgoingDocument.Document == null)
             {
-                DocumentType = DocumentType.Outgoing,
-                OutgoingDocument = outgoingDocument
-            }, cancellationToken);
+                outgoingDocument.Document = new Document();
+            }
+
+            outgoingDocument.Document.DocumentType = DocumentType.Outgoing;
+            outgoingDocument.Document.RegistrationDate = DateTime.Now;
+            outgoingDocument.Document.Status = DocumentStatus.New;
+            outgoingDocument.Document.RecipientId = null;
+
+            await _documentService.AddAsync(outgoingDocument.Document, cancellationToken);            
+            await _dbContext.AddAsync(outgoingDocument, cancellationToken);            
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return outgoingDocument;
         }

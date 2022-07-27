@@ -9,10 +9,10 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
     public class Document : ExtendedEntity, IDocument
     {
         public DocumentType DocumentType { get; set; }
-        public int RegistrationNumber { get; set; }
+        public long RegistrationNumber { get; set; }
         public DateTime RegistrationDate { get; set; }
-        public long RecipientId { get; set; }
-        public bool RecipientIsDepartment { get; set; }
+        public long? RecipientId { get; set; }
+        public long DestinationDepartmentId { get; set; } 
 
         #region [ IDocument ]
 
@@ -34,6 +34,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
 
         public List<SpecialRegisterMapping> SpecialRegisterMappings { get; set; }
         public List<DocumentUploadedFile> DocumentUploadedFiles { get; set; }
+        public List<WorkflowHistoryLog> WorkflowHistories { get; set; }
 
         #endregion
     }

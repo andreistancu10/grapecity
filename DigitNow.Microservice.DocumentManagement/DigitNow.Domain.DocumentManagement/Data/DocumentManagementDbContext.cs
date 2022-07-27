@@ -1,4 +1,4 @@
-﻿#define MIGRATION_ONLY
+﻿#undef MIGRATION_ONLY
 
 #if    MIGRATION_ONLY
 using Microsoft.EntityFrameworkCore.Design;
@@ -41,16 +41,16 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<DocumentResolution> DocumentResolutions { get; set; }
         public DbSet<ConnectedDocument> ConnectedDocuments { get; set; }
         public DbSet<InternalDocument> InternalDocuments { get; set; }
-        public DbSet<RegistrationNumberCounter> RegistrationNumberCounters { get; set; }
         public DbSet<SpecialRegister> SpecialRegisters { get; set; }
         public DbSet<SpecialRegisterMapping> SpecialRegisterMappings { get; set; }
         public DbSet<UploadedFile> UploadedFiles { get; set; }
         public DbSet<DocumentUploadedFile> DocumentUploadedFiles { get; set; }
         public DbSet<DeliveryDetail> DeliveryDetails { get; set; }
+        public DbSet<WorkflowHistoryLog> WorkflowHistoryLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasDefaultSchema(Schema);
+            modelBuilder.HasDefaultSchema(Schema);            
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(DocumentManagementDbContext).Assembly);
         }
 

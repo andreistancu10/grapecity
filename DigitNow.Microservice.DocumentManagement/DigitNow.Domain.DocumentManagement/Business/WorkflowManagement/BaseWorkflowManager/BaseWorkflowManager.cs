@@ -29,47 +29,33 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
         public readonly IIdentityAdapterClient IdentityAdapterClient;
         public readonly DocumentManagementDbContext DbContext;
         protected abstract int[] allowedTransitionStatuses { get; }
-        protected abstract Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, WorkflowHistory lastWorkFlowRecord, CancellationToken token);
+        protected abstract Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token);
 
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            var document = await DbContext.Documents.FirstAsync(x => x.Id == command.DocumentId);
-            var virtualDocument = await GetVirtualDocumentWorkflowHistoryByIdAsync(document);
-            var lastWorkFlowRecord = GetLastWorkflowRecord(virtualDocument);
-
-            await CreateWorkflowRecordInternal(command, document, virtualDocument, lastWorkFlowRecord, token);
+            var document = await DbContext.Documents
+                .Include(x => x.WorkflowHistories)
+                .FirstAsync(x => x.Id == command.DocumentId);
+            var lastWorkFlowRecord = GetLastWorkflowRecord(document);
+            
+            await CreateWorkflowRecordInternal(command, document, lastWorkFlowRecord, token);
             await DbContext.SaveChangesAsync(token);
 
             return command;
         }
 
-        public WorkflowHistory GetLastWorkflowRecord(VirtualDocument document)
+        public WorkflowHistoryLog GetLastWorkflowRecord(Document document)
         {
-            return document.WorkflowHistory.OrderByDescending(x => x.CreatedAt).FirstOrDefault();
+            return document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).FirstOrDefault();
         }
 
-        public static bool IsTransitionAllowed(WorkflowHistory lastWorkFlowRecord, int[] allowedTransitionStatuses)
+        public static bool IsTransitionAllowed(WorkflowHistoryLog lastWorkFlowRecord, int[] allowedTransitionStatuses)
         {
-            if (lastWorkFlowRecord == null || !allowedTransitionStatuses.Contains((int)lastWorkFlowRecord.Status))
+            if (lastWorkFlowRecord == null || !allowedTransitionStatuses.Contains((int)lastWorkFlowRecord.DocumentStatus))
             {
                 return false;
             }
             return true;
-        }
-
-        protected async Task<VirtualDocument> GetVirtualDocumentWorkflowHistoryByIdAsync(Document document)
-        {
-            switch (document.DocumentType)
-            {
-                case DocumentType.Incoming:
-                    return await DbContext.IncomingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.DocumentId == document.Id);
-                case DocumentType.Internal:
-                    return await DbContext.InternalDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.DocumentId == document.Id);
-                case DocumentType.Outgoing:
-                    return await DbContext.OutgoingDocuments.Include(x => x.WorkflowHistory).FirstOrDefaultAsync(x => x.DocumentId == document.Id);
-                default:
-                    return null;
-            }
         }
 
         public async Task SetStatusAndRecipientBasedOnWorkflowDecision(long documentId, long recipientId, DocumentStatus status)
@@ -78,11 +64,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
 
             document.RecipientId = recipientId;
             document.Status = status;
-
-            if (document.DocumentType == DocumentType.Outgoing || document.DocumentType == DocumentType.Internal)
-            {
-                document.RecipientIsDepartment = false;
-            }
         }
 
         public async Task<User> FetchHeadOfDepartmentByDepartmentIdAsync(long departmentId, CancellationToken token)
@@ -99,7 +80,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             return response.Users.FirstOrDefault(x => x.Roles.Contains(RecipientType.Mayor.Code));
         }
 
-        protected async virtual Task TransferResponsibility(WorkflowHistory oldRecord, WorkflowHistory newRecord, ICreateWorkflowHistoryCommand command)
+        protected async virtual Task TransferResponsibility(WorkflowHistoryLog oldRecord, WorkflowHistoryLog newRecord, ICreateWorkflowHistoryCommand command)
         {
             if (oldRecord == null)
             {
@@ -110,7 +91,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             newRecord.RecipientType = oldRecord.RecipientType;
             newRecord.RecipientName = oldRecord.RecipientName;
 
-            await SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, newRecord.RecipientId, newRecord.Status);
+            await SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, newRecord.RecipientId, newRecord.DocumentStatus);
         }
 
         protected virtual void TransitionNotAllowed(ICreateWorkflowHistoryCommand command)
@@ -138,32 +119,31 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             return true;
         }
 
-        protected async Task PassDocumentToRegistry(VirtualDocument document, ICreateWorkflowHistoryCommand command, CancellationToken token)
+        protected async Task PassDocumentToRegistry(Document document, ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
             var creator = await IdentityAdapterClient.GetUserByIdAsync(document.CreatedBy, token);
 
-            document.WorkflowHistory
-                .Add(WorkflowHistoryFactory
-                .Create(RecipientType.Functionary, creator, DocumentStatus.NewDeclinedCompetence, command.DeclineReason, command.Remarks));
+            var newWorkflowHistoryLog = WorkflowHistoryLogFactory.Create(document.Id, RecipientType.Functionary, creator, DocumentStatus.NewDeclinedCompetence, command.DeclineReason, command.Remarks);
+            document.WorkflowHistories.Add(newWorkflowHistoryLog);
 
             await SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, creator.Id, DocumentStatus.NewDeclinedCompetence);
         }
 
-        protected async Task PassDocumentToFunctionary(VirtualDocument document, WorkflowHistory newWorkflowResponsible, ICreateWorkflowHistoryCommand command)
+        protected async Task PassDocumentToFunctionary(Document document, WorkflowHistoryLog newWorkflowResponsible, ICreateWorkflowHistoryCommand command)
         {
             var oldWorkflowResponsible = GetOldWorkflowResponsible(document, x => x.RecipientType == RecipientType.Functionary.Id);
 
             await TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 
-            document.WorkflowHistory.Add(newWorkflowResponsible);
+            document.WorkflowHistories.Add(newWorkflowResponsible);
         }
 
-        public WorkflowHistory GetOldWorkflowResponsible(VirtualDocument document, Expression<Func<WorkflowHistory, bool>> predicate)
+        public WorkflowHistoryLog GetOldWorkflowResponsible(Document document, Expression<Func<WorkflowHistoryLog, bool>> predicate)
         {
-            return ExtractResponsible(document.WorkflowHistory, predicate);
+            return ExtractResponsible(document.WorkflowHistories, predicate);
         }
 
-        private static WorkflowHistory ExtractResponsible(List<WorkflowHistory> history, Expression<Func<WorkflowHistory, bool>> predicate)
+        private static WorkflowHistoryLog ExtractResponsible(List<WorkflowHistoryLog> history, Expression<Func<WorkflowHistoryLog, bool>> predicate)
         {
             return history.AsQueryable()
                           .Where(predicate)

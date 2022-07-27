@@ -9,7 +9,6 @@ public class OutgoingDocumentConfiguration : IEntityTypeConfiguration<OutgoingDo
     {
         builder.ToTable(nameof(OutgoingDocument), DocumentManagementDbContext.Schema);
 
-        builder.Property(p => p.RecipientTypeId).IsRequired();
         builder.Property(p => p.RecipientName).IsRequired();
         builder.Property(p => p.IdentificationNumber).IsRequired();
         builder.Property(p => p.ContactDetailId).IsRequired();

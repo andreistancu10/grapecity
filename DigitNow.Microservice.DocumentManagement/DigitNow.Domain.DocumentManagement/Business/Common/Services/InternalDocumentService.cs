@@ -15,7 +15,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 {
     public interface IInternalDocumentService
     {
-        Task<InternalDocument> CreateAsync(InternalDocument internalDocument, CancellationToken cancellationToken);
+        Task<InternalDocument> AddAsync(InternalDocument internalDocument, CancellationToken cancellationToken);
         Task<List<InternalDocument>> FindAllAsync(Expression<Func<InternalDocument, bool>> predicate, CancellationToken cancellationToken);
         Task SetResolutionAsync(IList<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken);
     }
@@ -24,30 +24,31 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IDocumentService _documentService;
-        private readonly IIdentityService _identityService;
-        private readonly IDocumentResolutionService _documentResolutionService;
 
         public InternalDocumentService(     
             DocumentManagementDbContext dbContext,
-            IDocumentService documentService, 
-            IIdentityService identityService,
-            IDocumentResolutionService documentResolutionService)
+            IDocumentService documentService)
         {
             _dbContext = dbContext;
             _documentService = documentService;
-            _identityService = identityService;
-            _documentResolutionService = documentResolutionService;
         }
 
-        public async Task<InternalDocument> CreateAsync(InternalDocument internalDocument, CancellationToken cancellationToken)
+        public async Task<InternalDocument> AddAsync(InternalDocument internalDocument, CancellationToken cancellationToken)
         {
-            internalDocument.Document = new Document 
-            { 
-                DocumentType = DocumentType.Internal,
-                InternalDocument = internalDocument
-            };
+            if (internalDocument.Document == null)
+            {
+                internalDocument.Document = new Document();
+            }
 
-            await _documentService.AddDocument(internalDocument.Document, cancellationToken);
+            internalDocument.Document.DocumentType = DocumentType.Internal;
+            internalDocument.Document.RegistrationDate = DateTime.Now;
+            internalDocument.Document.Status = DocumentStatus.New;
+            internalDocument.Document.RecipientId = null;
+
+            await _documentService.AddAsync(internalDocument.Document, cancellationToken);
+            await _dbContext.AddAsync(internalDocument, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
             return internalDocument;
         }
 

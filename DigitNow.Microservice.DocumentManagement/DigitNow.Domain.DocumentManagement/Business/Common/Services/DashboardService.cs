@@ -108,6 +108,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             if (IsRole(userModel, RecipientType.HeadOfDepartment))
             {
+                //TODO: Get all users by departmentId
                 var usersResponse = await _identityAdapterClient.GetUsersAsync(cancellationToken);
 
                 return usersResponse.Users
@@ -123,7 +124,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             var userId = _identityService.GetCurrentUserId();
 
-            var getUserByIdResponse = await _authenticationClient.GetUserById(userId, cancellationToken);
+            var getUserByIdResponse = await _identityAdapterClient.GetUserByIdAsync(userId, cancellationToken);
             if (getUserByIdResponse == null)
                 throw new InvalidOperationException($"User with identifier '{userId}' was not found!");
 
@@ -162,7 +163,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 var relatedUserIds = await GetRelatedUserIdsAsync(userModel, cancellationToken);
 
                 documentsQuery = documentsQuery
-                    .Where(x => relatedUserIds.Contains(x.CreatedBy) || relatedUserIds.Contains(x.RecipientId));
+                    .Where(x => 
+                        relatedUserIds.Contains(x.CreatedBy) 
+                        || 
+                        (x.RecipientId.HasValue && relatedUserIds.Contains(x.RecipientId.Value))
+                    );
             }
 
             return documentsQuery;

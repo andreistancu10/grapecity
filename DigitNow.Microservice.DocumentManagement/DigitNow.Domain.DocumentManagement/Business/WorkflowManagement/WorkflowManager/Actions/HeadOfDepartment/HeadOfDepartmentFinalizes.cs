@@ -15,35 +15,36 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         public HeadOfDepartmentFinalizes(IServiceProvider serviceProvider) : base(serviceProvider) { }
         protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.New };
 
-        protected async override Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, WorkflowHistory lastWorkFlowRecord, CancellationToken token)
+        protected async override Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token)
         {
             if (!Validate(command, lastWorkFlowRecord, document))
                 return command;
 
-            var departmentToReceiveDocument = virtualDocument.WorkflowHistory
+            var departmentToReceiveDocument = document.WorkflowHistories
                     .Where(x => x.RecipientType == RecipientType.Department.Id)
                     .OrderBy(x => x.CreatedAt)
                     .First().RecipientId;
 
-            var newWorkflowResponsible = new WorkflowHistory
+            document.DestinationDepartmentId = departmentToReceiveDocument;
+            document.RecipientId = null;
+            document.Status = DocumentStatus.Finalized;
+
+
+            var newWorkflowResponsible = new WorkflowHistoryLog
             {
-                Status = DocumentStatus.Finalized,
+                DocumentStatus = DocumentStatus.Finalized,
                 Remarks = command.Remarks,
                 RecipientType = RecipientType.Department.Id,
                 RecipientId = departmentToReceiveDocument,
                 RecipientName = $"Departamentul {departmentToReceiveDocument}!"
             };
 
-            document.RecipientIsDepartment = true;
-            document.RecipientId = departmentToReceiveDocument;
-            document.Status = DocumentStatus.Finalized;
-
-            virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
+            document.WorkflowHistories.Add(newWorkflowResponsible);
 
             return command;
         }
 
-        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord, Document document)
+        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord, Document document)
         {
             if (!IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses) || document.DocumentType == DocumentType.Incoming)
             {

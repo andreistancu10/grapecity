@@ -13,25 +13,25 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         public FunctionaryFinalizes(IServiceProvider serviceProvider) : base(serviceProvider) { }
         protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.New, (int)DocumentStatus.InWorkDeclined };
         
-        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, WorkflowHistory oldWorkflowResponsible, CancellationToken token)
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog oldWorkflowResponsible, CancellationToken token)
         {
             if (!Validate(command, oldWorkflowResponsible))
                 return command;
 
-            var newWorkflowResponsible = new WorkflowHistory
+            var newWorkflowResponsible = new WorkflowHistoryLog
             {
-                Status = DocumentStatus.Finalized,
+                DocumentStatus = DocumentStatus.Finalized,
                 Remarks = command.Remarks
             };
 
             await TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
 
-            virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
+            document.WorkflowHistories.Add(newWorkflowResponsible);
 
             return command;
         }
 
-        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
+        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord)
         {
             if (!IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
             {

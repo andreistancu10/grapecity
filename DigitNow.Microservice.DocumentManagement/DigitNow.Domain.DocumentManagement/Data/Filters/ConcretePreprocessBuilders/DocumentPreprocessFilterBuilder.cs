@@ -19,7 +19,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders.Prepr
         private readonly DocumentManagementDbContext _dbContext;
 
         public DocumentPreprocessFilterBuilder(DocumentManagementDbContext dbContext, DocumentPreprocessFilter documentFilterModel)
-            : base(documentFilterModel) 
+            : base(documentFilterModel)
         {
             _dbContext = dbContext;
         }
@@ -90,6 +90,14 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders.Prepr
             }
         }
 
+        public void BuildFilterByDepartment()
+        {
+            if (EntityFilter.DepartmentFilter != null)
+            {
+                GeneratedFilters.Add(document => EntityFilter.DepartmentFilter.DepartmentIds.Contains(document.DestinationDepartmentId));
+            }
+        }
+
         protected override void InternalBuild()
         {
             if (EntityFilter.IdentifiersFilter != null)
@@ -103,6 +111,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders.Prepr
                 BuildFilterByRegistrationDate();
                 BuildFilterByDocumentType();
                 BuildFilterByDocumentState();
+                BuildFilterByDepartment();
             }
         }
     }

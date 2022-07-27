@@ -59,38 +59,38 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateD
 
             shippableDocument.DeliveryDetails = deliveryDetails;
 
-            // TODO: Refactor this part after DestinationDepartmentId will be added on DocumentBase
-            document.RecipientId = 0;
-            document.Status = DocumentStatus.Finalized;
-
             var departmentToReceiveDocument = default(long);
 
-            if (virtualDocument.Document.DocumentType == DocumentType.Outgoing)
+            if (document.DocumentType == DocumentType.Outgoing)
             {
-                departmentToReceiveDocument = GetDestinationDepartmentFromHistory(virtualDocument);
+                departmentToReceiveDocument = GetDestinationDepartmentFromHistory();
             }
             else
             {
                 departmentToReceiveDocument = await GetDestinationDepartmentByCodeAsync("registratura", token);
             }
 
-            var newWorkflowResponsible = new WorkflowHistory
+            document.DestinationDepartmentId = departmentToReceiveDocument;
+            document.RecipientId = null;
+            document.Status = DocumentStatus.Finalized;
+
+            var newWorkflowResponsible = new WorkflowHistoryLog
             {
-                Status = DocumentStatus.Finalized,
+                DocumentStatus = DocumentStatus.Finalized,
                 RecipientType = RecipientType.Department.Id,
                 RecipientId = departmentToReceiveDocument,
                 RecipientName = $"Departamentul {departmentToReceiveDocument}!"
             };
             
-            virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
+            await _dbContext.WorkflowHistoryLogs.AddAsync(newWorkflowResponsible, token);
         }
 
-        private long GetDestinationDepartmentFromHistory(VirtualDocument virtualDocument)
+        private long GetDestinationDepartmentFromHistory()
         {
-            return virtualDocument.WorkflowHistory
-                                   .Where(x => x.RecipientType == RecipientType.Department.Id)
-                                   .OrderBy(x => x.CreatedAt)
-                                   .First().RecipientId;
+            return _dbContext.WorkflowHistoryLogs
+                .Where(x => x.RecipientType == RecipientType.Department.Id)
+                .OrderBy(x => x.CreatedAt)
+                .First().RecipientId;
         }
         private async Task<long> GetDestinationDepartmentByCodeAsync(string code, CancellationToken token)
         {

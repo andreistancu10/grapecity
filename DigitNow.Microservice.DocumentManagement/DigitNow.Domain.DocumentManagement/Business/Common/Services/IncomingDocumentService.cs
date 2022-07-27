@@ -23,22 +23,32 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
     public class IncomingDocumentService : IIncomingDocumentService
     {
         private readonly DocumentManagementDbContext _dbContext;
+        private readonly IDocumentService _documentService;
 
-        public IncomingDocumentService(DocumentManagementDbContext dbContext)
+        public IncomingDocumentService(
+            DocumentManagementDbContext dbContext,
+            IDocumentService documentService)
         {
             _dbContext = dbContext;
+            _documentService = documentService;
         }
 
         public async Task<IncomingDocument> AddAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken)
         {
-            incomingDocument.Document = new Document
+            if (incomingDocument.Document == null)
             {
-                DocumentType = DocumentType.Incoming,
-                RegistrationDate = DateTime.Now
-            };
+                incomingDocument.Document = new Document();
+            }
 
+            incomingDocument.Document.DocumentType = DocumentType.Incoming;
+            incomingDocument.Document.RegistrationDate = DateTime.Now;
+            incomingDocument.Document.Status = DocumentStatus.InWorkUnallocated;
+            incomingDocument.Document.RecipientId = null;
+
+            await _documentService.AddAsync(incomingDocument.Document, cancellationToken);
             await _dbContext.AddAsync(incomingDocument, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
+
             return incomingDocument;
         }
 

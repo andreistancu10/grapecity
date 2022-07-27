@@ -21,27 +21,40 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
         IQueryable<Document> FindAllQueryable(Expression<Func<Document, bool>> predicate);
         Task<int> CountAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken cancellationToken);
-
-        [Obsolete("This will be refactored in future sprints", error: false)]
-        Task AddDocument(Document document, CancellationToken cancellationToken);
     }
 
     public class DocumentService : IDocumentService
     {
         protected readonly DocumentManagementDbContext _dbContext;
-        private readonly IIdentityService _identityService;
 
-        public DocumentService(DocumentManagementDbContext dbContext,
-            IIdentityService identityService)
+        public DocumentService(DocumentManagementDbContext dbContext)
         {
             _dbContext = dbContext;
-            _identityService = identityService;
         }
 
         public async Task<Document> AddAsync(Document newDocument, CancellationToken cancellationToken)
         {
-            await _dbContext.AddAsync(newDocument, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            var dbContextTransaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+            try
+            {
+                // Insert the entity without relationships
+                _dbContext.Entry(newDocument).State = EntityState.Added;
+                await SetRegistrationNumberAsync(newDocument, cancellationToken);
+                await _dbContext.SaveChangesAsync(cancellationToken);
+
+                await dbContextTransaction.CommitAsync(cancellationToken);
+            }
+            catch
+            {
+                //TODO: Log error
+                await dbContextTransaction.RollbackAsync();
+                throw;
+            }
+            finally
+            {
+                dbContextTransaction?.Dispose();
+            }
+            
             return newDocument;
         }
 
@@ -73,46 +86,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
                 .CountAsync(cancellationToken);
         }
 
-        // TODO: Use RegistrationNumberCounterService
-        public async Task AddDocument(Document document, CancellationToken cancellationToken)
+        private async Task SetRegistrationNumberAsync(Document document, CancellationToken cancellationToken)
         {
-            var dbContextTransaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable);
-            try
-            {
-                var maxRegNumber = await _dbContext.RegistrationNumberCounters
-                    .Where(reg => reg.RegistrationDate.Year == DateTime.Now.Year)
-                    .Select(reg => reg.RegistrationNumber)
-                    .DefaultIfEmpty()
-                    .MaxAsync();
+            var maxRegNumber = await _dbContext.Documents
+                .Where(reg => reg.RegistrationDate.Year == DateTime.Now.Year)
+                .Select(reg => reg.RegistrationNumber)
+                .DefaultIfEmpty()
+                .MaxAsync();
 
-                var newRegNumber = ++maxRegNumber;
-
-                document.RegistrationNumber = newRegNumber;
-                document.RegistrationDate = DateTime.Now;
-
-                if (document.InternalDocument == null && document.IncomingDocument == null && document.OutgoingDocument == null)
-                    throw new InvalidOperationException(); //TODO: Add descriptive error
-
-                await _dbContext.AddAsync(document, cancellationToken);
-                await _dbContext.RegistrationNumberCounters.AddAsync(new RegistrationNumberCounter
-                {
-                    RegistrationNumber = newRegNumber,
-                    RegistrationDate = DateTime.Now
-                });
-
-                await _dbContext.SaveChangesAsync(cancellationToken);
-                await dbContextTransaction.CommitAsync(cancellationToken);
-            }
-            catch
-            {
-                //TODO: Log error
-                await dbContextTransaction.RollbackAsync();
-                throw;
-            }
-            finally
-            {
-                dbContextTransaction?.Dispose();
-            }
+            document.RegistrationNumber = ++maxRegNumber;
+            document.RegistrationDate = DateTime.Now;
         }
     }
 }

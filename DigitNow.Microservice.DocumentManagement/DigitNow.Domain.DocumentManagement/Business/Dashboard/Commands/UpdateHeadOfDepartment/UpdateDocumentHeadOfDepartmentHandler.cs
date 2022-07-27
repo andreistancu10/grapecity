@@ -8,6 +8,7 @@ using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +19,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IIdentityAdapterClient _identityAdapterClient;
-        private User _headOfDepartment;
 
         public UpdateDocumentHeadOfDepartmentHandler(DocumentManagementDbContext dbContext, IIdentityAdapterClient identityAdapterClient)
         {
@@ -29,9 +29,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
         {
             var response = await _identityAdapterClient.GetUsersAsync(cancellationToken);
             var departmentUsers = response.Users.Where(x => x.Departments.Contains(request.DepartmentId));
-            _headOfDepartment = departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
+            var headOfDepartment = departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
 
-            if (_headOfDepartment == null)
+            if (headOfDepartment == null)
                 return ResultObject.Error(new ErrorMessage
                 {
                     Message = $"No responsible for department with id {request.DepartmentId} was found.",
@@ -39,43 +39,29 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                     Parameters = new object[] { request.DepartmentId }
                 });
 
-            await UpdateDocuments(request);
-            await _dbContext.SaveChangesAsync();
+            await UpdateDocuments(request, headOfDepartment);            
 
             return new ResultObject(ResultStatusCode.Ok);
         }
 
-        private async Task UpdateDocuments(UpdateDocumentHeadOfDepartmentCommand request)
+        private async Task UpdateDocuments(UpdateDocumentHeadOfDepartmentCommand request, User headOfDepartment)
         {
-            foreach (var docInfo in request.DocumentInfo)
+            var requestedDocumentIds = request.DocumentInfo.Select(x => x.DocumentId);
+
+            var foundDocuments = await _dbContext.Documents
+                    .Include(x => x.WorkflowHistories)
+                    .Where(x => requestedDocumentIds.Contains(x.Id))
+                    .ToListAsync(); //TODO: Add token
+            
+            foreach (var foundDocument in foundDocuments)
             {
-                var document = await _dbContext.Documents.FirstAsync(x => x.Id == docInfo.DocumentId);
-
-                switch (document.DocumentType)
-                {
-                    case DocumentType.Incoming:
-                        await UpdateHeadOfDepartment<IncomingDocument>(document);
-                        break;
-                    case DocumentType.Internal:
-                        await UpdateHeadOfDepartment<InternalDocument>(document);
-                        break;
-                    case DocumentType.Outgoing:
-                        await UpdateHeadOfDepartment<OutgoingDocument>(document);
-                        break;
-                    default:
-                        break;
-                }
+                foundDocument.Status = DocumentStatus.InWorkUnallocated;
+                foundDocument.DestinationDepartmentId = request.DepartmentId;
+                foundDocument.WorkflowHistories.Add(WorkflowHistoryLogFactory.Create(foundDocument.Id, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkUnallocated));
             }
-        }
 
-        private async Task UpdateHeadOfDepartment<T>(Document document) where T : VirtualDocument
-        {
-            var virtualDocument = await _dbContext.Set<T>().AsQueryable()
-                .FirstOrDefaultAsync(x => x.DocumentId == document.Id);
-
-            document.Status = DocumentStatus.InWorkUnallocated;
-            document.RecipientId = (int)_headOfDepartment.Id;
-            virtualDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(RecipientType.HeadOfDepartment, _headOfDepartment, DocumentStatus.InWorkUnallocated));
+            await _dbContext.BulkUpdateAsync(foundDocuments);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
