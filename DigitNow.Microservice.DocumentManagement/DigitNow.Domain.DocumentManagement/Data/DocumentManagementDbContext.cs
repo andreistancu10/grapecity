@@ -46,7 +46,6 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<SpecialRegisterMapping> SpecialRegisterMappings { get; set; }
         public DbSet<UploadedFile> UploadedFiles { get; set; }
         public DbSet<DocumentUploadedFile> DocumentUploadedFiles { get; set; }
-        public DbSet<DeliveryDetail> DeliveryDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
