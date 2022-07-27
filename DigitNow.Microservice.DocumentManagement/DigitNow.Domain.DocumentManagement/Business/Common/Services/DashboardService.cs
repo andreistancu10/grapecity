@@ -2,11 +2,15 @@
 using DigitNow.Adapters.MS.Identity;
 using DigitNow.Domain.Authentication.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
+using DigitNow.Domain.DocumentManagement.Data.Filters;
+using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
+using DigitNow.Domain.DocumentManagement.extensions.Role;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -14,9 +18,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
-using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
-using DigitNow.Domain.DocumentManagement.Data.Filters;
-using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -24,7 +25,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         Task<long> CountAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken);
 
+        Task<long> CountAllArchiveDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken);
+
         Task<List<VirtualDocument>> GetAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken cancellationToken);
+        Task<List<VirtualDocument>> GetAllArchiveDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken cancellationToken);
     }
 
     public class DashboardService : IDashboardService
@@ -67,9 +71,21 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         #region [ IDashboardService ]
 
-        public async Task<long> CountAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
+        public Task<long> CountAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
+            => CountAllDocumentsByFlowAsync(FlowType.Documents, preprocessFilter, postprocessFilter, cancellationToken);
+
+        public Task<List<VirtualDocument>> GetAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken cancellationToken)
+            => GetAllDocumentsByFlowAsync(FlowType.Documents, preprocessFilter, postprocessFilter, page, count, cancellationToken);
+
+        public Task<long> CountAllArchiveDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
+            => CountAllDocumentsByFlowAsync(FlowType.ArchivedDocuments, preprocessFilter, postprocessFilter, cancellationToken);
+
+        public Task<List<VirtualDocument>> GetAllArchiveDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken cancellationToken)
+            => GetAllDocumentsByFlowAsync(FlowType.ArchivedDocuments, preprocessFilter, postprocessFilter, page, count, cancellationToken);
+
+        private async Task<long> CountAllDocumentsByFlowAsync(FlowType flowType, DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
         {
-            var documentsQuery = await BuildPreprocessDocumentsQueryAsync(preprocessFilter, cancellationToken);
+            var documentsQuery = await BuildPreprocessDocumentsQueryAsync(flowType, preprocessFilter, cancellationToken);
             if (postprocessFilter.IsEmpty())
                 return await documentsQuery.CountAsync(cancellationToken);
 
@@ -80,9 +96,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return await _virtualDocumentService.CountVirtualDocuments(lightweightDocuments, postprocessFilter, cancellationToken);
         }
 
-        public async Task<List<VirtualDocument>> GetAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken cancellationToken)
+        private async Task<List<VirtualDocument>> GetAllDocumentsByFlowAsync(FlowType flowType, DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken cancellationToken)
         {
-            var documentsQuery = await BuildPreprocessDocumentsQueryAsync(preprocessFilter, cancellationToken);
+            var documentsQuery = await BuildPreprocessDocumentsQueryAsync(flowType, preprocessFilter, cancellationToken);
 
             var documents = await documentsQuery.OrderByDescending(x => x.CreatedAt)
                  .Skip((page - 1) * count)
@@ -104,9 +120,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private async Task<IEnumerable<long>> GetRelatedUserIdsAsync(UserModel userModel, CancellationToken cancellationToken) =>
             (await GetRelatedUsersAsync(userModel, cancellationToken)).Select(x => x.Id);
 
+
         private async Task<IList<UserModel>> GetRelatedUsersAsync(UserModel userModel, CancellationToken cancellationToken)
         {
-            if (IsRole(userModel, RecipientType.HeadOfDepartment))
+            if (userModel.HasRole(RecipientType.HeadOfDepartment))
             {
                 var usersResponse = await _identityAdapterClient.GetUsersAsync(cancellationToken);
 
@@ -134,8 +151,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         #region [ Utils - Preprocessing Filters ]
 
+        private enum FlowType
+        {
+            Documents,
+            ArchivedDocuments
+        }
+
         private IList<Expression<Func<Document, bool>>> GetDocumentsPreprocessBuiltinPredicates() =>
-            PredicateFactory.CreatePredicatesList<Document>(x => x.CreatedAt.Year >= PreviousYear);
+            PredicateFactory.CreatePredicatesList<Document>(x => x.CreatedAt.Year >= PreviousYear && x.IsArchived == false);
+
+        private IList<Expression<Func<Document, bool>>> GetArchivedDocumentsPreprocessBuiltinPredicates() =>
+            PredicateFactory.CreatePredicatesList<Document>(x => x.IsArchived == true);
 
         private IList<Expression<Func<Document, bool>>> GetDocumentsPreprocessPredicates(DocumentPreprocessFilter preprocessFilter) =>
             ExpressionFilterBuilderRegistry.GetDocumentPreprocessFilterBuilder(_dbContext, preprocessFilter).Build();
@@ -149,15 +175,35 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
             return preprocessPredicates;
         }
-
-        private async Task<IQueryable<Document>> BuildPreprocessDocumentsQueryAsync(DocumentPreprocessFilter documentFilter, CancellationToken cancellationToken)
+        private IList<Expression<Func<Document, bool>>> GetArchivedPreprocessPredicates(DocumentPreprocessFilter preprocessFilter)
         {
-            var documentsQuery = _dbContext.Documents
-                .WhereAll(GetPreprocessPredicates(documentFilter));
+            var preprocessPredicates = GetArchivedDocumentsPreprocessBuiltinPredicates();
+            if (!preprocessFilter.IsEmpty())
+            {
+                GetDocumentsPreprocessPredicates(preprocessFilter).ForEach(predicate => preprocessPredicates.Add(predicate));
+            }
+            return preprocessPredicates;
+        }
+
+        private async Task<IQueryable<Document>> BuildPreprocessDocumentsQueryAsync(FlowType flowType, DocumentPreprocessFilter documentFilter, CancellationToken cancellationToken)
+        {
+            var documentsQuery = _dbContext.Documents.AsQueryable();
+            switch (flowType)
+            {
+                case FlowType.Documents:
+                    documentsQuery = documentsQuery.WhereAll(GetPreprocessPredicates(documentFilter));
+                    break;
+                case FlowType.ArchivedDocuments:
+                    documentsQuery = documentsQuery.WhereAll(GetArchivedPreprocessPredicates(documentFilter));
+                    break;
+
+            }
+
+
 
             var userModel = await GetCurrentUserAsync(cancellationToken);
 
-            if (!IsRole(userModel, RecipientType.Mayor))
+            if (!userModel.HasRole(RecipientType.Mayor))
             {
                 var relatedUserIds = await GetRelatedUserIdsAsync(userModel, cancellationToken);
 
@@ -167,13 +213,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             return documentsQuery;
         }
-
-        #endregion
-
-        #region [ Utils ]
-
-        private static bool IsRole(UserModel userModel, RecipientType role) =>
-            userModel.Roles.Contains(role.Code);
 
         #endregion
     }

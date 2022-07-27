@@ -1,9 +1,11 @@
-﻿using System.Threading;
+﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Archive.Queries;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
+using DigitNow.Domain.DocumentManagement.Public.Dashboard.Models;
 using HTSS.Platform.Core.Files;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
@@ -14,7 +16,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Archive;
 
 [Authorize]
 [ApiController]
-[Route("api/archive/operational")]
+[Route("api/archive")]
 public class ArchiveController : ApiController
 {
     private readonly IMediator _mediator;
@@ -30,14 +32,10 @@ public class ArchiveController : ApiController
         _exportService = exportService;
     }
 
-    [HttpGet]
-    public async Task<IActionResult> GetArchivedDocumentsAsync(CancellationToken cancellationToken)
+    [HttpPost("operational/get-documents")]
+    public async Task<ActionResult<List<GetDocumentsResponse>>> GetDocumentsAsync([FromBody] GetDocumentsRequest request, CancellationToken cancellationToken)
     {
-        var getArchivedDocumentsQuery = _mapper.Map<GetArchivedDocumentsQuery>(Request);
-
-        return await _mediator.Send(getArchivedDocumentsQuery, cancellationToken) switch
-        {
-            var result => Ok(result)
-        };
+        var query = _mapper.Map<GetDocumentsOperationalArchiveQuery>(request);
+        return Ok(await _mediator.Send(query, cancellationToken));
     }
 }

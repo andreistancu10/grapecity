@@ -26,6 +26,8 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Models
         public DocumentStatusFilterDto DocumentStatusFilter { get; set; }
 
         public DocumentIdentifiersFilterDto DocumentIdentifiersFilter { get; set; }
+
+        public DocumentIdentificationNumberDto IdentificationNumber { get; set; }
     }
 
     public class DocumentIdentifiersFilterDto
@@ -58,6 +60,11 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Models
     public class DocumentCategoryFilterDto
     {
         public List<int> CategoryIds { get; set; }
+    }
+
+    public class DocumentIdentificationNumberDto
+    {
+        public string IdentificationNumber { get; set; }
     }
 
     public class DocumentStatusFilterDto

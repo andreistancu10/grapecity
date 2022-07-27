@@ -29,11 +29,31 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders
             {
                 GeneratedFilters.Add(x => categoriesIds.Contains(((OutgoingDocument)(object)x).DocumentTypeId));
             }
+        } 
+        
+        private void BuildFilterByIdentificationNumbery()
+        {
+            if (EntityFilter == null || EntityFilter.IdentificationNumber == null)
+                return;
+
+            var identificationNumber = EntityFilter.IdentificationNumber;
+            var targetType = typeof(T);
+
+            
+            if (targetType == typeof(IncomingDocument))
+            {
+                GeneratedFilters.Add(x => identificationNumber.Equals(((IncomingDocument)(object)x).IdentificationNumber));
+            }
+            else if (targetType == typeof(OutgoingDocument))
+            {
+                GeneratedFilters.Add(x => identificationNumber.Equals(((OutgoingDocument)(object)x).IdentificationNumber));
+            }
         }
 
         protected override void InternalBuild()
         {
             BuildFilterByCategory();
+            BuildFilterByIdentificationNumbery();
         }
     }
 }

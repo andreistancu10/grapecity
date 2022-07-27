@@ -4,6 +4,7 @@ using DigitNow.Domain.DocumentManagement.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    partial class DocumentManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220726081752_ArchiveDashboard")]
+    partial class ArchiveDashboard
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -124,50 +126,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ContactDetail", "DocumentMangement");
-                });
-
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.DeliveryDetails.DeliveryDetail", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("Id")
-                        .HasColumnOrder(1);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("CreatedAt")
-                        .HasColumnOrder(2);
-
-                    b.Property<long>("CreatedBy")
-                        .HasColumnType("bigint")
-                        .HasColumnName("CreatedBy")
-                        .HasColumnOrder(3);
-
-                    b.Property<int>("DeliveryMode")
-                        .HasColumnType("int");
-
-                    b.Property<int>("DirectShipping")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("ModifiedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("ModifiedAt")
-                        .HasColumnOrder(4);
-
-                    b.Property<long>("ModifiedBy")
-                        .HasColumnType("bigint")
-                        .HasColumnName("ModifiedBy")
-                        .HasColumnOrder(5);
-
-                    b.Property<int>("Post")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("DeliveryDetail", "DocumentMangement");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Document", b =>
@@ -351,9 +309,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnName("CreatedBy")
                         .HasColumnOrder(3);
 
-                    b.Property<long?>("DeliveryDetailsId")
-                        .HasColumnType("bigint");
-
                     b.Property<string>("Detail")
                         .HasColumnType("nvarchar(max)");
 
@@ -409,8 +364,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ContactDetailId");
-
-                    b.HasIndex("DeliveryDetailsId");
 
                     b.HasIndex("DocumentId")
                         .IsUnique();
@@ -507,9 +460,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnName("CreatedBy")
                         .HasColumnOrder(3);
 
-                    b.Property<long?>("DeliveryDetailsId")
-                        .HasColumnType("bigint");
-
                     b.Property<long>("DocumentId")
                         .HasColumnType("bigint")
                         .HasColumnName("DocumentId")
@@ -548,8 +498,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ContactDetailId");
-
-                    b.HasIndex("DeliveryDetailsId");
 
                     b.HasIndex("DocumentId")
                         .IsUnique();
@@ -831,10 +779,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .WithMany()
                         .HasForeignKey("ContactDetailId");
 
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.DeliveryDetails.DeliveryDetail", "DeliveryDetails")
-                        .WithMany()
-                        .HasForeignKey("DeliveryDetailsId");
-
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Document", "Document")
                         .WithOne("IncomingDocument")
                         .HasForeignKey("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", "DocumentId")
@@ -842,8 +786,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .IsRequired();
 
                     b.Navigation("ContactDetail");
-
-                    b.Navigation("DeliveryDetails");
 
                     b.Navigation("Document");
                 });
@@ -867,10 +809,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.DeliveryDetails.DeliveryDetail", "DeliveryDetails")
-                        .WithMany()
-                        .HasForeignKey("DeliveryDetailsId");
-
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Document", "Document")
                         .WithOne("OutgoingDocument")
                         .HasForeignKey("DigitNow.Domain.DocumentManagement.Data.Entities.OutgoingDocument", "DocumentId")
@@ -878,8 +816,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .IsRequired();
 
                     b.Navigation("ContactDetail");
-
-                    b.Navigation("DeliveryDetails");
 
                     b.Navigation("Document");
                 });

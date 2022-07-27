@@ -1,14 +1,14 @@
 ﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
+using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
+using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
+using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
-using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
-using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
-using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -21,7 +21,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     public class DocumentMappingService : IDocumentMappingService
     {
         #region [ Fields ]
-    
+
         private readonly IMapper _mapper;
         private readonly DocumentRelationsFetcher _documentRelationsFetcher;
         private readonly DocumentReportRelationsFetcher _documentReportRelationsFetcher;
@@ -43,25 +43,25 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         #region [ IDocumentMappingService ]
 
-    public async Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
-    {
-        if (!virtualDocuments.Any()) return new List<DocumentViewModel>();
+        public async Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
+        {
+            if (!virtualDocuments.Any()) return new List<DocumentViewModel>();
 
-        await _documentRelationsFetcher.TriggerFetchersAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
-        return MapDocuments(virtualDocuments)
-            .OrderByDescending(x => x.RegistrationDate)
-            .ToList();
-    }
+            await _documentRelationsFetcher.TriggerFetchersAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
+            return MapDocuments(virtualDocuments)
+                .OrderByDescending(x => x.RegistrationDate)
+                .ToList();
+        }
 
-    public async Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
-    {
-        if (!virtualDocuments.Any()) return new List<ReportViewModel>();
+        public async Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
+        {
+            if (!virtualDocuments.Any()) return new List<ReportViewModel>();
 
-        await _documentRelationsFetcher.TriggerFetchersAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
-        return MapDocumentsReports(virtualDocuments)
-            .OrderByDescending(x => x.RegistrationDate)
-            .ToList();
-    }
+            await _documentRelationsFetcher.TriggerFetchersAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
+            return MapDocumentsReports(virtualDocuments)
+                .OrderByDescending(x => x.RegistrationDate)
+                .ToList();
+        }
 
         #endregion
 
@@ -74,7 +74,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var incomingDocuments = documents.Where(x => x is IncomingDocument).Cast<IncomingDocument>();
             if (incomingDocuments.Any())
             {
-                result.AddRange(MapChildDocuments(incomingDocuments));
+                result.AddRange(MapIncomingChildDocuments(incomingDocuments));
             }
 
             var internalDocuments = documents.Where(x => x is InternalDocument).Cast<InternalDocument>();
@@ -86,7 +86,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var outgoingDocuments = documents.Where(x => x is OutgoingDocument).Cast<OutgoingDocument>();
             if (outgoingDocuments.Any())
             {
-                result.AddRange(MapChildDocuments(outgoingDocuments));
+                result.AddRange(MapOutgoingChildDocuments(outgoingDocuments));
             }
 
             return result;
@@ -96,7 +96,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             where T : VirtualDocument
         {
             var result = new List<DocumentViewModel>();
-        
+
             foreach (var childDocument in childDocuments)
             {
                 var aggregate = new VirtualDocumentAggregate<T>
@@ -108,6 +108,48 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 };
 
                 result.Add(_mapper.Map<VirtualDocumentAggregate<T>, DocumentViewModel>(aggregate));
+            }
+
+            return result;
+        }
+
+        private List<DocumentViewModel> MapIncomingChildDocuments(IEnumerable<IncomingDocument> childDocuments)
+        {
+            var result = new List<DocumentViewModel>();
+            foreach (var childDocument in childDocuments)
+            {
+                var aggregate = new VirtualDocumentAggregate<IncomingDocument>
+                {
+                    VirtualDocument = childDocument,
+                    Users = _documentRelationsFetcher.DocumentUsers,
+                    Categories = _documentRelationsFetcher.DocumentCategories,
+                    InternalCategories = _documentRelationsFetcher.DocumentInternalCategories
+                };
+
+                var document = new DocumentViewModel();
+                document.IdentificationNumber = childDocument.IdentificationNumber ?? null;
+                result.Add(_mapper.Map(aggregate, document));
+            }
+
+            return result;
+        }
+
+        private List<DocumentViewModel> MapOutgoingChildDocuments(IEnumerable<OutgoingDocument> childDocuments)
+        {
+            var result = new List<DocumentViewModel>();
+            foreach (var childDocument in childDocuments)
+            {
+                var aggregate = new VirtualDocumentAggregate<OutgoingDocument>
+                {
+                    VirtualDocument = childDocument,
+                    Users = _documentRelationsFetcher.DocumentUsers,
+                    Categories = _documentRelationsFetcher.DocumentCategories,
+                    InternalCategories = _documentRelationsFetcher.DocumentInternalCategories
+                };
+
+                var document = new DocumentViewModel();
+                document.IdentificationNumber = childDocument.IdentificationNumber ?? null;
+                result.Add(_mapper.Map(aggregate, document));
             }
 
             return result;

@@ -16,6 +16,7 @@
 		<Compile Include=".configurations\DomainServiceExtensions.cs" />
 		<Compile Include=".configurations\IConfigurationBuilderExtensions.cs" />
 		<Compile Include=".extensions\Autocorrect\StringExtensions.cs" />
+		<Compile Include=".extensions\Role\RoleExtension.cs" />
 		<Compile Include=".extensions\Validators\RuleBuilderExtensions.cs" />
 		<Compile Include=".utils\DevOnlyActionFilter.cs" />
 		<Compile Include=".utils\FilterDescriptor.cs" />
@@ -81,6 +82,10 @@
 
 	<ItemGroup>
 	  <Folder Include="Migrations\" />
+	  <Folder Include="Public\Archive\Mappings\" />
+	  <Folder Include="Public\Archive\Models\" />
+	  <Folder Include="Public\Archive\Validators\" />
+	  <Folder Include="Public\Common\" />
 	</ItemGroup>
 
 </Project>

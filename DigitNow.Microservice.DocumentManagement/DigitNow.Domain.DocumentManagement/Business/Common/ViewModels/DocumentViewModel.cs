@@ -15,6 +15,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
         public int ResolutionPeriod { get; set; }
         public int Status { get; set; }
         public bool IsDispatched { get; set; }
+        public string IdentificationNumber { get; set; }
         public string User { get; set; }
     }
 }
