@@ -21,7 +21,7 @@ namespace DigitNow.Adapters.MS.Catalog
         public async Task<Department> GetDepartmentByCodeAsync(string code, CancellationToken cancellationToken)
         {
             var pagedResult = await _catalogHttpClient.GetAsync<ResultPagedList<Department>>($"Departments/filter?Code={code}", cancellationToken);
-            return pagedResult.Items.First();
+            return pagedResult.Items.FirstOrDefault();
         }
 
         public Task<DocumentType> GetDocumentTypeByIdAsync(int id, CancellationToken cancellationToken) => _catalogHttpClient.GetAsync<DocumentType>($"DocumentTypes/{id}", cancellationToken);
