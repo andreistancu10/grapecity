@@ -206,7 +206,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             return result;
         }
-
         #endregion
     }
 }

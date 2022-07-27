@@ -120,7 +120,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private async Task<IEnumerable<long>> GetRelatedUserIdsAsync(UserModel userModel, CancellationToken cancellationToken) =>
             (await GetRelatedUsersAsync(userModel, cancellationToken)).Select(x => x.Id);
 
-
         private async Task<IList<UserModel>> GetRelatedUsersAsync(UserModel userModel, CancellationToken cancellationToken)
         {
             if (userModel.HasRole(RecipientType.HeadOfDepartment))
@@ -198,7 +197,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                     break;
 
             }
-
 
 
             var userModel = await GetCurrentUserAsync(cancellationToken);

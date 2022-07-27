@@ -38,7 +38,6 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders
 
             var identificationNumber = EntityFilter.IdentificationNumber;
             var targetType = typeof(T);
-
             
             if (targetType == typeof(IncomingDocument))
             {
