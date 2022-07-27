@@ -1,8 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using System;
 using System.Collections.Generic;
-using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles;
-using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMappings;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {

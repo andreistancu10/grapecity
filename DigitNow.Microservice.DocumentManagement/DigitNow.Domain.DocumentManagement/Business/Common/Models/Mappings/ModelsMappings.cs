@@ -5,7 +5,7 @@ using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.Catalog.Contracts.Departments.GetDepartments;
 using DigitNow.Domain.Catalog.Contracts.DocumentTypes.GetDocumentTypes;
 using DigitNow.Domain.Catalog.Contracts.InternalDocumentTypes;
-using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMappings;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Domain.Authentication.Contracts;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings

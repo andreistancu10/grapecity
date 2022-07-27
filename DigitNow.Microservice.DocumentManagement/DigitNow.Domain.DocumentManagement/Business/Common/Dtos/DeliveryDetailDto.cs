@@ -1,7 +1,8 @@
-﻿
-namespace DigitNow.Domain.DocumentManagement.Data.Entities
+﻿using System;
+
+namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos
 {
-    public class DeliveryDetail : ExtendedEntity
+    public class DeliveryDetailDto
     {
         public int DeliveryMode { get; set; }
         public int DirectShipping { get; set; }

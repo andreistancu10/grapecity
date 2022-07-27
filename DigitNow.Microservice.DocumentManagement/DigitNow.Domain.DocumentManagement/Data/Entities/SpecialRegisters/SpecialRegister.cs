@@ -1,5 +1,5 @@
 ﻿
-namespace DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
+namespace DigitNow.Domain.DocumentManagement.Data.Entities;
 
 public class SpecialRegister : ExtendedEntity
 {

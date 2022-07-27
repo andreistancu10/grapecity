@@ -1,6 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data.Entities.UploadedFiles;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles;
+namespace DigitNow.Domain.DocumentManagement.Data.Entities;
 
 public class DocumentUploadedFile : ExtendedEntity
 {

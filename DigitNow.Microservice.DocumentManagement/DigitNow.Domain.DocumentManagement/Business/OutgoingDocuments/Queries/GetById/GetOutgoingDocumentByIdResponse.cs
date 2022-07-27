@@ -1,6 +1,5 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.DeliveryDetails;
-using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Dtos;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using System;
 using System.Collections.Generic;
 
@@ -26,9 +25,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries.
         public int RecipientTypeId { get; set; }
         public int DocumentTypeId { get; set; }
         public string DocumentTypeDetail { get; set; }
-        public DeliveryDetail DeliveryDetails { get; set; }
-        public List<WorkflowHistoryLog> WorkflowHistory { get; set; } = new();
-        public List<ConnectedDocument> ConnectedDocuments { get; set; } = new();
-        public List<DocumentUploadedFile> DocumentUploadedFiles { get; set; } = new();
+        public DeliveryDetailDto DeliveryDetails { get; set; }
+        public List<WorkflowHistoryLogDto> WorkflowHistory { get; set; } = new();
+        public List<ConnectedDocumentDto> ConnectedDocuments { get; set; } = new();
+        public List<DocumentUploadedFileDto> DocumentUploadedFiles { get; set; } = new();
     }
 }
