@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
@@ -58,11 +60,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
                 var lastWorkflowHistory = source.VirtualDocument.WorkflowHistory.LastOrDefault(c => c.Status == DocumentStatus.InWorkAllocated);
-                if (lastWorkflowHistory != null)
-                {
-                    return new BasicViewModel(lastWorkflowHistory.RecipientId, lastWorkflowHistory.RecipientName);
-                }
-                return null;
+
+                return lastWorkflowHistory == null
+                    ? null
+                    : new BasicViewModel(lastWorkflowHistory.RecipientId, lastWorkflowHistory.RecipientName);
             }
         }
 
@@ -138,12 +139,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 GetSpecialRegister(source);
 
             private static BasicViewModel GetSpecialRegister<T>(VirtualReportAggregate<T> reportAggregate)
-                where T: VirtualDocument
+                where T : VirtualDocument
             {
-                if (reportAggregate.SpecialRegisterMapping == null) 
-                    return null;
-
-                return new BasicViewModel(reportAggregate.SpecialRegisterMapping.SpecialRegisterId, reportAggregate.SpecialRegisterMapping.SpecialRegister.Name);
+                return reportAggregate.SpecialRegisterMapping == null
+                    ? null
+                    : new BasicViewModel(reportAggregate.SpecialRegisterMapping.SpecialRegisterId, reportAggregate.SpecialRegisterMapping.SpecialRegister.Name);
             }
         }
 
@@ -180,12 +180,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 GetUserViewModel(source, source.VirtualDocument);
 
             private static BasicViewModel GetUserViewModel<T>(VirtualReportAggregate<T> documentAggregate, VirtualDocument virtualDocument)
-                where T: VirtualDocument
+                where T : VirtualDocument
             {
                 var foundUser = documentAggregate.Users.FirstOrDefault(x => x.Id == virtualDocument.Document.CreatedBy);
-                if (foundUser == null) return null;
 
-                return new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
+                return foundUser == null
+                    ? null
+                    : new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
             }
         }
 
@@ -196,27 +197,45 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
                 var foundCategory = source.Categories.FirstOrDefault(x => x.Id == source.VirtualDocument.DocumentTypeId);
-                return new BasicViewModel(foundCategory.Id, foundCategory.Name);
+
+                return foundCategory == null
+                    ? null
+                    : new BasicViewModel(foundCategory.Id, foundCategory.Name);
             }
 
             public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
                 var foundCategory = source.InternalCategories.FirstOrDefault(x => x.Id == source.VirtualDocument.InternalDocumentTypeId);
-                return new BasicViewModel(foundCategory.Id, foundCategory.Name);
+
+                return foundCategory == null
+                    ? null
+                    : new BasicViewModel(foundCategory.Id, foundCategory.Name);
             }
         }
 
         private class MapRecipient :
-            IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>
+            IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
+            IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
         {
             public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember,
                 ResolutionContext context)
             {
-                var foundUser = source.Users.FirstOrDefault(x => x.Id == source.VirtualDocument.Document.RecipientId);
+                return FindRecipient(source.Users, source.VirtualDocument.Document.RecipientId);
+            }
 
-                return foundUser != null ?
-                    new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}") :
-                    null;
+            public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember,
+                ResolutionContext context)
+            {
+                return FindRecipient(source.Users, source.VirtualDocument.Document.RecipientId);
+            }
+
+            private static BasicViewModel FindRecipient(IEnumerable<UserModel> users, long userId)
+            {
+                var foundUser = users.FirstOrDefault(x => x.Id == userId);
+
+                return foundUser == null
+                    ? null
+                    : new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
             }
         }
     }
