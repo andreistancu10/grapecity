@@ -30,7 +30,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateD
         public async Task<ResultObject> Handle(CreateDocumentDeliveryDetailsCommand request, CancellationToken cancellationToken)
         {
             var deliveryDetails = _mapper.Map<DeliveryDetail>(request);
-            var document = await _dbContext.Documents.FirstAsync(x => x.Id == request.DocumentId);
+            var document = await _dbContext.Documents.FirstAsync(x => x.Id == request.DocumentId, cancellationToken);
 
             switch (document.DocumentType)
             {
@@ -52,7 +52,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateD
         private async Task CreateDeliveryDetails<T>(Document document, DeliveryDetail deliveryDetails, CancellationToken token) where T : VirtualDocument
         {
             var virtualDocument = await _dbContext.Set<T>().AsQueryable()
-                .FirstOrDefaultAsync(x => x.DocumentId == document.Id);
+                .FirstOrDefaultAsync(x => x.DocumentId == document.Id, token);
 
             var shippableDocument = virtualDocument as IShippable;
             if (shippableDocument == null) throw new InvalidCastException($"Cannot convert from {nameof(VirtualDocument)} to {nameof(IShippable)}");
@@ -67,7 +67,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateD
 
             if (virtualDocument.Document.DocumentType == DocumentType.Outgoing)
             {
-                departmentToReceiveDocument = GetDestinationDepartmentFromHistory(virtualDocument, token);
+                departmentToReceiveDocument = GetDestinationDepartmentFromHistory(virtualDocument);
             }
             else
             {
@@ -85,7 +85,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateD
             virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
         }
 
-        private long GetDestinationDepartmentFromHistory(VirtualDocument virtualDocument, CancellationToken token)
+        private long GetDestinationDepartmentFromHistory(VirtualDocument virtualDocument)
         {
             return virtualDocument.WorkflowHistory
                                    .Where(x => x.RecipientType == RecipientType.Department.Id)
