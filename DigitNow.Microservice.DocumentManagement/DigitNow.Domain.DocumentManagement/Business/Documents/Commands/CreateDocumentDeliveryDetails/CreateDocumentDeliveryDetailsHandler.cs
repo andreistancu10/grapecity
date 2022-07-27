@@ -29,8 +29,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateD
 
         public async Task<ResultObject> Handle(CreateDocumentDeliveryDetailsCommand request, CancellationToken cancellationToken)
         {
-            var document = await _dbContext.Documents.FirstAsync(x => x.Id == request.DocumentId);
             var deliveryDetails = _mapper.Map<DeliveryDetail>(request);
+            var document = await _dbContext.Documents.FirstAsync(x => x.Id == request.DocumentId);
 
             switch (document.DocumentType)
             {
