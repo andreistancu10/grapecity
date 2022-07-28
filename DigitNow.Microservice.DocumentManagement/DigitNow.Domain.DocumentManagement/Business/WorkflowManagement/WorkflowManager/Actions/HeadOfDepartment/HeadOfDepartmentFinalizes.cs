@@ -12,9 +12,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
         protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.New };
 
-        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token)
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
         {
-            if (!Validate(command, lastWorkFlowRecord, document))
+            if (!Validate(command, lastWorkflowRecord, document))
                 return command;
 
             var departmentToReceiveDocument = document.WorkflowHistories

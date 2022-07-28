@@ -46,7 +46,7 @@ public class CreateInternalDocumentHandler : ICommandHandler<CreateInternalDocum
             RecipientType = RecipientType.Department.Id,
             DocumentStatus = DocumentStatus.New, 
             RecipientName = $"Departamentul {request.ReceiverDepartmentId}" 
-        });
+        }, cancellationToken);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
 

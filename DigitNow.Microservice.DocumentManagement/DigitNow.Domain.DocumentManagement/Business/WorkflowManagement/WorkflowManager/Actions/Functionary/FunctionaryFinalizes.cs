@@ -1,10 +1,7 @@
-﻿    using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
+﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.WorkflowManager.Actions.Functionary
 {
@@ -13,9 +10,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         public FunctionaryFinalizes(IServiceProvider serviceProvider) : base(serviceProvider) { }
         protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.New, (int)DocumentStatus.InWorkDeclined };
         
-        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog oldWorkflowResponsible, CancellationToken token)
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
         {
-            if (!Validate(command, oldWorkflowResponsible))
+            if (!Validate(command, lastWorkflowRecord))
                 return command;
 
             var newWorkflowResponsible = new WorkflowHistoryLog
@@ -24,7 +21,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 Remarks = command.Remarks
             };
 
-            await TransferResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
+            await TransferResponsibilityAsync(lastWorkflowRecord, newWorkflowResponsible, command, token);
 
             document.WorkflowHistories.Add(newWorkflowResponsible);
 

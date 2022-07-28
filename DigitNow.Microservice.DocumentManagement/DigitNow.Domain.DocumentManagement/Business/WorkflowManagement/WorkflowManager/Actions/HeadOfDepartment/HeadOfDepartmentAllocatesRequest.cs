@@ -14,9 +14,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         public HeadOfDepartmentAllocatesRequest(IServiceProvider serviceProvider) : base(serviceProvider) { }
         protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkUnallocated, (int)DocumentStatus.OpinionRequestedUnallocated, (int)DocumentStatus.InWorkDelegatedUnallocated };
 
-        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token)
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
         {
-            if (!Validate(command, lastWorkFlowRecord))
+            if (!Validate(command, lastWorkflowRecord))
                 return command;
 
             var user = await IdentityAdapterClient.GetUserByIdAsync((long)command.RecipientId, token);
@@ -24,7 +24,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             if (!UserExists(user, command))
                 return command;
 
-            var newDocumentStatus = lastWorkFlowRecord.DocumentStatus == DocumentStatus.OpinionRequestedUnallocated
+            var newDocumentStatus = lastWorkflowRecord.DocumentStatus == DocumentStatus.OpinionRequestedUnallocated
                 ? DocumentStatus.OpinionRequestedAllocated
                 : DocumentStatus.InWorkAllocated;
 

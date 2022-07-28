@@ -2,9 +2,6 @@
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.WorkflowManager.Actions.Functionary
 {
@@ -13,15 +10,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         public FunctionaryDeclines(IServiceProvider serviceProvider) : base(serviceProvider) { }
         protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.OpinionRequestedAllocated, (int)DocumentStatus.InWorkDeclined };
         
-        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token)
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
         {
-            if (!Validate(command, lastWorkFlowRecord))
+            if (!Validate(command, lastWorkflowRecord))
                 return command;
 
             switch (document.DocumentType)
             {
                 case DocumentType.Incoming:
-                    return await CreateWorkflowHistoryForIncoming(command, document, lastWorkFlowRecord, token);
+                    return await CreateWorkflowHistoryForIncoming(command, document, lastWorkflowRecord, token);
                 case DocumentType.Internal:
                 case DocumentType.Outgoing:
                     return await CreateWorkflowHistoryForOutgoingAndInternal(command, document, token);

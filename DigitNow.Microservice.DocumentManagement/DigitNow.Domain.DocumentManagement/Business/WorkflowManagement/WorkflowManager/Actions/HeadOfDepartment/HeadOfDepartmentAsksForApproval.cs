@@ -16,9 +16,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         public HeadOfDepartmentAsksForApproval(IServiceProvider serviceProvider) : base(serviceProvider) { }
         protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.New };
 
-        protected async override Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token)
+        protected async override Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
         {
-            if (!Validate(command, lastWorkFlowRecord, document))
+            if (!Validate(command, lastWorkflowRecord, document))
                 return command;
 
             var userResponse = await IdentityService.FetchMayorAsync(token);

@@ -62,7 +62,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
             }
 
             await _dbContext.BulkUpdateAsync(foundDocuments);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(token);
         }
     }
 }

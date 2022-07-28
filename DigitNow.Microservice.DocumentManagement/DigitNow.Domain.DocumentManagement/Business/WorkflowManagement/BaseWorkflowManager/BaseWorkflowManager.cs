@@ -28,7 +28,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
         }
 
         protected abstract int[] allowedTransitionStatuses { get; }
-        protected abstract Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token);
+        protected abstract Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token);
 
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
@@ -43,7 +43,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             return command;
         }
 
-        public WorkflowHistoryLog GetLastWorkflowRecord(Document document)
+        public static WorkflowHistoryLog GetLastWorkflowRecord(Document document)
         {
             return document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).FirstOrDefault();
         }

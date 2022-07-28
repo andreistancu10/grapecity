@@ -7,12 +7,7 @@ using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
-using DigitNow.Domain.DocumentManagement.Business.Common.Dtos;
 
 namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Create;
 
@@ -22,21 +17,18 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
     private readonly IMapper _mapper;
     private readonly IOutgoingDocumentService _outgoingDocumentService;
     private readonly IIdentityAdapterClient _identityAdapterClient;
-    private readonly IIdentityService _identityService;
     private readonly IUploadedFileService _uploadedFileService;
 
     public CreateOutgoingDocumentHandler(DocumentManagementDbContext dbContext,
         IMapper mapper,
         IOutgoingDocumentService outgoingDocumentService,
         IIdentityAdapterClient identityAdapterClient, 
-        IIdentityService identityService,
         IUploadedFileService uploadedFileService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _outgoingDocumentService = outgoingDocumentService;
         _identityAdapterClient = identityAdapterClient;
-        _identityService = identityService;
         _uploadedFileService = uploadedFileService;
     }
 
@@ -60,7 +52,7 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
             DocumentStatus = DocumentStatus.New,
             RecipientName = $"Departamentul {request.RecipientId}!"
         };
-        await _dbContext.WorkflowHistoryLogs.AddAsync(newWorkflowHistoryLog);
+        await _dbContext.WorkflowHistoryLogs.AddAsync(newWorkflowHistoryLog, cancellationToken);
         
         await _dbContext.SingleUpdateAsync(newOutgoingDocument, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
