@@ -19,6 +19,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public DocumentStatus Status { get; set; }
         public DateTime StatusModifiedAt { get; set; }
         public long StatusModifiedBy { get; set; }
+        public bool IsArchived { get; set; }
 
         #endregion
 
