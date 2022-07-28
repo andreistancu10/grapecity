@@ -157,11 +157,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             {
                 var relatedUserIds = await GetRelatedUserIdsAsync(userModel, cancellationToken);
 
+                // TODO:(!) This is only temporary, Apply filter permissions in the future versions                
                 documentsQuery = documentsQuery
                     .Where(x => 
-                        relatedUserIds.Contains(x.CreatedBy) 
+                        relatedUserIds.Contains(x.CreatedBy)
                         || 
-                        (x.RecipientId.HasValue && relatedUserIds.Contains(x.RecipientId.Value))
+                        (userModel.Departments.Contains(x.DestinationDepartmentId))
                     );
             }
 

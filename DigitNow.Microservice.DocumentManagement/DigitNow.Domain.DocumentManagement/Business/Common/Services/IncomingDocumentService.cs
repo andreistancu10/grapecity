@@ -3,12 +3,7 @@ using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Domain.Business.Common.Factories;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 {
@@ -24,13 +19,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IDocumentService _documentService;
+        private readonly IIdentityService _identityService;
 
         public IncomingDocumentService(
             DocumentManagementDbContext dbContext,
-            IDocumentService documentService)
+            IDocumentService documentService,
+            IIdentityService identityService)
         {
             _dbContext = dbContext;
             _documentService = documentService;
+            _identityService = identityService;
         }
 
         public async Task<IncomingDocument> AddAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken)
@@ -43,7 +41,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             incomingDocument.Document.DocumentType = DocumentType.Incoming;
             incomingDocument.Document.RegistrationDate = DateTime.Now;
             incomingDocument.Document.Status = DocumentStatus.InWorkUnallocated;
-            incomingDocument.Document.RecipientId = null;
+
+            if (!incomingDocument.Document.RecipientId.HasValue)
+            {
+                incomingDocument.Document.RecipientId = await _identityService.GetHeadOfDepartmentUserIdAsync(incomingDocument.Document.DestinationDepartmentId, cancellationToken);
+            }
 
             await _documentService.AddAsync(incomingDocument.Document, cancellationToken);
             await _dbContext.AddAsync(incomingDocument, cancellationToken);

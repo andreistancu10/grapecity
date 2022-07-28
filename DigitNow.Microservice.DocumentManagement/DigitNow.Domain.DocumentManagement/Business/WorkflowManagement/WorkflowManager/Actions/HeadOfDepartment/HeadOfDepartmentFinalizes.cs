@@ -7,13 +7,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 {
     public class HeadOfDepartmentFinalizes : BaseWorkflowManager, IWorkflowHandler
     {
-        public HeadOfDepartmentFinalizes(IServiceProvider serviceProvider) : base(serviceProvider) { }
+        public HeadOfDepartmentFinalizes(IServiceProvider serviceProvider) 
+            : base(serviceProvider) { }
+
         protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.New };
 
-        protected override Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token)
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token)
         {
             if (!Validate(command, lastWorkFlowRecord, document))
-                return Task.FromResult(command);
+                return command;
 
             var departmentToReceiveDocument = document.WorkflowHistories
                     .Where(x => x.RecipientType == RecipientType.Department.Id)
@@ -21,9 +23,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                     .First().RecipientId;
 
             document.DestinationDepartmentId = departmentToReceiveDocument;
-            document.RecipientId = null;
+            document.RecipientId = await IdentityService.GetHeadOfDepartmentUserIdAsync(departmentToReceiveDocument, token);
             document.Status = DocumentStatus.Finalized;
-
 
             var newWorkflowResponsible = new WorkflowHistoryLog
             {
@@ -36,7 +37,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             document.WorkflowHistories.Add(newWorkflowResponsible);
 
-            return Task.FromResult(command);
+            return command;
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord, Document document)

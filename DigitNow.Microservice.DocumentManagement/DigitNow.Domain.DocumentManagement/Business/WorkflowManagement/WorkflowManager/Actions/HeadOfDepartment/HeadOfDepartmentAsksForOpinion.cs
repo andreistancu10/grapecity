@@ -22,7 +22,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             if (!Validate(command, lastWorkFlowRecord, document))
                 return command;
 
-            var headOfDepartment = await FetchHeadOfDepartmentByDepartmentIdAsync((long)command.RecipientId, token);
+            var headOfDepartment = await IdentityService.GetHeadOfDepartmentUserAsync((long)command.RecipientId, token);
 
             if (!UserExists(headOfDepartment, command))
                 return command;

@@ -8,11 +8,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos.Mappings
     {
         public DtosMappings()
         {
-            CreateMap<DeliveryDetail, DeliveryDetailDto>();
-            CreateMap<ConnectedDocument, ConnectedDocumentDto>();
-            CreateMap<WorkflowHistoryLog, WorkflowHistoryLogDto>();
-            CreateMap<ContactDetail, ContactDetailDto>();
-            CreateMap<DocumentUploadedFile, DocumentUploadedFileDto>();
+            CreateMap<DeliveryDetail, DeliveryDetailDto>().ReverseMap();
+            CreateMap<ConnectedDocument, ConnectedDocumentDto>().ReverseMap();
+            CreateMap<WorkflowHistoryLog, WorkflowHistoryLogDto>().ReverseMap();
+            CreateMap<ContactDetail, ContactDetailDto>().ReverseMap();
+            CreateMap<DocumentUploadedFile, DocumentUploadedFileDto>().ReverseMap();
         }
     }
 }

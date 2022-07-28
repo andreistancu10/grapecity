@@ -24,13 +24,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IDocumentService _documentService;
+        private readonly IIdentityService _identityService;
 
-        public InternalDocumentService(     
+        public InternalDocumentService(
             DocumentManagementDbContext dbContext,
-            IDocumentService documentService)
+            IDocumentService documentService,
+            IIdentityService identityService)
         {
             _dbContext = dbContext;
             _documentService = documentService;
+            _identityService = identityService;
         }
 
         public async Task<InternalDocument> AddAsync(InternalDocument internalDocument, CancellationToken cancellationToken)
@@ -43,7 +46,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             internalDocument.Document.DocumentType = DocumentType.Internal;
             internalDocument.Document.RegistrationDate = DateTime.Now;
             internalDocument.Document.Status = DocumentStatus.New;
-            internalDocument.Document.RecipientId = null;
+
+            if (!internalDocument.Document.RecipientId.HasValue)
+            {
+                internalDocument.Document.RecipientId = await _identityService.GetHeadOfDepartmentUserIdAsync(internalDocument.Document.DestinationDepartmentId, cancellationToken);
+            }
 
             await _documentService.AddAsync(internalDocument.Document, cancellationToken);
             await _dbContext.AddAsync(internalDocument, cancellationToken);

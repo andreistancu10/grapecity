@@ -292,6 +292,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
                     DocumentId = table.Column<long>(type: "bigint", nullable: false),
                     DocumentStatus = table.Column<int>(type: "int", nullable: false),
+                    DestinationDepartmentId = table.Column<int>(type: "int", nullable: false),
                     RecipientType = table.Column<int>(type: "int", nullable: false),
                     RecipientId = table.Column<long>(type: "bigint", nullable: false),
                     RecipientName = table.Column<string>(type: "nvarchar(max)", nullable: true),

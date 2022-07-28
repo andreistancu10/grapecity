@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Adapters.MS.Catalog;
+using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
@@ -19,12 +20,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateD
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IMapper _mapper;
         private readonly ICatalogAdapterClient _catalogAdapterClient;
+        private readonly IIdentityService _identityService;
 
-        public CreateDocumentDeliveryDetailsHandler(DocumentManagementDbContext dbContext, IMapper mapper, ICatalogAdapterClient catalogAdapterClient)
+        public CreateDocumentDeliveryDetailsHandler(
+            DocumentManagementDbContext dbContext, 
+            IMapper mapper, 
+            ICatalogAdapterClient catalogAdapterClient,
+            IIdentityService identityService)
         {
             _dbContext = dbContext;
             _mapper = mapper;
             _catalogAdapterClient = catalogAdapterClient;
+            _identityService = identityService;
         }
 
         public async Task<ResultObject> Handle(CreateDocumentDeliveryDetailsCommand request, CancellationToken cancellationToken)
@@ -71,7 +78,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateD
             }
 
             document.DestinationDepartmentId = departmentToReceiveDocument;
-            document.RecipientId = null;
+            document.RecipientId = await _identityService.GetHeadOfDepartmentUserIdAsync(departmentToReceiveDocument, token);
             document.Status = DocumentStatus.Finalized;
 
             var newWorkflowResponsible = new WorkflowHistoryLog

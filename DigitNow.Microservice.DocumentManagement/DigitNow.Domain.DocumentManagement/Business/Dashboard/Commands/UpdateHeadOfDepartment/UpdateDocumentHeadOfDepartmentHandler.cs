@@ -39,7 +39,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                     Parameters = new object[] { request.DepartmentId }
                 });
 
-            await UpdateDocuments(request, headOfDepartment, cancellationToken);            
+            await UpdateDocuments(request, headOfDepartment, cancellationToken);
 
             return new ResultObject(ResultStatusCode.Ok);
         }
@@ -57,6 +57,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
             {
                 foundDocument.Status = DocumentStatus.InWorkUnallocated;
                 foundDocument.DestinationDepartmentId = request.DepartmentId;
+                foundDocument.RecipientId = headOfDepartment.Id;
                 foundDocument.WorkflowHistories.Add(WorkflowHistoryLogFactory.Create(foundDocument.Id, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkUnallocated));
             }
 

@@ -2,12 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 {
@@ -22,13 +17,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IDocumentService _documentService;
+        private readonly IIdentityService _identityService;
 
         public OutgoingDocumentService(
             DocumentManagementDbContext dbContext,
-            IDocumentService documentService)
+            IDocumentService documentService,
+            IIdentityService identityService)
         {
             _dbContext = dbContext;
             _documentService = documentService;
+            _identityService = identityService;
         }
 
         public async Task<OutgoingDocument> AddAsync(OutgoingDocument outgoingDocument, CancellationToken cancellationToken)
@@ -41,7 +39,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             outgoingDocument.Document.DocumentType = DocumentType.Outgoing;
             outgoingDocument.Document.RegistrationDate = DateTime.Now;
             outgoingDocument.Document.Status = DocumentStatus.New;
-            outgoingDocument.Document.RecipientId = null;
+
+            if (!outgoingDocument.Document.RecipientId.HasValue)
+            {
+                outgoingDocument.Document.RecipientId = await _identityService.GetHeadOfDepartmentUserIdAsync(outgoingDocument.Document.DestinationDepartmentId, cancellationToken);
+            }
 
             await _documentService.AddAsync(outgoingDocument.Document, cancellationToken);            
             await _dbContext.AddAsync(outgoingDocument, cancellationToken);            

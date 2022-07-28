@@ -1,9 +1,9 @@
-﻿
-namespace DigitNow.Adapters.MS.Identity.Poco
+﻿using System;
+
+namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos
 {
     public class ContactDetailDto
     {
-        public int Id { get; set; }
         public string? IdentificationNumber { get; set; }
         public int CountryId { get; set; }
         public int CountyId { get; set; }

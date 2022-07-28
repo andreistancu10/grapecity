@@ -53,8 +53,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(c => c.User, opt => opt.MapFrom<MapDocumentUser>())
                 .ForMember(c => c.ResolutionPeriod, opt => opt.MapFrom<MapDocumentResolutionPeriod>())
                 .ForMember(c => c.DocumentCategory, opt => opt.MapFrom<MapDocumentCategory>());
-
-            CreateMap<DocumentViewModel, GetDocumentResponse>();
         }
 
         private class MapDocumentType :

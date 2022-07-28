@@ -1,7 +1,4 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Dtos;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
-using System;
-using System.Collections.Generic;
 
 namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries.GetById
 {
@@ -12,7 +9,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries.
         public long CreatedBy { get; set; }
         public DateTime ModifiedAt { get; set; }
         public long ModifiedBy { get; set; }
-        public int DepartmentId { get; set; }
+        public int DepartmentId { get; set; }        
         public int DeadlineDaysNumber { get; set; }
         public string Description { get; set; }
         public string Observation { get; set; }
@@ -25,7 +22,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries.
         public int RecipientTypeId { get; set; }
         public int DocumentTypeId { get; set; }
         public string DocumentTypeDetail { get; set; }
+
+        public ContactDetailDto ContactDetails { get; set; }
         public DeliveryDetailDto DeliveryDetails { get; set; }
+
         public List<WorkflowHistoryLogDto> WorkflowHistory { get; set; } = new();
         public List<ConnectedDocumentDto> ConnectedDocuments { get; set; } = new();
         public List<DocumentUploadedFileDto> DocumentUploadedFiles { get; set; } = new();

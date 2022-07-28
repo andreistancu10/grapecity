@@ -66,7 +66,8 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             {
                 DocumentType = DocumentType.Incoming,
                 IncomingDocument = newIncomingDocument,
-                DestinationDepartmentId = request.RecipientId
+                DestinationDepartmentId = request.RecipientId,
+                RecipientId = headOfDepartment.Id
             };
             
             await _incomingDocumentService.AddAsync(newIncomingDocument, cancellationToken);
@@ -118,7 +119,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
         var contactDetails = request.ContactDetail;
         contactDetails.IdentificationNumber = request.IdentificationNumber;
 
-        var contactDetailDto = _mapper.Map<ContactDetailDto>(contactDetails);
+        var contactDetailDto = _mapper.Map<Adapters.MS.Identity.Poco.IdentityContactDetail>(contactDetails);
         await _identityAdapterClient.CreateContactDetailsAsync(contactDetailDto, cancellationToken);
     }
 }

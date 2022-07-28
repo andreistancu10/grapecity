@@ -47,14 +47,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                     break;
                 case DocumentType.Internal:
                 case DocumentType.Outgoing:
-                    MayorApprovedInternalOutgoingDocument(command, document);
+                    await MayorApprovedInternalOutgoingDocumentAsync(command, document, token);
                     break;
                 default:
                     break;
             }
         }
 
-        private static void MayorApprovedInternalOutgoingDocument(ICreateWorkflowHistoryCommand command, Document document)
+        private async Task MayorApprovedInternalOutgoingDocumentAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
         {
             var departmentToReceiveDocument = document.WorkflowHistories
                 .Where(x => x.RecipientType == RecipientType.Department.Id)
@@ -62,7 +62,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 .First().RecipientId;
 
             document.DestinationDepartmentId = departmentToReceiveDocument;
-            document.RecipientId = null;
+            document.RecipientId = await IdentityService.GetHeadOfDepartmentUserIdAsync(departmentToReceiveDocument, token);
 
             var newWorkflowResponsible = new WorkflowHistoryLog
             {
@@ -99,7 +99,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                     break;
                 case DocumentType.Internal:
                 case DocumentType.Outgoing:
-                    MayorDeclinedIncomingDocumentInternalOutgoingDocument(command, document);
+                    await MayorDeclinedIncomingDocumentInternalOutgoingDocumentAsync(command, document, token);
                     break;
                 default:
                     break;
@@ -107,7 +107,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
         }
 
-        private static void MayorDeclinedIncomingDocumentInternalOutgoingDocument(ICreateWorkflowHistoryCommand command, Document document)
+        private async Task MayorDeclinedIncomingDocumentInternalOutgoingDocumentAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
         {
             var departmentToReceiveDocument = document.WorkflowHistories
                 .Where(x => x.RecipientType == RecipientType.Department.Id)
@@ -124,7 +124,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             };
 
             document.DestinationDepartmentId = departmentToReceiveDocument;
-            document.RecipientId = null;
+            document.RecipientId = await IdentityService.GetHeadOfDepartmentUserIdAsync(departmentToReceiveDocument, token);
 
             document.WorkflowHistories.Add(newWorkflowResponsible);
         }

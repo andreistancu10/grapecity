@@ -1,13 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos
+﻿
+namespace DigitNow.Adapters.MS.Identity.Poco
 {
-    public class ContactDetailDto
+    public class IdentityContactDetail
     {
+        public int Id { get; set; }
+        public string? IdentificationNumber { get; set; }
         public int CountryId { get; set; }
         public int CountyId { get; set; }
         public int CityId { get; set; }

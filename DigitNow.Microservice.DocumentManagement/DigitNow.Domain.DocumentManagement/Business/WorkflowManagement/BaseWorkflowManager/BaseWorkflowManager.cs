@@ -1,5 +1,6 @@
 ﻿using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
+using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
@@ -15,14 +16,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
 {
     public abstract class BaseWorkflowManager
     {
+        protected readonly DocumentManagementDbContext DbContext;
+        protected readonly IIdentityAdapterClient IdentityAdapterClient;
+        protected readonly IIdentityService IdentityService;
+
         protected BaseWorkflowManager(IServiceProvider serviceProvider)
         {
-            IdentityAdapterClient = serviceProvider.GetService<IIdentityAdapterClient>();
             DbContext = serviceProvider.GetService<DocumentManagementDbContext>();
+            IdentityAdapterClient = serviceProvider.GetService<IIdentityAdapterClient>();
+            IdentityService = serviceProvider.GetService<IIdentityService>();
         }
-
-        public readonly IIdentityAdapterClient IdentityAdapterClient;
-        public readonly DocumentManagementDbContext DbContext;
 
         protected abstract int[] allowedTransitionStatuses { get; }
         protected abstract Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token);
@@ -60,20 +63,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
 
             document.RecipientId = recipientId;
             document.Status = status;
-        }
-
-        public async Task<User> FetchHeadOfDepartmentByDepartmentIdAsync(long departmentId, CancellationToken token)
-        {
-            var response = await IdentityAdapterClient.GetUsersAsync(token);
-            var departmentUsers = response.Users.Where(x => x.Departments.Contains(departmentId));
-            
-            return departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
-        }
-
-        public async Task<User> FetchMayorAsync(CancellationToken token)
-        {
-            var response = await IdentityAdapterClient.GetUsersAsync(token);
-            return response.Users.FirstOrDefault(x => x.Roles.Contains(RecipientType.Mayor.Code));
         }
 
         protected async virtual Task TransferResponsibilityAsync(WorkflowHistoryLog oldRecord, WorkflowHistoryLog newRecord, ICreateWorkflowHistoryCommand command, CancellationToken token)

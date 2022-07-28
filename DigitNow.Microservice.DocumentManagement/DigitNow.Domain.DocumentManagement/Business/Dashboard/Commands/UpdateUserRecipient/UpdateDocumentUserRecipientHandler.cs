@@ -7,11 +7,6 @@ using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateUserRecipient
 {
@@ -55,16 +50,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                 if (isHeadOfDepartment)
                 {
                     foundDocument.Status = DocumentStatus.InWorkDelegatedUnallocated;
-                    //TODO:(!) Ask what happends in the case where the user is head of dept for multiple departments
-                    foundDocument.RecipientId = null;
                 }
                 else
                 {
                     foundDocument.Status = DocumentStatus.InWorkDelegated;
-                    foundDocument.RecipientId = targetUser.Id;
                 }
-
+                
                 foundDocument.DestinationDepartmentId = targetUser.Departments.FirstOrDefault();
+                foundDocument.RecipientId = targetUser.Id;
 
                 var recipientType = isHeadOfDepartment ? RecipientType.HeadOfDepartment : RecipientType.Functionary;
 

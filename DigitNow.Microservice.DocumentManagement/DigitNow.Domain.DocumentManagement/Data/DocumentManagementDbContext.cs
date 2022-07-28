@@ -78,7 +78,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
 
             foreach (var entry in ChangeTracker.Entries<IDocument>())
             {
-                if (entry.Property("Status").IsModified)
+                if (entry.Property(nameof(IDocument.Status)).IsModified)
                 {
                     entry.Entity.StatusModifiedAt = DateTime.Now;
                     entry.Entity.StatusModifiedBy = _identityService.GetCurrentUserId();

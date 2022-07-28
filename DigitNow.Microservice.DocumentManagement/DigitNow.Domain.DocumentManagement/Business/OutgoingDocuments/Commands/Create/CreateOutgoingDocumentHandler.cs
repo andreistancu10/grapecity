@@ -12,6 +12,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Dtos;
 
 namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Create;
 
@@ -21,18 +22,21 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
     private readonly IMapper _mapper;
     private readonly IOutgoingDocumentService _outgoingDocumentService;
     private readonly IIdentityAdapterClient _identityAdapterClient;
+    private readonly IIdentityService _identityService;
     private readonly IUploadedFileService _uploadedFileService;
 
     public CreateOutgoingDocumentHandler(DocumentManagementDbContext dbContext,
         IMapper mapper,
         IOutgoingDocumentService outgoingDocumentService,
         IIdentityAdapterClient identityAdapterClient, 
+        IIdentityService identityService,
         IUploadedFileService uploadedFileService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _outgoingDocumentService = outgoingDocumentService;
         _identityAdapterClient = identityAdapterClient;
+        _identityService = identityService;
         _uploadedFileService = uploadedFileService;
     }
 
@@ -86,7 +90,7 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
         var contactDetails = request.ContactDetail;
         contactDetails.IdentificationNumber = request.IdentificationNumber;
 
-        var contactDetailDto = _mapper.Map<ContactDetailDto>(contactDetails);
+        var contactDetailDto = _mapper.Map<IdentityContactDetail>(contactDetails);
         await _identityAdapterClient.CreateContactDetailsAsync(contactDetailDto, cancellationToken);
     }
 }

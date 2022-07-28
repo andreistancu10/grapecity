@@ -18,7 +18,7 @@ public class OutgoingDocument : VirtualDocument, IShippable
 
     public List<ConnectedDocument>? ConnectedDocuments { get; set; } = new();
     public ContactDetail ContactDetail { get; set; }
-    public DeliveryDetail DeliveryDetails { get; set ; }
+    public DeliveryDetail? DeliveryDetails { get; set ; }
 
     #endregion
 }
