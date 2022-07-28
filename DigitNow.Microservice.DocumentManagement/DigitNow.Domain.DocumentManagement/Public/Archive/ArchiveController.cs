@@ -21,15 +21,12 @@ public class ArchiveController : ApiController
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
-    private readonly IIdentityService _identityService;
-    private readonly IExportService<GetDocumentResponse> _exportService;
 
-    public ArchiveController(IMediator mediator, IMapper mapper, IIdentityService identityService, IExportService<GetDocumentResponse> exportService)
+
+    public ArchiveController(IMediator mediator, IMapper mapper)
     {
         _mediator = mediator;        
         _mapper = mapper;
-        _identityService = identityService;
-        _exportService = exportService;
     }
 
     [HttpPost("operational/get-documents")]
