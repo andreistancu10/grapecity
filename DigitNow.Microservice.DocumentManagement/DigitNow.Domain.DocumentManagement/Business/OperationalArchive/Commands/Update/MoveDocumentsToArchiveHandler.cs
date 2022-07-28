@@ -20,11 +20,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.OperationalArchive.Command
         public async Task<ResultObject> Handle(MoveDocumentsToArchiveCommand request, CancellationToken cancellationToken)
         {          
             var documents = await  _dbContext.Documents
-                .Where(
-                    x => !x.IsArchived &&
-                    x.StatusModifiedAt.Date.AddMonths(_archivingPeriod) < System.DateTime.Now.Date &&
-                    (x.Status == DocumentStatus.Finalized || (x.DocumentType == DocumentType.Internal && x.Status == DocumentStatus.InWorkCountersignature))
-                )
+                .Where(x => !x.IsArchived)
+                .Where(x => x.StatusModifiedAt.Date.AddMonths(_archivingPeriod) < System.DateTime.Now.Date)
+                .Where(x => x.Status == DocumentStatus.Finalized || (x.DocumentType == DocumentType.Internal && x.Status == DocumentStatus.InWorkCountersignature))
                 .ToListAsync(cancellationToken);
 
             foreach (var document in documents)
