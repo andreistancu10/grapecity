@@ -4,14 +4,9 @@ using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.DeliveryDetails;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Documents.Abstractions;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateDocumentDeliveryDetails
 {
@@ -83,6 +78,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateD
 
             var newWorkflowResponsible = new WorkflowHistoryLog
             {
+                DocumentId = document.Id,
                 DocumentStatus = DocumentStatus.Finalized,
                 RecipientType = RecipientType.Department.Id,
                 RecipientId = departmentToReceiveDocument,

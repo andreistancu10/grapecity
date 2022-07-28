@@ -119,7 +119,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
         var contactDetails = request.ContactDetail;
         contactDetails.IdentificationNumber = request.IdentificationNumber;
 
-        var contactDetailDto = _mapper.Map<Adapters.MS.Identity.Poco.IdentityContactDetail>(contactDetails);
+        var contactDetailDto = _mapper.Map<IdentityContactDetail>(contactDetails);
         await _identityAdapterClient.CreateContactDetailsAsync(contactDetailDto, cancellationToken);
     }
 }
