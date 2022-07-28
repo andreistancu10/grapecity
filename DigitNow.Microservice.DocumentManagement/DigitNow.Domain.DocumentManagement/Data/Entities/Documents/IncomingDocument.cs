@@ -1,7 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.Entities.DeliveryDetails;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Documents.Abstractions;
-using System;
-using System.Collections.Generic;
+﻿using DigitNow.Domain.DocumentManagement.Data.Entities.Documents.Abstractions;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities;
 
@@ -26,7 +23,7 @@ public class IncomingDocument : VirtualDocument, IShippable
 
     public List<ConnectedDocument>? ConnectedDocuments { get; set; } = new();
     public ContactDetail ContactDetail { get; set; }
-    public DeliveryDetail DeliveryDetails { get; set; }
+    public DeliveryDetail? DeliveryDetails { get; set; }
 
     #endregion
 }

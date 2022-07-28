@@ -1,8 +1,5 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.DeliveryDetails;
-using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Dtos;
 using System;
-using System.Collections.Generic;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.GetById
 {
@@ -17,8 +14,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.
         public int IssuerTypeId { get; set; }
         public string IssuerName { get; set; }
         public int ExternalNumber { get; set; }
-        public DateTime? ExternalNumberDate { get; set; }
-        public ContactDetail ContactDetail { get; set; }
+        public DateTime? ExternalNumberDate { get; set; }        
         public string IdentificationNumber { get; set; }
         public string ContentSummary { get; set; }
         public int NumberOfPages { get; set; }
@@ -29,8 +25,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.
         public bool? IsUrgent { get; set; }
         public bool? IsGDPRAgreed { get; set; }
         public int RegistrationNumber { get; set; }
-        public DeliveryDetail DeliveryDetails { get; set; }
-        public List<WorkflowHistory> WorkflowHistory { get; set; } = new();
-        public List<ConnectedDocument> ConnectedDocuments { get; set; } = new();
+
+        public ContactDetailDto ContactDetail { get; set; }
+        public DeliveryDetailDto DeliveryDetails { get; set; }
+
+        public List<WorkflowHistoryLogDto> WorkflowHistory { get; set; } = new();
+        public List<ConnectedDocumentDto> ConnectedDocuments { get; set; } = new();
     }
 }

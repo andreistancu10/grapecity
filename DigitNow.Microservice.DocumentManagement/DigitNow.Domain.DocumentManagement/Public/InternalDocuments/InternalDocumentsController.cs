@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Public.InternalDocuments;
 
-[Authorize]
+//[Authorize]
 [ApiController]
 [Route("api/internal-documents")]
 public class InternalDocumentsController : ApiController

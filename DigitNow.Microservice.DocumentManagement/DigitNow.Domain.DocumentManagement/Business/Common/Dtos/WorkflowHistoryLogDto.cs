@@ -1,10 +1,12 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using System;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities
+namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos
 {
-    public class WorkflowHistory : ExtendedEntity
+    public class WorkflowHistoryLogDto
     {
+        public long DocumentId { get; set; }
+        public DocumentStatus DocumentStatus { get; set; }
         public int RecipientType { get; set; }
         public long RecipientId { get; set; }
         public string RecipientName { get; set; }
@@ -12,6 +14,5 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public string DeclineReason { get; set; }
         public int? Resolution { get; set; }
         public DateTime? OpinionRequestedUntil { get; set; }
-        public DocumentStatus Status { get; set; }
     }
 }
