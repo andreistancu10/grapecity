@@ -14,47 +14,59 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 {
     public class FunctionaryAsksForApproval : BaseWorkflowManager, IWorkflowHandler
     {
-        public FunctionaryAsksForApproval(IServiceProvider serviceProvider) : base(serviceProvider) { }
+        public FunctionaryAsksForApproval(IServiceProvider serviceProvider) 
+            : base(serviceProvider) { }
 
-        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.OpinionRequestedAllocated, (int)DocumentStatus.New, (int)DocumentStatus.InWorkDeclined };
+        protected override int[] allowedTransitionStatuses => new int[] 
+        { 
+            (int)DocumentStatus.InWorkAllocated, 
+            (int)DocumentStatus.InWorkDelegated, 
+            (int)DocumentStatus.OpinionRequestedAllocated, 
+            (int)DocumentStatus.New, 
+            (int)DocumentStatus.InWorkDeclined 
+        };
 
-        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, WorkflowHistory lastWorkFlowRecord, CancellationToken token)
+        #region [ IWorkflowHandler ]
+
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
         {
-            if (!Validate(command, lastWorkFlowRecord))
+            if (!Validate(command, lastWorkflowRecord))
                 return command;
 
             switch (document.DocumentType)
             {
                 case DocumentType.Incoming:
-                    return await CreateWorkflowRecordForInternalOrOutgoing(command, virtualDocument);
+                    return await CreateWorkflowRecordForIncomingAsync(command, document, token);
                 case DocumentType.Internal:
                 case DocumentType.Outgoing:
-                    return await CreateWorkflowRecordForInternalOrOutgoing(command, document, virtualDocument, token);
+                    return await CreateWorkflowRecordForInternalOrOutgoingAsync(command, document, token);
                 default:
                     return command;
             }
         }
 
-        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordForInternalOrOutgoing(ICreateWorkflowHistoryCommand command, VirtualDocument virtualDocument)
-        {
-            var oldWorkflowResponsible = GetOldWorkflowResponsible(virtualDocument, x => x.RecipientType == RecipientType.HeadOfDepartment.Id);
+        #endregion
 
-            var newWorkflowResponsible = new WorkflowHistory
+        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordForIncomingAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
+        {
+            var oldWorkflowResponsible = await GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.HeadOfDepartment.Id, token);
+
+            var newWorkflowResponsible = new WorkflowHistoryLog
             {
-                Status = DocumentStatus.InWorkApprovalRequested,
+                DocumentStatus = DocumentStatus.InWorkApprovalRequested,
                 Resolution = command.Resolution
             };
 
-            await TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
-            virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
+            await TransferResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
+            document.WorkflowHistories.Add(newWorkflowResponsible);
 
             return command;
         }
 
-        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordForInternalOrOutgoing(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, CancellationToken token)
+        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordForInternalOrOutgoingAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
         {
             var response = await IdentityAdapterClient.GetUsersAsync(token);
-            var departmentUsers = response.Users.Where(x => x.Departments.Contains(document.RecipientId));
+            var departmentUsers = response.Users.Where(x => x.Departments.Contains(document.DestinationDepartmentId));
             var headOfDepartment = departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
 
             if (headOfDepartment == null)
@@ -69,17 +81,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 return command;
             }
 
-            virtualDocument.WorkflowHistory.Add(WorkflowHistoryFactory
-            .Create(RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkApprovalRequested));
+            document.WorkflowHistories.Add(WorkflowHistoryLogFactory.Create(document.Id, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkApprovalRequested));
 
             document.Status = DocumentStatus.InWorkApprovalRequested;
             document.RecipientId = headOfDepartment.Id;
-            document.RecipientIsDepartment = false;
 
             return command;
         }
 
-        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
+        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord)
         {
             if (!IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
             {

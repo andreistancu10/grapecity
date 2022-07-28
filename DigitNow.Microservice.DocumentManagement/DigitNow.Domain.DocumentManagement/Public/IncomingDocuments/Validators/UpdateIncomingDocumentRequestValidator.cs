@@ -16,7 +16,6 @@ public class UpdateIncomingDocumentRequestValidator : AbstractValidator<UpdateIn
         RuleFor(item => item.RecipientId).NotNull().NotEmpty();
         RuleFor(item => item.DocumentTypeId).NotNull().NotEmpty();
         RuleFor(item => item.ResolutionPeriod).NotNull().NotEmpty();
-        RuleFor(item => item.ContactDetail.Id).NotNull().NotEmpty();
         RuleFor(item => item.ContactDetail.CountryId).NotNull().NotEmpty();
         RuleFor(item => item.ContactDetail.CountyId).NotNull().NotEmpty();
         RuleFor(item => item.ContactDetail.CityId).NotNull().NotEmpty();

@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;

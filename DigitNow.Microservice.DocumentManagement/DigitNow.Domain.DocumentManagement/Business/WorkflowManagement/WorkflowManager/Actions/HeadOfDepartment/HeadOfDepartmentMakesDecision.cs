@@ -17,18 +17,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkApprovalRequested };
         private enum Decision { Approved = 1, Declined = 2};
 
-        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, WorkflowHistory lastWorkFlowRecord, CancellationToken token)
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
         {
-            if (!Validate(command, lastWorkFlowRecord))
+            if (!Validate(command, lastWorkflowRecord))
                 return command;
 
             switch ((Decision)command.Decision)
             {
                 case Decision.Declined:
-                    await ApplicationDeclined(command, virtualDocument);
+                    await ApplicationDeclinedAsync(command, document, token);
                     break;
                 case Decision.Approved:
-                    await ApplicationApproved(command, virtualDocument, token);
+                    await ApplicationApproved(command, document, token);
                     break;
                 default:
                     break;
@@ -37,39 +37,39 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             return command;
         }
 
-        private async Task<ICreateWorkflowHistoryCommand> ApplicationApproved(ICreateWorkflowHistoryCommand command, VirtualDocument document, CancellationToken token)
+        private async Task<ICreateWorkflowHistoryCommand> ApplicationApproved(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
         {
-            var userResponse = await FetchMayorAsync(token);
+            var userResponse = await IdentityService.FetchMayorAsync(token);
 
             if (!UserExists(userResponse, command))
                 return command;
 
-            document.WorkflowHistory
-                .Add(WorkflowHistoryFactory
-                .Create(RecipientType.Mayor, userResponse, DocumentStatus.InWorkMayorReview, command.DeclineReason, command.Remarks));
+            document.WorkflowHistories
+                .Add(WorkflowHistoryLogFactory
+                .Create(document.Id, RecipientType.Mayor, userResponse, DocumentStatus.InWorkMayorReview, command.DeclineReason, command.Remarks));
 
-            await SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, userResponse.Id, DocumentStatus.InWorkMayorReview);
+            await SetStatusAndRecipientBasedOnWorkflowDecisionAsync(command.DocumentId, userResponse.Id, DocumentStatus.InWorkMayorReview, token);
 
             return command;
         }
 
-        private async Task ApplicationDeclined(ICreateWorkflowHistoryCommand command, VirtualDocument document)
+        private async Task ApplicationDeclinedAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
         {
-            var oldWorkflowResponsible = GetOldWorkflowResponsible(document, x => x.RecipientType == RecipientType.Functionary.Id);
+            var oldWorkflowResponsible = await GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Functionary.Id, token);
 
-            var newWorkflowResponsible = new WorkflowHistory
+            var newWorkflowResponsible = new WorkflowHistoryLog
             {
-                Status = DocumentStatus.InWorkDeclined,
+                DocumentStatus = DocumentStatus.InWorkDeclined,
                 DeclineReason = command.DeclineReason,
                 Remarks = command.Remarks
             };
 
-            await TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
+            await TransferResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
 
-            document.WorkflowHistory.Add(newWorkflowResponsible);
+            document.WorkflowHistories.Add(newWorkflowResponsible);
         }
 
-        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
+        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord)
         {
             if (!IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
             {

@@ -7,11 +7,6 @@ using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateUserRecipient
 {
@@ -19,9 +14,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IIdentityAdapterClient _identityAdapterClient;
-        private User _user;
-        private DocumentStatus _status;
-        private bool _isHeadOfDepartment;
 
         public UpdateDocumentUserRecipientHandler(DocumentManagementDbContext dbContext, IIdentityAdapterClient identityAdapterClient)
         {
@@ -30,9 +22,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
         }
         public async Task<ResultObject> Handle(UpdateDocumentUserRecipientCommand request, CancellationToken cancellationToken)
         {
-            _user = await _identityAdapterClient.GetUserByIdAsync(request.UserId, cancellationToken);
-
-            if (_user == null)
+            var targetUser = await _identityAdapterClient.GetUserByIdAsync(request.UserId, cancellationToken);
+            if (targetUser == null)
                 return ResultObject.Error(new ErrorMessage
                 {
                     Message = $"No responsible with id {request.UserId} was found.",
@@ -40,46 +31,42 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                     Parameters = new object[] { request.UserId }
                 });
 
-            _isHeadOfDepartment = _user.Roles.Contains(RecipientType.HeadOfDepartment.Code);
-            _status = _isHeadOfDepartment ? DocumentStatus.InWorkDelegatedUnallocated : DocumentStatus.InWorkDelegated;
-
-            await UpdateDocuments(request.DocumentIds);
-
-            await _dbContext.SaveChangesAsync();
+            await UpdateDocumentsAsync(request.DocumentIds, targetUser, cancellationToken);
 
             return new ResultObject(ResultStatusCode.Ok);
         }
 
-        private async Task UpdateDocuments(List<long> documentIds)
+        private async Task UpdateDocumentsAsync(List<long> documentIds, User targetUser, CancellationToken token)
         {
-            foreach (var documentId in documentIds)
+            var foundDocuments = await _dbContext.Documents
+                .Where(x => documentIds.Contains(x.Id))
+                .ToListAsync(token);
+
+            var newWorkflowHistoryLogs = new List<WorkflowHistoryLog>();
+
+            foreach (var foundDocument in foundDocuments)
             {
-                var document = await _dbContext.Documents.FirstAsync(x => x.Id == documentId);
-
-                switch (document.DocumentType)
+                var isHeadOfDepartment = targetUser.Roles.Contains(RecipientType.HeadOfDepartment.Code);
+                if (isHeadOfDepartment)
                 {
-                    case DocumentType.Incoming:
-                        await UpdateRecipient<IncomingDocument>(document);
-                        break;
-                    case DocumentType.Internal:
-                        await UpdateRecipient<InternalDocument>(document);
-                        break;
-                    case DocumentType.Outgoing:
-                        await UpdateRecipient<OutgoingDocument>(document);
-                        break;
-                    default:
-                        break;
+                    foundDocument.Status = DocumentStatus.InWorkDelegatedUnallocated;
                 }
-            }
-        }
-        private async Task UpdateRecipient<T>(Document document) where T : VirtualDocument
-        {
-            var virtualDocument = await _dbContext.Set<T>().AsQueryable()
-                .FirstOrDefaultAsync(x => x.DocumentId == document.Id);
+                else
+                {
+                    foundDocument.Status = DocumentStatus.InWorkDelegated;
+                }
+                
+                foundDocument.DestinationDepartmentId = targetUser.Departments.FirstOrDefault();
+                foundDocument.RecipientId = targetUser.Id;
 
-            document.Status = _status;
-            document.RecipientId = (int)_user.Id;
-            virtualDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(_isHeadOfDepartment ? RecipientType.HeadOfDepartment : RecipientType.Functionary, _user, _status));
+                var recipientType = isHeadOfDepartment ? RecipientType.HeadOfDepartment : RecipientType.Functionary;
+
+                newWorkflowHistoryLogs.Add(WorkflowHistoryLogFactory.Create(foundDocument.Id, recipientType, targetUser, foundDocument.Status));
+            }
+
+            await _dbContext.BulkUpdateAsync(foundDocuments, token);
+            await _dbContext.BulkInsertAsync(newWorkflowHistoryLogs, token);
+            await _dbContext.SaveChangesAsync(token);
         }
     }
 }

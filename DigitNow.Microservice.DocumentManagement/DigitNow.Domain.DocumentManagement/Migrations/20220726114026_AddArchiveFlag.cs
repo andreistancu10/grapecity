@@ -4,24 +4,25 @@
 
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
-    public partial class UploadedFile_AbsolutePath : Migration
+    public partial class AddArchiveFlag : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "AbsolutePath",
+            migrationBuilder.AddColumn<bool>(
+                name: "IsArchived",
                 schema: "DocumentMangement",
-                table: "UploadedFile",
-                type: "nvarchar(max)",
-                nullable: true);
+                table: "Document",
+                type: "bit",
+                nullable: false,
+                defaultValue: false);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "AbsolutePath",
+                name: "IsArchived",
                 schema: "DocumentMangement",
-                table: "UploadedFile");
+                table: "Document");
         }
     }
 }

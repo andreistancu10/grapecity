@@ -16,8 +16,8 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Mappings
                 .ForMember(m => m.RegistrationNoFilter, opt => opt.MapFrom(src => src.RegistrationNoFilter))
                 .ForMember(m => m.RegistrationDateFilter, opt => opt.MapFrom(src => src.RegistrationDateFilter))
                 .ForMember(m => m.TypeFilter, opt => opt.MapFrom(src => src.DocumentTypeFilter))
-
                 .ForMember(m => m.StatusFilter, opt => opt.MapFrom(src => src.DocumentStatusFilter))
+                .ForMember(m => m.DepartmentFilter, opt => opt.MapFrom(src => src.DocumentDepartmentFilter))
                 .ForMember(m => m.IdentifiersFilter, opt => opt.MapFrom(src => src.DocumentIdentifiersFilter));
 
             CreateMap<DocumentFilterDto, DocumentPostprocessFilter>()
@@ -45,6 +45,9 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Mappings
                 CreateMap<DocumentStatusFilterDto, DocumentStatusFilter>()
                     .ForMember(m => m.Status, opt => opt.MapFrom(src => src.Status));
 
+                CreateMap<DocumentDepartmentFilterDto, DocumentDepartmentFilter>()
+                    .ForMember(m => m.DepartmentIds, opt => opt.MapFrom(src => src.DepartmentIds));
+
                 CreateMap<DocumentIdentifiersFilterDto, DocumentIdentifiersFilter>()
                     .ForMember(m => m.Identifiers, opt => opt.MapFrom(src => src.Identifiers));
                 
@@ -52,7 +55,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Mappings
                     .ForMember(m => m.IdentificationNumber, opt => opt.MapFrom(src => src.IdentificationNumber));
             }
             CreateMap<GetDocumentsRequest, GetDocumentsQuery>()
-                .ForMember(m => m.PreprocessFilter, opt => opt.MapFrom(src => src.Filter ?? new DocumentFilterDto()))                
+                .ForMember(m => m.PreprocessFilter, opt => opt.MapFrom(src => src.Filter ?? new DocumentFilterDto()))
                 .ForMember(m => m.PostprocessFilter, opt => opt.MapFrom(src => src.Filter ?? new DocumentFilterDto()));
             CreateMap<GetDocumentsRequest, GetDocumentsOperationalArchiveQuery>()
                .ForMember(m => m.PreprocessFilter, opt => opt.MapFrom(src => src.Filter ?? new DocumentFilterDto()))

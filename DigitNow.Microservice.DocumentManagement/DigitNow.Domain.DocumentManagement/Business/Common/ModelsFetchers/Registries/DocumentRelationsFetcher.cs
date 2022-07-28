@@ -11,10 +11,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
         private readonly IServiceProvider _serviceProvider;
 
         private IModelFetcher<UserModel, DocumentsFetcherContext> _documentsUsersFetcher;
+        private IModelFetcher<DocumentDepartmentModel, DocumentsFetcherContext> _documentsDepartmentsFetcher;
         private IModelFetcher<DocumentCategoryModel, DocumentsFetcherContext> _documentsCategoriesFetcher;
         private IModelFetcher<DocumentCategoryModel, DocumentsFetcherContext> _documentsInternalCategoriesFetcher;
 
         public IReadOnlyList<UserModel> DocumentUsers => GetItems(_documentsUsersFetcher);
+        public IReadOnlyList<DocumentDepartmentModel> DocumentDepartments => GetItems(_documentsDepartmentsFetcher);
         public IReadOnlyList<DocumentCategoryModel> DocumentCategories => GetItems(_documentsCategoriesFetcher);
         public IReadOnlyList<DocumentCategoryModel> DocumentInternalCategories => GetItems(_documentsInternalCategoriesFetcher);
 
@@ -27,6 +29,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
         {
             _documentsUsersFetcher = new DocumentsUsersFetcher(_serviceProvider);
             RemoteFetchers.Add(_documentsUsersFetcher);
+
+            _documentsDepartmentsFetcher = new DocumentsDepartmentsFetcher(_serviceProvider);
+            RemoteFetchers.Add(_documentsDepartmentsFetcher);
 
             _documentsCategoriesFetcher = new DocumentsCategoriesFetcher(_serviceProvider);
             RemoteFetchers.Add(_documentsCategoriesFetcher);

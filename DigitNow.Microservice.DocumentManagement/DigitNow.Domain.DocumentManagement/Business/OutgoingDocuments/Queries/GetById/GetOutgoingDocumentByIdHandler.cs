@@ -23,10 +23,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries.
             var foundOutgoingDocument = await _dbContext.OutgoingDocuments
                 .AsNoTracking()
                 .Include(x => x.Document)
+                .Include(x => x.Document.WorkflowHistories)
                 .Include(x => x.ContactDetail)
                 .Include(x => x.DeliveryDetails)
                 .Include(x => x.ConnectedDocuments)
-                .Include(x => x.WorkflowHistory)
                 .FirstOrDefaultAsync(c => c.DocumentId == request.Id, cancellationToken);
             
             if (foundOutgoingDocument == null) return null;

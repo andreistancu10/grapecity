@@ -1,7 +1,6 @@
-﻿
-namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
+﻿namespace DigitNow.Domain.DocumentManagement.Public.Common.Models;
 
-public class CreateContactDetailsRequest
+public class ContactDetailsRequest
 {
     public int CountryId { get; set; }
     public int CountyId { get; set; }

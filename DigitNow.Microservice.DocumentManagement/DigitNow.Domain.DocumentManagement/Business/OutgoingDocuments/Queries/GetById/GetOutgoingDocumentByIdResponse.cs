@@ -1,8 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.DeliveryDetails;
-using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles;
-using System;
-using System.Collections.Generic;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Dtos;
 
 namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries.GetById
 {
@@ -13,7 +9,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries.
         public long CreatedBy { get; set; }
         public DateTime ModifiedAt { get; set; }
         public long ModifiedBy { get; set; }
-        public int DepartmentId { get; set; }
+        public int DepartmentId { get; set; }        
         public int DeadlineDaysNumber { get; set; }
         public string Description { get; set; }
         public string Observation { get; set; }
@@ -26,9 +22,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries.
         public int RecipientTypeId { get; set; }
         public int DocumentTypeId { get; set; }
         public string DocumentTypeDetail { get; set; }
-        public DeliveryDetail DeliveryDetails { get; set; }
-        public List<WorkflowHistory> WorkflowHistory { get; set; } = new();
-        public List<ConnectedDocument> ConnectedDocuments { get; set; } = new();
-        public List<DocumentUploadedFile> DocumentUploadedFiles { get; set; } = new();
+
+        public ContactDetailDto ContactDetails { get; set; }
+        public DeliveryDetailDto DeliveryDetails { get; set; }
+
+        public List<WorkflowHistoryLogDto> WorkflowHistory { get; set; } = new();
+        public List<ConnectedDocumentDto> ConnectedDocuments { get; set; } = new();
+        public List<DocumentUploadedFileDto> DocumentUploadedFiles { get; set; } = new();
     }
 }
