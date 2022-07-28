@@ -11,7 +11,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
     {
         Task<IncomingDocument> AddAsync(IncomingDocument incomingDocument, CancellationToken cancellationToken);
         Task<List<IncomingDocument>> FindAllAsync(Expression<Func<IncomingDocument, bool>> predicate, CancellationToken cancellationToken);
-        Task SetResolutionAsync(IList<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken);
+        Task SetResolutionAsync(IEnumerable<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken);
         Task<IncomingDocument> FindFirstAsync(long id, CancellationToken cancellationToken);
     }
 
@@ -67,31 +67,37 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             return _dbContext.IncomingDocuments.Where(x => x.DocumentId == id).Include(x => x.Document).FirstOrDefaultAsync(cancellationToken);
         }
 
-        public async Task SetResolutionAsync(IList<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken)
+        public async Task SetResolutionAsync(IEnumerable<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken)
         {
             var dbIncomingDocuments = await _dbContext.IncomingDocuments
                 .Include(x => x.Document)
-                .Where(x => documentIds.Contains(x.Id))
+                .Where(x => documentIds.Contains(x.DocumentId))
                 .ToListAsync(cancellationToken);
-
             if (!dbIncomingDocuments.Any()) return;
+
+            var foundResolutions = await _dbContext.DocumentResolutions
+                    .Where(x => documentIds.Contains(x.DocumentId))
+                    .ToListAsync(cancellationToken);
 
             foreach (var dbIncomingDocument in dbIncomingDocuments)
             {
-                var foundResolution = await _dbContext.DocumentResolutions
-                    .FirstOrDefaultAsync(x => x.DocumentId == dbIncomingDocument.DocumentId, cancellationToken);                    
-
+                var foundResolution = foundResolutions.FirstOrDefault(x => x.DocumentId == dbIncomingDocument.DocumentId);
                 if (foundResolution == null)
                 {
-                    await _dbContext.AddAsync(DocumentResolutionFactory.Create(dbIncomingDocument, resolutionType, remarks), cancellationToken);
+                    await _dbContext.DocumentResolutions
+                        .AddAsync(DocumentResolutionFactory.Create(dbIncomingDocument, resolutionType, remarks), cancellationToken);
                 }
                 else
                 {
                     foundResolution.ResolutionType = resolutionType;
                     foundResolution.Remarks = remarks;
 
-                    await _dbContext.SingleUpdateAsync(foundResolution, cancellationToken);
+                    await _dbContext.DocumentResolutions
+                        .SingleUpdateAsync(foundResolution, cancellationToken);
                 }
+
+                dbIncomingDocument.Document.Status = DocumentStatus.Finalized;
+                await _dbContext.Documents.SingleUpdateAsync(dbIncomingDocument.Document, cancellationToken);
             }
 
             await _dbContext.SaveChangesAsync(cancellationToken);
