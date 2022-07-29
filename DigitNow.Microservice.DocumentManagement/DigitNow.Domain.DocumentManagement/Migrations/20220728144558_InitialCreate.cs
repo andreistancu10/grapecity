@@ -79,7 +79,8 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     DestinationDepartmentId = table.Column<long>(type: "bigint", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     StatusModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    StatusModifiedBy = table.Column<long>(type: "bigint", nullable: false)
+                    StatusModifiedBy = table.Column<long>(type: "bigint", nullable: false),
+                    IsArchived = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
