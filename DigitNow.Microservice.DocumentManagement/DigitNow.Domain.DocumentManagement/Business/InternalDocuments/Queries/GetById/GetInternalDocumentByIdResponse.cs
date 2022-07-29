@@ -1,5 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Dtos;
 using System;
 using System.Collections.Generic;
 
@@ -19,7 +18,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.InternalDocuments.Queries.
         public string Observation { get; set; }
         public int ReceiverDepartmentId { get; set; }
         public bool? IsUrgent { get; set; }
-        public List<WorkflowHistory> WorkflowHistory { get; set; } = new();
-        public List<DocumentUploadedFile> DocumentUploadedFiles { get; set; } = new();
+        public long RegistrationNumber { get; set; }
+        public List<WorkflowHistoryLogDto> WorkflowHistory { get; set; } = new();
+        public List<DocumentUploadedFileDto> DocumentUploadedFiles { get; set; } = new();
     }
 }

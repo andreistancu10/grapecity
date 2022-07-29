@@ -16,6 +16,8 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
 
         public DocumentStatusFilter StatusFilter { get; set; }
 
+        public DocumentDepartmentFilter DepartmentFilter { get; set; }
+
         public DocumentIdentifiersFilter IdentifiersFilter { get; set; }
 
         public static DocumentPreprocessFilter Empty => new DocumentPreprocessFilter();
@@ -57,11 +59,16 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
 
     public class DocumentCategoryFilter
     {
-        public List<int> CategoryIds { get; set; }
+        public List<long> CategoryIds { get; set; }
     }
 
     public class DocumentStatusFilter
     {
         public DocumentStatus Status { get; set; }
+    }
+
+    public class DocumentDepartmentFilter
+    {
+        public List<long> DepartmentIds { get; set; }
     }
 }

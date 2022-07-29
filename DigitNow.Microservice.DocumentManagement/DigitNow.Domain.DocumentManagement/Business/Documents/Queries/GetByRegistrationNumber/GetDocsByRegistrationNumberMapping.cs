@@ -7,7 +7,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetByReg
     {
         public GetDocsByRegistrationNumberMapping()
         {
-            CreateMap<Document, GetDocsByRegistrationNumberResponse>();
+            CreateMap<Document, GetDocsByRegistrationNumberResponse>()
+                .ForMember(c => c.DocumentId, opt => opt.MapFrom(src => src.Id));
         }
     }
 }

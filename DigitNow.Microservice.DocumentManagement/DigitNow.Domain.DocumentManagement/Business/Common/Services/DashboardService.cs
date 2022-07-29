@@ -8,12 +8,7 @@ using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Data.Filters;
 using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
@@ -22,9 +17,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IDashboardService
     {
-        Task<long> CountAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken);
+        Task<long> CountAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken token);
 
-        Task<List<VirtualDocument>> GetAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken cancellationToken);
+        Task<List<VirtualDocument>> GetAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken token);
     }
 
     public class DashboardService : IDashboardService
@@ -67,30 +62,30 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         #region [ IDashboardService ]
 
-        public async Task<long> CountAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
+        public async Task<long> CountAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken token)
         {
-            var documentsQuery = await BuildPreprocessDocumentsQueryAsync(preprocessFilter, cancellationToken);
+            var documentsQuery = await BuildPreprocessDocumentsQueryAsync(preprocessFilter, token);
             if (postprocessFilter.IsEmpty())
-                return await documentsQuery.CountAsync(cancellationToken);
+                return await documentsQuery.CountAsync(token);
 
             var lightweightDocuments = await documentsQuery
                 .Select(x => new Document { Id = x.Id, DocumentType = x.DocumentType })
-                .ToListAsync(cancellationToken);
+                .ToListAsync(token);
 
-            return await _virtualDocumentService.CountVirtualDocuments(lightweightDocuments, postprocessFilter, cancellationToken);
+            return await _virtualDocumentService.CountVirtualDocuments(lightweightDocuments, postprocessFilter, token);
         }
 
-        public async Task<List<VirtualDocument>> GetAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken cancellationToken)
+        public async Task<List<VirtualDocument>> GetAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken token)
         {
-            var documentsQuery = await BuildPreprocessDocumentsQueryAsync(preprocessFilter, cancellationToken);
+            var documentsQuery = await BuildPreprocessDocumentsQueryAsync(preprocessFilter, token);
 
             var documents = await documentsQuery.OrderByDescending(x => x.CreatedAt)
                  .Skip((page - 1) * count)
                  .Take(count)
                  .Select(x => new Document { Id = x.Id, DocumentType = x.DocumentType })
-                 .ToListAsync(cancellationToken);
+                 .ToListAsync(token);
 
-            var virtualDocuments = await _virtualDocumentService.FetchVirtualDocuments(documents, postprocessFilter, cancellationToken);
+            var virtualDocuments = await _virtualDocumentService.FetchVirtualDocuments(documents, postprocessFilter, token);
 
             return virtualDocuments
                 .OrderByDescending(x => x.CreatedAt)
@@ -108,6 +103,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             if (IsRole(userModel, RecipientType.HeadOfDepartment))
             {
+                //TODO: Get all users by departmentId
                 var usersResponse = await _identityAdapterClient.GetUsersAsync(cancellationToken);
 
                 return usersResponse.Users
@@ -123,7 +119,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             var userId = _identityService.GetCurrentUserId();
 
-            var getUserByIdResponse = await _authenticationClient.GetUserById(userId, cancellationToken);
+            var getUserByIdResponse = await _identityAdapterClient.GetUserByIdAsync(userId, cancellationToken);
             if (getUserByIdResponse == null)
                 throw new InvalidOperationException($"User with identifier '{userId}' was not found!");
 
@@ -161,8 +157,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             {
                 var relatedUserIds = await GetRelatedUserIdsAsync(userModel, cancellationToken);
 
+                // TODO:(!) This is only temporary, Apply filter permissions in the future versions                
                 documentsQuery = documentsQuery
-                    .Where(x => relatedUserIds.Contains(x.CreatedBy) || relatedUserIds.Contains(x.RecipientId));
+                    .Where(x => 
+                        relatedUserIds.Contains(x.CreatedBy)
+                        || 
+                        (userModel.Departments.Contains(x.DestinationDepartmentId))
+                    );
             }
 
             return documentsQuery;
