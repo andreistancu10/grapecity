@@ -10,8 +10,8 @@ using DigitNow.Domain.DocumentManagement.Data.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
-using DigitNow.Domain.DocumentManagement.Data.Filters;
-using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
+using DigitNow.Domain.DocumentManagement.Data.Filters.Documents.Preprocess;
+using DigitNow.Domain.DocumentManagement.Data.Filters.Documents.Postprocess;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -146,10 +146,81 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return preprocessPredicates;
         }
 
-        private async Task<IQueryable<Document>> BuildPreprocessDocumentsQueryAsync(DocumentPreprocessFilter documentFilter, CancellationToken cancellationToken)
+        private IList<Expression<Func<Document, bool>>> GetDocumentDepartmentRightsPredicates(UserModel currentUser)
+        {
+            var filter = new DocumentDepartmentRightsFilter();
+            var filterBuilder = new DocumentDepartmentRightsPreprocessFilterBuilder(_dbContext, filter);
+
+            //TODO: Write filter
+            filter.RegistryOfficeFilter = new DocumentRegistryOfficeDepartmentFilter
+            {
+                DepartmentId = default(long),
+                DepartmentCode = default(string)
+            };
+
+            return filterBuilder.Build();
+        }
+
+        private IList<Expression<Func<Document, bool>>> GetDocumentUserRightsPredicates(UserModel currentUser)
+        {
+            var filter = new DocumentUserRightsFilter();
+            var filterBuilder = new DocumentUserRightsPreprocessFilterBuilder(_dbContext, filter);
+
+            if (IsRole(currentUser, RecipientType.Mayor))
+            {
+                filter.MayorRightFilter = new DocumentMayorRightFilter();;
+            }
+            else if (IsRole(currentUser, RecipientType.HeadOfDepartment))
+            {
+                filter.HeadOfDepartmentRightsFilter = new DocumentHeadOfDepartmentRightFilter
+                {
+                    DepartmentId = currentUser.Departments.First() //TODO: Ask this
+                };
+            }
+            else if (IsRole(currentUser, RecipientType.Functionary))
+            {
+                filter.FunctionaryRightsFilter = new DocumentFunctionaryRightFilter
+                {
+                    UserId = currentUser.Id,
+                    DepartmentId = currentUser.Departments.First() //TODO: Ask this
+                };
+            }
+
+            return filterBuilder.Build();
+        }
+
+        private async Task<IQueryable<Document>> BuildPreprocessDocumentsQueryAsync(DocumentPreprocessFilter documentPreprocessFilter, CancellationToken cancellationToken)
         {
             var documentsQuery = _dbContext.Documents
-                .WhereAll(GetPreprocessPredicates(documentFilter));
+                .WhereAll(GetPreprocessPredicates(documentPreprocessFilter));
+
+            var userModel = await GetCurrentUserAsync(cancellationToken);
+
+            var registryOfficeDepartmentId = default(long); //TODO: Add this
+            var containsRegistryOfficeDepartments = userModel.Departments.Contains(registryOfficeDepartmentId);
+            if (containsRegistryOfficeDepartments)
+            {
+                documentsQuery.WhereAll(GetDocumentDepartmentRightsPredicates(userModel));
+            }
+            else
+            {
+                documentsQuery.WhereAll(GetDocumentUserRightsPredicates(userModel));
+            }
+
+            //if (!IsRole(userModel, RecipientType.Mayor))
+            //{
+            //    var relatedUserIds = await GetRelatedUserIdsAsync(userModel, cancellationToken);
+
+            //    // TODO:(!) This is only temporary, Apply filter permissions in the future versions                
+            //    documentsQuery = documentsQuery
+            //        .Where(x => 
+            //            relatedUserIds.Contains(x.CreatedBy)
+            //            || 
+            //            (userModel.Departments.Contains(x.DestinationDepartmentId))
+            //        );
+            //}
+
+            documentsQuery.WhereMyFilter(new MyFilter<Document>(x => x.Status == DocumentStatus.Finalized));
 
             return documentsQuery;
         }
@@ -162,5 +233,19 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             userModel.Roles.Contains(role.Code);
 
         #endregion
+    }
+
+    public class MyFilter<T> : List<Expression<Func<T, bool>>>
+        where T: IExtendedEntity
+    {
+        public MyFilter(params Expression<Func<T, bool>>[] expressions)
+        {
+            this.AddRange(expressions);
+        }
+        
+        public IList<Expression<Func<T, bool>>> ToPredicate()
+        {
+            return this;
+        }
     }
 }

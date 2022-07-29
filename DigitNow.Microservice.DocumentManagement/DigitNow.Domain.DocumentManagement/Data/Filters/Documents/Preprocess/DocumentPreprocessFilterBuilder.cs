@@ -1,30 +1,19 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
-using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders.Preprocess
+namespace DigitNow.Domain.DocumentManagement.Data.Filters.Documents.Preprocess
 {
-    internal interface IDocumentPreprocessFilterBuilder : IExpressionFilterBuilder<Document, DocumentPreprocessFilter>
-    {
-        void BuildFilterByRegistryType();
-        void BuildFilterByRegistrationNo();
-        void BuildFilterByRegistrationDate();
-        void BuildFilterByDocumentType();
-        void BuildFilterByDocumentState();
-        void BuildFilterByIdentifiers();
-    }
-
-    internal class DocumentPreprocessFilterBuilder : ExpressionFilterBuilder<Document, DocumentPreprocessFilter>, IDocumentPreprocessFilterBuilder
+    internal class DocumentPreprocessFilterBuilder : DataExpressionFilterBuilder<Document, DocumentPreprocessFilter>
     {
         private readonly DocumentManagementDbContext _dbContext;
 
-        public DocumentPreprocessFilterBuilder(DocumentManagementDbContext dbContext, DocumentPreprocessFilter documentFilterModel)
-            : base(documentFilterModel)
+        public DocumentPreprocessFilterBuilder(IServiceProvider serviceProvider, DocumentPreprocessFilter filter)
+            : base(serviceProvider, filter)
         {
-            _dbContext = dbContext;
+            _dbContext = serviceProvider.GetService<DocumentManagementDbContext>();
         }
 
-        public void BuildFilterByRegistryType()
+        private void BuildFilterByRegistryType()
         {
             if (EntityFilter.RegistryTypeFilter != null)
             {
@@ -36,16 +25,16 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders.Prepr
                     .Where(x => foundSpecialRegistrerIds.Contains(x.SpecialRegisterId))
                     .Select(x => x.DocumentId);
 
-                GeneratedFilters.Add(document => targetDocumentIds.Contains(document.Id));
+                EntityPredicates.Add(document => targetDocumentIds.Contains(document.Id));
             }
         }
 
-        public void BuildFilterByRegistrationNo()
+        private void BuildFilterByRegistrationNo()
         {
             var registrationNoFilter = EntityFilter.RegistrationNoFilter;
             if (registrationNoFilter != null)
             {
-                GeneratedFilters.Add(document =>
+                EntityPredicates.Add(document =>
                     document.RegistrationNumber >= registrationNoFilter.From
                     &&
                     document.RegistrationNumber <= registrationNoFilter.To
@@ -53,12 +42,12 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders.Prepr
             }
         }
 
-        public void BuildFilterByRegistrationDate()
+        private void BuildFilterByRegistrationDate()
         {
             var registrationDateFilter = EntityFilter.RegistrationDateFilter;
             if (registrationDateFilter != null)
             {
-                GeneratedFilters.Add(document =>
+                EntityPredicates.Add(document =>
                     document.RegistrationDate >= registrationDateFilter.From
                     &&
                     document.RegistrationDate <= registrationDateFilter.To
@@ -66,35 +55,35 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders.Prepr
             }
         }
 
-        public void BuildFilterByDocumentType()
+        private void BuildFilterByDocumentType()
         {
             if (EntityFilter.TypeFilter != null)
             {
-                GeneratedFilters.Add(document => document.DocumentType == EntityFilter.TypeFilter.DocumentType);
+                EntityPredicates.Add(document => document.DocumentType == EntityFilter.TypeFilter.DocumentType);
             }
         }
 
-        public void BuildFilterByDocumentState()
+        private void BuildFilterByDocumentState()
         {
             if (EntityFilter.StatusFilter != null)
             {
-                GeneratedFilters.Add(document => document.Status == EntityFilter.StatusFilter.Status);
+                EntityPredicates.Add(document => document.Status == EntityFilter.StatusFilter.Status);
             }
         }
 
-        public void BuildFilterByIdentifiers()
+        private void BuildFilterByIdentifiers()
         {
             if (EntityFilter.IdentifiersFilter != null)
             {
-                GeneratedFilters.Add(document => EntityFilter.IdentifiersFilter.Identifiers.Contains(document.Id));
+                EntityPredicates.Add(document => EntityFilter.IdentifiersFilter.Identifiers.Contains(document.Id));
             }
         }
 
-        public void BuildFilterByDepartment()
+        private void BuildFilterByDepartment()
         {
             if (EntityFilter.DepartmentFilter != null)
             {
-                GeneratedFilters.Add(document => EntityFilter.DepartmentFilter.DepartmentIds.Contains(document.DestinationDepartmentId));
+                EntityPredicates.Add(document => EntityFilter.DepartmentFilter.DepartmentIds.Contains(document.DestinationDepartmentId));
             }
         }
 

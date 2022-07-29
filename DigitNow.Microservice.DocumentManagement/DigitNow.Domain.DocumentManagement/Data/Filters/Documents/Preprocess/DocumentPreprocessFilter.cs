@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
+namespace DigitNow.Domain.DocumentManagement.Data.Filters.Documents.Preprocess
 {
     public class DocumentPreprocessFilter : DataFilter
     {
@@ -21,13 +21,6 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
         public DocumentIdentifiersFilter IdentifiersFilter { get; set; }
 
         public static DocumentPreprocessFilter Empty => new DocumentPreprocessFilter();
-    }
-
-    public class DocumentPostprocessFilter : DataFilter
-    {
-        public DocumentCategoryFilter CategoryFilter { get; set; }
-
-        public static DocumentPostprocessFilter Empty => new DocumentPostprocessFilter();
     }
 
     public class DocumentIdentifiersFilter
@@ -55,11 +48,6 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters
     public class DocumentTypeFilter
     {
         public DocumentType DocumentType { get; set; }
-    }
-
-    public class DocumentCategoryFilter
-    {
-        public List<long> CategoryIds { get; set; }
     }
 
     public class DocumentStatusFilter
