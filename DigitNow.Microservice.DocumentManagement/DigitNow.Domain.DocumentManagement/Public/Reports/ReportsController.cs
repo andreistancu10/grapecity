@@ -32,21 +32,37 @@ namespace DigitNow.Domain.DocumentManagement.Public.Reports
             _exportService = exportService;
         }
 
-        [HttpPost("get-report")]
-        public async Task<IActionResult> GetReportAsync([FromBody] GetReportRequest request)
+        [HttpPost("expired")]
+        public async Task<IActionResult> GetReportAsync([FromBody] GetExpiredReportRequest request)
         {
             var getReportQuery = _mapper.Map<GetReportQuery>(request);
-
             var reportResult = await _mediator.Send(getReportQuery);
-            if (reportResult == null) return NotFound();
+            
+            if (reportResult == null)
+            {
+                return NotFound();
+            }
 
             //TODO: Use translations for file name
-            var fileResult = await _exportService.CreateExcelFile(request.Type switch
+            var fileResult = await _exportService.CreateExcelFile("Documente expirate", "DocumentsSheet", reportResult);
+
+            return File(fileResult.Content, fileResult.ContentType, fileResult.Name);
+        }
+
+
+        [HttpPost("to-expire")]
+        public async Task<IActionResult> GetReportAsync([FromBody] GetToExpireReportRequest request)
+        {
+            var getReportQuery = _mapper.Map<GetReportQuery>(request);
+            var reportResult = await _mediator.Send(getReportQuery);
+            
+            if (reportResult == null)
             {
-                ReportType.ExpiredDocuments => "Documente expirate",
-                ReportType.DocumentsToExpire => "Documente ce urmeaza sa expire",
-                _ => throw new ArgumentOutOfRangeException($"Unknown report type '{request.Type}' provided!")
-            }, "DocumentsSheet", reportResult);
+                return NotFound();
+            }
+
+            //TODO: Use translations for file name
+            var fileResult = await _exportService.CreateExcelFile("Documente ce urmeaza sa expire", "DocumentsSheet", reportResult);
 
             return File(fileResult.Content, fileResult.ContentType, fileResult.Name);
         }
