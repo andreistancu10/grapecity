@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload;
-using DigitNow.Domain.DocumentManagement.Data.Entities.UploadedFiles;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Mappings;
 
