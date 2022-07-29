@@ -4,11 +4,6 @@ using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Concrete
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -74,7 +69,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var incomingDocuments = documents.Where(x => x is IncomingDocument).Cast<IncomingDocument>();
             if (incomingDocuments.Any())
             {
-                result.AddRange(MapIncomingChildDocuments(incomingDocuments));
+                result.AddRange(MapChildDocuments(incomingDocuments));
             }
 
             var internalDocuments = documents.Where(x => x is InternalDocument).Cast<InternalDocument>();
@@ -86,7 +81,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var outgoingDocuments = documents.Where(x => x is OutgoingDocument).Cast<OutgoingDocument>();
             if (outgoingDocuments.Any())
             {
-                result.AddRange(MapOutgoingChildDocuments(outgoingDocuments));
+                result.AddRange(MapChildDocuments(outgoingDocuments));
             }
 
             return result;
@@ -109,48 +104,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 };
 
                 result.Add(_mapper.Map<VirtualDocumentAggregate<T>, DocumentViewModel>(aggregate));
-            }
-
-            return result;
-        }
-
-        private List<DocumentViewModel> MapIncomingChildDocuments(IEnumerable<IncomingDocument> childDocuments)
-        {
-            var result = new List<DocumentViewModel>();
-            foreach (var childDocument in childDocuments)
-            {
-                var aggregate = new VirtualDocumentAggregate<IncomingDocument>
-                {
-                    VirtualDocument = childDocument,
-                    Users = _documentRelationsFetcher.DocumentUsers,
-                    Categories = _documentRelationsFetcher.DocumentCategories,
-                    InternalCategories = _documentRelationsFetcher.DocumentInternalCategories
-                };
-
-                var document = new DocumentViewModel();
-                document.IdentificationNumber = childDocument.IdentificationNumber;
-                result.Add(_mapper.Map(aggregate, document));
-            }
-
-            return result;
-        }
-
-        private List<DocumentViewModel> MapOutgoingChildDocuments(IEnumerable<OutgoingDocument> childDocuments)
-        {
-            var result = new List<DocumentViewModel>();
-            foreach (var childDocument in childDocuments)
-            {
-                var aggregate = new VirtualDocumentAggregate<OutgoingDocument>
-                {
-                    VirtualDocument = childDocument,
-                    Users = _documentRelationsFetcher.DocumentUsers,
-                    Categories = _documentRelationsFetcher.DocumentCategories,
-                    InternalCategories = _documentRelationsFetcher.DocumentInternalCategories
-                };
-
-                var document = new DocumentViewModel();
-                document.IdentificationNumber = childDocument.IdentificationNumber ?? null;
-                result.Add(_mapper.Map(aggregate, document));
             }
 
             return result;
