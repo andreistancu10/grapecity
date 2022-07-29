@@ -1,6 +1,4 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Data;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
@@ -22,11 +20,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.
         {
             var foundIncomingDocument = await _dbContext.IncomingDocuments
                 .AsNoTracking()
-                .Include(x=>x.Document)
                 .Include(x=>x.ContactDetail)
                 .Include(x=>x.DeliveryDetails)
                 .Include(x=>x.Document.WorkflowHistories)
                 .Include(x=>x.ConnectedDocuments)
+                .ThenInclude(x => x.Document)
                 .FirstOrDefaultAsync(c => c.DocumentId == request.Id, cancellationToken);
 
             if (foundIncomingDocument == null) return null;
