@@ -5,7 +5,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands
 
 public class CreateOutgoingDocumentCommand : ICommand<ResultObject>
 {
-    public int RecipientId { get; set; } //TODO: Rename to DestinationDepartmentId
+    public int DestinationDepartmentId { get; set; }
     public string RecipientName { get; set; }
     public string? IdentificationNumber { get; set; }
     public ContactDetailDto ContactDetail { get; set; }

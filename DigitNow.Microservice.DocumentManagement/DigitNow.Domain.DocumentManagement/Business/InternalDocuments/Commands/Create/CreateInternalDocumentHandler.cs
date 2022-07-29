@@ -42,10 +42,10 @@ public class CreateInternalDocumentHandler : ICommandHandler<CreateInternalDocum
         await _dbContext.WorkflowHistoryLogs.AddAsync(new WorkflowHistoryLog 
         { 
             DocumentId = newInternalDocument.DocumentId,
-            RecipientId = request.ReceiverDepartmentId, 
+            RecipientId = request.DestinationDepartmentId, 
             RecipientType = RecipientType.Department.Id,
             DocumentStatus = DocumentStatus.New, 
-            RecipientName = $"Departamentul {request.ReceiverDepartmentId}" 
+            RecipientName = $"Departamentul {request.DestinationDepartmentId}" 
         }, cancellationToken);
 
         await _dbContext.SaveChangesAsync(cancellationToken);

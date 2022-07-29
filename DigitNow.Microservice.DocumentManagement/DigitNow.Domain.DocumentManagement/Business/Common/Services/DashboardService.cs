@@ -151,20 +151,20 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var documentsQuery = _dbContext.Documents
                 .WhereAll(GetPreprocessPredicates(documentFilter));
 
-            var userModel = await GetCurrentUserAsync(cancellationToken);
+            //var userModel = await GetCurrentUserAsync(cancellationToken);
 
-            if (!IsRole(userModel, RecipientType.Mayor))
-            {
-                var relatedUserIds = await GetRelatedUserIdsAsync(userModel, cancellationToken);
+            //if (!IsRole(userModel, RecipientType.Mayor))
+            //{
+            //    var relatedUserIds = await GetRelatedUserIdsAsync(userModel, cancellationToken);
 
-                // TODO:(!) This is only temporary, Apply filter permissions in the future versions                
-                documentsQuery = documentsQuery
-                    .Where(x => 
-                        relatedUserIds.Contains(x.CreatedBy)
-                        || 
-                        (userModel.Departments.Contains(x.DestinationDepartmentId))
-                    );
-            }
+            //    // TODO:(!) This is only temporary, Apply filter permissions in the future versions                
+            //    documentsQuery = documentsQuery
+            //        .Where(x => 
+            //            relatedUserIds.Contains(x.CreatedBy)
+            //            || 
+            //            (userModel.Departments.Contains(x.DestinationDepartmentId))
+            //        );
+            //}
 
             return documentsQuery;
         }

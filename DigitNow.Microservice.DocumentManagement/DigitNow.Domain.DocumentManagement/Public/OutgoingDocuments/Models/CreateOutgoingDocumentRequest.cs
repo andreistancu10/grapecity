@@ -10,7 +10,7 @@ public record CreateOutgoingDocumentRequest
     public ContactDetailsRequest ContactDetail { get; init; }
     public string ContentSummary { get; init; }
     public int NumberOfPages { get; init; }
-    public int RecipientId { get; init; }
+    public int DestinationDepartmentId { get; init; }
     public int DocumentTypeId { get; init; }  //TODO: Rename it to DocumentCategoryId
     public string? DocumentTypeDetail { get; init; }
     public List<int>? ConnectedDocumentIds { get; init; }
