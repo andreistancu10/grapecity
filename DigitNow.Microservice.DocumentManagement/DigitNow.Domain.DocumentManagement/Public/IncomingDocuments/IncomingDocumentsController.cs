@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
+using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.GetById;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.GetRegistrationProof;
 using DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
@@ -48,6 +49,14 @@ public class IncomingDocumentsController : ApiController
         return CreateResponse(await _mediator.Send(command));
     }
 
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateIncomingDocument([FromRoute] int id, [FromBody] UpdateIncomingDocumentRequest request, CancellationToken cancellationToken)
+    {
+        var updateIncomingDocumentCommand = _mapper.Map<UpdateIncomingDocumentCommand>(request);
+        updateIncomingDocumentCommand.Id = id;
+
+        return CreateResponse(await _mediator.Send(updateIncomingDocumentCommand, cancellationToken));
+    }
 
     [HttpGet("generate-registration-proof/{id}")]
     public async Task<IActionResult> GetPdf([FromRoute] int id, CancellationToken cancellationToken)

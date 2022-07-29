@@ -2,18 +2,18 @@
 using System;
 using System.Collections.Generic;
 
-namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
+namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Update;
 
-public class CreateIncomingDocumentCommand : ICommand<ResultObject>
+public class UpdateIncomingDocumentCommand : ICommand<ResultObject>
 {
-    public DateTime? RegistrationDate { get; set; }
+    public int Id { get; set; }
     public int InputChannelId { get; set; }
     public int IssuerTypeId { get; set; }
     public string IssuerName { get; set; }
     public string IdentificationNumber { get; set; }
     public int ExternalNumber { get; set; }
     public DateTime? ExternalNumberDate { get; set; }
-    public CreateContactDetailCommand ContactDetail { get; set; }
+    public UpdateContactDetailCommand ContactDetail { get; set; }
     public string ContentSummary { get; set; }
     public int NumberOfPages { get; set; }
     public int RecipientId { get; set; }
@@ -22,6 +22,6 @@ public class CreateIncomingDocumentCommand : ICommand<ResultObject>
     public double ResolutionPeriod { get; set; }
     public bool? IsUrgent { get; set; }
     public bool? IsGDPRAgreed { get; set; }
-    public List<int> ConnectedDocumentIds { get; set; }
+    public List<long> ConnectedDocumentIds { get; set; }
     public List<long> UploadedFileIds { get; set; }
 }

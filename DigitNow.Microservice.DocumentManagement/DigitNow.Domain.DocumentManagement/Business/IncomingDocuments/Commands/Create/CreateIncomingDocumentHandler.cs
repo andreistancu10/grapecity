@@ -30,6 +30,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
         IMapper mapper,
         IDocumentService documentService,
         IIdentityAdapterClient identityAdapterClient,
+        IIncomingDocumentService incomingDocumentService,
         ISpecialRegisterMappingService specialRegisterMappingService,
         IUploadedFileService uploadedFileService)
     {
@@ -97,13 +98,13 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
         {
             var connectedDocuments = await _dbContext.IncomingDocuments
                 .Include(x => x.Document)
-                .Where(x => request.ConnectedDocumentIds.Contains(x.Document.Id))
+                .Where(x => request.ConnectedDocumentIds.Contains(x.Document.RegistrationNumber))
                 .ToListAsync(cancellationToken: cancellationToken);
 
             foreach (var connectedDocument in connectedDocuments)
             {
                 incomingDocumentForCreation.ConnectedDocuments
-                    .Add(new ConnectedDocument { DocumentId = connectedDocument.Document.Id });
+                    .Add(new ConnectedDocument { RegistrationNumber = connectedDocument.Document.RegistrationNumber, DocumentType = DocumentType.Incoming, ChildDocumentId = connectedDocument.Id });
             }
         }
     }
