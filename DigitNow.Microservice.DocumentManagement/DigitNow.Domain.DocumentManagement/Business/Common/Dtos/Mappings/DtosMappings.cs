@@ -13,7 +13,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos.Mappings
             CreateMap<DocumentUploadedFile, DocumentUploadedFileDto>().ReverseMap();
 
             CreateMap<ConnectedDocument, ConnectedDocumentDto>()
-                .ForMember(x => x.DocumentId, opt => opt.MapFrom(src => src.DocumentId))
                 .ForMember(x => x.RegistrationNumber, opt => opt.MapFrom(src => src.Document.RegistrationNumber))
                 .ForMember(x => x.DocumentType, opt => opt.MapFrom(src => src.Document.DocumentType));
         }
