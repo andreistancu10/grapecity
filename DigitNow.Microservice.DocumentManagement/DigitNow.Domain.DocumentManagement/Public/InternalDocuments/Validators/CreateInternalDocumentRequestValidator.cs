@@ -7,10 +7,10 @@ public class CreateInternalDocumentRequestValidator : AbstractValidator<CreateIn
 {
     public CreateInternalDocumentRequestValidator()
     {
-        RuleFor(item => item.DepartmentId).NotNull().NotEmpty();
+        RuleFor(item => item.SourceDepartmentId).NotNull().NotEmpty();
         RuleFor(item => item.InternalDocumentTypeId).NotNull().NotEmpty();
         RuleFor(item => item.DeadlineDaysNumber).NotNull().NotEmpty();
         RuleFor(item => item.Description).NotNull().NotEmpty();
-        RuleFor(item => item.ReceiverDepartmentId).NotNull().NotEmpty();
+        RuleFor(item => item.DestinationDepartmentId).NotNull().NotEmpty();
     }
 }

@@ -9,6 +9,6 @@ public class OutgoingDocumentMappings : Profile
     public OutgoingDocumentMappings()
     {
         CreateMap<CreateOutgoingDocumentCommand, OutgoingDocument>()
-            .ForPath(c => c.Document.DestinationDepartmentId, opt => opt.MapFrom(src => src.RecipientId));
+            .ForPath(c => c.Document.DestinationDepartmentId, opt => opt.MapFrom(src => src.DestinationDepartmentId));
     }
 }
