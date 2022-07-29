@@ -51,7 +51,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Mappings
                 CreateMap<DocumentIdentifiersFilterDto, DocumentIdentifiersFilter>()
                     .ForMember(m => m.Identifiers, opt => opt.MapFrom(src => src.Identifiers));
                 
-                CreateMap<DocumentIdentificationNumberDto, DocumentIdentificationNumber>()
+                CreateMap<DocumentIdentificationNumberFilterDto, DocumentIdentificationNumber>()
                     .ForMember(m => m.IdentificationNumber, opt => opt.MapFrom(src => src.IdentificationNumber));
             }
             CreateMap<GetDocumentsRequest, GetDocumentsQuery>()

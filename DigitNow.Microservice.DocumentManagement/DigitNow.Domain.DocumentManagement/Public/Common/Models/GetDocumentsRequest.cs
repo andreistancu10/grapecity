@@ -29,7 +29,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Models
 
         public DocumentIdentifiersFilterDto DocumentIdentifiersFilter { get; set; }
 
-        public DocumentIdentificationNumberDto IdentificationNumber { get; set; }
+        public DocumentIdentificationNumberFilterDto IdentificationNumber { get; set; }
     }
 
     public class DocumentIdentifiersFilterDto
@@ -64,7 +64,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Models
         public List<int> CategoryIds { get; set; }
     }
 
-    public class DocumentIdentificationNumberDto
+    public class DocumentIdentificationNumberFilterDto
     {
         public string IdentificationNumber { get; set; }
     }

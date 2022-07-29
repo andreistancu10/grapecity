@@ -128,7 +128,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 };
 
                 var document = new DocumentViewModel();
-                document.IdentificationNumber = childDocument.IdentificationNumber ?? null;
+                document.IdentificationNumber = childDocument.IdentificationNumber;
                 result.Add(_mapper.Map(aggregate, document));
             }
 
