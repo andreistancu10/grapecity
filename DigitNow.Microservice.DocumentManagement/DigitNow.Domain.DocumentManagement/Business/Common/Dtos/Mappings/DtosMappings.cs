@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.DeliveryDetails;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos.Mappings
 {
@@ -9,10 +8,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos.Mappings
         public DtosMappings()
         {
             CreateMap<DeliveryDetail, DeliveryDetailDto>().ReverseMap();
-            CreateMap<ConnectedDocument, ConnectedDocumentDto>().ReverseMap();
             CreateMap<WorkflowHistoryLog, WorkflowHistoryLogDto>().ReverseMap();
             CreateMap<ContactDetail, ContactDetailDto>().ReverseMap();
             CreateMap<DocumentUploadedFile, DocumentUploadedFileDto>().ReverseMap();
+
+            CreateMap<ConnectedDocument, ConnectedDocumentDto>()
+                .ForMember(x => x.RegistrationNumber, opt => opt.MapFrom(src => src.Document.RegistrationNumber))
+                .ForMember(x => x.DocumentType, opt => opt.MapFrom(src => src.Document.DocumentType));
         }
     }
 }
