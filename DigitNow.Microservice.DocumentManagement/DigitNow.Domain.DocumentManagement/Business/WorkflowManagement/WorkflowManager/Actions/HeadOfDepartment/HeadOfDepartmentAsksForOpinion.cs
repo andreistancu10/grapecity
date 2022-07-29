@@ -9,6 +9,7 @@ using HTSS.Platform.Core.Errors;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Documents;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.WorkflowManager.Actions.HeadOfDepartment
 {

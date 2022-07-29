@@ -1,6 +1,7 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
 using System.Linq;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Documents;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders.Preprocess
 {

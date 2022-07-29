@@ -1,4 +1,5 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.Entities.Documents.Abstractions;
+﻿using DigitNow.Domain.DocumentManagement.Data.Entities.ConnectedDocuments;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Documents.Abstractions;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities;
 

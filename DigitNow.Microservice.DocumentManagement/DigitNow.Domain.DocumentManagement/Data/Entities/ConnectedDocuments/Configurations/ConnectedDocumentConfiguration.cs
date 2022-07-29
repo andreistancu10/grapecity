@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DigitNow.Domain.DocumentManagement.Data.Entities.ConnectedDocuments;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities;

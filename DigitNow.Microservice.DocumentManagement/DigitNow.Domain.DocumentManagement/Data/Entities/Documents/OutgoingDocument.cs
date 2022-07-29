@@ -1,6 +1,7 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data.Entities.DeliveryDetails;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Documents.Abstractions;
 using System.Collections.Generic;
+using DigitNow.Domain.DocumentManagement.Data.Entities.ConnectedDocuments;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities;
 

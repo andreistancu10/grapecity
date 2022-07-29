@@ -10,6 +10,7 @@ using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registri
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.UploadedFiles;
 using HTSS.Platform.Core.CQRS;
 
 namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload

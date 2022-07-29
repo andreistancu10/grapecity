@@ -1,4 +1,5 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
+﻿using DigitNow.Domain.DocumentManagement.Data.Entities.Documents;
+using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities;
 

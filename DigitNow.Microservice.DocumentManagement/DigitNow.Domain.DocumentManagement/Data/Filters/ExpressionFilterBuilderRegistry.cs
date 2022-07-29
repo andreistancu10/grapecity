@@ -1,4 +1,5 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Documents;
 using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders;
 using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteBuilders.Preprocess;
 using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;

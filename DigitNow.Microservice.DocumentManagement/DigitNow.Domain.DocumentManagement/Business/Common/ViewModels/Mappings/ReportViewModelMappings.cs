@@ -59,7 +59,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
 
             public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
-                var lastWorkflowHistory = source.VirtualDocument.WorkflowHistory.LastOrDefault(c => c.Status == DocumentStatus.InWorkAllocated);
+                var lastWorkflowHistory = source.VirtualDocument.Document.WorkflowHistories.LastOrDefault(c => c.DocumentStatus == DocumentStatus.InWorkAllocated);
 
                 return lastWorkflowHistory == null
                     ? null
@@ -229,8 +229,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 return FindRecipient(source.Users, source.VirtualDocument.Document.RecipientId);
             }
 
-            private static BasicViewModel FindRecipient(IEnumerable<UserModel> users, long userId)
+            private static BasicViewModel FindRecipient(IEnumerable<UserModel> users, long? userId)
             {
+                if (userId==null)
+                {
+                    return null;
+                }
+
                 var foundUser = users.FirstOrDefault(x => x.Id == userId);
 
                 return foundUser == null

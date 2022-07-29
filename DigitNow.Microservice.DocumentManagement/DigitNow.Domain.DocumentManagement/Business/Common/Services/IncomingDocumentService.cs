@@ -4,6 +4,7 @@ using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Domain.Business.Common.Factories;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Documents;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 {

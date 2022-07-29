@@ -1,13 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities;
-
-public class DocumentUploadedFileConfiguration : IEntityTypeConfiguration<DocumentUploadedFile>
+namespace DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles.Configurations
 {
-    public void Configure(EntityTypeBuilder<DocumentUploadedFile> builder)
+    public class DocumentUploadedFileConfiguration : IEntityTypeConfiguration<DocumentUploadedFile>
     {
-        builder.ToTable(nameof(DocumentUploadedFile), DocumentManagementDbContext.Schema);
-        builder.HasKey(p => p.Id);
+        public void Configure(EntityTypeBuilder<DocumentUploadedFile> builder)
+        {
+            builder.ToTable(nameof(DocumentUploadedFile), DocumentManagementDbContext.Schema);
+            builder.HasKey(p => p.Id);
+        }
     }
 }

@@ -8,6 +8,7 @@ using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+using DigitNow.Domain.DocumentManagement.Data.Entities.ConnectedDocuments;
 
 namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Create;
 

@@ -2,6 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Documents;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 

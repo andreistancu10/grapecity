@@ -10,6 +10,7 @@ using DigitNow.Domain.DocumentManagement.Data.Extensions;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Documents;
 using DigitNow.Domain.DocumentManagement.Data.Filters;
 using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
 

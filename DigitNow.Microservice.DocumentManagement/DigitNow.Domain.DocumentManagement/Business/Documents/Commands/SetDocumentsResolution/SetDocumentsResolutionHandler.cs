@@ -8,6 +8,7 @@ using DigitNow.Domain.DocumentManagement.Business.Documents.Models;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Documents;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
 
