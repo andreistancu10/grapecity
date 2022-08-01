@@ -1,13 +1,11 @@
-﻿using System.Collections.Generic;
-
-namespace DigitNow.Domain.DocumentManagement.Public.InternalDocuments.Models;
+﻿namespace DigitNow.Domain.DocumentManagement.Public.InternalDocuments.Models;
 
 public record CreateInternalDocumentRequest(
-    int DepartmentId,
+    int SourceDepartmentId,
     int InternalDocumentTypeId,  //TODO: Rename it to DocumentCategoryId
     int DeadlineDaysNumber,
     string Description,
     string? Observation,
-    int ReceiverDepartmentId,
+    int DestinationDepartmentId,
     bool? IsUrgent,
     List<long> UploadedFileIds);

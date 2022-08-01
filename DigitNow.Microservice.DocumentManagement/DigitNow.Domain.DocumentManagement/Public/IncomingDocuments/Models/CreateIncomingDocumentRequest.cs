@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using DigitNow.Domain.DocumentManagement.Public.Common.Models;
 
 namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments.Models;
 
@@ -19,7 +18,7 @@ public class CreateIncomingDocumentRequest
     public double? ResolutionPeriod { get; set; }
     public bool? IsUrgent { get; set; }
     public bool? IsGDPRAgreed { get; set; }
-    public CreateContactDetailsRequest ContactDetail { get; set; }
+    public ContactDetailsRequest ContactDetail { get; set; }
     public List<int> ConnectedDocumentIds { get; set; }
-    public List<long> UploadedFileIds { get; set; }
+    public List<long>? UploadedFileIds { get; set; }
 }

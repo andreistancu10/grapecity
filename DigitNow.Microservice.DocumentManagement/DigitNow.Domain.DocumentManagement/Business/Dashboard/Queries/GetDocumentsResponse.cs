@@ -1,4 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Models;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using System.Collections.Generic;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries

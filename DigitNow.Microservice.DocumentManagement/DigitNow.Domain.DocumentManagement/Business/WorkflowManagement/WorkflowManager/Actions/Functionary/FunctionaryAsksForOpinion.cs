@@ -5,36 +5,33 @@ using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.WorkflowManager.Actions.Functionary
 {
     public class FunctionaryAsksForOpinion : BaseWorkflowManager, IWorkflowHandler
     {
         public FunctionaryAsksForOpinion(IServiceProvider serviceProvider) : base(serviceProvider) { }
-        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated };
+        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.New, (int)DocumentStatus.InWorkDeclined };
         
-        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, WorkflowHistory lastWorkFlowRecord, CancellationToken token)
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
         {
-            if (!Validate(command, lastWorkFlowRecord))
+            if (!Validate(command, lastWorkflowRecord))
                 return command;
 
-            var headOfDepartment = await FetchHeadOfDepartmentByDepartmentIdAsync((long)command.RecipientId, token);
+            var headOfDepartment = await IdentityService.GetHeadOfDepartmentUserAsync((long)command.RecipientId, token);
 
             if (!UserExists(headOfDepartment, command))
                 return command;
 
-            virtualDocument.WorkflowHistory.Add(WorkflowHistoryFactory
-                .Create(UserRole.HeadOfDepartment, headOfDepartment, DocumentStatus.OpinionRequestedUnallocated, string.Empty, command.Remarks, command.OpinionRequestedUntil));
+            document.WorkflowHistories.Add(WorkflowHistoryLogFactory
+                .Create(document.Id, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.OpinionRequestedUnallocated, string.Empty, command.Remarks, command.OpinionRequestedUntil));
 
-            SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, headOfDepartment.Id, DocumentStatus.OpinionRequestedUnallocated);
+            await SetStatusAndRecipientBasedOnWorkflowDecisionAsync(command.DocumentId, headOfDepartment.Id, DocumentStatus.OpinionRequestedUnallocated, token);
             
             return command;
         }
 
-        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
+        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord)
         {
             if (command.RecipientId <= 0 || !IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
             {
@@ -42,17 +39,20 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 return false;
             }
 
-            if (command.OpinionRequestedUntil == null || command.OpinionRequestedUntil < DateTime.Now )
+            if (command.OpinionRequestedUntil.HasValue)
             {
-                command.Result = ResultObject.Error(new ErrorMessage
+                var comparer = DateTime.Compare(command.OpinionRequestedUntil.Value, DateTime.Today);
+                if (comparer < 0)
                 {
-                    Message = $"The entered date is invalid!",
-                    TranslationCode = "dms.date.backend.update.validation.invalidDate",
-                    Parameters = new object[] { command.OpinionRequestedUntil }
-                });
-                return false;
+                    command.Result = ResultObject.Error(new ErrorMessage
+                    {
+                        Message = $"The entered date is invalid!",
+                        TranslationCode = "dms.date.backend.update.validation.invalidDate",
+                        Parameters = new object[] { command.OpinionRequestedUntil }
+                    });
+                    return false;
+                }
             }
-
             return true;
         }
     }

@@ -1,8 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Adapters.MS.Identity;
-using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.Authentication.Client;
-using DigitNow.Domain.Catalog.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
@@ -10,256 +8,159 @@ using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
+using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
+using DigitNow.Domain.DocumentManagement.Data.Filters;
+using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IDashboardService
     {
-        Task<long> CountAllDocumentsAsync(IList<Expression<Func<Document, bool>>> predicates, CancellationToken cancellationToken);
-        Task<List<DocumentViewModel>> GetAllDocumentsAsync(IList<Expression<Func<Document, bool>>> predicates, int page, int count, CancellationToken cancellationToken);
+        Task<long> CountAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken token);
+
+        Task<List<VirtualDocument>> GetAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken token);
     }
 
     public class DashboardService : IDashboardService
     {
+        #region [ Fields ]
+
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IMapper _mapper;
         private readonly IIdentityService _identityService;
         private readonly IIdentityAdapterClient _identityAdapterClient;
-        private readonly ICatalogClient _catalogClient;
         private readonly IAuthenticationClient _authenticationClient;
+        private readonly IVirtualDocumentService _virtualDocumentService;
+
+        #endregion
+
+        #region [ Properties ]
+
+        private static int PreviousYear => DateTime.UtcNow.Year - 1;
+
+        #endregion
+
+        #region [ Construction ]
 
         public DashboardService(DocumentManagementDbContext dbContext,
             IMapper mapper,
             IIdentityService identityService,
             IIdentityAdapterClient identityAdapterClient,
-            ICatalogClient catalogClient,
-            IAuthenticationClient identityManager)
+            IAuthenticationClient identityManager,
+            IVirtualDocumentService virtualDocumentService)
         {
             _dbContext = dbContext;
             _mapper = mapper;
             _identityService = identityService;
             _identityAdapterClient = identityAdapterClient;
-            _catalogClient = catalogClient;
             _authenticationClient = identityManager;
+            _virtualDocumentService = virtualDocumentService;
         }
 
-        public async Task<long> CountAllDocumentsAsync(IList<Expression<Func<Document, bool>>> predicates, CancellationToken cancellationToken)
+        #endregion
+
+        #region [ IDashboardService ]
+
+        public async Task<long> CountAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken token)
         {
-            var userModel = await GetCurrentUserAsync(cancellationToken);
+            var documentsQuery = await BuildPreprocessDocumentsQueryAsync(preprocessFilter, token);
+            if (postprocessFilter.IsEmpty())
+                return await documentsQuery.CountAsync(token);
 
-            var documentsCountQuery = default(IQueryable<Document>);
+            var lightweightDocuments = await documentsQuery
+                .Select(x => new Document { Id = x.Id, DocumentType = x.DocumentType })
+                .ToListAsync(token);
 
-            if (userModel.Roles.ToList().Contains(UserRole.Mayor.Code))
-            {
-                documentsCountQuery = _dbContext.Documents
-                    .WhereAll(predicates);
-            }
-            else
-            {
-                var relatedUserIds = await GetRelatedUserIdsAsync(userModel, cancellationToken);
-
-                documentsCountQuery = _dbContext.Documents
-                    .WhereAll(predicates)
-                    .Where(x => relatedUserIds.Contains(x.CreatedBy));
-            }
-
-            var result = await documentsCountQuery.CountAsync(cancellationToken);
-
-            return result;
+            return await _virtualDocumentService.CountVirtualDocuments(lightweightDocuments, postprocessFilter, token);
         }
 
-        public async Task<List<DocumentViewModel>> GetAllDocumentsAsync(IList<Expression<Func<Document, bool>>> predicates, int page, int count, CancellationToken cancellationToken)
+        public async Task<List<VirtualDocument>> GetAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken token)
         {
-            var userModel = await GetCurrentUserAsync(cancellationToken);
+            var documentsQuery = await BuildPreprocessDocumentsQueryAsync(preprocessFilter, token);
 
-            var documentsQuery = default(IQueryable<Document>);
+            var documents = await documentsQuery.OrderByDescending(x => x.CreatedAt)
+                 .Skip((page - 1) * count)
+                 .Take(count)
+                 .Select(x => new Document { Id = x.Id, DocumentType = x.DocumentType })
+                 .ToListAsync(token);
 
-            if (userModel.Roles.ToList().Contains(UserRole.Mayor.Code))
+            var virtualDocuments = await _virtualDocumentService.FetchVirtualDocuments(documents, postprocessFilter, token);
+
+            return virtualDocuments
+                .OrderByDescending(x => x.CreatedAt)
+                .ToList();
+        }
+
+        #endregion
+
+        #region [ Relationships ]
+
+        private async Task<IEnumerable<long>> GetRelatedUserIdsAsync(UserModel userModel, CancellationToken cancellationToken) =>
+            (await GetRelatedUsersAsync(userModel, cancellationToken)).Select(x => x.Id);
+
+        private async Task<IList<UserModel>> GetRelatedUsersAsync(UserModel userModel, CancellationToken cancellationToken)
+        {
+            if (IsRole(userModel, RecipientType.HeadOfDepartment))
             {
-                documentsQuery = _dbContext.Documents
-                    .WhereAll(predicates)
-                    .OrderByDescending(x => x.RegistrationDate)
-                    .Skip((page - 1) * count)
-                    .Take(count);
-            }
-            else
-            {
-                var relatedUserIds = await GetRelatedUserIdsAsync(userModel, cancellationToken);
+                //TODO: Get all users by departmentId
+                var usersResponse = await _identityAdapterClient.GetUsersAsync(cancellationToken);
 
-                documentsQuery = _dbContext.Documents
-                    .WhereAll(predicates)
-                    .Where(x => relatedUserIds.Contains(x.CreatedBy))
-                    .OrderByDescending(x => x.RegistrationDate)
-                    .Skip((page - 1) * count)
-                    .Take(count);
+                return usersResponse.Users
+                    .Select(x => _mapper.Map<UserModel>(x))
+                    .Append(userModel)
+                    .ToList();
             }
 
-            var documents = await documentsQuery.ToListAsync(cancellationToken);
-
-            var documentsRelationsBag = await GetDocumentsRelationsBagAsync(documents, cancellationToken);
-
-            return await MapDocumentsAsync(documents, documentsRelationsBag, cancellationToken);
+            return new List<UserModel> { userModel };
         }
 
         private async Task<UserModel> GetCurrentUserAsync(CancellationToken cancellationToken)
         {
             var userId = _identityService.GetCurrentUserId();
 
-            var getUserByIdResponse = await _authenticationClient.GetUserById(userId, cancellationToken);
+            var getUserByIdResponse = await _identityAdapterClient.GetUserByIdAsync(userId, cancellationToken);
             if (getUserByIdResponse == null)
-                throw new UnauthorizedAccessException("Cannot retrieve request user!");                
+                throw new InvalidOperationException($"User with identifier '{userId}' was not found!");
 
-            return _mapper.Map<UserModel>(getUserByIdResponse);            
+            return _mapper.Map<UserModel>(getUserByIdResponse);
         }
 
-        private async Task<List<DocumentViewModel>> MapDocumentsAsync(IEnumerable<Document> documents, DocumentRelationsBag documentRelationsBag, CancellationToken cancellationToken)
+        #endregion
+
+        #region [ Utils - Preprocessing Filters ]
+
+        private IList<Expression<Func<Document, bool>>> GetDocumentsPreprocessBuiltinPredicates() =>
+            PredicateFactory.CreatePredicatesList<Document>(x => x.CreatedAt.Year >= PreviousYear);
+
+        private IList<Expression<Func<Document, bool>>> GetDocumentsPreprocessPredicates(DocumentPreprocessFilter preprocessFilter) =>
+            ExpressionFilterBuilderRegistry.GetDocumentPreprocessFilterBuilder(_dbContext, preprocessFilter).Build();
+
+        private IList<Expression<Func<Document, bool>>> GetPreprocessPredicates(DocumentPreprocessFilter preprocessFilter)
         {
-            var result = new List<DocumentViewModel>();
-
-            var incomingDocuments = documents
-                .Where(x => x.DocumentType == DocumentType.Incoming)
-                .ToList();
-            result.AddRange(await MapChildDocumentAsync<IncomingDocument>(incomingDocuments, documentRelationsBag, cancellationToken, x => x.WorkflowHistory));
-
-            var internalDocuments = documents
-                .Where(x => x.DocumentType == DocumentType.Internal)
-                .ToList();
-            result.AddRange(await MapChildDocumentAsync<InternalDocument>(internalDocuments, documentRelationsBag, cancellationToken));
-
-            var outogingDocuments = documents
-                .Where(x => x.DocumentType == DocumentType.Outgoing)
-                .ToList();
-            result.AddRange(await MapChildDocumentAsync<OutgoingDocument>(outogingDocuments, documentRelationsBag, cancellationToken, x => x.WorkflowHistory));
-
-            return result;
-        }
-
-        private async Task<List<DocumentViewModel>> MapChildDocumentAsync<T>(List<Document> documents, DocumentRelationsBag documentRelationsBag, CancellationToken cancellationToken, params Expression<Func<T, object>>[] includes)
-            where T : VirtualDocument
-        {
-            var documentIds = documents.Select(x => x.Id).ToList();
-
-            var virtualDocuments = await _dbContext.Set<T>().AsQueryable()
-                .Includes(includes)
-                .Where(x => documentIds.Contains(x.DocumentId))
-                .ToListAsync(cancellationToken);
-
-            var documentRegistry = documents.ToDictionary(x => x, y => virtualDocuments.Where(x => x.DocumentId == y.Id));
-
-            var result = new List<DocumentViewModel>();
-            foreach (var registryEntry in documentRegistry)
+            var preprocessPredicates = GetDocumentsPreprocessBuiltinPredicates();
+            if (!preprocessFilter.IsEmpty())
             {
-                var document = registryEntry.Key;
-                
-                foreach (var virtualDocument in registryEntry.Value)
-                {
-                    // Note: ViewModels relationships can be loaded dynamically in future versions
-                    var aggregate = new VirtualDocumentAggregate<T>
-                    {
-                        VirtualDocument = virtualDocument,
-                        Users = documentRelationsBag.Users,
-                        Categories = documentRelationsBag.Categories,
-                        InternalCategories = documentRelationsBag.InternalCategories
-                    };
-
-                    result.Add(_mapper.Map<VirtualDocumentAggregate<T>, DocumentViewModel>(aggregate));
-                }
+                GetDocumentsPreprocessPredicates(preprocessFilter).ForEach(predicate => preprocessPredicates.Add(predicate));
             }
-            return result;
+            return preprocessPredicates;
         }
 
-        private async Task<IList<UserModel>> GetRelatedUsersAsync(UserModel userModel, CancellationToken cancellationToken)
+        private async Task<IQueryable<Document>> BuildPreprocessDocumentsQueryAsync(DocumentPreprocessFilter documentFilter, CancellationToken cancellationToken)
         {
-            if (userModel.Roles.ToList().Contains(UserRole.HeadOfDepartment.Code))
-            {
-                var usersResponse = await _identityAdapterClient.GetUsersAsync(cancellationToken);
-                
-                return usersResponse.Users
-                    .Select(x => _mapper.Map<UserModel>(x))
-                    .Append(userModel)
-                    .ToList();                
-            }
+            var documentsQuery = _dbContext.Documents
+                .WhereAll(GetPreprocessPredicates(documentFilter));
 
-            return new List<UserModel> { userModel };
+            return documentsQuery;
         }
 
-        private async Task<IEnumerable<long>> GetRelatedUserIdsAsync(UserModel userModel, CancellationToken cancellationToken) =>
-            (await GetRelatedUsersAsync(userModel, cancellationToken)).Select(x => x.Id);
+        #endregion
 
-        private async Task<DocumentRelationsBag> GetDocumentsRelationsBagAsync(IList<Document> documents, CancellationToken cancellationToken)
-        {
-            var users = await GetRelatedUserRegistryAsync(documents, cancellationToken);
-            var documentCategories = await GetDocumentCategoriesAsync(cancellationToken);
-            var internalDocumentCategories = await GetInternalDocumentCategoriesAsync(cancellationToken);
+        #region [ Utils ]
 
-            return new DocumentRelationsBag
-            {
-                Users = users,
-                Categories = documentCategories,
-                InternalCategories = internalDocumentCategories
-            };
-        }
+        private static bool IsRole(UserModel userModel, RecipientType role) =>
+            userModel.Roles.Contains(role.Code);
 
-        private async Task<List<User>> GetRelatedUserRegistryAsync(IList<Document> documents, CancellationToken cancellationToken)
-        {
-            var createdByUsers = documents
-                .Select(x => x.CreatedBy)
-                .ToList();
-
-            var usersList = await _authenticationClient.GetUsersWithExtensions(cancellationToken);
-
-            var relatedUsers = usersList.UserExtensions
-                .Where(x => createdByUsers.Contains(x.Id))
-                .Select(x => new User
-                {
-                    Id = x.Id,
-                    FirstName = x.FirstName,
-                    LastName = x.LastName,
-                    Active = x.Active,
-                    Email = x.UserName
-                })
-                .ToList();
-
-            return relatedUsers;
-        }
-
-        private async Task<List<DocumentCategoryModel>> GetDocumentCategoriesAsync(CancellationToken cancellationToken)
-        {
-            var documentTypesResponse = await _catalogClient.DocumentTypes.GetDocumentTypesAsync(cancellationToken);
-
-            // Note: DocumentTypes is actual DocumentCategory
-            var documentCategoryModels = documentTypesResponse.DocumentTypes
-                .Select(x => _mapper.Map<DocumentCategoryModel>(x))
-                .ToList();
-
-            return documentCategoryModels;
-        }
-
-        private async Task<List<InternalDocumentCategoryModel>> GetInternalDocumentCategoriesAsync(CancellationToken cancellationToken)
-        {
-            var internalDocumentTypesResponse = await _catalogClient.InternalDocumentTypes.GetInternalDocumentTypesAsync(cancellationToken);
-
-            // Note: DocumentTypes is actual DocumentCategory
-            var internalDocumentCategoryModels = internalDocumentTypesResponse.InternalDocumentTypes
-                .Select(x => _mapper.Map<InternalDocumentCategoryModel>(x))
-                .ToList();
-
-            return internalDocumentCategoryModels;
-        }
-
-
-        private class DocumentRelationsBag
-        {
-            public IReadOnlyList<User> Users { get; set; }
-            public IReadOnlyList<DocumentCategoryModel> Categories { get; set; }
-            public IReadOnlyList<InternalDocumentCategoryModel> InternalCategories { get; set; }
-        }
+        #endregion
     }
 }

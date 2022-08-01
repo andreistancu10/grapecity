@@ -14,9 +14,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         public HeadOfDepartmentAllocatesRequest(IServiceProvider serviceProvider) : base(serviceProvider) { }
         protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkUnallocated, (int)DocumentStatus.OpinionRequestedUnallocated, (int)DocumentStatus.InWorkDelegatedUnallocated };
 
-        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, WorkflowHistory lastWorkFlowRecord, CancellationToken token)
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
         {
-            if (!Validate(command, lastWorkFlowRecord))
+            if (!Validate(command, lastWorkflowRecord))
                 return command;
 
             var user = await IdentityAdapterClient.GetUserByIdAsync((long)command.RecipientId, token);
@@ -24,20 +24,20 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             if (!UserExists(user, command))
                 return command;
 
-            var newDocumentStatus = lastWorkFlowRecord.Status == DocumentStatus.OpinionRequestedUnallocated
+            var newDocumentStatus = lastWorkflowRecord.DocumentStatus == DocumentStatus.OpinionRequestedUnallocated
                 ? DocumentStatus.OpinionRequestedAllocated
                 : DocumentStatus.InWorkAllocated;
 
-            virtualDocument.WorkflowHistory
-                .Add(WorkflowHistoryFactory
-                .Create(UserRole.Functionary, user, newDocumentStatus));
+            document.WorkflowHistories
+                .Add(WorkflowHistoryLogFactory
+                .Create(document.Id, RecipientType.Functionary, user, newDocumentStatus));
 
-            SetStatusAndRecipientBasedOnWorkflowDecision(command.DocumentId, user.Id, newDocumentStatus);
+            await SetStatusAndRecipientBasedOnWorkflowDecisionAsync(command.DocumentId, user.Id, newDocumentStatus, token);
 
             return command;
         }
 
-        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
+        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord)
         {
             if (command.RecipientId <= 0 || !IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
             {

@@ -1,6 +1,5 @@
 ﻿using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
-using DigitNow.Domain.Authentication.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
@@ -10,7 +9,6 @@ using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -22,29 +20,26 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IIdentityAdapterClient _identityAdapterClient;
-        private readonly IAuthenticationClient _authenticationClient;
         private readonly IIdentityService _identityService;
         private readonly IMailSenderService _mailSenderService;
         private User _currentUser;
         private User _delegatedUser;
-        private DocumentStatus _status;
-        private bool _isHeadOfDepartment;
+
 
         public UpdateDocumentUserRecipientHandler(
             DocumentManagementDbContext dbContext,
             IIdentityAdapterClient identityAdapterClient,
-            IAuthenticationClient authenticationClient,
             IIdentityService identityService,
             IMailSenderService mailSenderService)
         {
             _dbContext = dbContext;
             _identityAdapterClient = identityAdapterClient;
-            _authenticationClient = authenticationClient;
             _identityService = identityService;
             _mailSenderService = mailSenderService;
         }
         public async Task<ResultObject> Handle(UpdateDocumentUserRecipientCommand request, CancellationToken cancellationToken)
         {
+
             _currentUser = await _identityAdapterClient.GetUserByIdAsync(_identityService.GetCurrentUserId(), cancellationToken);
             _delegatedUser = await _identityAdapterClient.GetUserByIdAsync(request.UserId, cancellationToken);
 
@@ -56,11 +51,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                     Parameters = new object[] { request.UserId }
                 });
 
-            _isHeadOfDepartment = _delegatedUser.Roles.Contains(UserRole.HeadOfDepartment.Code);
-            _status = _isHeadOfDepartment ? DocumentStatus.InWorkDelegatedUnallocated : DocumentStatus.InWorkDelegated;
-
-            await UpdateDocuments(request.DocumentIds);
-            await _dbContext.SaveChangesAsync();
+            await UpdateDocumentsAsync(request.DocumentIds, _delegatedUser, cancellationToken);
 
             await Task.WhenAll
             (
@@ -71,34 +62,37 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
             return new ResultObject(ResultStatusCode.Ok);
         }
 
-        private async Task UpdateDocuments(List<long> documentIds)
+        private async Task UpdateDocumentsAsync(List<long> documentIds, User targetUser, CancellationToken token)
         {
-            foreach (var documentId in documentIds)
+            var foundDocuments = await _dbContext.Documents
+                .Where(x => documentIds.Contains(x.Id))
+                .ToListAsync(token);
+
+            var newWorkflowHistoryLogs = new List<WorkflowHistoryLog>();
+
+            foreach (var foundDocument in foundDocuments)
             {
-                var document = await _dbContext.Documents.FirstAsync(x => x.Id == documentId);
-
-                switch (document.DocumentType)
+                var isHeadOfDepartment = targetUser.Roles.Contains(RecipientType.HeadOfDepartment.Code);
+                if (isHeadOfDepartment)
                 {
-                    case DocumentType.Incoming:
-                        await UpdateRecipient<IncomingDocument>(document);
-                        break;
-                    case DocumentType.Internal:
-                        await UpdateRecipient<InternalDocument>(document);
-                        break;
-                    case DocumentType.Outgoing:
-                        await UpdateRecipient<OutgoingDocument>(document);
-                        break;
+                    foundDocument.Status = DocumentStatus.InWorkDelegatedUnallocated;
                 }
-            }
-        }
-        private async Task UpdateRecipient<T>(Document document) where T : VirtualDocument
-        {
-            var virtualDocument = await _dbContext.Set<T>().AsQueryable()
-                .FirstOrDefaultAsync(x => x.DocumentId == document.Id);
+                else
+                {
+                    foundDocument.Status = DocumentStatus.InWorkDelegated;
+                }
+                
+                foundDocument.DestinationDepartmentId = targetUser.Departments.FirstOrDefault();
+                foundDocument.RecipientId = targetUser.Id;
 
-            document.Status = _status;
-            document.RecipientId = (int)_delegatedUser.Id;
-            virtualDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(_isHeadOfDepartment ? UserRole.HeadOfDepartment : UserRole.Functionary, _delegatedUser, _status));
+                var recipientType = isHeadOfDepartment ? RecipientType.HeadOfDepartment : RecipientType.Functionary;
+
+                newWorkflowHistoryLogs.Add(WorkflowHistoryLogFactory.Create(foundDocument.Id, recipientType, targetUser, foundDocument.Status));
+            }
+
+            await _dbContext.BulkUpdateAsync(foundDocuments, token);
+            await _dbContext.BulkInsertAsync(newWorkflowHistoryLogs, token);
+            await _dbContext.SaveChangesAsync(token);
         }
     }
 }

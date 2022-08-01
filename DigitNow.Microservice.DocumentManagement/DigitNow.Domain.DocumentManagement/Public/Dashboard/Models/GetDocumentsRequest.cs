@@ -25,6 +25,8 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Models
 
         public DocumentStatusFilterDto DocumentStatusFilter { get; set; }
 
+        public DocumentDepartmentFilterDto DocumentDepartmentFilter { get; set; }
+
         public DocumentIdentifiersFilterDto DocumentIdentifiersFilter { get; set; }
     }
 
@@ -35,7 +37,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Models
 
     public class DocumentRegistyTypeFilterDto
     {
-        public string RegistryType { get; set; }
+        public List<string> RegistryTypes { get; set; }
     }
 
     public class DocumentRegistrationNoFilterDto
@@ -57,11 +59,16 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Models
 
     public class DocumentCategoryFilterDto
     {
-        public int CategoryId { get; set; }
+        public List<int> CategoryIds { get; set; }
     }
 
     public class DocumentStatusFilterDto
     {
         public DocumentStatus Status { get; set; }
+    }
+
+    public class DocumentDepartmentFilterDto
+    {
+        public List<long> DepartmentIds { get; set; }
     }
 }

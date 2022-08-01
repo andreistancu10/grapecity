@@ -16,31 +16,69 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         public HeadOfDepartmentDeclines(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
         protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkUnallocated, (int)DocumentStatus.OpinionRequestedUnallocated, (int)DocumentStatus.InWorkDelegatedUnallocated };
-        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, WorkflowHistory lastWorkFlowRecord, CancellationToken token)
+
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
         {
-            if (!Validate(command, lastWorkFlowRecord))
+            if (!Validate(command, lastWorkflowRecord))
                 return command;
 
-            var newDocumentStatus = lastWorkFlowRecord.Status == DocumentStatus.OpinionRequestedUnallocated
-                ? DocumentStatus.InWorkAllocated
-                : DocumentStatus.NewDeclinedCompetence;
+            switch (document.DocumentType)
+            {
+                case DocumentType.Incoming:
+                    return await CreateWorkflowForIncomingAsync(command, document, lastWorkflowRecord, token);
+                case DocumentType.Internal:
+                case DocumentType.Outgoing:
+                    return await CreateWorkflowForOutgoingAndInternalAsync(command, document, lastWorkflowRecord, token);
+                default:
+                    return command;
+            }
+        }
 
-            await SetResponsibleBasedOnStatus(command, virtualDocument, newDocumentStatus, token);
+        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowForOutgoingAndInternalAsync(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token)
+        {
+            var newWorkflowResponsible = new WorkflowHistoryLog
+            {
+                DocumentStatus = DocumentStatus.New,
+                DeclineReason = command.DeclineReason,
+                Remarks = command.Remarks
+            };
+
+            await PassDocumentToFunctionaryAsync(document, newWorkflowResponsible, command, token);
 
             return command;
         }
 
-        private async Task SetResponsibleBasedOnStatus(ICreateWorkflowHistoryCommand command, VirtualDocument document, DocumentStatus status, CancellationToken token)
+        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowForIncomingAsync(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token)
         {
-            if (status == DocumentStatus.InWorkAllocated)
-                PassDocumentToFunctionary(document, command);
-            else
-                await PassDocumentToRegistry(document, command, token);
+            var newDocumentStatus = lastWorkFlowRecord.DocumentStatus == DocumentStatus.OpinionRequestedUnallocated
+                ? DocumentStatus.InWorkAllocated
+                : DocumentStatus.NewDeclinedCompetence;
+
+            await SetResponsibleBasedOnStatus(command, document, newDocumentStatus, token);
+
+            return command;
         }
 
-        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
+        private async Task SetResponsibleBasedOnStatus(ICreateWorkflowHistoryCommand command, Document document, DocumentStatus status, CancellationToken token)
         {
-            if (lastWorkFlowRecord == null || !allowedTransitionStatuses.Contains((int)lastWorkFlowRecord.Status))
+            if (status == DocumentStatus.InWorkAllocated)
+            {
+                var newWorkflowResponsible = new WorkflowHistoryLog
+                {
+                    DocumentStatus = DocumentStatus.InWorkAllocated,
+                    DeclineReason = command.DeclineReason,
+                    Remarks = command.Remarks
+                };
+
+                await PassDocumentToFunctionaryAsync(document, newWorkflowResponsible, command, token);
+            }
+            else
+                await PassDocumentToRegistryAsync(document, command, token);
+        }
+
+        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord)
+        {
+            if (lastWorkFlowRecord == null || !allowedTransitionStatuses.Contains((int)lastWorkFlowRecord.DocumentStatus))
             {
                 command.Result = ResultObject.Error(new ErrorMessage
                 {

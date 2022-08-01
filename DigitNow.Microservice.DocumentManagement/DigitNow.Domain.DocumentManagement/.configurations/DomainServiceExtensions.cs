@@ -15,9 +15,7 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using DigitNow.Domain.Authentication.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Notifications.Mail;
-using Domain.Mail.Client;
 
 namespace DigitNow.Domain.DocumentManagement.configurations
 {
@@ -50,7 +48,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddServices();
 
             services.AddScoped<RouteParameterAccessor>();
-            services.AddAuthenticationClientDomainServices(configuration);            
+            services.AddAuthenticationClientDomainServices(configuration);
             services.AddLocalizationMQServices();
             services.AddCatalogClientDomainServices(configuration);
             services.AddMailClientDomainServices();
@@ -67,7 +65,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations
         {
             return services;
         }
-        
+
         public static IServiceCollection AddServices(this IServiceCollection services)
         {
             // Export
@@ -86,9 +84,10 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<IVirtualDocumentService, VirtualDocumentService>();
             services.AddTransient<IDocumentResolutionService, DocumentResolutionService>();
             services.AddTransient<IDashboardService, DashboardService>();
+            services.AddTransient<IDocumentMappingService, DocumentMappingService>();
             services.AddTransient<ISpecialRegisterMappingService, SpecialRegisterMappingService>();
             services.AddTransient<ISpecialRegisterService, SpecialRegisterService>();
-            services.AddTransient<IFileService, FileService>();
+            services.AddTransient<IFileService, FileService>(c => new FileService(true));
             services.AddTransient<IUploadedFileService, UploadedFileService>();
 
             return services;

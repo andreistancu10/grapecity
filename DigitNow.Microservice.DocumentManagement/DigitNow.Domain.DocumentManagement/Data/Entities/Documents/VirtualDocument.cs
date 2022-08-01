@@ -34,13 +34,8 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         [Column(nameof(DocumentId), Order = 6)]
         public long DocumentId { get; set; }
 
-        #endregion
-
-
-        #region [ Relationship ]
-        public List<WorkflowHistory> WorkflowHistory { get; set; } = new();
+        public Document Document { get; set; }
 
         #endregion
-
     }
 }

@@ -1,18 +1,13 @@
-﻿using AutoMapper;
-using DigitNow.Adapters.MS.Identity;
+﻿using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
-using DigitNow.Domain.Authentication.Client;
-using DigitNow.Domain.Authentication.Contracts.Users.GetUsersByFilter;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -25,6 +20,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
         private readonly IMailSenderService _mailSenderService;
         private readonly IAuthenticationClientAdapter _authenticationClientAdapter;
         private User _headOfDepartment;
+        private readonly IIdentityAdapterClient _identityAdapterClient;
 
         public UpdateDocumentHeadOfDepartmentHandler(
             DocumentManagementDbContext dbContext, 
@@ -37,12 +33,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
         }
         public async Task<ResultObject> Handle(UpdateDocumentHeadOfDepartmentCommand request, CancellationToken cancellationToken)
         {
-            var headOfDepartmentUsers = await _authenticationClientAdapter
-                .GetUsersByRoleAndDepartmentAsync(UserRole.HeadOfDepartment.Code, request.DepartmentId, cancellationToken);            
+            var response = await _identityAdapterClient.GetUsersAsync(cancellationToken);
+            var departmentUsers = response.Users.Where(x => x.Departments.Contains(request.DepartmentId));
+            var headOfDepartment = departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
 
-            _headOfDepartment = headOfDepartmentUsers.First();
-
-            if (_headOfDepartment == null)
+            if (headOfDepartment == null)
                 return ResultObject.Error(new ErrorMessage
                 {
                     Message = $"No responsible for department with id {request.DepartmentId} was found.",
@@ -50,8 +45,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                     Parameters = new object[] { request.DepartmentId }
                 });
 
-            await UpdateDocuments(request);
-            await _dbContext.SaveChangesAsync();
+            await UpdateDocuments(request, headOfDepartment, cancellationToken);
 
             var documentIds = request.DocumentInfo.Select(x => x.DocumentId).ToList();
             await _mailSenderService.SendMail_SendBulkDocumentsTemplate(_headOfDepartment, documentIds, cancellationToken);
@@ -59,35 +53,25 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
             return new ResultObject(ResultStatusCode.Ok);
         }
 
-        private async Task UpdateDocuments(UpdateDocumentHeadOfDepartmentCommand request)
+        private async Task UpdateDocuments(UpdateDocumentHeadOfDepartmentCommand request, User headOfDepartment, CancellationToken token)
         {
-            foreach (var docInfo in request.DocumentInfo)
+            var requestedDocumentIds = request.DocumentInfo.Select(x => x.DocumentId);
+
+            var foundDocuments = await _dbContext.Documents
+                    .Include(x => x.WorkflowHistories)
+                    .Where(x => requestedDocumentIds.Contains(x.Id))
+                    .ToListAsync(token);
+            
+            foreach (var foundDocument in foundDocuments)
             {
-                var document = await _dbContext.Documents.FirstAsync(x => x.Id == docInfo.DocumentId);
-
-                switch (document.DocumentType)
-                {
-                    case DocumentType.Incoming:
-                        await UpdateHeadOfDepartment<IncomingDocument>(document);
-                        break;
-                    case DocumentType.Internal:
-                        await UpdateHeadOfDepartment<InternalDocument>(document);
-                        break;
-                    case DocumentType.Outgoing:
-                        await UpdateHeadOfDepartment<OutgoingDocument>(document);
-                        break;
-                }
+                foundDocument.Status = DocumentStatus.InWorkUnallocated;
+                foundDocument.DestinationDepartmentId = request.DepartmentId;
+                foundDocument.RecipientId = headOfDepartment.Id;
+                foundDocument.WorkflowHistories.Add(WorkflowHistoryLogFactory.Create(foundDocument.Id, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkUnallocated));
             }
-        }
 
-        private async Task UpdateHeadOfDepartment<T>(Document document) where T : VirtualDocument
-        {
-            var virtualDocument = await _dbContext.Set<T>().AsQueryable()
-                .FirstOrDefaultAsync(x => x.DocumentId == document.Id);
-
-            document.Status = DocumentStatus.InWorkUnallocated;
-            document.RecipientId = (int)_headOfDepartment.Id;
-            virtualDocument.WorkflowHistory.Add(WorkflowHistoryFactory.Create(UserRole.HeadOfDepartment, _headOfDepartment, DocumentStatus.InWorkUnallocated));
+            await _dbContext.BulkUpdateAsync(foundDocuments);
+            await _dbContext.SaveChangesAsync(token);
         }
     }
 }

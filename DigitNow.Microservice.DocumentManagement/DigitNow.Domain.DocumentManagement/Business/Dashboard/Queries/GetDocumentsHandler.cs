@@ -1,87 +1,57 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
-using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Filters;
+using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
+using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
 using HTSS.Platform.Core.CQRS;
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries
+namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
+
+public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, GetDocumentsResponse>
 {
-    public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, GetDocumentsResponse>
+    private readonly IDashboardService _dashboardService;
+    private readonly IDocumentMappingService _documentMappingService;
+
+    public GetDocumentsHandler(
+        IDashboardService dashboardService,
+        IDocumentMappingService documentMappingService)
     {
-        private readonly IMapper _mapper;
-        private readonly IDashboardService _dashboardService;
+        _dashboardService = dashboardService;
+        _documentMappingService = documentMappingService;
+    }
 
-        private int PreviousYear => DateTime.UtcNow.Year - 1;
+    public async Task<GetDocumentsResponse> Handle(GetDocumentsQuery request, CancellationToken cancellationToken)
+    {
+        var totalItems = await _dashboardService.CountAllDocumentsAsync(request.PreprocessFilter, request.PostprocessFilter, cancellationToken);
 
-        public GetDocumentsHandler(IMapper mapper, IDashboardService dashboardService)
+        var documents = await _dashboardService.GetAllDocumentsAsync(request.PreprocessFilter, request.PostprocessFilter,
+            request.Page,
+            request.Count,
+            cancellationToken);
+
+        var viewModels = await _documentMappingService.MapToDocumentViewModelAsync(documents, cancellationToken);
+
+        return BuildFirstPageDocumentResponse(request, totalItems, viewModels);
+    }
+
+    private static GetDocumentsResponse BuildFirstPageDocumentResponse(GetDocumentsQuery query, long totalItems, IList<DocumentViewModel> items)
+    {
+        var pageCount = totalItems / query.Count;
+
+        if (items.Count % query.Count > 0)
         {
-            _mapper = mapper;
-            _dashboardService = dashboardService;
+            pageCount += 1;
         }
 
-        public Task<GetDocumentsResponse> Handle(GetDocumentsQuery query, CancellationToken cancellationToken)
+        return new GetDocumentsResponse
         {
-            if (query.Filter == null)
-            {
-                return GetSimpleResponseAsync(query, cancellationToken);
-            }
-            return GetComplexResponseAsync(query, cancellationToken);
-        }
-
-        private async Task<GetDocumentsResponse> GetSimpleResponseAsync(GetDocumentsQuery query, CancellationToken cancellationToken)
-        {
-            var predicates = PredicateFactory.CreatePredicatesList<Document>(x => x.CreatedAt.Year >= PreviousYear);
-
-            var totalItems = await _dashboardService.CountAllDocumentsAsync(predicates, cancellationToken);
-
-            var items = await _dashboardService.GetAllDocumentsAsync(predicates,
-                    query.Page,
-                    query.Count,
-                cancellationToken);
-
-            return BuildDocumentResponse(query, totalItems, items);
-        }
-
-        private async Task<GetDocumentsResponse> GetComplexResponseAsync(GetDocumentsQuery query, CancellationToken cancellationToken)
-        {
-            var predicates = ExpressionFilterBuilderRegistry
-                .GetDocumentPredicatesByFilter(query.Filter)
-                .Build();
-
-            var totalItems = await _dashboardService.CountAllDocumentsAsync(predicates, cancellationToken);
-
-            var items = await _dashboardService.GetAllDocumentsAsync(
-                predicates,
-                query.Page,
-                query.Count,
-                cancellationToken);
-
-            return BuildDocumentResponse(query, totalItems, items);
-        }
-
-        private static GetDocumentsResponse BuildDocumentResponse(GetDocumentsQuery query, long totalItems, IList<DocumentViewModel> items)
-        {
-            var pageCount = totalItems / query.Count;
-
-            if (items.Count % query.Count > 0)
-            {
-                pageCount += 1;
-            }
-
-            return new GetDocumentsResponse
-            {
-                TotalItems = totalItems,
-                PageNumber = query.Page,
-                PageSize = query.Count,
-                TotalPages = pageCount,
-                Items = items
-            };
-        }
+            TotalItems = totalItems,
+            TotalPages = pageCount,
+            PageNumber = query.Page,
+            PageSize = query.Count,
+            Items = items
+        };
     }
 }

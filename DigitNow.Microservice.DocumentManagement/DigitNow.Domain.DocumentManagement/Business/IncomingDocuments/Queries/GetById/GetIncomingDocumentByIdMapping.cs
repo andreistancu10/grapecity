@@ -7,7 +7,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.
     {
         public GetIncomingDocumentByIdMapping()
         {
-            CreateMap<IncomingDocument, GetIncomingDocumentByIdResponse>();
+            CreateMap<IncomingDocument, GetIncomingDocumentByIdResponse>()
+                .ForMember(c => c.ConnectedDocuments, opt => opt.MapFrom(src => src.ConnectedDocuments))
+                .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.Document.RegistrationNumber))
+                .ForPath(c => c.WorkflowHistory, opt => opt.MapFrom(src => src.Document.WorkflowHistories));
         }
     }
 }
