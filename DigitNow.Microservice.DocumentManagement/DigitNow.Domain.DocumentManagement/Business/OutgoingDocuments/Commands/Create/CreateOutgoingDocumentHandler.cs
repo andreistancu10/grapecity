@@ -49,9 +49,9 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
         {
             DocumentId = newOutgoingDocument.DocumentId,
             RecipientType = RecipientType.Department.Id,
-            RecipientId = request.RecipientId,
+            RecipientId = request.DestinationDepartmentId,
             DocumentStatus = DocumentStatus.New,
-            RecipientName = $"Departamentul {request.RecipientId}!"
+            RecipientName = $"Departamentul {request.DestinationDepartmentId}"
         };
         await _dbContext.WorkflowHistoryLogs.AddAsync(newWorkflowHistoryLog, cancellationToken);
         
