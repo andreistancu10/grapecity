@@ -20,7 +20,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Archive.Commands
                 return ResultObject.Error(new ErrorMessage
                 {
                     Message = $"The document with id '{request.DocumentId}' was not found.",
-                    TranslationCode = "documentManagement.archive.operational.backend.deleteDocument.notFound",
+                    TranslationCode = "documentManagement.archive.operational.backend.deleteDocument.IdNotFound",
                     Parameters = new object[] { request.DocumentId }
                 });
 
