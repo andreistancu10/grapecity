@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateDocumentDeliveryDetails;
 using DigitNow.Domain.DocumentManagement.Business.Documents.Commands.SetDocumentsResolution;
 using DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetByRegistrationNumber;

@@ -101,15 +101,14 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
     {
         if (request.ConnectedDocumentIds.Any())
         {
-            var connectedDocuments = await _dbContext.IncomingDocuments
-                .Include(x => x.Document)
-                .Where(x => request.ConnectedDocumentIds.Contains(x.Document.RegistrationNumber))
+            var connectedDocuments = await _dbContext.Documents
+                .Where(x => request.ConnectedDocumentIds.Contains(x.Id))
                 .ToListAsync(cancellationToken: cancellationToken);
 
             foreach (var connectedDocument in connectedDocuments)
             {
                 incomingDocumentForCreation.ConnectedDocuments
-                    .Add(new ConnectedDocument { RegistrationNumber = connectedDocument.Document.RegistrationNumber, DocumentType = DocumentType.Incoming, ChildDocumentId = connectedDocument.Id });
+                    .Add(new ConnectedDocument { DocumentId = connectedDocument.Id });
             }
         }
     }

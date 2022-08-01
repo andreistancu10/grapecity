@@ -199,21 +199,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             }
 
-            var userModel = await GetCurrentUserAsync(cancellationToken);
-
-            if (!userModel.HasRole(RecipientType.Mayor))
-            {
-                var relatedUserIds = await GetRelatedUserIdsAsync(userModel, cancellationToken);
-
-                // TODO:(!) This is only temporary, Apply filter permissions in the future versions                
-                documentsQuery = documentsQuery
-                    .Where(x => 
-                        relatedUserIds.Contains(x.CreatedBy)
-                        || 
-                        (userModel.Departments.Contains(x.DestinationDepartmentId))
-                    );
-            }
-
             return documentsQuery;
         }
 

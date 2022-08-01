@@ -48,9 +48,9 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
         {
             DocumentId = newOutgoingDocument.DocumentId,
             RecipientType = RecipientType.Department.Id,
-            RecipientId = request.RecipientId,
+            RecipientId = request.DestinationDepartmentId,
             DocumentStatus = DocumentStatus.New,
-            RecipientName = $"Departamentul {request.RecipientId}!"
+            RecipientName = $"Departamentul {request.DestinationDepartmentId}"
         };
         await _dbContext.WorkflowHistoryLogs.AddAsync(newWorkflowHistoryLog, cancellationToken);
         
@@ -65,14 +65,13 @@ public class CreateOutgoingDocumentHandler : ICommandHandler<CreateOutgoingDocum
     {
         if (request.ConnectedDocumentIds.Any())
         {
-            var connectedDocuments = await _dbContext.OutgoingDocuments
-                .Include(x => x.Document)
-                .Where(x => request.ConnectedDocumentIds.Contains(x.Document.RegistrationNumber)).ToListAsync(cancellationToken);
+            var connectedDocuments = await _dbContext.Documents
+                .Where(x => request.ConnectedDocumentIds.Contains(x.Id)).ToListAsync(cancellationToken);
 
             foreach (var connectedDocument in connectedDocuments)
             {
                 outgoingDocumentForCreation.ConnectedDocuments
-                    .Add(new ConnectedDocument { RegistrationNumber = connectedDocument.Document.RegistrationNumber, DocumentType = DocumentType.Outgoing });
+                    .Add(new ConnectedDocument { DocumentId = connectedDocument.Id });
             }
         }
     }

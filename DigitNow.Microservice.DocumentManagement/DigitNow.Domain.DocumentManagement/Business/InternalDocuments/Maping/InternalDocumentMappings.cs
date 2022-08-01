@@ -9,7 +9,6 @@ public class InternalDocumentMappings: Profile
     public InternalDocumentMappings()
     {
         CreateMap<CreateInternalDocumentCommand, InternalDocument>()
-            .ForMember(c => c.SourceDepartmentId, opt => opt.MapFrom(src => src.DepartmentId))
-            .ForPath(c => c.Document.DestinationDepartmentId, opt => opt.MapFrom(src => src.ReceiverDepartmentId));
+            .ForPath(c => c.Document.DestinationDepartmentId, opt => opt.MapFrom(src => src.DestinationDepartmentId));
     }
 }
