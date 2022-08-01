@@ -37,7 +37,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Reports
         {
             var getReportQuery = _mapper.Map<GetReportQuery>(request);
             var reportResult = await _mediator.Send(getReportQuery);
-            
+
             if (reportResult == null)
             {
                 return NotFound();
@@ -55,7 +55,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Reports
         {
             var getReportQuery = _mapper.Map<GetReportQuery>(request);
             var reportResult = await _mediator.Send(getReportQuery);
-            
+
             if (reportResult == null)
             {
                 return NotFound();

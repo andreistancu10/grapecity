@@ -231,7 +231,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
 
             private static BasicViewModel FindRecipient(IEnumerable<UserModel> users, long? userId)
             {
-                if (userId==null)
+                if (userId == null)
                 {
                     return null;
                 }
