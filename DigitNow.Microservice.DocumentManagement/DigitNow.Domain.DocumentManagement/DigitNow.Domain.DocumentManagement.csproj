@@ -83,9 +83,6 @@
 
 	<ItemGroup>
 	  <Folder Include="Migrations\" />
-	  <Folder Include="Public\Archive\Mappings\" />
-	  <Folder Include="Public\Archive\Models\" />
-	  <Folder Include="Public\Archive\Validators\" />
 	  <Folder Include="Public\Common\" />
 	</ItemGroup>
 

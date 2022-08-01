@@ -13,11 +13,6 @@ using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
 using DigitNow.Domain.DocumentManagement.extensions.Role;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
-using DigitNow.Domain.DocumentManagement.Data.Filters;
-using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -85,7 +80,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         private async Task<long> CountAllDocumentsByFlowAsync(FlowType flowType, DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
         {
-            var documentsQuery = await BuildPreprocessDocumentsQueryAsync(flowType, preprocessFilter, cancellationToken);
+            var documentsQuery = BuildPreprocessDocumentsQueryAsync(flowType, preprocessFilter);
             if (postprocessFilter.IsEmpty())
                 return await documentsQuery.CountAsync(cancellationToken);
 
@@ -98,7 +93,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         private async Task<List<VirtualDocument>> GetAllDocumentsByFlowAsync(FlowType flowType, DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken token)
         {
-            var documentsQuery = await BuildPreprocessDocumentsQueryAsync(flowType, preprocessFilter, token);
+            var documentsQuery = BuildPreprocessDocumentsQueryAsync(flowType, preprocessFilter);
 
             var documents = await documentsQuery.OrderByDescending(x => x.CreatedAt)
                  .Skip((page - 1) * count)
@@ -185,7 +180,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return preprocessPredicates;
         }
 
-        private async Task<IQueryable<Document>> BuildPreprocessDocumentsQueryAsync(FlowType flowType, DocumentPreprocessFilter documentFilter, CancellationToken cancellationToken)
+        private IQueryable<Document> BuildPreprocessDocumentsQueryAsync(FlowType flowType, DocumentPreprocessFilter documentFilter)
         {
             var documentsQuery = _dbContext.Documents.AsQueryable();
             switch (flowType)

@@ -1,12 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Archive.Commands;
 using DigitNow.Domain.DocumentManagement.Business.Archive.Queries;
-using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
+using DigitNow.Domain.DocumentManagement.Public.Archive.Models;
 using DigitNow.Domain.DocumentManagement.Public.Dashboard.Models;
-using HTSS.Platform.Core.Files;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -25,7 +22,7 @@ public class ArchiveController : ApiController
 
     public ArchiveController(IMediator mediator, IMapper mapper)
     {
-        _mediator = mediator;        
+        _mediator = mediator;
         _mapper = mapper;
     }
 
@@ -34,5 +31,13 @@ public class ArchiveController : ApiController
     {
         var query = _mapper.Map<GetDocumentsOperationalArchiveQuery>(request);
         return Ok(await _mediator.Send(query, cancellationToken));
+    }
+
+    [HttpPut("operational/delete")]
+    public async Task<IActionResult> DeleteDocument([FromBody] DeleteDocumentRequest request, CancellationToken cancellationToken)
+    {
+        var deleteDocumentCommand = _mapper.Map<DeleteDocumentCommand>(request);
+
+        return CreateResponse(await _mediator.Send(deleteDocumentCommand, cancellationToken));
     }
 }
