@@ -152,11 +152,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             ArchivedDocuments
         }
 
-        private IList<Expression<Func<Document, bool>>> GetDocumentsPreprocessBuiltinPredicates() =>
-            PredicateFactory.CreatePredicatesList<Document>(x => x.CreatedAt.Year >= PreviousYear && x.IsArchived == false);
+        private static IList<Expression<Func<Document, bool>>> GetDocumentsPreprocessBuiltinPredicates() =>
+            PredicateFactory.CreatePredicatesList<Document>(x => x.CreatedAt.Year >= PreviousYear && !x.IsArchived);
 
-        private IList<Expression<Func<Document, bool>>> GetArchivedDocumentsPreprocessBuiltinPredicates() =>
-            PredicateFactory.CreatePredicatesList<Document>(x => x.IsArchived == true);
+        private static IList<Expression<Func<Document, bool>>> GetArchivedDocumentsPreprocessBuiltinPredicates() =>
+            PredicateFactory.CreatePredicatesList<Document>(x => x.IsArchived);
 
         private IList<Expression<Func<Document, bool>>> GetDocumentsPreprocessPredicates(DocumentPreprocessFilter preprocessFilter) =>
             ExpressionFilterBuilderRegistry.GetDocumentPreprocessFilterBuilder(_dbContext, preprocessFilter).Build();

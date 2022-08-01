@@ -20,7 +20,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Archive.Commands
                 return ResultObject.Error(new ErrorMessage
                 {
                     Message = $"The document with id '{request.DocumentId}' was not found.",
-                    TranslationCode = "catalog.headOfdepartment.backend.update.validation.entityNotFound",
+                    TranslationCode = "documentManagement.archive.operational.backend.deleteDocument.notFound",
                     Parameters = new object[] { request.DocumentId }
                 });
 
