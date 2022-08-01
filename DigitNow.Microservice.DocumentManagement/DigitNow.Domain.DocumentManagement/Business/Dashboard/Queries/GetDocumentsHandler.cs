@@ -27,8 +27,8 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, GetDocuments
         var totalItems = await _dashboardService.CountAllDocumentsAsync(request.PreprocessFilter, request.PostprocessFilter, cancellationToken);
 
         var documents = await _dashboardService.GetAllDocumentsAsync(request.PreprocessFilter, request.PostprocessFilter,
-            request.Page,
-            request.Count,
+            request.Page, 
+            request.Count, 
             cancellationToken);
 
         var viewModels = await _documentMappingService.MapToDocumentViewModelAsync(documents, cancellationToken);

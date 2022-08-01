@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
-using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
+using DigitNow.Domain.DocumentManagement.Data.Filters.Documents.Postprocess;
+using DigitNow.Domain.DocumentManagement.Data.Filters.Documents.Preprocess;
 using DigitNow.Domain.DocumentManagement.Public.Dashboard.Models;
-using System;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Mappings
 {

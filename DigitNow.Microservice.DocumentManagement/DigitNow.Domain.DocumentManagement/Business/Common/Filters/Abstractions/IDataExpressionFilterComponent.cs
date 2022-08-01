@@ -8,9 +8,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Abstraction
         where T : IExtendedEntity
         where TContext : IDataExpressionFilterComponentContext
     {
-        public abstract DataExpressions<T> ExtractDataExpressions(TContext context);
+        Task<DataExpressions<T>> ExtractDataExpressionsAsync(TContext context, CancellationToken token);
 
-        public IList<Expression<Func<T, bool>>> ExtractPredicates(TContext context) =>
-            ExtractDataExpressions(context).ToPredicates();
+        Task<IList<Expression<Func<T, bool>>>> ExtractPredicatesAsync(TContext context, CancellationToken token);
     }
 }

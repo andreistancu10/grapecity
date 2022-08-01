@@ -2,7 +2,7 @@
 
 namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights.Preprocess
 {
-    public class DocumentUserRightsFilter
+    public class DocumentUserRightsFilter : DataFilter
     {
         public DocumentMayorRightFilter MayorRightFilter { get; set; }
 
