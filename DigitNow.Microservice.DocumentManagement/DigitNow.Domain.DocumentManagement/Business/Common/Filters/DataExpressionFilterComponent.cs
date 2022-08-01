@@ -36,7 +36,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters
 
         #region [ DataExpressionFilterComponent ]
 
-        protected virtual Task<DataExpressions<T>> SetBuiltinDataExpressionsAsync(TContext context, CancellationToken token) => null;
+        protected virtual Task<DataExpressions<T>> SetBuiltinDataExpressionsAsync(TContext context, CancellationToken token) => 
+            Task.FromResult(new DataExpressions<T>());
 
         protected abstract Task<DataExpressions<T>> SetCustomDataExpressionsAsync(TContext context, CancellationToken token);
 
@@ -46,12 +47,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters
 
         public async Task<DataExpressions<T>> ExtractDataExpressionsAsync(TContext context, CancellationToken token)
         {
-            var builtinExpressions = await SetBuiltinDataExpressionsAsync(context, token);
-            if (builtinExpressions != null)
-            {
-                _dataExpressions.AddRange(builtinExpressions);
-            }
-
+            _dataExpressions.AddRange(await SetBuiltinDataExpressionsAsync(context, token));
             _dataExpressions.AddRange(await SetCustomDataExpressionsAsync(context, token));
             return _dataExpressions;
         }

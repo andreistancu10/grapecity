@@ -2,13 +2,13 @@
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights.Preprocess
+namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
 {
-    internal class DocumentUserRightsPreprocessFilterBuilder : DataExpressionFilterBuilder<Document, DocumentUserRightsFilter>
+    internal class DocumentUserRightsFilterBuilder : DataExpressionFilterBuilder<Document, DocumentUserRightsFilter>
     {
         private readonly DocumentManagementDbContext _dbContext;
 
-        public DocumentUserRightsPreprocessFilterBuilder(IServiceProvider serviceProvider, DocumentUserRightsFilter filter)
+        public DocumentUserRightsFilterBuilder(IServiceProvider serviceProvider, DocumentUserRightsFilter filter)
             : base(serviceProvider, filter)
         {
             _dbContext = serviceProvider.GetService<DocumentManagementDbContext>();
@@ -40,7 +40,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights.Prepro
 
                 // Allow access for additional documents with the following rules
 
-                //TODO: Add last workflow
+                //TODO: ASK ABOUT THIS
                 //var lastWorkflowsFound = _dbContext.WorkflowHistoryLogs
                 //    .OrderByDescending(x => x.CreatedAt)
                 //    .Distinct(x => x.DestinationDepartmentId)
@@ -53,13 +53,13 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights.Prepro
                     (x.DocumentType == DocumentType.Outgoing || x.DocumentType == DocumentType.Internal)
                     &&
                     (
-                        (x.Status == DocumentStatus.New)
+                        x.Status == DocumentStatus.New
                             ||
-                         (x.Status == DocumentStatus.InWorkCountersignature) //TODO: Ask about this
+                         x.Status == DocumentStatus.InWorkCountersignature //TODO: Ask about this
                             ||
-                         (x.Status == DocumentStatus.InWorkMayorDeclined)
+                         x.Status == DocumentStatus.InWorkMayorDeclined
                             ||
-                         (x.Status == DocumentStatus.Finalized)
+                         x.Status == DocumentStatus.Finalized
                     )
                 );
             }

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights.Preprocess
+namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
 {
     public class DocumentUserRightsFilter : DataFilter
     {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using DigitNow.Domain.Catalog.Client;
+﻿using DigitNow.Domain.Catalog.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
@@ -55,9 +50,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors
                 return new List<ReportViewModel>();
             }
 
-            var vDocuments = await _virtualDocumentService.FetchVirtualDocuments(documents, cancellationToken);
+            var virtualDocuments = _virtualDocumentService.ConvertDocumentsToVirtualDocuments(documents);
 
-            return await _documentMappingService.MapToReportViewModelAsync(vDocuments, cancellationToken);
+            return await _documentMappingService.MapToReportViewModelAsync(virtualDocuments, cancellationToken);
         }
 
         private async Task<IEnumerable<Document>> GetEligibleIncomingDocumentsAsync(DateTime fromDate, DateTime toDate, CancellationToken cancellationToken)

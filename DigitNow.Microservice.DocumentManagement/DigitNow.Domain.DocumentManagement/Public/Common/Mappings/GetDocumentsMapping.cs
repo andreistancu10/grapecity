@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Archive.Queries;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
-using DigitNow.Domain.DocumentManagement.Data.Filters.Documents.Postprocess;
-using DigitNow.Domain.DocumentManagement.Data.Filters.Documents.Preprocess;
+using DigitNow.Domain.DocumentManagement.Data.Filters.Documents;
 using DigitNow.Domain.DocumentManagement.Public.Dashboard.Models;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Mappings
@@ -10,18 +10,17 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Mappings
     {
         public GetDocumentsMapping()
         {
-            CreateMap<DocumentFilterDto, DocumentPreprocessFilter>()
+            CreateMap<DocumentFilterDto, DocumentFilter>()
                 .ForMember(m => m.RegistryTypeFilter, opt => opt.MapFrom(src => src.RegistryTypeFilter))
                 .ForMember(m => m.RegistrationNoFilter, opt => opt.MapFrom(src => src.RegistrationNoFilter))
                 .ForMember(m => m.RegistrationDateFilter, opt => opt.MapFrom(src => src.RegistrationDateFilter))
                 .ForMember(m => m.TypeFilter, opt => opt.MapFrom(src => src.DocumentTypeFilter))
                 .ForMember(m => m.StatusFilter, opt => opt.MapFrom(src => src.DocumentStatusFilter))
                 .ForMember(m => m.DepartmentFilter, opt => opt.MapFrom(src => src.DocumentDepartmentFilter))
-                .ForMember(m => m.IdentifiersFilter, opt => opt.MapFrom(src => src.DocumentIdentifiersFilter));
-
-            CreateMap<DocumentFilterDto, DocumentPostprocessFilter>()
+                .ForMember(m => m.IdentifiersFilter, opt => opt.MapFrom(src => src.DocumentIdentifiersFilter))
+                .ForMember(m => m.IdentificationNumberFilter, opt => opt.MapFrom(src => src.IdentificationNumberFilter))
+                .ForMember(m => m.IdentifiersFilter, opt => opt.MapFrom(src => src.DocumentIdentifiersFilter))
                 .ForMember(m => m.CategoryFilter, opt => opt.MapFrom(src => src.DocumentCategoryFilter));
-
             {
                 CreateMap<DocumentRegistyTypeFilterDto, DocumentRegistryTypeFilter>()
                     .ForMember(m => m.RegistryTypes, opt => opt.MapFrom(src => src.RegistryTypes));
@@ -48,10 +47,16 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Mappings
 
                 CreateMap<DocumentIdentifiersFilterDto, DocumentIdentifiersFilter>()
                     .ForMember(m => m.Identifiers, opt => opt.MapFrom(src => src.Identifiers));
+                
+                CreateMap<DocumentIdentificationNumberFilterDto, DocumentIdentificationNumber>()
+                    .ForMember(m => m.IdentificationNumber, opt => opt.MapFrom(src => src.IdentificationNumber));
             }
+            
             CreateMap<GetDocumentsRequest, GetDocumentsQuery>()
-                .ForMember(m => m.PreprocessFilter, opt => opt.MapFrom(src => src.Filter ?? new DocumentFilterDto()))
-                .ForMember(m => m.PostprocessFilter, opt => opt.MapFrom(src => src.Filter ?? new DocumentFilterDto()));
+                .ForMember(m => m.Filter, opt => opt.MapFrom(src => src.Filter ?? new DocumentFilterDto()));
+
+            CreateMap<GetDocumentsRequest, GetDocumentsOperationalArchiveQuery>()
+                .ForMember(m => m.Filter, opt => opt.MapFrom(src => src.Filter ?? new DocumentFilterDto()));
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Reports.Models
 {

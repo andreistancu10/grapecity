@@ -2,10 +2,10 @@
 using DigitNow.Adapters.MS.Catalog.Poco;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Filters;
-using DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights.Preprocess;
+using DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Preprocess
+namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Documents
 {
     internal class DocumentRightsFilterPreprocessComponent : DataExpressionFilterComponent<Document, DocumentRightsFilterPreprocessComponentContext>
     {
@@ -34,11 +34,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
             var containsRegistryOfficeDepartments = context.CurrentUser.Departments.Contains(registryOfficeDepartment.Id);
             if (containsRegistryOfficeDepartments)
             {
-                return new DocumentDepartmentRightsPreprocessFilterBuilder(ServiceProvider, context.DepartmentRightsFilter)
+                return new DocumentDepartmentRightsFilterBuilder(ServiceProvider, context.DepartmentRightsFilter)
                     .Build();
             }
 
-            return new DocumentUserRightsPreprocessFilterBuilder(ServiceProvider, context.UserRightsFilter)
+            return new DocumentUserRightsFilterBuilder(ServiceProvider, context.UserRightsFilter)
                 .Build();
         }
 

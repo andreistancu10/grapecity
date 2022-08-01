@@ -1,6 +1,8 @@
-﻿using DigitNow.Adapters.MS.Catalog;
+﻿using AutoMapper;
+using DigitNow.Adapters.MS.Catalog;
 using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
@@ -9,7 +11,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 {
     public interface IIdentityService
     {
-        Task<User> GetCurrentUserAsync(CancellationToken token);
+        Task<UserModel> GetCurrentUserAsync(CancellationToken token);
         long GetCurrentUserId();
         bool TryGetCurrentUserId(out int userId);
         Task<RecipientType> GetCurrentUserFirstRoleAsync(CancellationToken token);
@@ -26,23 +28,32 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
     public class IdentityService : IIdentityService
     {
+        private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccesor;
         private readonly IIdentityAdapterClient _identityAdapterClient;
         private readonly ICatalogAdapterClient _catalogAdapterClient;
 
         public IdentityService(
+            IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
             IIdentityAdapterClient identityAdapterClient,
             ICatalogAdapterClient catalogAdapterClient)
         {
+            _mapper = mapper;
             _httpContextAccesor = httpContextAccessor;
             _identityAdapterClient = identityAdapterClient;
             _catalogAdapterClient = catalogAdapterClient;
         }
 
-        public Task<User> GetCurrentUserAsync(CancellationToken token)
+        public async Task<UserModel> GetCurrentUserAsync(CancellationToken token)
         {
-            return _identityAdapterClient.GetUserByIdAsync(GetCurrentUserId(), token);
+            var currentUserId = GetCurrentUserId();
+
+            var getUserByIdResponse = await _identityAdapterClient.GetUserByIdAsync(currentUserId, token);
+            if (getUserByIdResponse == null)
+                throw new InvalidOperationException($"User with identifier '{currentUserId}' was not found!");
+
+            return _mapper.Map<UserModel>(getUserByIdResponse);
         }
 
         public long GetCurrentUserId()

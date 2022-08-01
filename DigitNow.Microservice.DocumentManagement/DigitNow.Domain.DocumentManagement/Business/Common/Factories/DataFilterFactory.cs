@@ -1,6 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights.Preprocess;
+using DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
 {

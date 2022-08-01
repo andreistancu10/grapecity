@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Filters;
 using HTSS.Platform.Core.Domain;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,13 +35,11 @@ namespace DigitNow.Domain.DocumentManagement.Data.Extensions
             return queryable;
         }
 
-        public static IQueryable<T> WhereMyFilter<T>(this IQueryable<T> queryable, Business.Common.Services.MyFilter<T> myFilter = null)
+        internal static IQueryable<T> WhereMyFilter<T>(this IQueryable<T> queryable, DataExpression<T> dataExpression = null)
             where T: IExtendedEntity
         {
-            if (myFilter == null) return queryable;
-            IList<Expression<Func<T, bool>>> x = myFilter.ToPredicate();
-            queryable = queryable.Where(x[0]);
-            return queryable;
+            if (dataExpression == null) return queryable;
+            return queryable.Where(dataExpression.ToPredicate());
         }
     }
 }

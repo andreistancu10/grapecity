@@ -2,13 +2,13 @@
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights.Preprocess
+namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
 {
-    internal class DocumentDepartmentRightsPreprocessFilterBuilder : DataExpressionFilterBuilder<Document, DocumentDepartmentRightsFilter>
+    internal class DocumentDepartmentRightsFilterBuilder : DataExpressionFilterBuilder<Document, DocumentDepartmentRightsFilter>
     {
         private readonly DocumentManagementDbContext _dbContext;
 
-        public DocumentDepartmentRightsPreprocessFilterBuilder(IServiceProvider serviceProvider, DocumentDepartmentRightsFilter filter)
+        public DocumentDepartmentRightsFilterBuilder(IServiceProvider serviceProvider, DocumentDepartmentRightsFilter filter)
             : base(serviceProvider, filter)
         {
             _dbContext = serviceProvider.GetService<DocumentManagementDbContext>();
@@ -23,15 +23,15 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights.Prepro
                 // Outgoing => Only with Status = Finalized
 
                 EntityPredicates.Add(x =>
-                    (x.DocumentType == DocumentType.Incoming)
+                    x.DocumentType == DocumentType.Incoming
                     ||
-                    (
-                        (x.DocumentType == DocumentType.Outgoing)
+                    
+                        x.DocumentType == DocumentType.Outgoing
                         &&
-                        (x.Status == DocumentStatus.Finalized)
-                    )
+                        x.Status == DocumentStatus.Finalized
+                    
                 );
-            }            
+            }
         }
 
         protected override void InternalBuild()

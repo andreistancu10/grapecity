@@ -1,11 +1,6 @@
-﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
-using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
 using HTSS.Platform.Core.CQRS;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
 
@@ -24,9 +19,9 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, GetDocuments
 
     public async Task<GetDocumentsResponse> Handle(GetDocumentsQuery request, CancellationToken cancellationToken)
     {
-        var totalItems = await _dashboardService.CountAllDocumentsAsync(request.PreprocessFilter, request.PostprocessFilter, cancellationToken);
+        var totalItems = await _dashboardService.CountActiveDocumentsAsync(request.Filter, cancellationToken);
 
-        var documents = await _dashboardService.GetAllDocumentsAsync(request.PreprocessFilter, request.PostprocessFilter,
+        var documents = await _dashboardService.GetActiveDocumentsAsync(request.Filter,
             request.Page, 
             request.Count, 
             cancellationToken);

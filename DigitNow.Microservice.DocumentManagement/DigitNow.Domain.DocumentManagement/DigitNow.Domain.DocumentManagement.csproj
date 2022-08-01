@@ -23,6 +23,7 @@
 		<Compile Include=".configurations\DomainServiceExtensions.cs" />
 		<Compile Include=".configurations\IConfigurationBuilderExtensions.cs" />
 		<Compile Include=".extensions\Autocorrect\StringExtensions.cs" />
+		<Compile Include=".extensions\User\UserExtension.cs" />
 		<Compile Include=".extensions\Validators\RuleBuilderExtensions.cs" />
 		<Compile Include=".utils\DevOnlyActionFilter.cs" />
 		<Compile Include=".utils\FilterDescriptor.cs" />
@@ -87,8 +88,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Business\Common\Filters\Components\Documents\Postprocess\" />
 	  <Folder Include="Migrations\" />
+	  <Folder Include="Public\Common\" />
 	</ItemGroup>
 
 </Project>

@@ -1,13 +1,14 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
+﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Filters.Documents.Preprocess
+namespace DigitNow.Domain.DocumentManagement.Data.Filters.Documents
 {
-    internal class DocumentPreprocessFilterBuilder : DataExpressionFilterBuilder<Document, DocumentPreprocessFilter>
+    internal class DocumentFilterBuilder : DataExpressionFilterBuilder<Document, DocumentFilter>
     {
         private readonly DocumentManagementDbContext _dbContext;
 
-        public DocumentPreprocessFilterBuilder(IServiceProvider serviceProvider, DocumentPreprocessFilter filter)
+        public DocumentFilterBuilder(IServiceProvider serviceProvider, DocumentFilter filter)
             : base(serviceProvider, filter)
         {
             _dbContext = serviceProvider.GetService<DocumentManagementDbContext>();
@@ -87,6 +88,34 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Documents.Preprocess
             }
         }
 
+        private void BuildFilterByCategory()
+        {
+            if (EntityFilter.CategoryFilter != null)
+            {
+                var categoriesIds = EntityFilter.CategoryFilter.CategoryIds;
+
+                EntityPredicates.Add(x =>
+                    (x.DocumentType == DocumentType.Internal && categoriesIds.Contains(x.InternalDocument.InternalDocumentTypeId))
+                    ||
+                    (x.DocumentType == DocumentType.Incoming && categoriesIds.Contains(x.IncomingDocument.DocumentTypeId))
+                    ||
+                    (x.DocumentType == DocumentType.Outgoing && categoriesIds.Contains(x.OutgoingDocument.DocumentTypeId))
+                );
+            }
+        }
+
+        private void BuildFilterByIdentificationNumbery()
+        {
+            if (EntityFilter.IdentificationNumberFilter == null)
+            {
+                EntityPredicates.Add(x =>
+                    (x.DocumentType == DocumentType.Incoming && x.IncomingDocument.IdentificationNumber == EntityFilter.IdentificationNumberFilter.IdentificationNumber)
+                    ||
+                    (x.DocumentType == DocumentType.Outgoing && x.OutgoingDocument.IdentificationNumber == EntityFilter.IdentificationNumberFilter.IdentificationNumber)
+                );
+            }
+        }
+
         protected override void InternalBuild()
         {
             if (EntityFilter.IdentifiersFilter != null)
@@ -101,6 +130,8 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Documents.Preprocess
                 BuildFilterByDocumentType();
                 BuildFilterByDocumentState();
                 BuildFilterByDepartment();
+                BuildFilterByCategory();
+                BuildFilterByIdentificationNumbery();
             }
         }
     }
