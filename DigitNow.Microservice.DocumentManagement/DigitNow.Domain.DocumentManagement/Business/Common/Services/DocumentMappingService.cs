@@ -57,7 +57,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         if (!virtualDocuments.Any()) return new List<ReportViewModel>();
 
-        await _documentRelationsFetcher.TriggerFetchersAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
+        await _documentReportRelationsFetcher.TriggerFetchersAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
         return MapDocumentsReports(virtualDocuments)
             .OrderByDescending(x => x.RegistrationDate)
             .ToList();
