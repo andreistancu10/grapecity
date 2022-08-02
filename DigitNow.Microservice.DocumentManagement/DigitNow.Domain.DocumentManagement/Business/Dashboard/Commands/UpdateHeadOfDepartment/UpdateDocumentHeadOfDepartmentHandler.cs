@@ -7,10 +7,6 @@ using DigitNow.Domain.DocumentManagement.Data;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
 {
@@ -18,24 +14,22 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IMailSenderService _mailSenderService;
-        private readonly IAuthenticationClientAdapter _authenticationClientAdapter;
-        private User _headOfDepartment;
         private readonly IIdentityAdapterClient _identityAdapterClient;
 
         public UpdateDocumentHeadOfDepartmentHandler(
-            DocumentManagementDbContext dbContext, 
-            IMailSenderService mailSenderService,
-            IAuthenticationClientAdapter authenticationClientAdapter)
+            DocumentManagementDbContext dbContext,
+            IIdentityAdapterClient identityAdapterClient,
+            IMailSenderService mailSenderService)
         {
             _dbContext = dbContext;
             _mailSenderService = mailSenderService;
-            _authenticationClientAdapter = authenticationClientAdapter;
+            _identityAdapterClient = identityAdapterClient;
         }
         public async Task<ResultObject> Handle(UpdateDocumentHeadOfDepartmentCommand request, CancellationToken cancellationToken)
         {
             var response = await _identityAdapterClient.GetUsersAsync(cancellationToken);
             var departmentUsers = response.Users.Where(x => x.Departments.Contains(request.DepartmentId));
-            var headOfDepartment = departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
+            var headOfDepartment = departmentUsers.FirstOrDefault(); // departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
 
             if (headOfDepartment == null)
                 return ResultObject.Error(new ErrorMessage
@@ -48,7 +42,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
             await UpdateDocuments(request, headOfDepartment, cancellationToken);
 
             var documentIds = request.DocumentInfo.Select(x => x.DocumentId).ToList();
-            await _mailSenderService.SendMail_SendBulkDocumentsTemplate(_headOfDepartment, documentIds, cancellationToken);
+            headOfDepartment.Email = "iuliathira@yahoo.com";
+            await _mailSenderService.SendMail_SendBulkDocumentsTemplate(headOfDepartment, documentIds, cancellationToken);
 
             return new ResultObject(ResultStatusCode.Ok);
         }

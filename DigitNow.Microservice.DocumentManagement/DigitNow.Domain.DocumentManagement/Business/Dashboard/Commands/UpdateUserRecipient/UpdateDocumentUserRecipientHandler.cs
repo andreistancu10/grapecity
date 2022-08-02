@@ -53,11 +53,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
 
             await UpdateDocumentsAsync(request.DocumentIds, _delegatedUser, cancellationToken);
 
-            await Task.WhenAll
-            (
-                _mailSenderService.SendMail_DelegateDocumentToFunctionary(_currentUser, _delegatedUser, request.DocumentIds, cancellationToken),
-                _mailSenderService.SendMail_DelegateDocumentToFunctionarySupervisor(_currentUser, _delegatedUser, cancellationToken)
-            );
+            await _mailSenderService.SendMail_DelegateDocumentToFunctionarySupervisor(_currentUser, _delegatedUser, cancellationToken);
+
+            //await Task.WhenAll
+            //(
+            //    _mailSenderService.SendMail_DelegateDocumentToFunctionary(_currentUser, _delegatedUser, request.DocumentIds, cancellationToken),
+            //    _mailSenderService.SendMail_DelegateDocumentToFunctionarySupervisor(_currentUser, _delegatedUser, cancellationToken)
+            //);
 
             return new ResultObject(ResultStatusCode.Ok);
         }

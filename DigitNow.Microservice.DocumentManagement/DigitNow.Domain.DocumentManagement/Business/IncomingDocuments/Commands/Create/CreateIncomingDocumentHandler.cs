@@ -25,13 +25,15 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
     private readonly ISpecialRegisterMappingService _specialRegisterMappingService;
     private readonly IIncomingDocumentService _incomingDocumentService;
     private readonly IUploadedFileService _uploadedFileService;
+    private readonly IMailSenderService _mailSenderService;
 
     public CreateIncomingDocumentHandler(DocumentManagementDbContext dbContext,
         IMapper mapper,
         IIdentityAdapterClient identityAdapterClient,
         ISpecialRegisterMappingService specialRegisterMappingService,
         IUploadedFileService uploadedFileService,
-        IIncomingDocumentService incomingDocumentService)
+        IIncomingDocumentService incomingDocumentService,
+        IMailSenderService mailSenderService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
@@ -39,6 +41,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
         _uploadedFileService = uploadedFileService;
         _specialRegisterMappingService = specialRegisterMappingService;
         _incomingDocumentService = incomingDocumentService;
+        _mailSenderService = mailSenderService;
     }
         
     public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
@@ -87,6 +90,16 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             });
         }
 
+        if(request.ContactDetail?.Email != null)
+        {
+            await _mailSenderService.SendMail_CreateIncomingDocument(
+                new User { FirstName = request.IssuerName, Email = request.ContactDetail.Email },
+                newIncomingDocument.Document.RegistrationNumber, 
+                newIncomingDocument.Document.RegistrationDate, 
+                cancellationToken
+                );
+        }
+
         return ResultObject.Created(newIncomingDocument.DocumentId);
     }
 
@@ -94,7 +107,8 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
     {
         var response = await _identityAdapterClient.GetUsersAsync(token);
         var departmentUsers = response.Users.Where(x => x.Departments.Contains(departmentId));
-        return departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
+        return departmentUsers.FirstOrDefault();
+       // return departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
     }
 
     private async Task AttachConnectedDocumentsAsync(CreateIncomingDocumentCommand request, IncomingDocument incomingDocumentForCreation, CancellationToken cancellationToken)

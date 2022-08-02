@@ -4,15 +4,13 @@ using Domain.Mail.Contracts.Mails;
 using Domain.Mail.Contracts.MailTemplates;
 using Microsoft.Extensions.Configuration;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Notifications.Mail
 {
     public interface IMailSender
     {
         Task SendMail(MailTemplateEnum templateId, string mailTo, object mailBodyParameters, CancellationToken token);
-        Task SendMail(MailTemplateEnum templateId, string mailTo, string mailSubjectParameters, object mailBodyParameters, CancellationToken token);
+        Task SendMail(MailTemplateEnum templateId, string mailTo, object mailSubjectParameters, object mailBodyParameters, CancellationToken token);
     }
 
     public class MailSender : IMailSender
@@ -29,12 +27,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Notifications.Mail
         public Task SendMail(MailTemplateEnum templateId, string mailTo, object mailBodyParameters, CancellationToken token) =>
             SendMail(templateId, mailTo, mailSubjectParameters: string.Empty, mailBodyParameters, token);
 
-        public Task SendMail(MailTemplateEnum templateId, string mailTo, string mailSubjectParameters, object mailBodyParameters, CancellationToken token)
+        public Task SendMail(MailTemplateEnum templateId, string mailTo, object mailSubjectParameters, object mailBodyParameters, CancellationToken token)
         {
             var mailEvent = new CreateMailEvent
             {
                 FluentMailProviderTypeId = GetMailProvider(),
-                SubjectParameters = mailSubjectParameters,
+                SubjectParameters = JsonSerializer.Serialize(mailSubjectParameters),
                 BodyParameters = JsonSerializer.Serialize(mailBodyParameters),
                 MailTemplateId = templateId,
                 Receiver = mailTo
@@ -46,7 +44,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Notifications.Mail
         private FluentMailProviderTypeEnum GetMailProvider()
         {
             // TODO: Get from configuration
-            return FluentMailProviderTypeEnum.FluentMailSmtp;
+            return FluentMailProviderTypeEnum.FluentMailSendGrid;
         }
     }
 }

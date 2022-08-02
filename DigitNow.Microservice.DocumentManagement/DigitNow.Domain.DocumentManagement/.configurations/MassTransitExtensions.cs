@@ -1,5 +1,6 @@
 ﻿using System;
 using DigitNow.Domain.Authentication.Client;
+using DigitNow.Domain.Authentication.Contracts.Users.GetUsersByFilter;
 using DigitNow.Domain.Catalog.Client.configurations;
 using Domain.Localization.Client.configurations;
 using Domain.Mail.Client;
@@ -17,6 +18,7 @@ public static class MassTransitExtensions
         serviceCollection.AddLocalizationMQServicesConfigs();
         serviceCollection.AddCatalogClientMassTransitServiceConfigurations();
         serviceCollection.AddMailClientMassTransitServiceConfigurations();
+        serviceCollection.AddRequestClient<IGetUsersByRoleAndDepartmentRequest>();
     }
 
     public static void AddDocumentManagementMassTransitRabbitConfigurations(this IRabbitMqBusFactoryConfigurator rabbit, IBusRegistrationContext context, Action<IReceiveEndpointConfigurator> registerAction)

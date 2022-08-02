@@ -19,8 +19,6 @@ namespace DigitNow.Domain.DocumentManagement.configurations.Adapters
             services.AddTransient<IIdentityAdapterClient, IdentityAdapterClient>();
             services.AddTransient<ICatalogAdapterClient, CatalogAdapterClient>();
 
-            services.AddTransient<IAuthenticationClientAdapter, AuthenticationClientAdapter>();
-
             return services;
         }
 
