@@ -107,8 +107,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
     {
         var response = await _identityAdapterClient.GetUsersAsync(token);
         var departmentUsers = response.Users.Where(x => x.Departments.Contains(departmentId));
-        return departmentUsers.FirstOrDefault();
-       // return departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
+        return departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
     }
 
     private async Task AttachConnectedDocumentsAsync(CreateIncomingDocumentCommand request, IncomingDocument incomingDocumentForCreation, CancellationToken cancellationToken)

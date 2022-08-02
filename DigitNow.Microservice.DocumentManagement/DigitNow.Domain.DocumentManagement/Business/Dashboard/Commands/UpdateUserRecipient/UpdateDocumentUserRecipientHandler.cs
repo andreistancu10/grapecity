@@ -9,10 +9,6 @@ using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateUserRecipient
 {
@@ -22,8 +18,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
         private readonly IIdentityAdapterClient _identityAdapterClient;
         private readonly IIdentityService _identityService;
         private readonly IMailSenderService _mailSenderService;
-        private User _currentUser;
-        private User _delegatedUser;
 
 
         public UpdateDocumentUserRecipientHandler(
@@ -40,10 +34,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
         public async Task<ResultObject> Handle(UpdateDocumentUserRecipientCommand request, CancellationToken cancellationToken)
         {
 
-            _currentUser = await _identityAdapterClient.GetUserByIdAsync(_identityService.GetCurrentUserId(), cancellationToken);
-            _delegatedUser = await _identityAdapterClient.GetUserByIdAsync(request.UserId, cancellationToken);
+            var currentUser = await _identityAdapterClient.GetUserByIdAsync(_identityService.GetCurrentUserId(), cancellationToken);
+            var targetUser = await _identityAdapterClient.GetUserByIdAsync(request.UserId, cancellationToken);
 
-            if (_delegatedUser == null)
+            if (targetUser == null)
                 return ResultObject.Error(new ErrorMessage
                 {
                     Message = $"No responsible with id {request.UserId} was found.",
@@ -51,14 +45,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                     Parameters = new object[] { request.UserId }
                 });
 
-            await UpdateDocumentsAsync(request.DocumentIds, _delegatedUser, cancellationToken);
-
-            //await _mailSenderService.SendMail_DelegateDocumentToFunctionarySupervisor(_currentUser, _delegatedUser, cancellationToken);
+            await UpdateDocumentsAsync(request.DocumentIds, targetUser, cancellationToken);
 
             await Task.WhenAll
             (
-                _mailSenderService.SendMail_DelegateDocumentToFunctionary(_currentUser, _delegatedUser, request.DocumentIds, cancellationToken),
-                _mailSenderService.SendMail_DelegateDocumentToFunctionarySupervisor(_currentUser, _delegatedUser, cancellationToken)
+                _mailSenderService.SendMail_DelegateDocumentToFunctionary(currentUser, targetUser, request.DocumentIds, cancellationToken),
+                _mailSenderService.SendMail_DelegateDocumentToFunctionarySupervisor(currentUser, targetUser, cancellationToken)
             );
 
             return new ResultObject(ResultStatusCode.Ok);

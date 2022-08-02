@@ -29,7 +29,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
         {
             var response = await _identityAdapterClient.GetUsersAsync(cancellationToken);
             var departmentUsers = response.Users.Where(x => x.Departments.Contains(request.DepartmentId));
-            var headOfDepartment = departmentUsers.FirstOrDefault(); // departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
+            var headOfDepartment = departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
 
             if (headOfDepartment == null)
                 return ResultObject.Error(new ErrorMessage
@@ -42,7 +42,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
             await UpdateDocuments(request, headOfDepartment, cancellationToken);
 
             var documentIds = request.DocumentInfo.Select(x => x.DocumentId).ToList();
-            headOfDepartment.Email = "iuliathira@yahoo.com";
             await _mailSenderService.SendMail_SendBulkDocumentsTemplate(headOfDepartment, documentIds, cancellationToken);
 
             return new ResultObject(ResultStatusCode.Ok);
