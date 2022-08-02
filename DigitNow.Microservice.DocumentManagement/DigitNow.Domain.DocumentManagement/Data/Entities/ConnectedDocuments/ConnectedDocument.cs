@@ -1,7 +1,6 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.Entities.Documents;
-using HTSS.Platform.Core.Domain;
+﻿using HTSS.Platform.Core.Domain;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities.ConnectedDocuments
+namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
     public class ConnectedDocument : Entity
     {

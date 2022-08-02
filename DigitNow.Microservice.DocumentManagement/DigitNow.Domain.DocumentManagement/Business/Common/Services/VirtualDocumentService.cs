@@ -6,13 +6,7 @@ using DigitNow.Domain.DocumentManagement.Data.Extensions;
 using DigitNow.Domain.DocumentManagement.Data.Filters;
 using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Threading;
-using System.Threading.Tasks;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Documents;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {

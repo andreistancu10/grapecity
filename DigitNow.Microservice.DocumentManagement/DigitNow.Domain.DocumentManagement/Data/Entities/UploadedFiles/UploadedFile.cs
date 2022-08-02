@@ -1,4 +1,4 @@
-﻿namespace DigitNow.Domain.DocumentManagement.Data.Entities.UploadedFiles
+﻿namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
     public class UploadedFile : ExtendedEntity
     {

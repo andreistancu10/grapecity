@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.ConnectedDocuments;
-using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos.Mappings
 {

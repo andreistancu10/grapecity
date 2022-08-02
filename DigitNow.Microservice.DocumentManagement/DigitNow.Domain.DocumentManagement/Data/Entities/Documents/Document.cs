@@ -1,7 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities.Documents
+namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
     public class Document : ExtendedEntity, IDocument
     {

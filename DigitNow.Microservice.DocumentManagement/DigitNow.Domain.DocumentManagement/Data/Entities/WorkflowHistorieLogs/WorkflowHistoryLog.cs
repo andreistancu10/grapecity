@@ -1,6 +1,4 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using System;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Documents;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {

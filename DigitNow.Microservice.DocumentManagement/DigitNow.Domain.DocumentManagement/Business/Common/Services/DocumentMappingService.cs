@@ -1,10 +1,5 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;

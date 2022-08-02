@@ -3,16 +3,9 @@
 #if    MIGRATION_ONLY
 #endif
 
-using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.EntityFrameworkCore;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-using DigitNow.Domain.DocumentManagement.Data.Entities.ConnectedDocuments;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Documents;
-using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
-using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles;
-using DigitNow.Domain.DocumentManagement.Data.Entities.UploadedFiles;
 
 namespace DigitNow.Domain.DocumentManagement.Data
 {

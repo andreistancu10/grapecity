@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Documents;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {

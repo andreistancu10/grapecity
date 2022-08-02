@@ -1,9 +1,10 @@
 ﻿
-namespace DigitNow.Domain.DocumentManagement.Data.Entities;
-
-public class SpecialRegister : ExtendedEntity
+namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
-    public string Name { get; set; }
-    public string Observations { get; set; }
-    public int DocumentCategoryId { get; set; }
+    public class SpecialRegister : ExtendedEntity
+    {
+        public string Name { get; set; }
+        public string Observations { get; set; }
+        public int DocumentCategoryId { get; set; }
+    }
 }

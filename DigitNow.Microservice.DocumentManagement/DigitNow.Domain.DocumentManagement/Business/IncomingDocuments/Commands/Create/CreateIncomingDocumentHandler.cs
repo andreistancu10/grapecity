@@ -2,10 +2,6 @@
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using HTSS.Platform.Core.Errors;
 using DigitNow.Adapters.MS.Identity;
@@ -14,8 +10,6 @@ using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
-using DigitNow.Domain.DocumentManagement.Data.Entities.ConnectedDocuments;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Documents;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create
 {
