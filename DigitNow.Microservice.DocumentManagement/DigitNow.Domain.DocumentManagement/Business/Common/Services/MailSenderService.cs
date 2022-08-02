@@ -53,7 +53,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .Select(x => x.RegistrationNumber)
                 .ToArrayAsync(token);
 
-            delegatedUser.Email = "iuliathira@yahoo.com";
 
             await _mailSender.SendMail(MailTemplateEnum.DelegateDocumentToFunctionaryTemplate, delegatedUser.Email, new
             {
