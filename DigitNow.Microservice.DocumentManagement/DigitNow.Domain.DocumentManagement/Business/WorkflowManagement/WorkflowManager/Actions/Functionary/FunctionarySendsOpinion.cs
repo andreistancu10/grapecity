@@ -1,11 +1,7 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
+﻿    using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.WorkflowManager.Actions.Functionary
 {
@@ -19,15 +15,56 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             if (!Validate(command, lastWorkflowRecord))
                 return command;
 
+            switch (document.DocumentType)
+            {
+                case DocumentType.Incoming:
+                    return await CreateWorkflowHistoryForIncoming(command, document, lastWorkflowRecord, token);
+                case DocumentType.Internal:
+                case DocumentType.Outgoing:
+                    return await CreateWorkflowHistoryForOutgoingOrInternal(command, document, token);
+                default:
+                    return command;
+            }
+        }
+
+        private static async Task<ICreateWorkflowHistoryCommand> CreateWorkflowHistoryForOutgoingOrInternal(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
+        {
             var oldWorkflowResponsible = document.WorkflowHistories
-                .Where(x => (x.RecipientType == RecipientType.Functionary.Id && (x.DocumentStatus == DocumentStatus.InWorkAllocated || x.DocumentStatus == DocumentStatus.New)) 
-                          || x.RecipientType == RecipientType.HeadOfDepartment.Id && x.DocumentStatus == DocumentStatus.OpinionRequestedUnallocated)
-                .OrderByDescending(x => x.CreatedAt)
-                .FirstOrDefault();
+                    .Where(x => x.DocumentStatus == DocumentStatus.New)
+                    .OrderByDescending(x => x.CreatedAt)
+                    .FirstOrDefault();
 
             var newWorkflowResponsible = new WorkflowHistoryLog
             {
-                DocumentStatus = document.DocumentType == DocumentType.Incoming ? DocumentStatus.InWorkAllocated : DocumentStatus.New,
+                DocumentStatus = DocumentStatus.New,
+                Remarks = command.Remarks,
+                RecipientType = RecipientType.Department.Id,
+                RecipientId = oldWorkflowResponsible.DestinationDepartmentId,
+                RecipientName = $"Departamentul {oldWorkflowResponsible.DestinationDepartmentId}",
+                DestinationDepartmentId = oldWorkflowResponsible.DestinationDepartmentId
+            };
+
+            document.Status = DocumentStatus.New;
+            document.DestinationDepartmentId = oldWorkflowResponsible.DestinationDepartmentId;
+            document.WorkflowHistories.Add(newWorkflowResponsible);
+
+            ResetDateAsOpinionWasSent(document);
+
+            return await Task.FromResult(command);
+        }
+
+        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowHistoryForIncoming(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
+        {
+            var oldWorkflowResponsible = document.WorkflowHistories
+                .Where(x => x.RecipientType == RecipientType.Functionary.Id && x.DocumentStatus == DocumentStatus.InWorkAllocated)
+                .OrderByDescending(x => x.CreatedAt)
+                .FirstOrDefault();
+
+            document.Status = DocumentStatus.InWorkAllocated;
+
+            var newWorkflowResponsible = new WorkflowHistoryLog
+            {
+                DocumentStatus = DocumentStatus.InWorkAllocated,
                 Remarks = command.Remarks
             };
 

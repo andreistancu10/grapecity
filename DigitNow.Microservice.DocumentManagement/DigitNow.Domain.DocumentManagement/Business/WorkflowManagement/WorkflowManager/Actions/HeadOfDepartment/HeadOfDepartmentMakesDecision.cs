@@ -5,16 +5,13 @@ using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.WorkflowManager.Actions.HeadOfDepartment
 {
     public class HeadOfDepartmentMakesDecision : BaseWorkflowManager, IWorkflowHandler
     {
         public HeadOfDepartmentMakesDecision(IServiceProvider serviceProvider) : base(serviceProvider) { }
-        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkApprovalRequested };
+        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkApprovalRequested, (int)DocumentStatus.OpinionRequestedUnallocated };
         private enum Decision { Approved = 1, Declined = 2};
 
         protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
@@ -46,7 +43,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             document.WorkflowHistories
                 .Add(WorkflowHistoryLogFactory
-                .Create(document.Id, RecipientType.Mayor, userResponse, DocumentStatus.InWorkMayorReview, command.DeclineReason, command.Remarks));
+                .Create(document, RecipientType.Mayor, userResponse, DocumentStatus.InWorkMayorReview, command.DeclineReason, command.Remarks));
 
             await SetStatusAndRecipientBasedOnWorkflowDecisionAsync(command.DocumentId, userResponse.Id, DocumentStatus.InWorkMayorReview, token);
 
@@ -55,11 +52,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
         private async Task ApplicationDeclinedAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
         {
-            var oldWorkflowResponsible = await GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Functionary.Id, token);
+            var oldWorkflowResponsible = await GetOldWorkflowResponsibleAsync(document,document.DocumentType == DocumentType.Incoming 
+                ? x => x.RecipientType == RecipientType.Functionary.Id 
+                : x => x.RecipientType == RecipientType.Department.Id, token);
 
             var newWorkflowResponsible = new WorkflowHistoryLog
             {
-                DocumentStatus = DocumentStatus.InWorkDeclined,
+                DocumentStatus = document.DocumentType == DocumentType.Incoming ? DocumentStatus.InWorkDeclined : DocumentStatus.New,
                 DeclineReason = command.DeclineReason,
                 Remarks = command.Remarks
             };

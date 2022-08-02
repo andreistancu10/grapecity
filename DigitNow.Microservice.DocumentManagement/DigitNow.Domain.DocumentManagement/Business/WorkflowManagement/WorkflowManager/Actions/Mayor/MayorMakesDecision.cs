@@ -59,6 +59,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             document.DestinationDepartmentId = departmentToReceiveDocument;
             document.RecipientId = await IdentityService.GetHeadOfDepartmentUserIdAsync(departmentToReceiveDocument, token);
+            document.Status = DocumentStatus.InWorkCountersignature;
 
             var newWorkflowResponsible = new WorkflowHistoryLog
             {
@@ -83,6 +84,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             await TransferResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
 
+            document.Status = DocumentStatus.InWorkCountersignature;
             document.WorkflowHistories.Add(newWorkflowResponsible);
         }
 
@@ -119,6 +121,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 RecipientName = $"Departamentul {departmentToReceiveDocument}!"
             };
 
+            document.Status = DocumentStatus.InWorkMayorDeclined;
             document.DestinationDepartmentId = departmentToReceiveDocument;
             document.RecipientId = await IdentityService.GetHeadOfDepartmentUserIdAsync(departmentToReceiveDocument, token);
 
@@ -137,6 +140,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             await TransferResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
 
+            document.Status = DocumentStatus.InWorkMayorDeclined;
             document.WorkflowHistories.Add(newWorkflowResponsible);
         }
 

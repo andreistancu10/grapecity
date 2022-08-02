@@ -108,7 +108,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
         {
             var creator = await IdentityAdapterClient.GetUserByIdAsync(document.CreatedBy, token);
 
-            var newWorkflowHistoryLog = WorkflowHistoryLogFactory.Create(document.Id, RecipientType.Functionary, creator, DocumentStatus.NewDeclinedCompetence, command.DeclineReason, command.Remarks);
+            var newWorkflowHistoryLog = WorkflowHistoryLogFactory.Create(document, RecipientType.Functionary, creator, DocumentStatus.NewDeclinedCompetence, command.DeclineReason, command.Remarks);
             document.WorkflowHistories.Add(newWorkflowHistoryLog);
 
             await SetStatusAndRecipientBasedOnWorkflowDecisionAsync(command.DocumentId, creator.Id, DocumentStatus.NewDeclinedCompetence, token);
@@ -117,15 +117,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
         protected async Task PassDocumentToFunctionaryAsync(Document document, WorkflowHistoryLog newWorkflowResponsible, ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
             var oldWorkflowResponsible = await GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Functionary.Id, token);
-
             await TransferResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
 
             document.WorkflowHistories.Add(newWorkflowResponsible);
         }
 
-        public static Task<WorkflowHistoryLog> GetOldWorkflowResponsibleAsync(Document document, Expression<Func<WorkflowHistoryLog, bool>> predicate, CancellationToken token)
+        protected static async Task<WorkflowHistoryLog> GetOldWorkflowResponsibleAsync(Document document, Expression<Func<WorkflowHistoryLog, bool>> predicate, CancellationToken token)
         {
-            return ExtractResponsibleAsync(document.WorkflowHistories, predicate, token);
+            return await ExtractResponsibleAsync(document.WorkflowHistories, predicate, token);
         }
 
         private static Task<WorkflowHistoryLog> ExtractResponsibleAsync(List<WorkflowHistoryLog> history, Expression<Func<WorkflowHistoryLog, bool>> predicate, CancellationToken token)

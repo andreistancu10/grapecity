@@ -4,10 +4,6 @@ using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.WorkflowManager.Actions.HeadOfDepartment
 {
@@ -36,16 +32,24 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
         private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowForOutgoingAndInternalAsync(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token)
         {
+            var oldWorkflowResponsible = await GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Department.Id, token);
+
             var newWorkflowResponsible = new WorkflowHistoryLog
             {
                 DocumentStatus = DocumentStatus.New,
                 DeclineReason = command.DeclineReason,
-                Remarks = command.Remarks
+                Remarks = command.Remarks,
+                RecipientType = RecipientType.Department.Id,
+                RecipientId = oldWorkflowResponsible.DestinationDepartmentId,
+                RecipientName = $"Departamentul {oldWorkflowResponsible.DestinationDepartmentId}",
+                DestinationDepartmentId = oldWorkflowResponsible.DestinationDepartmentId
             };
 
-            await PassDocumentToFunctionaryAsync(document, newWorkflowResponsible, command, token);
+            document.Status = DocumentStatus.New;
+            document.DestinationDepartmentId = oldWorkflowResponsible.DestinationDepartmentId;
+            document.WorkflowHistories.Add(newWorkflowResponsible);
 
-            return command;
+            return await Task.FromResult(command);
         }
 
         private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowForIncomingAsync(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token)
@@ -65,7 +69,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             {
                 var newWorkflowResponsible = new WorkflowHistoryLog
                 {
-                    DocumentStatus = DocumentStatus.InWorkAllocated,
+                    DocumentStatus = status,
                     DeclineReason = command.DeclineReason,
                     Remarks = command.Remarks
                 };

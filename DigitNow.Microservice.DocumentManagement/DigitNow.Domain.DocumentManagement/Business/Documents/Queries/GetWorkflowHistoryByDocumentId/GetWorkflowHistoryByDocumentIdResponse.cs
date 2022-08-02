@@ -10,6 +10,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetWorkf
         public string DeclineReason { get; set; }
         public int? Resolution { get; set; }
         public DateTime? OpinionRequestedUntil { get; set; }
-        public DocumentStatus Status { get; set; }
+        public DocumentStatus DocumentStatus { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

@@ -30,7 +30,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             document.WorkflowHistories
                 .Add(WorkflowHistoryLogFactory
-                .Create(document.Id, RecipientType.Functionary, user, newDocumentStatus));
+                .Create(document, RecipientType.Functionary, user, newDocumentStatus));
 
             await SetStatusAndRecipientBasedOnWorkflowDecisionAsync(command.DocumentId, user.Id, newDocumentStatus, token);
 

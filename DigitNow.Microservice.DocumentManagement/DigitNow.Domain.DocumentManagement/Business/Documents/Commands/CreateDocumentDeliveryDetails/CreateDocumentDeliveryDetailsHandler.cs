@@ -82,7 +82,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateD
                 DocumentStatus = DocumentStatus.Finalized,
                 RecipientType = RecipientType.Department.Id,
                 RecipientId = departmentToReceiveDocument,
-                RecipientName = $"Departamentul {departmentToReceiveDocument}!"
+                RecipientName = $"Departamentul {departmentToReceiveDocument}"
             };
             
             await _dbContext.WorkflowHistoryLogs.AddAsync(newWorkflowResponsible, token);

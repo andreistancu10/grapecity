@@ -2,8 +2,6 @@
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
-using System.Threading;
-using System.Threading.Tasks;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
@@ -15,19 +13,16 @@ public class CreateInternalDocumentHandler : ICommandHandler<CreateInternalDocum
     private readonly DocumentManagementDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly IUploadedFileService _uploadedFileService;
-    private readonly IDocumentService _documentService;
     private readonly IInternalDocumentService _internalDocumentService;
 
     public CreateInternalDocumentHandler(DocumentManagementDbContext dbContext,
         IMapper mapper, 
         IUploadedFileService uploadedFileService, 
-        IDocumentService documentService,
         IInternalDocumentService internalDocumentService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _uploadedFileService = uploadedFileService;
-        _documentService = documentService;
         _internalDocumentService = internalDocumentService;
     }
 
@@ -45,7 +40,8 @@ public class CreateInternalDocumentHandler : ICommandHandler<CreateInternalDocum
             RecipientId = request.DestinationDepartmentId, 
             RecipientType = RecipientType.Department.Id,
             DocumentStatus = DocumentStatus.New, 
-            RecipientName = $"Departamentul {request.DestinationDepartmentId}" 
+            RecipientName = $"Departamentul {request.DestinationDepartmentId}" ,
+            DestinationDepartmentId = request.DestinationDepartmentId
         }, cancellationToken);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
