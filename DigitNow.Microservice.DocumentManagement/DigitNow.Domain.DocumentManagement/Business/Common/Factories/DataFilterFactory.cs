@@ -13,8 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
             //TODO: Write filter
             filter.RegistryOfficeFilter = new DocumentRegistryOfficeDepartmentFilter
             {
-                DepartmentId = default(long),
-                DepartmentCode = default(string)
+                DepartmentId = default(long)
             };
 
             return filter;

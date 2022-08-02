@@ -10,6 +10,5 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
     public class DocumentRegistryOfficeDepartmentFilter
     {
         public long DepartmentId { get; set; }
-        public string DepartmentCode { get; set; }
     }
 }

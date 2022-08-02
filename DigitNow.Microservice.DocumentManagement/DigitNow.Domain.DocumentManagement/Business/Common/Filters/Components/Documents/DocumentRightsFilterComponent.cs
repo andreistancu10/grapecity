@@ -1,5 +1,7 @@
 ﻿using DigitNow.Adapters.MS.Catalog;
 using DigitNow.Adapters.MS.Catalog.Poco;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
+using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Filters;
 using DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights;
@@ -29,30 +31,41 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
 
         protected override async Task<DataExpressions<Document>> SetCustomDataExpressionsAsync(DocumentRightsFilterPreprocessComponentContext context, CancellationToken token)
         {
+            var currentUser = context.CurrentUser;
+            var result = new DataExpressions<Document>();
+
+            // Mayor has full access
+            if (IsRole(currentUser, RecipientType.Mayor)) 
+                return result;
+
             var registryOfficeDepartment = await GetRegistryOfficeDepartmentAsync(token);
 
-            var containsRegistryOfficeDepartments = context.CurrentUser.Departments.Contains(registryOfficeDepartment.Id);
-            if (containsRegistryOfficeDepartments)
-            {
-                return new DocumentDepartmentRightsFilterBuilder(ServiceProvider, context.DepartmentRightsFilter)
-                    .Build();
-            }
+            // Set registry office department
+            context.DepartmentRightsFilter.RegistryOfficeFilter.DepartmentId = registryOfficeDepartment.Id;
 
-            return new DocumentUserRightsFilterBuilder(ServiceProvider, context.UserRightsFilter)
-                .Build();
+            var departmentFilters = new DocumentDepartmentRightsFilterBuilder(ServiceProvider, context.DepartmentRightsFilter).Build();
+            result.AddRange(departmentFilters);
+
+            var rolesFilters = new DocumentUserRightsFilterBuilder(ServiceProvider, context.UserRightsFilter).Build();
+            result.AddRange(rolesFilters);
+
+            return result;
         }
 
         #endregion
 
         #region [ Helpers ]
 
-        private async Task<DepartmentDto> GetRegistryOfficeDepartmentAsync(CancellationToken token)
+        private async Task<Department> GetRegistryOfficeDepartmentAsync(CancellationToken token)
         {
             //TODO: Get departments by code
-            var departments = await _catalogAdapterClient.GetDepartmentsAsync(token);
+            var department = await _catalogAdapterClient.GetDepartmentByCodeAsync("registratura",token);
 
-            return departments.First(x => x.Name == "Registratura");
+            return department;
         }
+
+        private static bool IsRole(UserModel userModel, RecipientType role) =>
+            userModel.Roles.Contains(role.Code);
 
         #endregion
     }
