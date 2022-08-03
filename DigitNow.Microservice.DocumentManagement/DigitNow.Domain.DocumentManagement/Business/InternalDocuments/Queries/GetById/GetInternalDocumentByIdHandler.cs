@@ -21,9 +21,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.InternalDocuments.Queries.
         public async Task<GetInternalDocumentByIdResponse> Handle(GetInternalDocumentByIdQuery request, CancellationToken cancellationToken)
         {
             var foundInternalDocument = await _dbContext.InternalDocuments
-                .Include(x => x.WorkflowHistory)
+                .AsNoTracking()
                 .Include(x => x.Document)
-                .ThenInclude(x => x.DocumentUploadedFiles)
+                .Include(x => x.Document.WorkflowHistories)
                 .FirstOrDefaultAsync(c => c.DocumentId == request.Id, cancellationToken);
             
             if (foundInternalDocument == null) return null;

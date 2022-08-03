@@ -14,38 +14,38 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         public FunctionarySendsOpinion(IServiceProvider serviceProvider) : base(serviceProvider) { }
         protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.OpinionRequestedAllocated };
 
-        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, VirtualDocument virtualDocument, WorkflowHistory lastWorkflowRecord, CancellationToken token)
+        protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
         {
             if (!Validate(command, lastWorkflowRecord))
                 return command;
 
-            var oldWorkflowResponsible = virtualDocument.WorkflowHistory
-                .Where(x => (x.RecipientType == RecipientType.Functionary.Id && (x.Status == DocumentStatus.InWorkAllocated || x.Status == DocumentStatus.New)) 
-                          || x.RecipientType == RecipientType.HeadOfDepartment.Id && x.Status == DocumentStatus.OpinionRequestedUnallocated)
+            var oldWorkflowResponsible = document.WorkflowHistories
+                .Where(x => (x.RecipientType == RecipientType.Functionary.Id && (x.DocumentStatus == DocumentStatus.InWorkAllocated || x.DocumentStatus == DocumentStatus.New)) 
+                          || x.RecipientType == RecipientType.HeadOfDepartment.Id && x.DocumentStatus == DocumentStatus.OpinionRequestedUnallocated)
                 .OrderByDescending(x => x.CreatedAt)
                 .FirstOrDefault();
 
-            var newWorkflowResponsible = new WorkflowHistory
+            var newWorkflowResponsible = new WorkflowHistoryLog
             {
-                Status = document.DocumentType == DocumentType.Incoming ? DocumentStatus.InWorkAllocated : DocumentStatus.New,
+                DocumentStatus = document.DocumentType == DocumentType.Incoming ? DocumentStatus.InWorkAllocated : DocumentStatus.New,
                 Remarks = command.Remarks
             };
 
-            await TransferResponsibility(oldWorkflowResponsible, newWorkflowResponsible, command);
+            await TransferResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
 
-            virtualDocument.WorkflowHistory.Add(newWorkflowResponsible);
+            document.WorkflowHistories.Add(newWorkflowResponsible);
 
-            ResetDateAsOpinionWasSent(virtualDocument);
+            ResetDateAsOpinionWasSent(document);
 
             return command;
         }
 
-        private static void ResetDateAsOpinionWasSent(VirtualDocument virtualDocument)
+        private static void ResetDateAsOpinionWasSent(Document document)
         {
-            virtualDocument.WorkflowHistory.ForEach(x => x.OpinionRequestedUntil = null);
+            document.WorkflowHistories.ForEach(x => x.OpinionRequestedUntil = null);
         }
 
-        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistory lastWorkFlowRecord)
+        private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord)
         {
             if (string.IsNullOrWhiteSpace(command.Remarks) || !IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
             {

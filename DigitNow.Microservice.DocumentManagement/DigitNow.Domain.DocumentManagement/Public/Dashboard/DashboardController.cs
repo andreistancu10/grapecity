@@ -54,7 +54,7 @@ public class DashboardController : ApiController
     }
 
     [HttpPost("export-excel")]
-    public async Task<ActionResult<FileContentResult>> ExportExcelAsync([FromBody] GetDocumentsRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> ExportExcelAsync([FromBody] GetDocumentsRequest request, CancellationToken cancellationToken)
     {
         var command = _mapper.Map<GetDocumentsQuery>(request);
         var result = await _mediator.Send(command, cancellationToken);

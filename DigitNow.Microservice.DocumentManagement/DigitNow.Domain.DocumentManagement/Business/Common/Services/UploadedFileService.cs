@@ -7,15 +7,13 @@ using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentUploadedFiles;
-using DigitNow.Domain.DocumentManagement.Data.Entities.UploadedFiles;
 using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IUploadedFileService
     {
-        Task<UploadedFile> CreateAsync(UploadFileCommand request, Guid newGuid, string filePath, CancellationToken cancellationToken);
+        Task<UploadedFile> CreateAsync(UploadFileCommand request, Guid newGuid, string relativeFilePath, string absoluteFilePath, CancellationToken cancellationToken);
         Task CreateDocumentUploadedFilesAsync(IEnumerable<long> uploadedFileIds, Document document, CancellationToken cancellationToken);
         Task UpdateDocumentUploadedFilesAsync(List<long> uploadedFileIds, Document document, CancellationToken cancellationToken);
         Task<List<UploadedFile>> GetUploadedFilesAsync(IEnumerable<long> ids, CancellationToken cancellationToken);
@@ -39,12 +37,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         public async Task<UploadedFile> CreateAsync(
             UploadFileCommand request,
             Guid newGuid,
-            string filePath,
+            string relativeFilePath, 
+            string absoluteFilePath,
             CancellationToken cancellationToken)
         {
             var newFile = _mapper.Map<UploadedFile>(request);
             newFile.Guid = newGuid;
-            newFile.RelativePath = filePath;
+            newFile.RelativePath = relativeFilePath;
+            newFile.AbsolutePath = absoluteFilePath;
 
             await _dbContext.UploadedFiles.AddAsync(newFile, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);

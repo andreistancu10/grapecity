@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Queries.GetSpecialRegisters;
 using DigitNow.Domain.DocumentManagement.Data;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
 using HTSS.Platform.Infrastructure.Data.Abstractions;
 using HTSS.Platform.Infrastructure.Data.EntityFramework;

@@ -9,7 +9,7 @@ using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Concrete
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
-using DigitNow.Domain.DocumentManagement.Data.Entities.UploadedFiles;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 
 namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload
@@ -32,15 +32,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Uploa
         public async Task<FileViewModel> Handle(UploadFileCommand command, CancellationToken cancellationToken)
         {
             var newGuid = Guid.NewGuid();
-            var filePath = await _fileService.UploadFileAsync(command.File, newGuid.ToString());
-            var newUploadedFile = await _uploadedFileService.CreateAsync(command, newGuid, filePath, cancellationToken);
+            var (relativePath, absolutePath) = await _fileService.UploadFileAsync(command.File, newGuid.ToString());
+            var newUploadedFile = await _uploadedFileService.CreateAsync(command, newGuid, relativePath, absolutePath, cancellationToken);
 
             if (command.DocumentId != null)
             {
-               await _uploadedFileService.AssociateUploadedFileToDocumentAsync(
-                    newUploadedFile.Id, 
-                    (long) command.DocumentId,
-                    cancellationToken);
+                await _uploadedFileService.AssociateUploadedFileToDocumentAsync(
+                     newUploadedFile.Id,
+                     (long)command.DocumentId,
+                     cancellationToken);
             }
 
             var uploadedFiles = new List<UploadedFile>

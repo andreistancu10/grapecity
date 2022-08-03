@@ -2,7 +2,7 @@
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Models
 {
-    internal class UserModel
+    public class UserModel
     {
         public long Id { get; set; }
         public string FirstName { get; set; }

@@ -37,11 +37,5 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public Document Document { get; set; }
 
         #endregion
-
-        #region [ Relationship ]
-
-        public List<WorkflowHistory> WorkflowHistory { get; set; } = new();
-
-        #endregion
     }
 }

@@ -7,7 +7,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetWorkf
     {
         public GetDocumentResolutionByDocumentIdMappings()
         {
-            CreateMap<WorkflowHistory, GetWorkflowHistoryByDocumentIdResponse>();
+            CreateMap<WorkflowHistoryLog, GetWorkflowHistoryByDocumentIdResponse>();
         }
     }
 }

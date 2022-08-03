@@ -2,7 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Queries.GetSpecialRegisters;
-using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Mappings;
 

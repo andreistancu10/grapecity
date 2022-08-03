@@ -9,12 +9,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
         public int DocumentType { get; set; }
         public DateTime RegistrationDate { get; set; }
         public int RegistrationNumber { get; set; }
-        public string IssuerName { get; set; }
-        public string Recipient { get; set; }
-        public string DocumentCategory { get; set; }
-        public int ResolutionDuration { get; set; }
+        public BasicViewModel Issuer { get; set; }
+        public BasicViewModel Recipient { get; set; }
+        public BasicViewModel DocumentCategory { get; set; }
+        public int ResolutionPeriod { get; set; }
         public int Status { get; set; }
-        public string DispatchBy { get; set; }
-        public string User { get; set; }
+        public bool IsDispatched { get; set; }
+        public BasicViewModel User { get; set; }
+        public string IdentificationNumber { get; set; }
     }
 }
