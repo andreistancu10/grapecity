@@ -1,12 +1,8 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using System.Threading.Tasks;
-using System.Threading;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
-using System;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Documents;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.WorkflowManager.Actions.HeadOfDepartment
 {

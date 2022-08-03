@@ -1,6 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.Entities.Documents;
-
-namespace DigitNow.Domain.DocumentManagement.Data.Entities
+﻿namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
     public class SpecialRegisterMapping : ExtendedEntity
     {
