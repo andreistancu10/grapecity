@@ -29,13 +29,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries
             IReportProcessor report = new ReportRelatedProcessor(_serviceProvider);
             var reportViewModels = await report.GetDataAsync(request.FromDate, request.ToDate, cancellationToken);
 
-            return await MapToExportReportViewModels(reportViewModels, cancellationToken);
+            return await MapToExportReportViewModels(reportViewModels, request.LanguageId, cancellationToken);
         }
 
-        private async Task<List<ExportReportViewModel>> MapToExportReportViewModels(IEnumerable<ReportViewModel> reportViewModels, CancellationToken cancellationToken)
+        private async Task<List<ExportReportViewModel>> MapToExportReportViewModels(IEnumerable<ReportViewModel> reportViewModels, int languageId, CancellationToken cancellationToken)
         {
-            var documentTypeDictionary = await GetDocumentTypeTranslationsAsync(cancellationToken);
-            var documentStatus = await GetDocumentStatusTranslationsAsync(cancellationToken);
+            var documentTypeDictionary = await GetDocumentTypeTranslationsAsync(languageId,cancellationToken);
+            var documentStatus = await GetDocumentStatusTranslationsAsync(languageId,cancellationToken);
 
             return reportViewModels
                 .Select(reportViewModel => new ReportViewModelAggregate
@@ -48,10 +48,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries
                 .ToList();
         }
 
-        private async Task<Dictionary<DocumentStatus, string>> GetDocumentStatusTranslationsAsync(CancellationToken cancellationToken)
+        private async Task<Dictionary<DocumentStatus, string>> GetDocumentStatusTranslationsAsync(int languageId, CancellationToken cancellationToken)
         {
             var documentStatusTranslationsResponse = await _localizationManager.Translate(
-                1,
+                languageId,
                 CustomMappings.DocumentStatusTranslations.Select(c => c.Value),
                 cancellationToken);
 
@@ -66,10 +66,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries
             return documentStatus;
         }
 
-        private async Task<Dictionary<DocumentType, string>> GetDocumentTypeTranslationsAsync(CancellationToken cancellationToken)
+        private async Task<Dictionary<DocumentType, string>> GetDocumentTypeTranslationsAsync(int languageId, CancellationToken cancellationToken)
         {
             var documentTypeTranslationsResponse = await _localizationManager.Translate(
-                1,
+                languageId,
                 CustomMappings.DocumentTypeTranslations.Select(c => c.Value),
                 cancellationToken);
 
