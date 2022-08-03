@@ -10,66 +10,67 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace DigitNow.Domain.DocumentManagement.Public.SpecialRegisters;
-
-[Authorize]
-[ApiController]
-[Route("api/special-registers")]
-public class SpecialRegistersController : ApiController
+namespace DigitNow.Domain.DocumentManagement.Public.SpecialRegisters
 {
-    private readonly IMediator _mediator;
-    private readonly IMapper _mapper;
-
-    public SpecialRegistersController(IMediator mediator, IMapper mapper)
+    [Authorize]
+    [ApiController]
+    [Route("api/special-registers")]
+    public class SpecialRegistersController : ApiController
     {
-        _mediator = mediator;
-        _mapper = mapper;
-    }
+        private readonly IMediator _mediator;
+        private readonly IMapper _mapper;
 
-    [HttpPost]
-    public async Task<IActionResult> CreateSpecialRegisterAsync([FromBody] CreateSpecialRegisterRequest request)
-    {
-        return await _mediator.Send(_mapper.Map<CreateSpecialRegisterCommand>(request))
-            switch
+        public SpecialRegistersController(IMediator mediator, IMapper mapper)
         {
-            null => NotFound(),
-            var result => Ok(result)
-        };
-    }
+            _mediator = mediator;
+            _mapper = mapper;
+        }
 
-    [HttpPut("{id:long}")]
-    public async Task<IActionResult> UpdateSpecialRegisterAsync([FromRoute] long id, [FromBody] UpdateSpecialRegisterRequest request)
-    {
-        var command = _mapper.Map<UpdateSpecialRegisterCommand>(request);
-        command.Id = id;
-
-        return await _mediator.Send(command)
-            switch
+        [HttpPost]
+        public async Task<IActionResult> CreateSpecialRegisterAsync([FromBody] CreateSpecialRegisterRequest request)
         {
-            null => NotFound(),
-            var result => Ok(result)
-        };
-    }
+            return await _mediator.Send(_mapper.Map<CreateSpecialRegisterCommand>(request))
+                switch
+                {
+                    null => NotFound(),
+                    var result => Ok(result)
+                };
+        }
 
-    [HttpGet("filter")]
-    public async Task<IActionResult> GetSpecialRegistersAsync()
-    {
-        return await _mediator.Send(new SpecialRegisterQuery())
-            switch
+        [HttpPut("{id:long}")]
+        public async Task<IActionResult> UpdateSpecialRegisterAsync([FromRoute] long id, [FromBody] UpdateSpecialRegisterRequest request)
         {
-            null => NotFound(),
-            var result => Ok(result)
-        };
-    }
+            var command = _mapper.Map<UpdateSpecialRegisterCommand>(request);
+            command.Id = id;
 
-    [HttpGet("{id:long}")]
-    public async Task<IActionResult> GetSpecialRegisterByIdAsync([FromRoute] long id)
-    {
-        return await _mediator.Send(new GetSpecialRegisterByIdQuery(id))
-            switch
+            return await _mediator.Send(command)
+                switch
+                {
+                    null => NotFound(),
+                    var result => Ok(result)
+                };
+        }
+
+        [HttpGet("filter")]
+        public async Task<IActionResult> GetSpecialRegistersAsync([FromQuery] GetSpecialRegisterRequest request)
         {
-            null => NotFound(),
-            var result => Ok(result)
-        };
+            return await _mediator.Send(new GetSpecialRegistersQuery())
+                switch
+                {
+                    null => NotFound(),
+                    var result => Ok(result)
+                };
+        }
+
+        [HttpGet("{id:long}")]
+        public async Task<IActionResult> GetSpecialRegisterByIdAsync([FromRoute] long id)
+        {
+            return await _mediator.Send(new GetSpecialRegisterByIdQuery(id))
+                switch
+                {
+                    null => NotFound(),
+                    var result => Ok(result)
+                };
+        }
     }
 }
