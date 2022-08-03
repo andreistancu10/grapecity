@@ -15,19 +15,21 @@ namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries
         private readonly IServiceProvider _serviceProvider;
         private readonly ILocalizationManager _localizationManager;
 
-        public GetReportHandler(IMapper mapper,
+        public GetReportHandler(
             IServiceProvider serviceProvider,
+            IMapper mapper,
             ILocalizationManager localizationManager)
         {
-            _mapper = mapper;
             _serviceProvider = serviceProvider;
+            _mapper = mapper;
             _localizationManager = localizationManager;
         }
 
         public async Task<List<ExportReportViewModel>> Handle(GetReportQuery request, CancellationToken cancellationToken)
         {
-            IReportProcessor report = new ReportRelatedProcessor(_serviceProvider);
-            var reportViewModels = await report.GetDataAsync(request.FromDate, request.ToDate, cancellationToken);
+            var reportProcessor = new ReportRelatedProcessor(_serviceProvider);
+
+            var reportViewModels = await reportProcessor.ProcessDocumentsAsync(request.FromDate, request.ToDate, cancellationToken);
 
             return await MapToExportReportViewModels(reportViewModels, request.LanguageId, cancellationToken);
         }

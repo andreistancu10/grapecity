@@ -24,6 +24,7 @@
 		<Compile Include=".utils\DevOnlyActionFilter.cs" />
 		<Compile Include=".utils\DocumentTypeTranslation.cs" />
 		<Compile Include=".utils\FilterDescriptor.cs" />
+		<Compile Include=".utils\LanguagesUtils.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="DigitNow.Domain.Authentication.Client" Version="6.0.6" />

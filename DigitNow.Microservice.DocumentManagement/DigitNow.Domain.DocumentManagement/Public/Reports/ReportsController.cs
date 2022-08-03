@@ -4,6 +4,7 @@ using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Business.Reports.Queries;
 using DigitNow.Domain.DocumentManagement.Public.Reports.Models;
+using DigitNow.Domain.DocumentManagement.utils;
 using Domain.Localization.Client;
 using HTSS.Platform.Core.Files;
 using HTSS.Platform.Infrastructure.Api.Tools;
@@ -36,34 +37,26 @@ namespace DigitNow.Domain.DocumentManagement.Public.Reports
         }
 
         [HttpPost("expired")]
-        public async Task<IActionResult> GetReportAsync([FromBody] GetExpiredReportRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetExpiredDocumentsReportAsync([FromBody] GetExpiredReportRequest request, CancellationToken cancellationToken)
         {
             var getReportQuery = _mapper.Map<GetReportQuery>(request);
             var reportResult = await _mediator.Send(getReportQuery, cancellationToken);
+            if (reportResult == null) return NotFound();
 
-            if (reportResult == null)
-            {
-                return NotFound();
-            }
-
-            var documentNameResponse = await _localizationManger.Translate(1, "dms.reports.expired-document-name", cancellationToken);
+            var documentNameResponse = await _localizationManger.Translate(request.LanguageId, "dms.reports.expired-document-name", cancellationToken);
             var fileResult = await _exportService.CreateExcelFile(documentNameResponse.Translation, "DocumentsSheet", reportResult);
 
             return File(fileResult.Content, fileResult.ContentType, fileResult.Name);
         }
 
         [HttpPost("to-expire")]
-        public async Task<IActionResult> GetReportAsync([FromBody] GetToExpireReportRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetAboutToExpireDocumentsReportAsync([FromBody] GetToExpireReportRequest request, CancellationToken cancellationToken)
         {
             var getReportQuery = _mapper.Map<GetReportQuery>(request);
             var reportResult = await _mediator.Send(getReportQuery, cancellationToken);
+            if (reportResult == null) return NotFound();
 
-            if (reportResult == null)
-            {
-                return NotFound();
-            }
-
-            var documentNameResponse = await _localizationManger.Translate(1, "dms.reports.to-expire-document-name", cancellationToken);
+            var documentNameResponse = await _localizationManger.Translate(request.LanguageId, "dms.reports.to-expire-document-name", cancellationToken);
             var fileResult = await _exportService.CreateExcelFile(documentNameResponse.Translation, "DocumentsSheet", reportResult);
 
             return File(fileResult.Content, fileResult.ContentType, fileResult.Name);

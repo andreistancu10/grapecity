@@ -48,8 +48,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.ReportViewModel.RegistrationNumber))
                .ForMember(c => c.Recipient, opt => opt.MapFrom(src => src.ReportViewModel.Recipient.Name))
                .ForMember(c => c.Issuer, opt => opt.MapFrom(src => src.ReportViewModel.Issuer.Name))
-               .ForMember(c => c.CurrentStatus, opt => opt.MapFrom<MapDocumentCurrentStatus>()) 
-               .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>()) 
+               .ForMember(c => c.CurrentStatus, opt => opt.MapFrom<MapDocumentCurrentStatus>())
+               .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>())
                .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.ReportViewModel.DocumentCategory.Name))
                .ForMember(c => c.Functionary, opt => opt.MapFrom(src => src.ReportViewModel.Functionary.Name))
                .ForMember(c => c.AllocationDate, opt => opt.MapFrom(src => src.ReportViewModel.AllocationDate))
@@ -75,10 +75,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
                 var lastWorkflowHistory = source.VirtualDocument.Document.WorkflowHistories.LastOrDefault(c => c.DocumentStatus == DocumentStatus.InWorkAllocated);
-
-                return lastWorkflowHistory == null
-                    ? null
-                    : new BasicViewModel(lastWorkflowHistory.RecipientId, lastWorkflowHistory.RecipientName);
+                if (lastWorkflowHistory != null)
+                {
+                    return new BasicViewModel(lastWorkflowHistory.RecipientId, lastWorkflowHistory.RecipientName); ;
+                }
+                return null;
             }
         }
 
@@ -156,9 +157,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             private static BasicViewModel GetSpecialRegister<T>(VirtualReportAggregate<T> reportAggregate)
                 where T : VirtualDocument
             {
-                return reportAggregate.SpecialRegisterMapping == null
-                    ? null
-                    : new BasicViewModel(reportAggregate.SpecialRegisterMapping.SpecialRegisterId, reportAggregate.SpecialRegisterMapping.SpecialRegister.Name);
+                if (reportAggregate.SpecialRegisterMapping != null)
+                {
+                    new BasicViewModel(reportAggregate.SpecialRegisterMapping.SpecialRegisterId, reportAggregate.SpecialRegisterMapping.SpecialRegister.Name);
+                }
+                return null;
             }
         }
 
@@ -225,10 +228,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 where T : VirtualDocument
             {
                 var foundUser = documentAggregate.Users.FirstOrDefault(x => x.Id == virtualDocument.Document.CreatedBy);
-
-                return foundUser == null
-                    ? null
-                    : new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
+                if (foundUser != null)
+                {
+                    return new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
+                }
+                return null;
             }
         }
 
@@ -239,19 +243,21 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
                 var foundCategory = source.Categories.FirstOrDefault(x => x.Id == source.VirtualDocument.DocumentTypeId);
-
-                return foundCategory == null
-                    ? null
-                    : new BasicViewModel(foundCategory.Id, foundCategory.Name);
+                if (foundCategory != null)
+                {
+                    return new BasicViewModel(foundCategory.Id, foundCategory.Name); ;
+                }
+                return null;
             }
 
             public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
                 var foundCategory = source.InternalCategories.FirstOrDefault(x => x.Id == source.VirtualDocument.InternalDocumentTypeId);
-
-                return foundCategory == null
-                    ? null
-                    : new BasicViewModel(foundCategory.Id, foundCategory.Name);
+                if (foundCategory != null)
+                {
+                    return new BasicViewModel(foundCategory.Id, foundCategory.Name);
+                }
+                return null;
             }
         }
 
@@ -279,10 +285,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 }
 
                 var foundUser = users.FirstOrDefault(x => x.Id == userId);
-
-                return foundUser == null
-                    ? null
-                    : new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
+                if (foundUser != null)
+                {
+                    return new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
+                }
+                return null;
             }
         }
     }
