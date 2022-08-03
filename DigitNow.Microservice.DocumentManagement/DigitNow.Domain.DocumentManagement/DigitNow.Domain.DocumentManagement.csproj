@@ -19,7 +19,10 @@
 		<Compile Include=".extensions\Autocorrect\StringExtensions.cs" />
 		<Compile Include=".extensions\User\UserExtension.cs" />
 		<Compile Include=".extensions\Validators\RuleBuilderExtensions.cs" />
+		<Compile Include=".utils\DocumentTypeTranslations.cs" />
+		<Compile Include=".utils\CustomMappings.cs" />
 		<Compile Include=".utils\DevOnlyActionFilter.cs" />
+		<Compile Include=".utils\DocumentTypeTranslation.cs" />
 		<Compile Include=".utils\FilterDescriptor.cs" />
 	</ItemGroup>
 	<ItemGroup>
