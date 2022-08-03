@@ -12,6 +12,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <PackageReference Include="Domain.Localization.Client" Version="6.0.1" />
 	  <PackageReference Include="OpenHtmlToPdf" Version="1.12.0" />
 	</ItemGroup>
 

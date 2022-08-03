@@ -1,9 +1,9 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -52,11 +52,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             if (!virtualDocuments.Any()) return new List<ReportViewModel>();
 
-            await _documentRelationsFetcher.TriggerFetchersAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
-            return MapDocumentsReports(virtualDocuments)
-                .OrderByDescending(x => x.RegistrationDate)
-                .ToList();
-        }
+        await _documentReportRelationsFetcher.TriggerFetchersAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
+        return MapDocumentsReports(virtualDocuments)
+            .OrderByDescending(x => x.RegistrationDate)
+            .ToList();
+    }
 
         #endregion
 

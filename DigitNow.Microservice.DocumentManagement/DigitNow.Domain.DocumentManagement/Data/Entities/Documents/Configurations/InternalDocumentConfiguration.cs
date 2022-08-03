@@ -1,23 +1,24 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities;
-
-public class InternalDocumentConfiguration : IEntityTypeConfiguration<InternalDocument>
+namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
-    public void Configure(EntityTypeBuilder<InternalDocument> builder)
+    public class InternalDocumentConfiguration : IEntityTypeConfiguration<InternalDocument>
     {
-        builder.ToTable(nameof(InternalDocument), DocumentManagementDbContext.Schema);
+        public void Configure(EntityTypeBuilder<InternalDocument> builder)
+        {
+            builder.ToTable(nameof(InternalDocument), DocumentManagementDbContext.Schema);
 
-        builder.Property(p => p.SourceDepartmentId).IsRequired();
-        builder.Property(p => p.InternalDocumentTypeId).IsRequired();
-        builder.Property(p => p.DeadlineDaysNumber).IsRequired();
-        builder.Property(p => p.Description).IsRequired();
-        builder.Property(p => p.Observation);
-        builder.Property(p => p.IsUrgent);
+            builder.Property(p => p.SourceDepartmentId).IsRequired();
+            builder.Property(p => p.InternalDocumentTypeId).IsRequired();
+            builder.Property(p => p.DeadlineDaysNumber).IsRequired();
+            builder.Property(p => p.Description).IsRequired();
+            builder.Property(p => p.Observation);
+            builder.Property(p => p.IsUrgent);
 
-        builder.HasOne(item => item.Document)
-            .WithOne(item => item.InternalDocument)
-            .HasForeignKey<InternalDocument>(item => item.DocumentId);
+            builder.HasOne(item => item.Document)
+                .WithOne(item => item.InternalDocument)
+                .HasForeignKey<InternalDocument>(item => item.DocumentId);
+        }
     }
 }

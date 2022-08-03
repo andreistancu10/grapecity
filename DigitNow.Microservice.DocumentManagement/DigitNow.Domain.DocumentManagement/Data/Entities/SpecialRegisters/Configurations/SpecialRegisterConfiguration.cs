@@ -1,16 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters.Configurations;
-
-public class SpecialRegisterConfiguration : IEntityTypeConfiguration<SpecialRegister>
+namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
-    public void Configure(EntityTypeBuilder<SpecialRegister> builder)
+    public class SpecialRegisterConfiguration : IEntityTypeConfiguration<SpecialRegister>
     {
-        builder.ToTable(nameof(SpecialRegister), DocumentManagementDbContext.Schema);
+        public void Configure(EntityTypeBuilder<SpecialRegister> builder)
+        {
+            builder.ToTable(nameof(SpecialRegister), DocumentManagementDbContext.Schema);
 
-        builder.HasKey(p => p.Id);
-        builder.Property(c => c.DocumentCategoryId).IsRequired();
-        builder.HasIndex(c => c.DocumentCategoryId).IsUnique();
+            builder.HasKey(p => p.Id);
+            builder.Property(c => c.DocumentCategoryId).IsRequired();
+            builder.HasIndex(c => c.DocumentCategoryId).IsUnique();
+        }
     }
 }

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities.DeliveryDetails.Configurations
+namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
     public class DeliveryDetailConfiguration
     {

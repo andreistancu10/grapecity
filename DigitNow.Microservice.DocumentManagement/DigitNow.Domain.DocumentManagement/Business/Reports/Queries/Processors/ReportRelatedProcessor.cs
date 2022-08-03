@@ -9,19 +9,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors
 {
-    public interface IReportProcessor
-    {
-        Task<List<ReportViewModel>> GetDataAsync(DateTime fromDate, DateTime toDate, CancellationToken cancellationToken);
-    }
-
-    public abstract class ReportRelatedProcessor : IReportProcessor
+    internal class ReportRelatedProcessor
     {
         private readonly IVirtualDocumentService _virtualDocumentService;
         private readonly IDocumentMappingService _documentMappingService;
         private readonly ICatalogClient _catalogClient;
         private readonly DocumentManagementDbContext _dbContext;
 
-        protected ReportRelatedProcessor(IServiceProvider serviceProvider)
+        public ReportRelatedProcessor(IServiceProvider serviceProvider)
         {
             _virtualDocumentService = serviceProvider.GetService<IVirtualDocumentService>();
             _documentMappingService = serviceProvider.GetService<IDocumentMappingService>();
@@ -29,19 +24,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors
             _dbContext = serviceProvider.GetService<DocumentManagementDbContext>();
         }
 
-        protected virtual void Validate(DateTime fromDate, DateTime toDate)
-        {
-        }
-
-        public async Task<List<ReportViewModel>> GetDataAsync(DateTime fromDate, DateTime toDate, CancellationToken cancellationToken)
-        {
-            Validate(fromDate, toDate);
-            return await GetDataInternalAsync(fromDate, toDate, cancellationToken);
-        }
-
-        protected virtual async Task<List<ReportViewModel>> GetDataInternalAsync(DateTime fromDate, DateTime toDate, CancellationToken cancellationToken)
+        public async Task<List<ReportViewModel>> ProcessDocumentsAsync(DateTime fromDate, DateTime toDate, CancellationToken cancellationToken)
         {
             var documents = new List<Document>();
+            
             documents.AddRange(await GetEligibleInternalDocumentsAsync(fromDate, toDate, cancellationToken));
             documents.AddRange(await GetEligibleIncomingDocumentsAsync(fromDate, toDate, cancellationToken));
 

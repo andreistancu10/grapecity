@@ -1,4 +1,6 @@
-﻿
+﻿using System.Collections.Generic;
+using System.Linq;
+
 namespace DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums
 {
     public enum DocumentStatus
@@ -19,4 +21,5 @@ namespace DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums
         InWorkMayorDeclined = 14,
         New = 15
     }
+
 }

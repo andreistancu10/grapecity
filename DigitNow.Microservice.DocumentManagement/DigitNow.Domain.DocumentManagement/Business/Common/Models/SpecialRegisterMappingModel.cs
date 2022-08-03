@@ -1,5 +1,4 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Models
 {
