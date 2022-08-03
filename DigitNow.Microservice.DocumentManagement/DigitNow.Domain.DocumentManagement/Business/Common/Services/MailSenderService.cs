@@ -1,5 +1,5 @@
-﻿using DigitNow.Adapters.MS.Identity.Poco;
-using DigitNow.Domain.Authentication.Client;
+﻿using DigitNow.Adapters.MS.Identity;
+using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.Authentication.Contracts.Users.GetUsersByFilter;
 using DigitNow.Domain.DocumentManagement.Business.Common.Notifications.Mail;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
@@ -21,16 +21,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IMailSender _mailSender;
-        private readonly IAuthenticationClient _authenticationClient;
+        private readonly IIdentityAdapterClient _identityAdapterClient;
 
         public MailSenderService(
             DocumentManagementDbContext dbContext, 
             IMailSender mailSender,
-            IAuthenticationClient authenticationClient)
+            IIdentityAdapterClient identityAdapterClient)
         {
             _dbContext = dbContext;
             _mailSender = mailSender;
-            _authenticationClient = authenticationClient;
+            _identityAdapterClient = identityAdapterClient;
         }
 
         public async Task SendMail_SendBulkDocumentsTemplate(User headOfDepartmentUser, IList<long> documentIds, CancellationToken token)
@@ -57,25 +57,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             await _mailSender.SendMail(MailTemplateEnum.DelegateDocumentToFunctionaryTemplate, delegatedUser.Email, new
             {
                 UserName = currentUser.UserName,
-                RegistryNumbers = String.Join(',', registryNumbers)
+                RegistryNumbers = string.Join(',', registryNumbers)
             }, token);
         }
 
         public async Task SendMail_DelegateDocumentToFunctionarySupervisor(User currentUser, User delegatedUser, IList<long> documentIds, CancellationToken token)
         {
-            var request = new GetUsersByRoleAndDepartmentRequest
-            {
-                RoleCode = RecipientType.HeadOfDepartment.Code,
-                DepartmentId = delegatedUser.Departments.First()
-            };
-
             var registryNumbers = await _dbContext.Documents
                 .Where(x => documentIds.Contains(x.Id))
                 .Select(x => x.RegistrationNumber)
                 .ToArrayAsync(token);
 
-            var userResponse = await _authenticationClient.GetUsersByRoleAndDepartment(request, token);
-
+            var userResponse = await _identityAdapterClient.GetUsersByRoleAndDepartment(RecipientType.HeadOfDepartment.Code, delegatedUser.Departments.First(), token);
 
             var tasks = new List<Task>();
             foreach (var targetUser in userResponse.Users)
@@ -84,7 +77,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 {
                     UserName = currentUser.UserName,
                     DelegateUserName = delegatedUser.UserName,
-                    DocumentJustification = String.Join(',', registryNumbers) 
+                    DocumentJustification = string.Join(',', registryNumbers) 
                 }, token));
             }
 
@@ -93,14 +86,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task SendMail_CreateIncomingDocument(User sender, long registrationId, DateTime date, CancellationToken token)
         {
+            var legalEntity = await _identityAdapterClient.GetCurrentLegalEntityAsync(token);
+
             await _mailSender.SendMail(MailTemplateEnum.AddRegistryTemplate, sender.Email,
                 new
                 {
-                    Address = "", //TODO: add address after implementation
+                    Address = legalEntity?.Name,
                 },
                 new
                 {
-                    Address = "", //TODO: add address after implementation
+                    Address = legalEntity?.Name,
                     Name = $"{sender.FirstName} {sender.LastName}",
                     RegistryNumber = registrationId.ToString(),
                     Date = date.ToShortDateString(),

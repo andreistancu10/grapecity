@@ -44,8 +44,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Notifications.Mail
 
         private FluentMailProviderTypeEnum GetMailProvider()
         {
-            var client = _configuration.GetValue<int>("EmailService:Client");
-            return (FluentMailProviderTypeEnum)client;
+            var client = _configuration.GetValue<FluentMailProviderTypeEnum>("EmailService:Client");
+            return client;
         }
     }
 }
