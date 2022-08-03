@@ -8,8 +8,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
     public class FunctionaryDeclines : BaseWorkflowManager, IWorkflowHandler
     {
         public FunctionaryDeclines(IServiceProvider serviceProvider) : base(serviceProvider) { }
-        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.OpinionRequestedAllocated, (int)DocumentStatus.InWorkDeclined };
-        
+        protected override int[] allowedTransitionStatuses => new int[] 
+        { 
+            (int)DocumentStatus.InWorkAllocated, 
+            (int)DocumentStatus.InWorkDelegated, 
+            (int)DocumentStatus.OpinionRequestedAllocated, 
+            (int)DocumentStatus.InWorkDeclined 
+        };
+
+        #region [ IWorkflowHandler ]
         protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
         {
             if (!Validate(command, lastWorkflowRecord))
@@ -26,6 +33,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                     return command;
             }
         }
+        #endregion
 
         private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowHistoryForIncoming(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token)
         {
@@ -45,7 +53,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 await PassDocumentToFunctionaryAsync(document, newWorkflowResponsible, command, token);
             }
             else
-                await PassDocumentToRegistryAsync(document, command, token);
+            {
+                document.Status = DocumentStatus.NewDeclinedCompetence;
+                await PassDocumentToRegistry(document, command, token);
+            }
 
             return command;
         }

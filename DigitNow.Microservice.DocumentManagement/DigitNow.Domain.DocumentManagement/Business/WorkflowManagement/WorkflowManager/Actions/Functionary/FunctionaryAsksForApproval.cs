@@ -5,10 +5,6 @@ using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
-using System;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.WorkflowManager.Actions.Functionary
 {
@@ -49,7 +45,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
         private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordForIncomingAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
         {
-            var oldWorkflowResponsible = await GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.HeadOfDepartment.Id, token);
+            var oldWorkflowResponsible = GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.HeadOfDepartment.Id);
 
             var newWorkflowResponsible = new WorkflowHistoryLog
             {
@@ -57,7 +53,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 Resolution = command.Resolution
             };
 
-            await TransferResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
+            await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
             document.WorkflowHistories.Add(newWorkflowResponsible);
 
             return command;
@@ -65,9 +61,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
         private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordForInternalOrOutgoingAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
         {
-            var response = await IdentityAdapterClient.GetUsersAsync(token);
-            var departmentUsers = response.Users.Where(x => x.Departments.Contains(document.DestinationDepartmentId));
-            var headOfDepartment = departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
+            var headOfDepartment = await IdentityService.GetHeadOfDepartmentUserAsync(document.DestinationDepartmentId, token);
 
             if (headOfDepartment == null)
             {
@@ -81,7 +75,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 return command;
             }
 
-            document.WorkflowHistories.Add(WorkflowHistoryLogFactory.Create(document.Id, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkApprovalRequested));
+            document.WorkflowHistories.Add(WorkflowHistoryLogFactory.Create(document, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkApprovalRequested));
 
             document.Status = DocumentStatus.InWorkApprovalRequested;
             document.RecipientId = headOfDepartment.Id;

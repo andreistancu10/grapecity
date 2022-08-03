@@ -5,17 +5,19 @@ using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.WorkflowManager.Actions.HeadOfDepartment
 {
     public class HeadOfDepartmentAsksForApproval : BaseWorkflowManager, IWorkflowHandler
     {
         public HeadOfDepartmentAsksForApproval(IServiceProvider serviceProvider) : base(serviceProvider) { }
-        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.New };
+        protected override int[] allowedTransitionStatuses => new int[] 
+        { 
+            (int)DocumentStatus.New,
+            (int)DocumentStatus.InWorkUnallocated
+        };
 
+        #region [ IWorkflowHandler ]
         protected async override Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
         {
             if (!Validate(command, lastWorkflowRecord, document))
@@ -28,17 +30,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             document.WorkflowHistories
                 .Add(WorkflowHistoryLogFactory
-                .Create(document.Id, RecipientType.Mayor, userResponse, DocumentStatus.InWorkMayorReview, string.Empty, command.Remarks, null, command.Resolution));
+                .Create(document, RecipientType.Mayor, userResponse, DocumentStatus.InWorkMayorReview, string.Empty, command.Remarks, null, command.Resolution));
 
-            await SetStatusAndRecipientBasedOnWorkflowDecisionAsync(command.DocumentId, userResponse.Id, DocumentStatus.InWorkMayorReview, token);
+            await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: false, command.DocumentId, userResponse.Id, DocumentStatus.InWorkMayorReview, token);
 
             return command;
-
         }
+
+        #endregion
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord, Document document)
         {
-            if (!IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses) || document.DocumentType == DocumentType.Incoming)
+            if (!IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
             {
                 TransitionNotAllowed(command);
                 return false;
