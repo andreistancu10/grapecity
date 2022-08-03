@@ -50,7 +50,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
             await Task.WhenAll
             (
                 _mailSenderService.SendMail_DelegateDocumentToFunctionary(currentUser, targetUser, request.DocumentIds, cancellationToken),
-                _mailSenderService.SendMail_DelegateDocumentToFunctionarySupervisor(currentUser, targetUser, cancellationToken)
+                _mailSenderService.SendMail_DelegateDocumentToFunctionarySupervisor(currentUser, targetUser, request.DocumentIds, cancellationToken)
             );
 
             return new ResultObject(ResultStatusCode.Ok);

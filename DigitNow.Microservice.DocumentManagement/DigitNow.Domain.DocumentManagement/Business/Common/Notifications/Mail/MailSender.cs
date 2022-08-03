@@ -2,7 +2,6 @@
 using Domain.Mail.Contracts.FluentMailProviderType;
 using Domain.Mail.Contracts.Mails;
 using Domain.Mail.Contracts.MailTemplates;
-using Microsoft.Extensions.Configuration;
 using System.Text.Json;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Notifications.Mail
@@ -16,12 +15,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Notifications.Mail
     public class MailSender : IMailSender
     {
         private readonly IMailClient _mailClient;
-        private readonly IConfiguration _configuration;
 
-        public MailSender(IMailClient mailClient, IConfiguration configuration)
+        public MailSender(IMailClient mailClient)
         {
             _mailClient = mailClient;
-            _configuration = configuration;
         }
 
         public Task SendMail(MailTemplateEnum templateId, string mailTo, object mailBodyParameters, CancellationToken token) =>
@@ -41,7 +38,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Notifications.Mail
             return _mailClient.CreateMail(mailEvent, token);
         }
 
-        private FluentMailProviderTypeEnum GetMailProvider()
+        private static FluentMailProviderTypeEnum GetMailProvider()
         {
             // TODO: Get from configuration
             return FluentMailProviderTypeEnum.FluentMailSendGrid;

@@ -13,7 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         Task SendMail_SendBulkDocumentsTemplate(User headOfDepartmentUser, IList<long> documentIds, CancellationToken token);
         Task SendMail_DelegateDocumentToFunctionary(User currentUser, User delegatedUser, IList<long> documentIds, CancellationToken token);
-        Task SendMail_DelegateDocumentToFunctionarySupervisor(User currentUser, User delegatedUser, CancellationToken token);
+        Task SendMail_DelegateDocumentToFunctionarySupervisor(User currentUser, User delegatedUser, IList<long> documentIds, CancellationToken token);
         Task SendMail_CreateIncomingDocument(User sender, long registrationId, DateTime date, CancellationToken token);
     }
 
@@ -42,7 +42,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             await _mailSender.SendMail(MailTemplateEnum.SendBulkDocumentsTemplate, headOfDepartmentUser.Email, new
             {
-                RegistryNumbers = registryNumbers
+                RegistryNumbers = String.Join(',', registryNumbers)
             }, token);
         }
 
@@ -57,19 +57,25 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             await _mailSender.SendMail(MailTemplateEnum.DelegateDocumentToFunctionaryTemplate, delegatedUser.Email, new
             {
                 UserName = currentUser.UserName,
-                RegistryNumbers = registryNumbers
+                RegistryNumbers = String.Join(',', registryNumbers)
             }, token);
         }
 
-        public async Task SendMail_DelegateDocumentToFunctionarySupervisor(User currentUser, User delegatedUser, CancellationToken token)
+        public async Task SendMail_DelegateDocumentToFunctionarySupervisor(User currentUser, User delegatedUser, IList<long> documentIds, CancellationToken token)
         {
             var request = new GetUsersByRoleAndDepartmentRequest
             {
                 RoleCode = RecipientType.HeadOfDepartment.Code,
-                DepartmentId = delegatedUser.Departments.First() //TODO: Ask about this
+                DepartmentId = delegatedUser.Departments.First()
             };
 
+            var registryNumbers = await _dbContext.Documents
+                .Where(x => documentIds.Contains(x.Id))
+                .Select(x => x.RegistrationNumber)
+                .ToArrayAsync(token);
+
             var userResponse = await _authenticationClient.GetUsersByRoleAndDepartment(request, token);
+
 
             var tasks = new List<Task>();
             foreach (var targetUser in userResponse.Users)
@@ -78,7 +84,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 {
                     UserName = currentUser.UserName,
                     DelegateUserName = delegatedUser.UserName,
-                    DocumentJustification = default(string) //TODO: Ask about this 
+                    DocumentJustification = String.Join(',', registryNumbers) 
                 }, token));
             }
 
