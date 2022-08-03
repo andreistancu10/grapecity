@@ -4,6 +4,7 @@ using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Public.OperationalArchive
@@ -14,16 +15,19 @@ namespace DigitNow.Domain.DocumentManagement.Public.OperationalArchive
     public class OperationalArchiveController : ApiController
     {
         private readonly IMediator _mediator;
+        private readonly ILogger<OperationalArchiveController> _logger;
 
-        public OperationalArchiveController(IMediator mediator, IMapper mapper)
+        public OperationalArchiveController(IMediator mediator, ILogger<OperationalArchiveController> logger)
         {
             _mediator = mediator;
+            _logger = logger;
         }
 
 
         [HttpPut]
         public async Task<IActionResult> MoveDocumentsToArchiveAsync()
         {
+            _logger.LogInformation("MS Doc Management - Move doc to archive called");
             return await _mediator.Send(new MoveDocumentsToArchiveCommand())
            switch
             {
