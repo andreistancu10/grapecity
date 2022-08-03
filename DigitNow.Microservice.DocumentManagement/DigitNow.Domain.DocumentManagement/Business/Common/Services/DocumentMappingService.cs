@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
-using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -16,7 +17,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     public class DocumentMappingService : IDocumentMappingService
     {
         #region [ Fields ]
-    
+
         private readonly IMapper _mapper;
         private readonly DocumentRelationsFetcher _documentRelationsFetcher;
         private readonly DocumentReportRelationsFetcher _documentReportRelationsFetcher;
@@ -38,19 +39,19 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         #region [ IDocumentMappingService ]
 
-    public async Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
-    {
-        if (!virtualDocuments.Any()) return new List<DocumentViewModel>();
+        public async Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
+        {
+            if (!virtualDocuments.Any()) return new List<DocumentViewModel>();
 
-        await _documentRelationsFetcher.TriggerFetchersAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
-        return MapDocuments(virtualDocuments)
-            .OrderByDescending(x => x.RegistrationDate)
-            .ToList();
-    }
+            await _documentRelationsFetcher.TriggerFetchersAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
+            return MapDocuments(virtualDocuments)
+                .OrderByDescending(x => x.RegistrationDate)
+                .ToList();
+        }
 
-    public async Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
-    {
-        if (!virtualDocuments.Any()) return new List<ReportViewModel>();
+        public async Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
+        {
+            if (!virtualDocuments.Any()) return new List<ReportViewModel>();
 
         await _documentReportRelationsFetcher.TriggerFetchersAsync(new DocumentsFetcherContext { Documents = virtualDocuments }, cancellationToken);
         return MapDocumentsReports(virtualDocuments)
@@ -91,7 +92,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             where T : VirtualDocument
         {
             var result = new List<DocumentViewModel>();
-        
+
             foreach (var childDocument in childDocuments)
             {
                 var aggregate = new VirtualDocumentAggregate<T>
@@ -160,7 +161,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             return result;
         }
-
         #endregion
     }
 }
