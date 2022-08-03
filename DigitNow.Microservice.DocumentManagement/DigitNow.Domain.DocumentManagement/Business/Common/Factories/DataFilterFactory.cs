@@ -12,7 +12,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
 
             if (IsRole(currentUser, RecipientType.Mayor))
             {
-                filter.MayorPermissionsFilter = new DocumentMayorPermissionsFilter(); ;
+                filter.MayorPermissionsFilter = new DocumentMayorPermissionsFilter();
             }
             else if (IsRole(currentUser, RecipientType.HeadOfDepartment))
             {

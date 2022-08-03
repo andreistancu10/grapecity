@@ -11,7 +11,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters
     {
         #region [ Fields ]
 
-        private DataExpressions<T> _dataExpressions = new DataExpressions<T>();
+        private readonly DataExpressions<T> _dataExpressions = new DataExpressions<T>();
 
         #endregion
 
@@ -27,7 +27,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters
 
         #region [ Construction ]
 
-        public DataExpressionFilterComponent(IServiceProvider serviceProvider)
+        protected DataExpressionFilterComponent(IServiceProvider serviceProvider)
         {
             ServiceProvider = serviceProvider;
         }

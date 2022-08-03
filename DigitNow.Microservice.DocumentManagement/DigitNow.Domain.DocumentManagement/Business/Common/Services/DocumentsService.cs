@@ -34,7 +34,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
         public async Task<Document> AddAsync(Document newDocument, CancellationToken token)
         {
-            var dbContextTransaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable);
+            var dbContextTransaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, token);
             try
             {
                 // Insert the entity without relationships
@@ -47,7 +47,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             catch
             {
                 //TODO: Log error
-                await dbContextTransaction.RollbackAsync();
+                await dbContextTransaction.RollbackAsync(token);
                 throw;
             }
             finally
@@ -92,7 +92,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
                 .Where(reg => reg.RegistrationDate.Year == DateTime.Now.Year)
                 .Select(reg => reg.RegistrationNumber)
                 .DefaultIfEmpty()
-                .MaxAsync();
+                .MaxAsync(token);
 
             document.RegistrationNumber = ++maxRegNumber;
             document.RegistrationDate = DateTime.Now;

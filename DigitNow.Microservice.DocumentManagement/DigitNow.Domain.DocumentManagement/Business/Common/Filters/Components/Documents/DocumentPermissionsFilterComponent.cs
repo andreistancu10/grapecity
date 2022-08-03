@@ -59,16 +59,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
             };
         }
 
-        private async Task<Department> GetRegistryOfficeDepartmentAsync(CancellationToken token)
-        {
-            //TODO: Get departments by code
-            var department = await _catalogAdapterClient.GetDepartmentByCodeAsync("registratura", token);
-
-            return department;
-        }
-
-        private static bool IsRole(UserModel userModel, RecipientType role) =>
-            userModel.Roles.Contains(role.Code);
+        [Obsolete("Will be refactored with the use of the Catalog SDK")]
+        private Task<Department> GetRegistryOfficeDepartmentAsync(CancellationToken token) =>        
+            _catalogAdapterClient.GetDepartmentByCodeAsync("registratura", token);
 
         #endregion
     }
