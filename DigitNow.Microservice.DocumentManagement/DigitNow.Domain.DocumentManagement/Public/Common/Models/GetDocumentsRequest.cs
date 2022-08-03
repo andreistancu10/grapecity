@@ -13,7 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Models
 
     public class DocumentFilterDto
     {
-        public DocumentRegistyTypeFilterDto RegistryTypeFilter { get; set; }
+        public DocumentRegistryTypeFilterDto RegistryTypeFilter { get; set; }
 
         public DocumentRegistrationNoFilterDto RegistrationNoFilter { get; set; }
 
@@ -37,7 +37,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Models
         public List<long> Identifiers { get; set; }
     }
 
-    public class DocumentRegistyTypeFilterDto
+    public class DocumentRegistryTypeFilterDto
     {
         public List<string> RegistryTypes { get; set; }
     }

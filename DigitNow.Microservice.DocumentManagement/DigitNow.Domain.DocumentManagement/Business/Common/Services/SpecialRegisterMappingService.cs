@@ -29,17 +29,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             if (register != null)
             {
-                await AddDocumentMappingAsync(incomingDocument.DocumentId, register, cancellationToken);
+                await AddDocumentMappingAsync(incomingDocument.DocumentId, register.Id, cancellationToken);
             }
         }
 
-        private async Task AddDocumentMappingAsync(long documentId, SpecialRegister register,
+        private async Task AddDocumentMappingAsync(long documentId, long registerId,
             CancellationToken cancellationToken)
         {
             var newMapping = new SpecialRegisterMapping
             {
                 DocumentId = documentId,
-                SpecialRegister = register
+                SpecialRegisterId = registerId
             };
 
             await _dbContext.SpecialRegisterMappings.AddAsync(newMapping, cancellationToken);
