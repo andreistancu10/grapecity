@@ -9,13 +9,10 @@ using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Dashboard;
 
-//[Authorize]
+[Authorize]
 [ApiController]
 [Route("api/dashboard")]
 public class DashboardController : ApiController

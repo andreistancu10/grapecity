@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DigitNow.Domain.DocumentManagement.Public.IncomingDocuments;
 
-//[Authorize]
+[Authorize]
 [ApiController]
 [Route("api/incoming-documents")]
 public class IncomingDocumentsController : ApiController
