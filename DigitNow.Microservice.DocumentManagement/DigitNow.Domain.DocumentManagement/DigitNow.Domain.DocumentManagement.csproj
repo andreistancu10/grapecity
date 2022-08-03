@@ -19,15 +19,19 @@
 		<Compile Include=".extensions\Autocorrect\StringExtensions.cs" />
 		<Compile Include=".extensions\User\UserExtension.cs" />
 		<Compile Include=".extensions\Validators\RuleBuilderExtensions.cs" />
+		<Compile Include=".utils\DocumentTypeTranslations.cs" />
+		<Compile Include=".utils\CustomMappings.cs" />
 		<Compile Include=".utils\DevOnlyActionFilter.cs" />
+		<Compile Include=".utils\DocumentTypeTranslation.cs" />
 		<Compile Include=".utils\FilterDescriptor.cs" />
+		<Compile Include=".utils\LanguagesUtils.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="DigitNow.Domain.Authentication.Client" Version="6.0.6" />
 		<PackageReference Include="DigitNow.Domain.Authentication.Contracts" Version="6.0.6" />
 		<PackageReference Include="DigitNow.Domain.Catalog.Client" Version="6.0.9" />
 		<PackageReference Include="DigitNow.Domain.Catalog.Contracts" Version="6.0.9" />
-		<PackageReference Include="Domain.Localization.Client" Version="1.0.7" />
+		<PackageReference Include="Domain.Localization.Client" Version="6.0.1" />
 		<PackageReference Include="HTSS.Platform.Core.Files" Version="6.0.2" />
 		<PackageReference Include="HTSS.Platform.Infrastructure.Api.Tools" Version="6.0.1" />
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />

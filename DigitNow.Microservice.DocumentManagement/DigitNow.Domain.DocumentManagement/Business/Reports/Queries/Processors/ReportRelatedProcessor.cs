@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using DigitNow.Domain.Catalog.Client;
+﻿using DigitNow.Domain.Catalog.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
@@ -14,19 +9,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors
 {
-    public interface IReportProcessor
-    {
-        Task<List<ReportViewModel>> GetDataAsync(DateTime fromDate, DateTime toDate, CancellationToken cancellationToken);
-    }
-
-    public abstract class ReportRelatedProcessor : IReportProcessor
+    internal class ReportRelatedProcessor
     {
         private readonly IVirtualDocumentService _virtualDocumentService;
         private readonly IDocumentMappingService _documentMappingService;
         private readonly ICatalogClient _catalogClient;
         private readonly DocumentManagementDbContext _dbContext;
 
-        protected ReportRelatedProcessor(IServiceProvider serviceProvider)
+        public ReportRelatedProcessor(IServiceProvider serviceProvider)
         {
             _virtualDocumentService = serviceProvider.GetService<IVirtualDocumentService>();
             _documentMappingService = serviceProvider.GetService<IDocumentMappingService>();
@@ -34,19 +24,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors
             _dbContext = serviceProvider.GetService<DocumentManagementDbContext>();
         }
 
-        protected virtual void Validate(DateTime fromDate, DateTime toDate)
-        {
-        }
-
-        public async Task<List<ReportViewModel>> GetDataAsync(DateTime fromDate, DateTime toDate, CancellationToken cancellationToken)
-        {
-            Validate(fromDate, toDate);
-            return await GetDataInternalAsync(fromDate, toDate, cancellationToken);
-        }
-
-        protected virtual async Task<List<ReportViewModel>> GetDataInternalAsync(DateTime fromDate, DateTime toDate, CancellationToken cancellationToken)
+        public async Task<List<ReportViewModel>> ProcessDocumentsAsync(DateTime fromDate, DateTime toDate, CancellationToken cancellationToken)
         {
             var documents = new List<Document>();
+            
             documents.AddRange(await GetEligibleInternalDocumentsAsync(fromDate, toDate, cancellationToken));
             documents.AddRange(await GetEligibleIncomingDocumentsAsync(fromDate, toDate, cancellationToken));
 
@@ -55,9 +36,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors
                 return new List<ReportViewModel>();
             }
 
-            var vDocuments = await _virtualDocumentService.FetchVirtualDocuments(documents, cancellationToken);
+            var virtualDocuments = await _virtualDocumentService.FetchVirtualDocuments(documents, cancellationToken);
 
-            return await _documentMappingService.MapToReportViewModelAsync(vDocuments, cancellationToken);
+            return await _documentMappingService.MapToReportViewModelAsync(virtualDocuments, cancellationToken);
         }
 
         private async Task<IEnumerable<Document>> GetEligibleIncomingDocumentsAsync(DateTime fromDate, DateTime toDate, CancellationToken cancellationToken)

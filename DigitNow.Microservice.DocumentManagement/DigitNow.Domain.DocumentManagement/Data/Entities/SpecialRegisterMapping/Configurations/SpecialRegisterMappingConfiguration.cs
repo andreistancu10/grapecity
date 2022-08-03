@@ -1,16 +1,17 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMappings.Configurations;
-
-public class SpecialRegisterMappingConfiguration : IEntityTypeConfiguration<SpecialRegisterMapping>
+namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
-    public void Configure(EntityTypeBuilder<SpecialRegisterMapping> builder)
+    public class SpecialRegisterMappingConfiguration : IEntityTypeConfiguration<SpecialRegisterMapping>
     {
-        builder.HasKey(c => c.Id);
+        public void Configure(EntityTypeBuilder<SpecialRegisterMapping> builder)
+        {
+            builder.HasKey(c => c.Id);
 
-        builder.HasOne(item => item.Document)
-            .WithMany(item => item.SpecialRegisterMappings)
-            .HasForeignKey(x => x.DocumentId);
+            builder.HasOne(item => item.Document)
+                .WithMany(item => item.SpecialRegisterMappings)
+                .HasForeignKey(x => x.DocumentId);
+        }
     }
 }

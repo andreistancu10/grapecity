@@ -1,9 +1,5 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using DigitNow.Domain.DocumentManagement.Data;
+﻿using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisterMappings;
-using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
 using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
