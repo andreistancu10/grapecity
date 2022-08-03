@@ -22,7 +22,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             switch (document.DocumentType)
             {
                 case DocumentType.Incoming:
-                    return await CreateWorkflowHistoryForIncoming(command, document, lastWorkflowRecord, token);
+                    return await CreateWorkflowHistoryForIncoming(command, document, token);
                 case DocumentType.Internal:
                 case DocumentType.Outgoing:
                     return await CreateWorkflowHistoryForOutgoingOrInternal(command, document, token);
@@ -49,7 +49,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             return command;
         }
 
-        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowHistoryForIncoming(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
+        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowHistoryForIncoming(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
         {
             var oldWorkflowResponsible = document.WorkflowHistories
                 .Where(x => x.RecipientType == RecipientType.Functionary.Id && x.DocumentStatus == DocumentStatus.InWorkAllocated)

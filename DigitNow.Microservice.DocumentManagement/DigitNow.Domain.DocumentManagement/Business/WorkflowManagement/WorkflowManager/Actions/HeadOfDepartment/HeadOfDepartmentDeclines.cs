@@ -40,7 +40,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
         private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowForOutgoingAndInternalAsync(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token)
         {
-            var oldWorkflowResponsible = GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Department.Id, token);
+            var oldWorkflowResponsible = GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Department.Id);
 
             document.Status = DocumentStatus.New;
             document.DestinationDepartmentId = oldWorkflowResponsible.RecipientId;

@@ -62,7 +62,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         {
             var oldWorkflowResponsible = GetOldWorkflowResponsibleAsync(document,document.DocumentType == DocumentType.Incoming 
                 ? x => x.RecipientType == RecipientType.Functionary.Id 
-                : x => x.RecipientType == RecipientType.Department.Id, token);
+                : x => x.RecipientType == RecipientType.Department.Id);
 
             var newWorkflowResponsible = new WorkflowHistoryLog
             {

@@ -152,18 +152,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
 
         protected async Task PassDocumentToFunctionaryAsync(Document document, WorkflowHistoryLog newWorkflowResponsible, ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            var oldWorkflowResponsible = GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Functionary.Id, token);
+            var oldWorkflowResponsible = GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Functionary.Id);
             await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
 
             document.WorkflowHistories.Add(newWorkflowResponsible);
         }
 
-        protected static WorkflowHistoryLog GetOldWorkflowResponsibleAsync(Document document, Expression<Func<WorkflowHistoryLog, bool>> predicate, CancellationToken token)
+        protected static WorkflowHistoryLog GetOldWorkflowResponsibleAsync(Document document, Expression<Func<WorkflowHistoryLog, bool>> predicate)
         {
-            return ExtractResponsibleAsync(document.WorkflowHistories, predicate, token);
+            return ExtractResponsible(document.WorkflowHistories, predicate);
         }
 
-        private static WorkflowHistoryLog ExtractResponsibleAsync(List<WorkflowHistoryLog> history, Expression<Func<WorkflowHistoryLog, bool>> predicate, CancellationToken token)
+        private static WorkflowHistoryLog ExtractResponsible(List<WorkflowHistoryLog> history, Expression<Func<WorkflowHistoryLog, bool>> predicate)
         {
             return history.AsQueryable()
                           .Where(predicate)
