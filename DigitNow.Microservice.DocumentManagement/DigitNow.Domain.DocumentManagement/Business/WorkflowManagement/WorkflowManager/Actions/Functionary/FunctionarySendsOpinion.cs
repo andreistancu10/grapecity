@@ -1,4 +1,4 @@
-﻿    using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
+﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
@@ -8,8 +8,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
     public class FunctionarySendsOpinion : BaseWorkflowManager, IWorkflowHandler
     {
         public FunctionarySendsOpinion(IServiceProvider serviceProvider) : base(serviceProvider) { }
-        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.OpinionRequestedAllocated };
+        protected override int[] allowedTransitionStatuses => new int[] 
+        { 
+            (int)DocumentStatus.OpinionRequestedAllocated 
+        };
 
+        #region [ IWorkflowHandler ]
         protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
         {
             if (!Validate(command, lastWorkflowRecord))
@@ -26,21 +30,23 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                     return command;
             }
         }
+        #endregion
 
-        private static async Task<ICreateWorkflowHistoryCommand> CreateWorkflowHistoryForOutgoingOrInternal(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
+        private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowHistoryForOutgoingOrInternal(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
         {
             var oldWorkflowResponsible = document.WorkflowHistories
                     .Where(x => x.DocumentStatus == DocumentStatus.New)
                     .OrderByDescending(x => x.CreatedAt)
                     .FirstOrDefault();
 
+            //TODO Create an abstract factory
             var newWorkflowResponsible = new WorkflowHistoryLog
             {
                 DocumentStatus = DocumentStatus.New,
                 Remarks = command.Remarks,
                 RecipientType = RecipientType.Department.Id,
                 RecipientId = oldWorkflowResponsible.DestinationDepartmentId,
-                RecipientName = $"Departamentul {oldWorkflowResponsible.DestinationDepartmentId}",
+                RecipientName = $"Departamentul { await GetDocumentNameByIdAsync(oldWorkflowResponsible.DestinationDepartmentId, token)}",
                 DestinationDepartmentId = oldWorkflowResponsible.DestinationDepartmentId
             };
 
@@ -68,7 +74,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 Remarks = command.Remarks
             };
 
-            await TransferResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
+            await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
 
             document.WorkflowHistories.Add(newWorkflowResponsible);
 

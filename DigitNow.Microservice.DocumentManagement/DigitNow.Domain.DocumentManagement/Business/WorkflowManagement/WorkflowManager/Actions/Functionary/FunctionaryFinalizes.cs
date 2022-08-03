@@ -8,7 +8,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
     public class FunctionaryFinalizes : BaseWorkflowManager, IWorkflowHandler
     {
         public FunctionaryFinalizes(IServiceProvider serviceProvider) : base(serviceProvider) { }
-        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkAllocated, (int)DocumentStatus.InWorkDelegated, (int)DocumentStatus.New, (int)DocumentStatus.InWorkDeclined };
+        protected override int[] allowedTransitionStatuses => new int[] 
+        {   
+            (int)DocumentStatus.InWorkAllocated, 
+            (int)DocumentStatus.InWorkDelegated, 
+            (int)DocumentStatus.New, 
+            (int)DocumentStatus.InWorkDeclined 
+        };
         
         protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
         {
@@ -21,7 +27,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 Remarks = command.Remarks
             };
 
-            await TransferResponsibilityAsync(lastWorkflowRecord, newWorkflowResponsible, command, token);
+            await TransferUserResponsibilityAsync(lastWorkflowRecord, newWorkflowResponsible, command, token);
 
             document.WorkflowHistories.Add(newWorkflowResponsible);
 

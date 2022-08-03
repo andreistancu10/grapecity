@@ -19,7 +19,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
                 Remarks = remarks,
                 OpinionRequestedUntil = opinionRequestedUntil,
                 Resolution = resolution,
-                DestinationDepartmentId = document.DestinationDepartmentId,
+                DestinationDepartmentId = (int)document.DestinationDepartmentId,
             };
     }
 }

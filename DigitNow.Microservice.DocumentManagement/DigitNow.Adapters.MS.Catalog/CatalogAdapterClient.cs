@@ -8,6 +8,7 @@ namespace DigitNow.Adapters.MS.Catalog
         Task<IList<DocumentType>> GetDocumentTypesAsync(CancellationToken cancellationToken);
         Task<IList<DocumentType>> GetInternalDocumentTypesAsync(CancellationToken cancellationToken);
         Task<Department> GetDepartmentByCodeAsync(string code, CancellationToken cancellationToken);
+        Task<Department> GetDepartmentByIdAsync(long id, CancellationToken cancellationToken);
         Task<IList<DepartmentDto>> GetDepartmentsAsync(CancellationToken token);
     }
     public class CatalogAdapterClient : ICatalogAdapterClient
@@ -57,5 +58,11 @@ namespace DigitNow.Adapters.MS.Catalog
 
         public Task<IList<DepartmentDto>> GetDepartmentsAsync(CancellationToken token) =>
             _catalogHttpClient.GetAsync<IList<DepartmentDto>>("departments/list", token);
+
+        public async Task<Department> GetDepartmentByIdAsync(long id, CancellationToken cancellationToken)
+        {
+            var pagedResult = await _catalogHttpClient.GetAsync<ResultPagedList<Department>>($"Departments/filter?Id={id}", cancellationToken);
+            return pagedResult.Items.FirstOrDefault();
+        }
     }
 }

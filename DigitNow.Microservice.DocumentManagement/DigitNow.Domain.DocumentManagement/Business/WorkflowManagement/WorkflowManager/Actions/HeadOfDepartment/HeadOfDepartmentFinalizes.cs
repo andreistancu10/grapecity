@@ -10,13 +10,45 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         public HeadOfDepartmentFinalizes(IServiceProvider serviceProvider) 
             : base(serviceProvider) { }
 
-        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.New };
+        protected override int[] allowedTransitionStatuses => new int[] 
+        { 
+            (int)DocumentStatus.New,
+            (int)DocumentStatus.InWorkUnallocated
+        };
 
+        #region [ IWorkflowHandler ]
         protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
         {
             if (!Validate(command, lastWorkflowRecord, document))
                 return command;
 
+            switch (document.DocumentType)
+            {
+                case DocumentType.Incoming:
+                     CreateWorkflowForIncomingDocumentAsync(command, document, token);
+                    break;
+                case DocumentType.Internal:
+                case DocumentType.Outgoing:
+                    await CreateWorkflowForOutgoingAndInternalDocumentAsync(command, document, token);
+                    break;
+                default:
+                    return command;
+            }
+
+            return command;
+        }
+
+        #endregion
+
+        private async Task CreateWorkflowForIncomingDocumentAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
+        {
+            document.Status = DocumentStatus.Finalized;
+            await PassDocumentToRegistry(document, command, token);
+        }
+
+
+        private async Task CreateWorkflowForOutgoingAndInternalDocumentAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
+        {
             var departmentToReceiveDocument = document.WorkflowHistories
                     .Where(x => x.RecipientType == RecipientType.Department.Id)
                     .OrderBy(x => x.CreatedAt)
@@ -32,12 +64,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 Remarks = command.Remarks,
                 RecipientType = RecipientType.Department.Id,
                 RecipientId = departmentToReceiveDocument,
-                RecipientName = $"Departamentul {departmentToReceiveDocument}!"
+                RecipientName = $"Departamentul { await GetDocumentNameByIdAsync(departmentToReceiveDocument, token) }"
             };
 
             document.WorkflowHistories.Add(newWorkflowResponsible);
-
-            return command;
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord, Document document)
