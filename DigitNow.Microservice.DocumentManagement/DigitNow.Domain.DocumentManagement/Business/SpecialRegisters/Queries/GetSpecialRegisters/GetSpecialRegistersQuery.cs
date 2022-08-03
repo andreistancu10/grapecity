@@ -1,4 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.Entities.SpecialRegisters;
+﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Infrastructure.Data.Abstractions;
 
