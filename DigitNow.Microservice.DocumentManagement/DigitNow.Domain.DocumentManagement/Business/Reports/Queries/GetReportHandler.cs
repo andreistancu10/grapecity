@@ -3,6 +3,7 @@ using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+using DigitNow.Domain.DocumentManagement.utils;
 using Domain.Localization.Client;
 using HTSS.Platform.Core.CQRS;
 
