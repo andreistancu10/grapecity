@@ -4,10 +4,9 @@ using DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Documents
 {
-    internal class DocumentRightsFilterPreprocessComponentContext : IDataExpressionFilterComponentContext
+    internal class DocumentPermissionsFilterComponentContext : IDataExpressionFilterComponentContext
     {
         public UserModel CurrentUser { get; set; }
-        public DocumentDepartmentRightsFilter DepartmentRightsFilter { get; set; }
-        public DocumentUserRightsFilter UserRightsFilter { get; set; }
+        public DocumentUserPermissionsFilters UserPermissionsFilter { get; set; }
     }
 }

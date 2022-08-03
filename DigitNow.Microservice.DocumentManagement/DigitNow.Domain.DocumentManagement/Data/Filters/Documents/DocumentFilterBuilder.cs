@@ -106,7 +106,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Documents
 
         private void BuildFilterByIdentificationNumbery()
         {
-            if (EntityFilter.IdentificationNumberFilter == null)
+            if (EntityFilter.IdentificationNumberFilter != null)
             {
                 EntityPredicates.Add(x =>
                     (x.DocumentType == DocumentType.Incoming && x.IncomingDocument.IdentificationNumber == EntityFilter.IdentificationNumberFilter.IdentificationNumber)

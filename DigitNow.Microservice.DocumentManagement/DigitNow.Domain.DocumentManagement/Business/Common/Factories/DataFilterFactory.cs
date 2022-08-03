@@ -6,40 +6,29 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
 {
     internal static class DataFilterFactory
     {
-        public static DocumentDepartmentRightsFilter BuildDocumentDepartmentRightsFilter(UserModel currentUser)
+        public static DocumentUserPermissionsFilters BuildDocumentUserRightsFilter(UserModel currentUser)
         {
-            var filter = new DocumentDepartmentRightsFilter();
-
-            //TODO: Write filter
-            filter.RegistryOfficeFilter = new DocumentRegistryOfficeDepartmentFilter
-            {
-                DepartmentId = default(long)
-            };
-
-            return filter;
-        }
-
-        public static DocumentUserRightsFilter BuildDocumentUserRightsFilter(UserModel currentUser)
-        {
-            var filter = new DocumentUserRightsFilter();
+            var filter = new DocumentUserPermissionsFilters();
 
             if (IsRole(currentUser, RecipientType.Mayor))
             {
-                filter.MayorRightFilter = new DocumentMayorRightFilter(); ;
+                filter.MayorPermissionsFilter = new DocumentMayorPermissionsFilter(); ;
             }
             else if (IsRole(currentUser, RecipientType.HeadOfDepartment))
             {
-                filter.HeadOfDepartmentRightsFilter = new DocumentHeadOfDepartmentRightFilter
+                filter.HeadOfDepartmentPermissionsFilter = new DocumentHeadOfDepartmentPermissionsFilter
                 {
-                    DepartmentId = currentUser.Departments.First() //TODO: Ask this
+                    // TODO:(!) Each user will be assigned to only one department
+                    DepartmentId = currentUser.Departments.First() 
                 };
             }
             else if (IsRole(currentUser, RecipientType.Functionary))
             {
-                filter.FunctionaryRightsFilter = new DocumentFunctionaryRightFilter
+                filter.FunctionaryPermissionsFilter = new DocumentFunctionaryPermissionsFilter
                 {
                     UserId = currentUser.Id,
-                    DepartmentId = currentUser.Departments.First() //TODO: Ask this
+                    // TODO:(!) Each user will be assigned to only one department
+                    DepartmentId = currentUser.Departments.First()
                 };
             }
 

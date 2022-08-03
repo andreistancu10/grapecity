@@ -54,6 +54,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             return await GetBuiltinDocumentsQuery()
                 .WhereAll((await GetActiveDocumentsExpressions(currentUser, filter, token)).ToPredicates())
+                .AsNoTracking()
                 .CountAsync(token);
         }
 
@@ -65,6 +66,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                  .WhereAll((await GetActiveDocumentsExpressions(currentUser, filter, token)).ToPredicates())
                  .Skip((page - 1) * count)
                  .Take(count)
+                 .AsNoTracking()
                  .ToListAsync(token);
 
             return _virtualDocumentService.ConvertDocumentsToVirtualDocuments(documents)
@@ -152,12 +154,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         private Task<DataExpressions<Document>> GetDocumentsUserRightsExpressionsAsync(UserModel currentUser, CancellationToken token)
         {
-            var rightsComponent = new DocumentRightsFilterPreprocessComponent(_serviceProvider);
-            var rightsComponentContext = new DocumentRightsFilterPreprocessComponentContext
+            var rightsComponent = new DocumentPermissionsFilterComponent(_serviceProvider);
+            var rightsComponentContext = new DocumentPermissionsFilterComponentContext
             {
                 CurrentUser = currentUser,
-                DepartmentRightsFilter = DataFilterFactory.BuildDocumentDepartmentRightsFilter(currentUser),
-                UserRightsFilter = DataFilterFactory.BuildDocumentUserRightsFilter(currentUser)
+                UserPermissionsFilter = DataFilterFactory.BuildDocumentUserRightsFilter(currentUser)
             };
 
             return rightsComponent.ExtractDataExpressionsAsync(rightsComponentContext, token);

@@ -62,7 +62,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             var newWorkflowResponsible = new WorkflowHistoryLog
             {
-                DocumentStatus = DocumentStatus.InWorkCountersignature,
+                DocumentStatus = DocumentStatus.InWorkMayorCountersignature,
                 Remarks = command.Remarks,
                 RecipientType = RecipientType.Department.Id,
                 RecipientId = departmentToReceiveDocument,
@@ -77,7 +77,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             var newWorkflowResponsible = new WorkflowHistoryLog
             {
-                DocumentStatus = DocumentStatus.InWorkCountersignature,
+                DocumentStatus = DocumentStatus.InWorkMayorCountersignature,
                 Remarks = command.Remarks
             };
 

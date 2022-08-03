@@ -6,12 +6,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-	  <Compile Remove="Data\Filters\DocumentsRights\PostprocessBuilders\**" />
-	  <EmbeddedResource Remove="Data\Filters\DocumentsRights\PostprocessBuilders\**" />
-	  <None Remove="Data\Filters\DocumentsRights\PostprocessBuilders\**" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 	<ItemGroup>
