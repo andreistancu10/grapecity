@@ -14,14 +14,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors
         Task<List<ReportViewModel>> GetDataAsync(DateTime fromDate, DateTime toDate, CancellationToken cancellationToken);
     }
 
-    public abstract class ReportRelatedProcessor : IReportProcessor
+    public class ReportRelatedProcessor : IReportProcessor
     {
         private readonly IVirtualDocumentService _virtualDocumentService;
         private readonly IDocumentMappingService _documentMappingService;
         private readonly ICatalogClient _catalogClient;
         private readonly DocumentManagementDbContext _dbContext;
 
-        protected ReportRelatedProcessor(IServiceProvider serviceProvider)
+        public ReportRelatedProcessor(IServiceProvider serviceProvider)
         {
             _virtualDocumentService = serviceProvider.GetService<IVirtualDocumentService>();
             _documentMappingService = serviceProvider.GetService<IDocumentMappingService>();
