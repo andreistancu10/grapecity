@@ -25,7 +25,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             switch (document.DocumentType)
             {
                 case DocumentType.Incoming:
-                     CreateWorkflowForIncomingDocumentAsync(command, document, token);
+                     await CreateWorkflowForIncomingDocumentAsync(command, document, token);
                     break;
                 case DocumentType.Internal:
                 case DocumentType.Outgoing:
@@ -46,7 +46,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             await PassDocumentToRegistry(document, command, token);
         }
 
-
         private async Task CreateWorkflowForOutgoingAndInternalDocumentAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
         {
             var departmentToReceiveDocument = document.WorkflowHistories
@@ -58,16 +57,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             document.RecipientId = await IdentityService.GetHeadOfDepartmentUserIdAsync(departmentToReceiveDocument, token);
             document.Status = DocumentStatus.Finalized;
 
-            var newWorkflowResponsible = new WorkflowHistoryLog
-            {
-                DocumentStatus = DocumentStatus.Finalized,
-                Remarks = command.Remarks,
-                RecipientType = RecipientType.Department.Id,
-                RecipientId = departmentToReceiveDocument,
-                RecipientName = $"Departamentul { await GetDocumentNameByIdAsync(departmentToReceiveDocument, token) }"
-            };
-
-            document.WorkflowHistories.Add(newWorkflowResponsible);
+            await PassDocumentToDepartment(document, command, token);
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord, Document document)

@@ -39,24 +39,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                     .OrderByDescending(x => x.CreatedAt)
                     .FirstOrDefault();
 
-            //TODO Create an abstract factory
-            var newWorkflowResponsible = new WorkflowHistoryLog
-            {
-                DocumentStatus = DocumentStatus.New,
-                Remarks = command.Remarks,
-                RecipientType = RecipientType.Department.Id,
-                RecipientId = oldWorkflowResponsible.DestinationDepartmentId,
-                RecipientName = $"Departamentul { await GetDocumentNameByIdAsync(oldWorkflowResponsible.DestinationDepartmentId, token)}",
-                DestinationDepartmentId = oldWorkflowResponsible.DestinationDepartmentId
-            };
-
             document.Status = DocumentStatus.New;
             document.DestinationDepartmentId = oldWorkflowResponsible.DestinationDepartmentId;
-            document.WorkflowHistories.Add(newWorkflowResponsible);
+
+            await PassDocumentToDepartment(document, command, token);
 
             ResetDateAsOpinionWasSent(document);
 
-            return await Task.FromResult(command);
+            return command;
         }
 
         private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowHistoryForIncoming(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)

@@ -42,22 +42,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         {
             var oldWorkflowResponsible = GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Department.Id, token);
 
-            var newWorkflowResponsible = new WorkflowHistoryLog
-            {
-                DocumentStatus = DocumentStatus.New,
-                DeclineReason = command.DeclineReason,
-                Remarks = command.Remarks,
-                RecipientType = RecipientType.Department.Id,
-                RecipientId = oldWorkflowResponsible.RecipientId,
-                RecipientName = $"Departamentul { await GetDocumentNameByIdAsync(oldWorkflowResponsible.RecipientId, token) }",
-                DestinationDepartmentId = (int)oldWorkflowResponsible.RecipientId
-            };
-
             document.Status = DocumentStatus.New;
             document.DestinationDepartmentId = oldWorkflowResponsible.RecipientId;
-            document.WorkflowHistories.Add(newWorkflowResponsible);
 
-            return await Task.FromResult(command);
+            await PassDocumentToDepartment(document, command, token);
+
+            return command;
         }
 
         private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowForIncomingAsync(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token)

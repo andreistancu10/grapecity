@@ -67,7 +67,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             {
                 document.DestinationDepartmentId = recipientId;
                 var headOfDepartment = await IdentityService.GetHeadOfDepartmentUserAsync(recipientId, token);
-                document.RecipientId = headOfDepartment.Id;
+                document.RecipientId = headOfDepartment?.Id;
             }
             else
             {
@@ -118,22 +118,36 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
 
         protected async Task PassDocumentToRegistry(Document document, ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            var registryDepartment = await CatalogAdapterClient.GetDepartmentByCodeAsync(UserDepartment.Registry.Code, token);
+            var registry = await CatalogAdapterClient.GetDepartmentByCodeAsync(UserDepartment.Registry.Code, token);
 
+            await CreateMetadata(document, command, registry, token);
+        }
+
+        protected async Task PassDocumentToDepartment(Document document, ICreateWorkflowHistoryCommand command, CancellationToken token)
+        {
+            var department = await CatalogAdapterClient.GetDepartmentByIdAsync(document.DestinationDepartmentId, token);
+
+            await CreateMetadata(document, command, department, token);
+        }
+
+        private async Task CreateMetadata(Document document, ICreateWorkflowHistoryCommand command, Adapters.MS.Catalog.Poco.Department department, CancellationToken token)
+        {
             var newWorkflowHistoryLog = new WorkflowHistoryLog
             {
                 DeclineReason = command.DeclineReason,
                 DocumentStatus = document.Status,
                 RecipientType = RecipientType.Department.Id,
-                RecipientId = registryDepartment.Id,
-                RecipientName = $"Departamentul {registryDepartment.Name}",
-                DestinationDepartmentId = (int)registryDepartment.Id,
-                Remarks = command.Remarks
+                RecipientId = department.Id,
+                RecipientName = $"Departamentul {department.Name}",
+                DestinationDepartmentId = (int)department.Id,
+                Remarks = command.Remarks,
+                OpinionRequestedUntil = command.OpinionRequestedUntil,
+                Resolution = command.Resolution
             };
 
             document.WorkflowHistories.Add(newWorkflowHistoryLog);
 
-            await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: true, command.DocumentId, registryDepartment.Id, document.Status, token);
+            await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: true, command.DocumentId, department.Id, document.Status, token);
         }
 
         protected async Task PassDocumentToFunctionaryAsync(Document document, WorkflowHistoryLog newWorkflowResponsible, ICreateWorkflowHistoryCommand command, CancellationToken token)
@@ -155,12 +169,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
                           .Where(predicate)
                           .OrderByDescending(x => x.CreatedAt)
                           .FirstOrDefault();
-        }
-
-        public async Task<string> GetDocumentNameByIdAsync(long id, CancellationToken token)
-        {
-            var department = await CatalogAdapterClient.GetDepartmentByIdAsync(id, token);
-            return department.Name;
         }
     }
 }
