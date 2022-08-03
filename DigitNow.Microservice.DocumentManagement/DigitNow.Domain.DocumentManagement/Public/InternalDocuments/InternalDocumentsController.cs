@@ -6,12 +6,10 @@ using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Public.InternalDocuments;
 
-//[Authorize]
+[Authorize]
 [ApiController]
 [Route("api/internal-documents")]
 public class InternalDocumentsController : ApiController

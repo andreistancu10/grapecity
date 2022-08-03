@@ -1,7 +1,7 @@
-﻿using DigitNow.Adapters.MS.Identity;
+﻿using DigitNow.Adapters.MS.Catalog;
+using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data;
@@ -19,12 +19,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
         protected readonly DocumentManagementDbContext DbContext;
         protected readonly IIdentityAdapterClient IdentityAdapterClient;
         protected readonly IIdentityService IdentityService;
+        protected readonly ICatalogAdapterClient CatalogAdapterClient;
 
         protected BaseWorkflowManager(IServiceProvider serviceProvider)
         {
             DbContext = serviceProvider.GetService<DocumentManagementDbContext>();
             IdentityAdapterClient = serviceProvider.GetService<IIdentityAdapterClient>();
             IdentityService = serviceProvider.GetService<IIdentityService>();
+            CatalogAdapterClient = serviceProvider.GetService<ICatalogAdapterClient>();
         }
 
         protected abstract int[] allowedTransitionStatuses { get; }
@@ -57,15 +59,25 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             return true;
         }
 
-        public async Task SetStatusAndRecipientBasedOnWorkflowDecisionAsync(long documentId, long recipientId, DocumentStatus status, CancellationToken token)
+        public async Task UpdateDocumentBasedOnWorkflowDecisionAsync(bool makeDocumentVisibleForDepartment, long documentId, long recipientId, DocumentStatus status, CancellationToken token)
         {
             var document = await DbContext.Documents.FirstAsync(x => x.Id == documentId, token);
 
-            document.RecipientId = recipientId;
+            if (makeDocumentVisibleForDepartment)
+            {
+                document.DestinationDepartmentId = recipientId;
+                var headOfDepartment = await IdentityService.GetHeadOfDepartmentUserAsync(recipientId, token);
+                document.RecipientId = headOfDepartment?.Id;
+            }
+            else
+            {
+                document.RecipientId = recipientId;
+            }
+
             document.Status = status;
         }
 
-        protected async virtual Task TransferResponsibilityAsync(WorkflowHistoryLog oldRecord, WorkflowHistoryLog newRecord, ICreateWorkflowHistoryCommand command, CancellationToken token)
+        protected async virtual Task TransferUserResponsibilityAsync(WorkflowHistoryLog oldRecord, WorkflowHistoryLog newRecord, ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
             if (oldRecord == null)
             {
@@ -76,7 +88,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             newRecord.RecipientType = oldRecord.RecipientType;
             newRecord.RecipientName = oldRecord.RecipientName;
 
-            await SetStatusAndRecipientBasedOnWorkflowDecisionAsync(command.DocumentId, newRecord.RecipientId, newRecord.DocumentStatus, token);
+            await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: false, command.DocumentId, newRecord.RecipientId, newRecord.DocumentStatus, token);
         }
 
         protected virtual void TransitionNotAllowed(ICreateWorkflowHistoryCommand command)
@@ -104,36 +116,59 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             return true;
         }
 
-        protected async Task PassDocumentToRegistryAsync(Document document, ICreateWorkflowHistoryCommand command, CancellationToken token)
+        protected async Task PassDocumentToRegistry(Document document, ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            var creator = await IdentityAdapterClient.GetUserByIdAsync(document.CreatedBy, token);
+            var registry = await CatalogAdapterClient.GetDepartmentByCodeAsync(UserDepartment.Registry.Code, token);
 
-            var newWorkflowHistoryLog = WorkflowHistoryLogFactory.Create(document.Id, RecipientType.Functionary, creator, DocumentStatus.NewDeclinedCompetence, command.DeclineReason, command.Remarks);
+            await CreateMetadata(document, command, registry, token);
+        }
+
+        protected async Task PassDocumentToDepartment(Document document, ICreateWorkflowHistoryCommand command, CancellationToken token)
+        {
+            var department = await CatalogAdapterClient.GetDepartmentByIdAsync(document.DestinationDepartmentId, token);
+
+            await CreateMetadata(document, command, department, token);
+        }
+
+        private async Task CreateMetadata(Document document, ICreateWorkflowHistoryCommand command, Adapters.MS.Catalog.Poco.Department department, CancellationToken token)
+        {
+            var newWorkflowHistoryLog = new WorkflowHistoryLog
+            {
+                DeclineReason = command.DeclineReason,
+                DocumentStatus = document.Status,
+                RecipientType = RecipientType.Department.Id,
+                RecipientId = department.Id,
+                RecipientName = $"Departamentul {department.Name}",
+                DestinationDepartmentId = (int)department.Id,
+                Remarks = command.Remarks,
+                OpinionRequestedUntil = command.OpinionRequestedUntil,
+                Resolution = command.Resolution
+            };
+
             document.WorkflowHistories.Add(newWorkflowHistoryLog);
 
-            await SetStatusAndRecipientBasedOnWorkflowDecisionAsync(command.DocumentId, creator.Id, DocumentStatus.NewDeclinedCompetence, token);
+            await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: true, command.DocumentId, department.Id, document.Status, token);
         }
 
         protected async Task PassDocumentToFunctionaryAsync(Document document, WorkflowHistoryLog newWorkflowResponsible, ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            var oldWorkflowResponsible = await GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Functionary.Id, token);
-
-            await TransferResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
+            var oldWorkflowResponsible = GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Functionary.Id);
+            await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
 
             document.WorkflowHistories.Add(newWorkflowResponsible);
         }
 
-        public static Task<WorkflowHistoryLog> GetOldWorkflowResponsibleAsync(Document document, Expression<Func<WorkflowHistoryLog, bool>> predicate, CancellationToken token)
+        protected static WorkflowHistoryLog GetOldWorkflowResponsibleAsync(Document document, Expression<Func<WorkflowHistoryLog, bool>> predicate)
         {
-            return ExtractResponsibleAsync(document.WorkflowHistories, predicate, token);
+            return ExtractResponsible(document.WorkflowHistories, predicate);
         }
 
-        private static Task<WorkflowHistoryLog> ExtractResponsibleAsync(List<WorkflowHistoryLog> history, Expression<Func<WorkflowHistoryLog, bool>> predicate, CancellationToken token)
+        private static WorkflowHistoryLog ExtractResponsible(List<WorkflowHistoryLog> history, Expression<Func<WorkflowHistoryLog, bool>> predicate)
         {
             return history.AsQueryable()
                           .Where(predicate)
                           .OrderByDescending(x => x.CreatedAt)
-                          .FirstOrDefaultAsync(token);
+                          .FirstOrDefault();
         }
     }
 }

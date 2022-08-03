@@ -3,15 +3,9 @@ using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
 {
@@ -55,10 +49,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
             
             foreach (var foundDocument in foundDocuments)
             {
-                foundDocument.Status = DocumentStatus.InWorkUnallocated;
+                foundDocument.Status = foundDocument.DocumentType == DocumentType.Incoming ? DocumentStatus.InWorkUnallocated : DocumentStatus.New;
                 foundDocument.DestinationDepartmentId = request.DepartmentId;
                 foundDocument.RecipientId = headOfDepartment.Id;
-                foundDocument.WorkflowHistories.Add(WorkflowHistoryLogFactory.Create(foundDocument.Id, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkUnallocated));
+                foundDocument.WorkflowHistories.Add(WorkflowHistoryLogFactory.Create(foundDocument, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkUnallocated));
             }
 
             await _dbContext.BulkUpdateAsync(foundDocuments);

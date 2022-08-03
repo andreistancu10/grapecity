@@ -73,7 +73,7 @@ public class CreateIncomingDocumentHandler : ICommandHandler<CreateIncomingDocum
             await _incomingDocumentService.AddAsync(newIncomingDocument, cancellationToken);
             await _uploadedFileService.CreateDocumentUploadedFilesAsync(request.UploadedFileIds, newIncomingDocument.Document, cancellationToken);
 
-            var newWorkflowHistroryLog = WorkflowHistoryLogFactory.Create(newIncomingDocument.DocumentId, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkUnallocated);
+            var newWorkflowHistroryLog = WorkflowHistoryLogFactory.Create(newIncomingDocument.Document, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkUnallocated);
             await _dbContext.WorkflowHistoryLogs.AddAsync(newWorkflowHistroryLog, cancellationToken);
 
             await _dbContext.SaveChangesAsync(cancellationToken);
