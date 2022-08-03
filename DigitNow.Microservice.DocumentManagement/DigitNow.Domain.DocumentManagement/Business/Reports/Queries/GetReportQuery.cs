@@ -6,7 +6,7 @@ using HTSS.Platform.Core.CQRS;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries
 {
-    public class GetReportQuery : IQuery<List<ReportViewModel>>
+    public class GetReportQuery : IQuery<List<ExportReportViewModel>>
     {
         public ReportType Type { get; set; }
         public DateTime FromDate { get; set; }

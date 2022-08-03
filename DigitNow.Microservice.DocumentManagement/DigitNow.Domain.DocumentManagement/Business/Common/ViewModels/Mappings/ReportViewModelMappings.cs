@@ -1,4 +1,7 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
@@ -38,23 +41,44 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(c => c.ResolutionDate, opt => opt.MapFrom<MapResolutionDate>())
                 .ForMember(c => c.Expired, opt => opt.MapFrom<MapExpired>())
                 .ForMember(c => c.SpecialRegister, opt => opt.MapFrom<MapSpecialRegister>());
+
+            CreateMap<ReportViewModelAggregate, ExportReportViewModel>()
+               .ForMember(c => c.Id, opt => opt.MapFrom(src => src.ReportViewModel.Id))
+               .ForMember(c => c.RegistrationDate, opt => opt.MapFrom(src => src.ReportViewModel.RegistrationDate))
+               .ForMember(c => c.RegistrationNumber, opt => opt.MapFrom(src => src.ReportViewModel.RegistrationNumber))
+               .ForMember(c => c.Recipient, opt => opt.MapFrom(src => src.ReportViewModel.Recipient.Name))
+               .ForMember(c => c.Issuer, opt => opt.MapFrom(src => src.ReportViewModel.Issuer.Name))
+               .ForMember(c => c.CurrentStatus, opt => opt.MapFrom<MapDocumentCurrentStatus>()) 
+               .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>()) 
+               .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.ReportViewModel.DocumentCategory.Name))
+               .ForMember(c => c.Functionary, opt => opt.MapFrom(src => src.ReportViewModel.Functionary.Name))
+               .ForMember(c => c.AllocationDate, opt => opt.MapFrom(src => src.ReportViewModel.AllocationDate))
+               .ForMember(c => c.ResolutionDate, opt => opt.MapFrom(src => src.ReportViewModel.ResolutionDate))
+               .ForMember(c => c.Expired, opt => opt.MapFrom(src => src.ReportViewModel.Expired))
+               .ForMember(c => c.SpecialRegister, opt => opt.MapFrom(src => src.ReportViewModel.SpecialRegister.Name));
         }
 
         private class MapFunctionary :
-            IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, string>,
-            IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, string>
+            IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
+            IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
         {
-            public string Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, string destMember, ResolutionContext context)
+            public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
                 var lastWorkflowHistory = source.VirtualDocument.Document.WorkflowHistories.LastOrDefault(c => c.DocumentStatus == DocumentStatus.InWorkAllocated);
-                return lastWorkflowHistory?.RecipientName;
+                if (lastWorkflowHistory != null)
+                {
+                    return new BasicViewModel(lastWorkflowHistory.RecipientId, lastWorkflowHistory.RecipientName);
+                }
+                return null;
             }
 
-            public string Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, string destMember, ResolutionContext context)
+            public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
                 var lastWorkflowHistory = source.VirtualDocument.Document.WorkflowHistories.LastOrDefault(c => c.DocumentStatus == DocumentStatus.InWorkAllocated);
 
-                return lastWorkflowHistory?.RecipientName;
+                return lastWorkflowHistory == null
+                    ? null
+                    : new BasicViewModel(lastWorkflowHistory.RecipientId, lastWorkflowHistory.RecipientName);
             }
         }
 
@@ -120,110 +144,134 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
         }
 
         private class MapSpecialRegister :
-            IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, string>,
-            IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, string>
+            IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
+            IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
         {
-            public string Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, string destMember, ResolutionContext context) =>
+            public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
                 GetSpecialRegister(source);
 
-            public string Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, string destMember, ResolutionContext context) =>
+            public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
                 GetSpecialRegister(source);
 
-            private static string GetSpecialRegister<T>(VirtualReportAggregate<T> reportAggregate)
+            private static BasicViewModel GetSpecialRegister<T>(VirtualReportAggregate<T> reportAggregate)
                 where T : VirtualDocument
             {
-                return reportAggregate.SpecialRegisterMapping?.SpecialRegister.Name;
+                return reportAggregate.SpecialRegisterMapping == null
+                    ? null
+                    : new BasicViewModel(reportAggregate.SpecialRegisterMapping.SpecialRegisterId, reportAggregate.SpecialRegisterMapping.SpecialRegister.Name);
             }
         }
 
         private class MapDocumentType :
-            IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, string>,
-            IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, string>
+            IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, int>,
+            IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, int>,
+            IValueResolver<ReportViewModelAggregate, ExportReportViewModel, string>
         {
-            public string Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination,
-                string destMember, ResolutionContext context) =>
-                DocumentTypeRo.Intrare.ToString();
+            public int Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, int destMember, ResolutionContext context) =>
+                (int)DocumentType.Incoming;
 
-            public string Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, string destMember, ResolutionContext context) =>
-                DocumentTypeRo.Intern.ToString();
+            public int Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, int destMember, ResolutionContext context) =>
+                (int)DocumentType.Internal;
+
+            public string Resolve(ReportViewModelAggregate source, ExportReportViewModel destination, string destMember,
+                ResolutionContext context)
+            {
+                if (source.DocumentTypeTranslations.ContainsKey((DocumentType)source.ReportViewModel.DocumentType))
+                {
+                    return source.DocumentTypeTranslations[(DocumentType)source.ReportViewModel.DocumentType];
+                }
+
+                return string.Empty;
+            }
         }
 
         private class MapDocumentCurrentStatus :
-            IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, string>,
-            IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, string>
-        {
-            public string Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination,
-                string destMember, ResolutionContext context) =>
-                GetStatus(source.VirtualDocument.Document);
-            public string Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, string destMember, ResolutionContext context) =>
-                GetStatus(source.VirtualDocument.Document);
+            IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, int?>,
+            IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, int?>,
+            IValueResolver<ReportViewModelAggregate, ExportReportViewModel, string>
 
-            private static string GetStatus(Document document)
+        {
+            public int? Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, int? destMember, ResolutionContext context) =>
+                (int)source.VirtualDocument.Document.Status;
+
+            public int? Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, int? destMember, ResolutionContext context) =>
+                null;
+
+            public string Resolve(ReportViewModelAggregate source, ExportReportViewModel destination, string destMember,
+                ResolutionContext context)
             {
-                return DocumentStatusMapping.FileStatusLabels
-                    .FirstOrDefault(c =>
-                        c.Key == document.Status)
-                    .Value;
+                var currentStatus = source.ReportViewModel.CurrentStatus.GetValueOrDefault();
+
+                if (source.StatusTranslations.ContainsKey((DocumentStatus)currentStatus))
+                {
+                    return source.StatusTranslations[(DocumentStatus)currentStatus];
+                }
+
+                return string.Empty;
             }
         }
 
         private class MapUserFromAggregate :
-            IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, string>,
-            IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, string>
+            IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
+            IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
         {
-            public string Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, string destMember, ResolutionContext context) =>
+            public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
                 GetUserViewModel(source, source.VirtualDocument);
 
-            public string Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, string destMember, ResolutionContext context) =>
+            public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
                 GetUserViewModel(source, source.VirtualDocument);
 
-            private static string GetUserViewModel<T>(VirtualReportAggregate<T> documentAggregate, VirtualDocument virtualDocument)
+            private static BasicViewModel GetUserViewModel<T>(VirtualReportAggregate<T> documentAggregate, VirtualDocument virtualDocument)
                 where T : VirtualDocument
             {
                 var foundUser = documentAggregate.Users.FirstOrDefault(x => x.Id == virtualDocument.Document.CreatedBy);
 
                 return foundUser == null
                     ? null
-                    : $"{foundUser.FirstName} {foundUser.LastName}";
+                    : new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
             }
         }
 
         private class MapDocumentCategory :
-            IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, string>,
-            IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, string>
+            IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
+            IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
         {
-            public string Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, string destMember, ResolutionContext context)
+            public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
                 var foundCategory = source.Categories.FirstOrDefault(x => x.Id == source.VirtualDocument.DocumentTypeId);
 
-                return foundCategory?.Name;
+                return foundCategory == null
+                    ? null
+                    : new BasicViewModel(foundCategory.Id, foundCategory.Name);
             }
 
-            public string Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, string destMember, ResolutionContext context)
+            public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
                 var foundCategory = source.InternalCategories.FirstOrDefault(x => x.Id == source.VirtualDocument.InternalDocumentTypeId);
 
-                return foundCategory?.Name;
+                return foundCategory == null
+                    ? null
+                    : new BasicViewModel(foundCategory.Id, foundCategory.Name);
             }
         }
 
         private class MapRecipient :
-            IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, string>,
-            IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, string>
+            IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
+            IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
         {
-            public string Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, string destMember,
+            public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember,
                 ResolutionContext context)
             {
                 return FindRecipient(source.Users, source.VirtualDocument.Document.RecipientId);
             }
 
-            public string Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, string destMember,
+            public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember,
                 ResolutionContext context)
             {
                 return FindRecipient(source.Users, source.VirtualDocument.Document.RecipientId);
             }
 
-            private static string FindRecipient(IEnumerable<UserModel> users, long? userId)
+            private static BasicViewModel FindRecipient(IEnumerable<UserModel> users, long? userId)
             {
                 if (userId == null)
                 {
@@ -234,7 +282,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
 
                 return foundUser == null
                     ? null
-                    : $"{foundUser.FirstName} {foundUser.LastName}";
+                    : new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
             }
         }
     }

@@ -1,6 +1,5 @@
-﻿
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums
 {
@@ -22,26 +21,60 @@ namespace DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums
         InWorkMayorDeclined = 14,
         New = 15
     }
-    
-    public static class DocumentStatusMapping
+
+    public static class CustomMappings
     {
-        public static readonly Dictionary<DocumentStatus, string> FileStatusLabels = new()
+        public static readonly Dictionary<DocumentType, string> DocumentTypeTranslations =
+            new()
+            {
+                { DocumentType.Incoming, "dms.document-type.incoming" },
+                { DocumentType.Internal, "dms.document-type.internal" },
+                { DocumentType.Outgoing, "dms.document-type.outgoing" },
+            };
+
+        public static readonly Dictionary<DocumentStatus, string> DocumentStatusTranslations = new()
         {
-            { DocumentStatus.InWorkUnallocated, "In lucru nerepartizat" },
-            { DocumentStatus.InWorkAllocated, "In lucru alocat" },
-            { DocumentStatus.OpinionRequestedUnallocated, "Solicitat opinie nerepartizat" },
-            { DocumentStatus.OpinionRequestedAllocated, "Solicitat opinie alocat" },
-            { DocumentStatus.InWorkApprovalRequested, "In lucru solicitare aprobare" },
-            { DocumentStatus.InWorkMayorReview, "In lucru verificare primar" },
-            { DocumentStatus.InWorkCountersignature, "In lucru contrasemnat primar" },
-            { DocumentStatus.InWorkMayorDeclined, "In lucru respins primar" },
-            { DocumentStatus.Finalized, "Finalizat" },
-            { DocumentStatus.NewDeclinedCompetence, "Nou declinat competenta" },
-            { DocumentStatus.InWorkDeclined, "In lucru respins" },
-            { DocumentStatus.InWorkApproved, "In lucru aprobat" },
-            { DocumentStatus.InWorkDelegated, "In lucru delegat" },
-            { DocumentStatus.InWorkDelegatedUnallocated, "In lucru delegat nerepartizat" },
-            { DocumentStatus.New, "Nou" }
+            { DocumentStatus.InWorkUnallocated, "dms.document.status.in-work-unallocated" },
+            { DocumentStatus.InWorkAllocated, "dms.document.status.in-work-Allocated" },
+            { DocumentStatus.OpinionRequestedUnallocated, "dms.document.status.opinion-requested-unallocated" },
+            { DocumentStatus.OpinionRequestedAllocated, "dms.document.status.opinion-requested-allocated" },
+            { DocumentStatus.InWorkApprovalRequested, "dms.document.status.in-work-approval-requested" },
+            { DocumentStatus.InWorkMayorReview, "dms.document.status.in-work-mayor-review" },
+            { DocumentStatus.InWorkCountersignature, "dms.document.status.in-work-countersignature" },
+            { DocumentStatus.InWorkMayorDeclined, "dms.document.status.in-work-mayor-declined" },
+            { DocumentStatus.Finalized, "dms.document.status.finalized" },
+            { DocumentStatus.NewDeclinedCompetence, "dms.document.status.new-declined-competence" },
+            { DocumentStatus.InWorkDeclined, "dms.document.status.in-work-declined" },
+            { DocumentStatus.InWorkApproved, "dms.document.status.in-work-approved" },
+            { DocumentStatus.InWorkDelegated, "dms.document.status.in-work-delegated" },
+            { DocumentStatus.InWorkDelegatedUnallocated, "dms.document.status.in-work-delegated-unallocated" },
+            { DocumentStatus.New, "dms.document.status.new" }
         };
+    }
+
+    public class DocumentTypeTranslation
+    {
+        public DocumentType DocumentType { get; set; }
+        public string DocumentTypeLabel { get; set; }
+
+        public DocumentTypeTranslation(DocumentType documentType, string documentTypeLabel)
+        {
+            DocumentType = documentType;
+            DocumentTypeLabel = documentTypeLabel;
+        }
+    }
+    public class DocumentTypeTranslations : List<DocumentTypeTranslation>
+    {
+        public string GetTranslation(DocumentType documentType)
+        {
+            var foundDocumentType = this.FirstOrDefault(x => x.DocumentType == documentType);
+
+            if (foundDocumentType != null)
+            {
+                return foundDocumentType.DocumentTypeLabel;
+            }
+
+            return string.Empty;
+        }
     }
 }

@@ -20,12 +20,12 @@ namespace DigitNow.Domain.DocumentManagement.Public.Reports
     {
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
-        private readonly IExportService<ReportViewModel> _exportService;
+        private readonly IExportService<ExportReportViewModel> _exportService;
 
         public ReportsController(
             IMediator mediator,
             IMapper mapper,
-            IExportService<ReportViewModel> exportService)
+            IExportService<ExportReportViewModel> exportService)
         {
             _mediator = mediator;
             _mapper = mapper;
