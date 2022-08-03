@@ -11,9 +11,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
     public class HeadOfDepartmentMakesDecision : BaseWorkflowManager, IWorkflowHandler
     {
         public HeadOfDepartmentMakesDecision(IServiceProvider serviceProvider) : base(serviceProvider) { }
-        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkApprovalRequested };
-        private enum Decision { Approved = 1, Declined = 2};
+        private enum Decision { Approved = 1, Declined = 2 };
 
+        protected override int[] allowedTransitionStatuses => new int[] 
+        { 
+            (int)DocumentStatus.InWorkApprovalRequested, 
+            (int)DocumentStatus.OpinionRequestedUnallocated 
+        };
+
+        #region [ IWorkflowHandler ]
         protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
         {
             if (!Validate(command, lastWorkflowRecord))
@@ -34,6 +40,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             return command;
         }
 
+        #endregion
+
         private async Task<ICreateWorkflowHistoryCommand> ApplicationApproved(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
         {
             var userResponse = await IdentityService.FetchMayorAsync(token);
@@ -43,25 +51,27 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             document.WorkflowHistories
                 .Add(WorkflowHistoryLogFactory
-                .Create(document.Id, RecipientType.Mayor, userResponse, DocumentStatus.InWorkMayorReview, command.DeclineReason, command.Remarks));
+                .Create(document, RecipientType.Mayor, userResponse, DocumentStatus.InWorkMayorReview, command.DeclineReason, command.Remarks, command.OpinionRequestedUntil, command.Resolution));
 
-            await SetStatusAndRecipientBasedOnWorkflowDecisionAsync(command.DocumentId, userResponse.Id, DocumentStatus.InWorkMayorReview, token);
+            await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: false, command.DocumentId, userResponse.Id, DocumentStatus.InWorkMayorReview, token);
 
             return command;
         }
 
         private async Task ApplicationDeclinedAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
         {
-            var oldWorkflowResponsible = await GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Functionary.Id, token);
+            var oldWorkflowResponsible = GetOldWorkflowResponsibleAsync(document,document.DocumentType == DocumentType.Incoming 
+                ? x => x.RecipientType == RecipientType.Functionary.Id 
+                : x => x.RecipientType == RecipientType.Department.Id);
 
             var newWorkflowResponsible = new WorkflowHistoryLog
             {
-                DocumentStatus = DocumentStatus.InWorkDeclined,
+                DocumentStatus = document.DocumentType == DocumentType.Incoming ? DocumentStatus.InWorkDeclined : DocumentStatus.New,
                 DeclineReason = command.DeclineReason,
                 Remarks = command.Remarks
             };
 
-            await TransferResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
+            await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
 
             document.WorkflowHistories.Add(newWorkflowResponsible);
         }

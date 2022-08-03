@@ -11,8 +11,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
     {
         public HeadOfDepartmentDeclines(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
-        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkUnallocated, (int)DocumentStatus.OpinionRequestedUnallocated, (int)DocumentStatus.InWorkDelegatedUnallocated };
+        protected override int[] allowedTransitionStatuses => new int[] 
+        { 
+            (int)DocumentStatus.InWorkUnallocated, 
+            (int)DocumentStatus.OpinionRequestedUnallocated, 
+            (int)DocumentStatus.InWorkDelegatedUnallocated 
+        };
 
+        #region [ IWorkflowHandler ]
         protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
         {
             if (!Validate(command, lastWorkflowRecord))
@@ -30,16 +36,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             }
         }
 
+        #endregion
+
         private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowForOutgoingAndInternalAsync(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkFlowRecord, CancellationToken token)
         {
-            var newWorkflowResponsible = new WorkflowHistoryLog
-            {
-                DocumentStatus = DocumentStatus.New,
-                DeclineReason = command.DeclineReason,
-                Remarks = command.Remarks
-            };
+            var oldWorkflowResponsible = GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Department.Id);
 
-            await PassDocumentToFunctionaryAsync(document, newWorkflowResponsible, command, token);
+            document.Status = DocumentStatus.New;
+            document.DestinationDepartmentId = oldWorkflowResponsible.RecipientId;
+
+            await PassDocumentToDepartment(document, command, token);
 
             return command;
         }
@@ -61,7 +67,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             {
                 var newWorkflowResponsible = new WorkflowHistoryLog
                 {
-                    DocumentStatus = DocumentStatus.InWorkAllocated,
+                    DocumentStatus = status,
                     DeclineReason = command.DeclineReason,
                     Remarks = command.Remarks
                 };
@@ -69,7 +75,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 await PassDocumentToFunctionaryAsync(document, newWorkflowResponsible, command, token);
             }
             else
-                await PassDocumentToRegistryAsync(document, command, token);
+            {
+                document.Status = DocumentStatus.NewDeclinedCompetence;
+                await PassDocumentToRegistry(document, command, token);
+            }
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord)

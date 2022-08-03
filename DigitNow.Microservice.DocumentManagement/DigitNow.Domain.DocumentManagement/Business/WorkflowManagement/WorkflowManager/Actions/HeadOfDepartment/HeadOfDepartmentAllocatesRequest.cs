@@ -9,8 +9,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
     public class HeadOfDepartmentAllocatesRequest : BaseWorkflowManager, IWorkflowHandler
     {
         public HeadOfDepartmentAllocatesRequest(IServiceProvider serviceProvider) : base(serviceProvider) { }
-        protected override int[] allowedTransitionStatuses => new int[] { (int)DocumentStatus.InWorkUnallocated, (int)DocumentStatus.OpinionRequestedUnallocated, (int)DocumentStatus.InWorkDelegatedUnallocated };
+        protected override int[] allowedTransitionStatuses => new int[] 
+        { 
+            (int)DocumentStatus.InWorkUnallocated, 
+            (int)DocumentStatus.OpinionRequestedUnallocated, 
+            (int)DocumentStatus.InWorkDelegatedUnallocated 
+        };
 
+        #region [ IWorkflowHandler ]
         protected override async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecordInternal(ICreateWorkflowHistoryCommand command, Document document, WorkflowHistoryLog lastWorkflowRecord, CancellationToken token)
         {
             if (!Validate(command, lastWorkflowRecord))
@@ -27,12 +33,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             document.WorkflowHistories
                 .Add(WorkflowHistoryLogFactory
-                .Create(document.Id, RecipientType.Functionary, user, newDocumentStatus));
+                .Create(document, RecipientType.Functionary, user, newDocumentStatus));
 
-            await SetStatusAndRecipientBasedOnWorkflowDecisionAsync(command.DocumentId, user.Id, newDocumentStatus, token);
+            await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: false, command.DocumentId, user.Id, newDocumentStatus, token);
 
             return command;
         }
+
+        #endregion
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord)
         {

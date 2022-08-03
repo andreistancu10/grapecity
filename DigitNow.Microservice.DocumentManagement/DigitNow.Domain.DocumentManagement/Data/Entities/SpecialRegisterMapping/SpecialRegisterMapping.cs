@@ -4,6 +4,7 @@
     {
         public long DocumentId { get; set; }
         public long SpecialRegisterId { get; set; }
+        public long? OrderNumber { get; set; }
 
         #region [ References ]
 

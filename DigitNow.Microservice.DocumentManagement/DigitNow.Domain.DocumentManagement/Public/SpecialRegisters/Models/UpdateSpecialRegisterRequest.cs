@@ -1,7 +1,8 @@
-﻿namespace DigitNow.Domain.DocumentManagement.Public.SpecialRegisters.Models;
-
-public class UpdateSpecialRegisterRequest
+﻿namespace DigitNow.Domain.DocumentManagement.Public.SpecialRegisters.Models
 {
-    public int DocumentCategoryId { get; set; }
-    public string Observations { get; set; }
+    public class UpdateSpecialRegisterRequest
+    {
+        public int DocumentCategoryId { get; set; }
+        public string Observations { get; set; }
+    }
 }

@@ -69,8 +69,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
                 await _incomingDocumentService.AddAsync(newIncomingDocument, cancellationToken);
                 await _uploadedFileService.CreateDocumentUploadedFilesAsync(request.UploadedFileIds, newIncomingDocument.Document, cancellationToken);
 
-                var newWorkflowHistoryLog = WorkflowHistoryLogFactory.Create(newIncomingDocument.DocumentId, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkUnallocated);
-                await _dbContext.WorkflowHistoryLogs.AddAsync(newWorkflowHistoryLog, cancellationToken);
+            var newWorkflowHistroryLog = WorkflowHistoryLogFactory.Create(newIncomingDocument.Document, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkUnallocated);
+            await _dbContext.WorkflowHistoryLogs.AddAsync(newWorkflowHistroryLog, cancellationToken);
 
                 await _dbContext.SaveChangesAsync(cancellationToken);
                 await _specialRegisterMappingService.MapDocumentAsync(newIncomingDocument, cancellationToken);
