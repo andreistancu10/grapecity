@@ -4,7 +4,6 @@ using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Documents.Abstractions;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
 
@@ -69,12 +68,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateD
             }
             else
             {
-                departmentToReceiveDocument = await GetDestinationDepartmentByCodeAsync("registratura", token);
+                departmentToReceiveDocument = await GetDestinationDepartmentByCodeAsync(UserDepartment.Registry.Code, token);
             }
 
             document.DestinationDepartmentId = departmentToReceiveDocument;
             document.RecipientId = await _identityService.GetHeadOfDepartmentUserIdAsync(departmentToReceiveDocument, token);
             document.Status = DocumentStatus.Finalized;
+
+            var department = await _catalogAdapterClient.GetDepartmentByIdAsync(departmentToReceiveDocument, token);
 
             var newWorkflowResponsible = new WorkflowHistoryLog
             {
@@ -82,7 +83,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateD
                 DocumentStatus = DocumentStatus.Finalized,
                 RecipientType = RecipientType.Department.Id,
                 RecipientId = departmentToReceiveDocument,
-                RecipientName = $"Departamentul {departmentToReceiveDocument}!"
+                RecipientName = $"Departamentul {department.Name}"
             };
             
             await _dbContext.WorkflowHistoryLogs.AddAsync(newWorkflowResponsible, token);

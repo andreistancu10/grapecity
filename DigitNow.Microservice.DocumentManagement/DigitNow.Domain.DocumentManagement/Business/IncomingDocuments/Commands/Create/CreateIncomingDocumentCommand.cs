@@ -1,7 +1,5 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Dtos;
 using HTSS.Platform.Core.CQRS;
-using System;
-using System.Collections.Generic;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create;
 

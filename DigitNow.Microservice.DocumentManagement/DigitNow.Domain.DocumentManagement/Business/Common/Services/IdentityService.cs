@@ -66,6 +66,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             var userId = GetCurrentUserId();
             var user = await _identityAdapterClient.GetUserByIdAsync(userId, token);
 
+            //TODO: refactor this BS
+            if (user.Departments.Contains(UserDepartment.MayorDepartment.Id) && user.Roles.Contains(RecipientType.HeadOfDepartment.Code))
+            {
+                return RecipientType.Mayor;
+            }
+
             var userRole = user.Roles.Intersect(RecipientType.ListOfTypes.Select(x => x.Code)).FirstOrDefault();
 
             return RecipientType.ListOfTypes.FirstOrDefault(role => role.Code == userRole) ?? new RecipientType { Id = 0 };
@@ -74,7 +80,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
         [Obsolete("Refactor this once the Identity & Catalog SDKs are completed")]
         public Task<User> FetchMayorAsync(CancellationToken token) =>
-            GetHeadOfDepartmentUserAsync("cabinetPrimar", token); //TODO: Fix this BS
+            GetHeadOfDepartmentUserAsync(UserDepartment.MayorDepartment.Code, token);
 
         [Obsolete("Refactor this once the Identity & Catalog SDKs are completed")]
         public async Task<long> FetchMayorIdAsync(CancellationToken token)

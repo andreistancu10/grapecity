@@ -69,11 +69,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                 var isHeadOfDepartment = targetUser.Roles.Contains(RecipientType.HeadOfDepartment.Code);
                 if (isHeadOfDepartment)
                 {
-                    foundDocument.Status = DocumentStatus.InWorkDelegatedUnallocated;
+                    foundDocument.Status = foundDocument.DocumentType == DocumentType.Incoming ? DocumentStatus.InWorkDelegatedUnallocated : DocumentStatus.New;
                 }
                 else
                 {
-                    foundDocument.Status = DocumentStatus.InWorkDelegated;
+                    foundDocument.Status = foundDocument.DocumentType == DocumentType.Incoming ? DocumentStatus.InWorkDelegated : DocumentStatus.New;
                 }
                 
                 foundDocument.DestinationDepartmentId = targetUser.Departments.FirstOrDefault();
@@ -81,7 +81,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
 
                 var recipientType = isHeadOfDepartment ? RecipientType.HeadOfDepartment : RecipientType.Functionary;
 
-                newWorkflowHistoryLogs.Add(WorkflowHistoryLogFactory.Create(foundDocument.Id, recipientType, targetUser, foundDocument.Status));
+                newWorkflowHistoryLogs.Add(WorkflowHistoryLogFactory.Create(foundDocument, recipientType, targetUser, foundDocument.Status));
             }
 
             await _dbContext.BulkUpdateAsync(foundDocuments, token);

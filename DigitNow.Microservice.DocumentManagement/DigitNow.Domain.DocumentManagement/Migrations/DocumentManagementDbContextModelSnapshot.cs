@@ -630,6 +630,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnName("ModifiedBy")
                         .HasColumnOrder(5);
 
+                    b.Property<long?>("OrderNumber")
+                        .HasColumnType("bigint");
+
                     b.Property<long>("SpecialRegisterId")
                         .HasColumnType("bigint");
 

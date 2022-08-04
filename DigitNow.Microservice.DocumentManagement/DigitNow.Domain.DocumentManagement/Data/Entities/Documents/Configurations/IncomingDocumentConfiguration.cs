@@ -1,20 +1,21 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities;
-
-public class IncomingDocumentConfiguration : IEntityTypeConfiguration<IncomingDocument>
+namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
-    public void Configure(EntityTypeBuilder<IncomingDocument> builder)
+    public class IncomingDocumentConfiguration : IEntityTypeConfiguration<IncomingDocument>
     {
-        builder.ToTable(nameof(IncomingDocument), DocumentManagementDbContext.Schema);
+        public void Configure(EntityTypeBuilder<IncomingDocument> builder)
+        {
+            builder.ToTable(nameof(IncomingDocument), DocumentManagementDbContext.Schema);
 
-        builder.Property(p => p.IssuerName).IsRequired();
-        builder.Property(p => p.NumberOfPages).IsRequired();
-        builder.Property(p => p.ContentSummary).IsRequired();
+            builder.Property(p => p.IssuerName).IsRequired();
+            builder.Property(p => p.NumberOfPages).IsRequired();
+            builder.Property(p => p.ContentSummary).IsRequired();
 
-        builder.HasOne(item => item.Document)
-            .WithOne(item => item.IncomingDocument)
-            .HasForeignKey<IncomingDocument>(item => item.DocumentId);
+            builder.HasOne(item => item.Document)
+                .WithOne(item => item.IncomingDocument)
+                .HasForeignKey<IncomingDocument>(item => item.DocumentId);
+        }
     }
 }

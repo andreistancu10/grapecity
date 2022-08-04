@@ -85,7 +85,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Documents
         }
 
         [HttpGet("workflow-history/{documentId}")]
-        public async Task<IActionResult> GetWorkflowHistory([FromRoute] long documentId)
+        public async Task<IActionResult> GetWorkflowHistory([FromRoute] int documentId)
         {
             return await _mediator.Send(new GetWorkflowHistoryByDocumentIdQuery { DocumentId = documentId })
                 switch

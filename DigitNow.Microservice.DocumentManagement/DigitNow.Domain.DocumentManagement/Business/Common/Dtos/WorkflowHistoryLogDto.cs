@@ -1,5 +1,4 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using System;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos
 {
@@ -14,5 +13,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos
         public string DeclineReason { get; set; }
         public int? Resolution { get; set; }
         public DateTime? OpinionRequestedUntil { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 }

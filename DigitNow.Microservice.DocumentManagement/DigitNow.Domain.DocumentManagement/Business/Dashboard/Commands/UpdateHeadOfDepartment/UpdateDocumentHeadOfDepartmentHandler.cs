@@ -58,10 +58,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
             
             foreach (var foundDocument in foundDocuments)
             {
-                foundDocument.Status = DocumentStatus.InWorkUnallocated;
+                foundDocument.Status = foundDocument.DocumentType == DocumentType.Incoming ? DocumentStatus.InWorkUnallocated : DocumentStatus.New;
                 foundDocument.DestinationDepartmentId = request.DepartmentId;
                 foundDocument.RecipientId = headOfDepartment.Id;
-                foundDocument.WorkflowHistories.Add(WorkflowHistoryLogFactory.Create(foundDocument.Id, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkUnallocated));
+                foundDocument.WorkflowHistories.Add(WorkflowHistoryLogFactory.Create(foundDocument, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkUnallocated));
             }
 
             await _dbContext.BulkUpdateAsync(foundDocuments);

@@ -1,18 +1,19 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities;
-
-public class DocumentConfiguration : IEntityTypeConfiguration<Document>
+namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
-    public void Configure(EntityTypeBuilder<Document> builder)
+    public class DocumentConfiguration : IEntityTypeConfiguration<Document>
     {
-        builder.ToTable(nameof(Document), DocumentManagementDbContext.Schema);
+        public void Configure(EntityTypeBuilder<Document> builder)
+        {
+            builder.ToTable(nameof(Document), DocumentManagementDbContext.Schema);
 
-        builder.HasKey(p => p.Id);
+            builder.HasKey(p => p.Id);
 
-        builder.Property(p => p.DocumentType).IsRequired();
-        builder.Property(p => p.RegistrationNumber).IsRequired();
-        builder.Property(p => p.RegistrationDate).IsRequired();
+            builder.Property(p => p.DocumentType).IsRequired();
+            builder.Property(p => p.RegistrationNumber).IsRequired();
+            builder.Property(p => p.RegistrationDate).IsRequired();
+        }
     }
 }
