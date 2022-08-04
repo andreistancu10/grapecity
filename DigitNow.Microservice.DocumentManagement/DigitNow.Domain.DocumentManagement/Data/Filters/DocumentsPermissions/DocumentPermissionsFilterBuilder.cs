@@ -68,8 +68,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
                     EntityPredicates.Add(x =>
                         (x.DocumentType == DocumentType.Incoming && x.DestinationDepartmentId == RegistryOfficeDepartmentRightsFilter.DepartmentId)
                         ||
-                        (x.DocumentType == DocumentType.Outgoing && x.DestinationDepartmentId == RegistryOfficeDepartmentRightsFilter.DepartmentId && x.Status == DocumentStatus.Finalized)
-                        // ????? Is this behaviour intended for outgoing ?
+                        (x.DocumentType == DocumentType.Outgoing && x.DestinationDepartmentId == RegistryOfficeDepartmentRightsFilter.DepartmentId && x.Status == DocumentStatus.Finalized)                        
                     );
                 }
             }
