@@ -1,6 +1,7 @@
 ﻿using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using HTSS.Platform.Core.CQRS;
@@ -12,11 +13,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
     public class UpdateDocumentHeadOfDepartmentHandler : ICommandHandler<UpdateDocumentHeadOfDepartmentCommand, ResultObject>
     {
         private readonly DocumentManagementDbContext _dbContext;
+        private readonly IMailSenderService _mailSenderService;
         private readonly IIdentityAdapterClient _identityAdapterClient;
 
-        public UpdateDocumentHeadOfDepartmentHandler(DocumentManagementDbContext dbContext, IIdentityAdapterClient identityAdapterClient)
+        public UpdateDocumentHeadOfDepartmentHandler(
+            DocumentManagementDbContext dbContext,
+            IIdentityAdapterClient identityAdapterClient,
+            IMailSenderService mailSenderService)
         {
             _dbContext = dbContext;
+            _mailSenderService = mailSenderService;
             _identityAdapterClient = identityAdapterClient;
         }
         public async Task<ResultObject> Handle(UpdateDocumentHeadOfDepartmentCommand request, CancellationToken cancellationToken)
@@ -34,6 +40,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
                 });
 
             await UpdateDocuments(request, headOfDepartment, cancellationToken);
+
+            var documentIds = request.DocumentInfo.Select(x => x.DocumentId).ToList();
+            await _mailSenderService.SendMail_SendBulkDocumentsTemplate(headOfDepartment, documentIds, cancellationToken);
 
             return new ResultObject(ResultStatusCode.Ok);
         }
