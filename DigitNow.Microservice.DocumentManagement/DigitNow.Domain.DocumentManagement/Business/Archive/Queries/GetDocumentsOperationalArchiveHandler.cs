@@ -20,9 +20,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Archive.Queries
 
         public async Task<GetDocumentsOperationalArchiveResponse> Handle(GetDocumentsOperationalArchiveQuery request, CancellationToken cancellationToken)
         {
-            var totalItems = await _dashboardService.CountAllArchiveDocumentsAsync(request.PreprocessFilter, request.PostprocessFilter, cancellationToken);
+            var totalItems = await _dashboardService.CountArchivedDocumentsAsync(request.Filter, cancellationToken);
 
-            var documents = await _dashboardService.GetAllArchiveDocumentsAsync(request.PreprocessFilter, request.PostprocessFilter,
+            var documents = await _dashboardService.GetArchivedDocumentsAsync(request.Filter,
                 request.Page,
                 request.Count,
                 cancellationToken);

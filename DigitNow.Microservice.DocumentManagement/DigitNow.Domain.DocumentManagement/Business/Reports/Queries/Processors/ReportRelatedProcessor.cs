@@ -36,7 +36,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors
                 return new List<ReportViewModel>();
             }
 
-            var virtualDocuments = await _virtualDocumentService.FetchVirtualDocuments(documents, cancellationToken);
+            var virtualDocuments = _virtualDocumentService.ConvertDocumentsToVirtualDocuments(documents);
 
             return await _documentMappingService.MapToReportViewModelAsync(virtualDocuments, cancellationToken);
         }

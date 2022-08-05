@@ -1,4 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
+﻿using DigitNow.Domain.DocumentManagement.Data.Filters.Documents;
 using HTSS.Platform.Core.CQRS;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Archive.Queries
@@ -7,7 +7,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Archive.Queries
     {
         public int Page { get; set; } = 1;
         public int Count { get; set; } = 10;
-        public DocumentPreprocessFilter PreprocessFilter { get; set; }
-        public DocumentPostprocessFilter PostprocessFilter { get; set; }
+        public DocumentFilter Filter { get; set; }
     }
 }
