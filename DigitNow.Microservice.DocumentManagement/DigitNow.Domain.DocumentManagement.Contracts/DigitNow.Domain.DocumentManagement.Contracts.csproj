@@ -17,6 +17,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="HTSS.Platform.Core.CQRS" Version="6.0.0" />
+	  <PackageReference Include="HTSS.Platform.Core.CQRS" Version="6.0.1" />
 	</ItemGroup>
 </Project>

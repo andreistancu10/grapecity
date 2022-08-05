@@ -22,7 +22,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="HTSS.Platform.Infrastructure.Consul" Version="6.0.0" />
-		<PackageReference Include="HTSS.Platform.Infrastructure.MassTransit" Version="6.0.1" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.MassTransit" Version="6.0.4" />
 		<PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.20.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.3">
 			<PrivateAssets>all</PrivateAssets>
