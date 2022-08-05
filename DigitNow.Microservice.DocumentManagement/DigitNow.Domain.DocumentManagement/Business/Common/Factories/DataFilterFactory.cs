@@ -1,6 +1,7 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights;
+using DigitNow.Domain.DocumentManagement.extensions.Role;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
 {
@@ -10,11 +11,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
         {
             var filter = new DocumentUserPermissionsFilters();
 
-            if (IsRole(currentUser, RecipientType.Mayor))
+            if (UserExtension.HasRole(currentUser, RecipientType.Mayor))
             {
                 filter.MayorPermissionsFilter = new DocumentMayorPermissionsFilter();
             }
-            else if (IsRole(currentUser, RecipientType.HeadOfDepartment))
+            else if (UserExtension.HasRole(currentUser, RecipientType.HeadOfDepartment))
             {
                 filter.HeadOfDepartmentPermissionsFilter = new DocumentHeadOfDepartmentPermissionsFilter
                 {
@@ -22,7 +23,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
                     DepartmentId = currentUser.Departments.First() 
                 };
             }
-            else if (IsRole(currentUser, RecipientType.Functionary))
+            else if (UserExtension.HasRole(currentUser, RecipientType.Functionary))
             {
                 filter.FunctionaryPermissionsFilter = new DocumentFunctionaryPermissionsFilter
                 {
@@ -34,12 +35,5 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
 
             return filter;
         }
-
-        #region [ Utils ]
-
-        private static bool IsRole(UserModel userModel, RecipientType role) =>
-            userModel.Roles.Contains(role.Code);
-
-        #endregion
     }
 }

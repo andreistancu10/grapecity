@@ -56,7 +56,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
         {
             return _dbContext.Documents
                 .Includes(includes)
-                .FirstOrDefaultAsync(predicate);
+                .FirstOrDefaultAsync(predicate, token);
         }
 
         public Task<List<Document>> FindAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken token)
