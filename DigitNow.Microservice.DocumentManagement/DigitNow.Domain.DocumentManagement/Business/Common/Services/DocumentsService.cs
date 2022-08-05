@@ -48,7 +48,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             {
                 dbContextTransaction?.Dispose();
             }
-            
+
             return newDocument;
         }
 

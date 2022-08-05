@@ -24,7 +24,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.OperationalArchive.Command
             var documents = await _dbContext.Documents
                 .Where(x => !x.IsArchived)
                 //.Where(x => x.StatusModifiedAt.Date.AddMonths(_archivingPeriod) < System.DateTime.Now.Date)
-                .Where(x => x.Status == DocumentStatus.Finalized || (x.DocumentType == DocumentType.Internal && x.Status == DocumentStatus.InWorkCountersignature))
+                .Where(x => x.Status == DocumentStatus.Finalized || (x.DocumentType == DocumentType.Internal && x.Status == DocumentStatus.InWorkMayorCountersignature))
                 .ToListAsync(cancellationToken);
             _logger.LogInformation($"Docs to be moved to archive: { documents.Count }");
 

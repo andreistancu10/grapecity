@@ -1,4 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.utils;
+using DigitNow.Domain.DocumentManagement.utils;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Reports.Models
 {

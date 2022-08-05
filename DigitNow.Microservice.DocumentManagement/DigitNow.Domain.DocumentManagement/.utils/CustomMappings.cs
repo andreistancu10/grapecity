@@ -20,7 +20,7 @@ namespace DigitNow.Domain.DocumentManagement.utils
             { DocumentStatus.OpinionRequestedAllocated, "dms.document.status.opinion-requested-allocated" },
             { DocumentStatus.InWorkApprovalRequested, "dms.document.status.in-work-approval-requested" },
             { DocumentStatus.InWorkMayorReview, "dms.document.status.in-work-mayor-review" },
-            { DocumentStatus.InWorkCountersignature, "dms.document.status.in-work-countersignature" },
+            { DocumentStatus.InWorkMayorCountersignature, "dms.document.status.in-work-countersignature" },
             { DocumentStatus.InWorkMayorDeclined, "dms.document.status.in-work-mayor-declined" },
             { DocumentStatus.Finalized, "dms.document.status.finalized" },
             { DocumentStatus.NewDeclinedCompetence, "dms.document.status.new-declined-competence" },

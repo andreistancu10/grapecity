@@ -1,9 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.Models;
+﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
-using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 
@@ -248,7 +244,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
 
             public bool Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, bool destMember, ResolutionContext context)
             {
-                return source.VirtualDocument.Document.Status == DocumentStatus.Finalized || source.VirtualDocument.Document.Status == DocumentStatus.InWorkCountersignature;
+                return source.VirtualDocument.Document.Status == DocumentStatus.Finalized || source.VirtualDocument.Document.Status == DocumentStatus.InWorkMayorCountersignature;
             }
         }
     }

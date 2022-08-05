@@ -9,5 +9,8 @@ namespace DigitNow.Adapters.MS.Catalog.Poco
 
         [JsonProperty("name")]
         public string Name { get; set; }
+
+        [JsonProperty("code")]
+        public string Code { get; set; }
     }
 }
