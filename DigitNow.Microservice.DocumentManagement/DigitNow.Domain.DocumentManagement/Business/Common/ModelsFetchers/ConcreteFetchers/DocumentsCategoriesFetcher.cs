@@ -27,18 +27,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
 
         protected override async Task<List<DocumentCategoryModel>> FetchInternalAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
         {
-            var documentTypes = await _catalogAdapterClient.GetDocumentTypesAsync(cancellationToken);
-
-            var documentCategoryModels = documentTypes
-                .Select(x => _mapper.Map<DocumentCategoryModel>(x))
-                .ToList();
-
-            return documentCategoryModels;
-        }
-
-        [Obsolete("This will be investigated in the future")]
-        private async Task<List<DocumentCategoryModel>> FetchInternalAsync_Rpc(DocumentsFetcherContext context, CancellationToken cancellationToken)
-        {
             var documentTypesResponse = await _catalogClient.DocumentTypes.GetDocumentTypesAsync(cancellationToken);
 
             // Note: DocumentTypes is actual DocumentCategory

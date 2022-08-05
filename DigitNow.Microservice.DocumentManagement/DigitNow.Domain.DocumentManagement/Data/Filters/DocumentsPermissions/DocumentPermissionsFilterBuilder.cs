@@ -62,13 +62,18 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
                 }
                 else
                 {
+                    //(!) Rules applied
                     // Incoming => Allow all
                     // Internal => No not allow
                     // Outgoing => Only with Status = Finalized
                     EntityPredicates.Add(x =>
-                        (x.DocumentType == DocumentType.Incoming && x.DestinationDepartmentId == RegistryOfficeDepartmentRightsFilter.DepartmentId)
-                        ||
-                        (x.DocumentType == DocumentType.Outgoing && x.DestinationDepartmentId == RegistryOfficeDepartmentRightsFilter.DepartmentId && x.Status == DocumentStatus.Finalized)                        
+                        (x.DestinationDepartmentId == RegistryOfficeDepartmentRightsFilter.DepartmentId)
+                        &&
+                        (
+                            (x.DocumentType == DocumentType.Incoming)
+                            ||
+                            (x.DocumentType == DocumentType.Outgoing && x.Status == DocumentStatus.Finalized)
+                        )
                     );
                 }
             }
@@ -105,16 +110,38 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
                 EntityPredicates.Add(x =>
                     (x.DestinationDepartmentId == FunctionaryPermissionsFilter.DepartmentId)
                     &&
-                    (x.DocumentType == DocumentType.Outgoing || x.DocumentType == DocumentType.Internal)
-                    &&
                     (
-                        x.Status == DocumentStatus.New
-                            ||
-                         x.Status == DocumentStatus.InWorkMayorCountersignature
-                            ||
-                         x.Status == DocumentStatus.InWorkMayorDeclined
-                            ||
-                         x.Status == DocumentStatus.Finalized
+                        (
+                            (x.DocumentType == DocumentType.Incoming)
+                            &&
+                            (
+                                x.Status == DocumentStatus.InWorkAllocated 
+                                    || 
+                                x.Status == DocumentStatus.OpinionRequestedAllocated 
+                                    || 
+                                x.Status == DocumentStatus.InWorkDeclined 
+                                    || 
+                                x.Status == DocumentStatus.InWorkMayorCountersignature 
+                                    || 
+                                x.Status == DocumentStatus.Finalized
+                            )
+                        )
+                        ||
+                        (
+                            (x.DocumentType == DocumentType.Internal || x.DocumentType == DocumentType.Outgoing)
+                            &&
+                            (
+                                x.Status == DocumentStatus.New
+                                    ||
+                                x.Status == DocumentStatus.OpinionRequestedAllocated
+                                    ||
+                                x.Status == DocumentStatus.InWorkDeclined
+                                    ||
+                                 x.Status == DocumentStatus.InWorkMayorCountersignature
+                                    ||
+                                 x.Status == DocumentStatus.Finalized
+                            )
+                        )
                     )
                 );
             }

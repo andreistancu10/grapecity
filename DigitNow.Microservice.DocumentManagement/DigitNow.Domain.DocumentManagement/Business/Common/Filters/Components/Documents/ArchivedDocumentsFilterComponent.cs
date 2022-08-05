@@ -8,7 +8,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
     {
         #region [ Properties ]
 
-        private static int PreviousYear => DateTime.UtcNow.Year - 1;
+        private DateTime StartOfYear => new DateTime(DateTime.Now.Year, 1, 1);
 
         #endregion
 
@@ -23,11 +23,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
 
         protected override Task<DataExpressions<Document>> SetBuiltinDataExpressionsAsync(ArchivedDocumentsFilterComponentContext context, CancellationToken token)
         {
-            return Task.FromResult(new DataExpressions<Document>
+            var builtinExpressions = new DataExpressions<Document>
             {
-                x => x.CreatedAt.Year >= PreviousYear,
                 x => x.IsArchived
-            });
+            };
+
+            if (context.DocumentFilter.RegistrationDateFilter == null)
+            {
+                builtinExpressions.Add(x => x.CreatedAt >= StartOfYear);
+            }
+
+            return Task.FromResult(builtinExpressions);
         }
 
         protected override Task<DataExpressions<Document>> SetCustomDataExpressionsAsync(ArchivedDocumentsFilterComponentContext context, CancellationToken token)
