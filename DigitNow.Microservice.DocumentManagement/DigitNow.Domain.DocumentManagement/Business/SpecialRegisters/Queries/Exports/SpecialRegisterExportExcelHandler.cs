@@ -1,10 +1,9 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.Catalog.Client;
-using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using HTSS.Platform.Core.CQRS;
 
 namespace DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Queries.Exports
@@ -14,7 +13,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Queries.E
         private readonly IMapper _mapper;
         private readonly ISpecialRegisterService _specialRegisterService;
         private readonly SpecialRegisterRelationsFetcher _specialRegisterRelationsFetcher;
-
 
         public SpecialRegisterExportExcelHandler(
             IMapper mapper,

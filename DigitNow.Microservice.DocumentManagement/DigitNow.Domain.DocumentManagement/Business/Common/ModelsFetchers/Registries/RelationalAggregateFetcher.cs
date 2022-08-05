@@ -1,15 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries
+﻿namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries
 {
     internal abstract class RelationalAggregateFetcher<TContext>
         where TContext : IModelFetcherContext
     {
-        protected List<IModelFetcher> RemoteFetchers = new List<IModelFetcher>();
-        protected List<IModelFetcher> InternalFetchers = new List<IModelFetcher>();
+        protected List<IModelFetcher> RemoteFetchers = new();
+        protected List<IModelFetcher> InternalFetchers = new();
 
         private void InitializeFetchers()
         {

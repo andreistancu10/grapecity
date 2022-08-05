@@ -1,5 +1,5 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
-using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
+using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.GenericFetchers;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchers
 {

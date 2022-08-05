@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
+using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Queries.Exports;
