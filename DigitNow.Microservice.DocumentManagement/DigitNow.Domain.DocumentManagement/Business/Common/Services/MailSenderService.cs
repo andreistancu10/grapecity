@@ -68,7 +68,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .Select(x => x.RegistrationNumber)
                 .ToArrayAsync(token);
 
-            var userResponse = await _identityAdapterClient.GetUsersByRoleAndDepartment(RecipientType.HeadOfDepartment.Code, delegatedUser.Departments.First(), token);
+            var userResponse = await _identityAdapterClient.GetUsersByRoleAndDepartment(RecipientType.HeadOfDepartment.Code, delegatedUser.Departments.FirstOrDefault(), token);
 
             var tasks = new List<Task>();
             foreach (var targetUser in userResponse.Users)
