@@ -219,7 +219,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
 
             public int Resolve(VirtualDocumentAggregate<InternalDocument> source, DocumentViewModel destination, int destMember, ResolutionContext context)
             {
-                return (int)source.VirtualDocument.DeadlineDaysNumber;
+                return source.VirtualDocument.DeadlineDaysNumber;
             }
         }
 
