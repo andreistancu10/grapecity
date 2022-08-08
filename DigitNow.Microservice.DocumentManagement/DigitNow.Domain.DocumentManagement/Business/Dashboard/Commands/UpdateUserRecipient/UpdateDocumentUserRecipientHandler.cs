@@ -45,13 +45,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                     Parameters = new object[] { request.UserId }
                 });
 
+            if (!targetUser.Departments.Any())
+                return ResultObject.Error(new ErrorMessage
+                {
+                    Message = $"The user with id {request.UserId} does not have any departments.",
+                    TranslationCode = "catalog.user.backend.update.validation.departmentEntityNotFound",
+                    Parameters = new object[] { request.UserId }
+                });
+
             await UpdateDocumentsAsync(request.DocumentIds, targetUser, cancellationToken);
 
-            await Task.WhenAll
-            (
-                _mailSenderService.SendMail_DelegateDocumentToFunctionary(currentUser, targetUser, request.DocumentIds, cancellationToken),
-                _mailSenderService.SendMail_DelegateDocumentToFunctionarySupervisor(currentUser, targetUser, request.DocumentIds, cancellationToken)
-            );
+            await _mailSenderService.SendMail_DelegateDocumentToFunctionary(currentUser, targetUser, request.DocumentIds, cancellationToken);
+            await _mailSenderService.SendMail_DelegateDocumentToFunctionarySupervisor(currentUser, targetUser, request.DocumentIds, cancellationToken);
 
             return new ResultObject(ResultStatusCode.Ok);
         }
