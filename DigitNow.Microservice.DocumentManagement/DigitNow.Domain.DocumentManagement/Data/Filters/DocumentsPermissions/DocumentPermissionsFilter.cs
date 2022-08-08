@@ -41,6 +41,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
 
     public class DocumentHeadOfDepartmentPermissionsFilter
     {
+        public long UserId { get; set; }
         public long DepartmentId { get; set; }
     }
 

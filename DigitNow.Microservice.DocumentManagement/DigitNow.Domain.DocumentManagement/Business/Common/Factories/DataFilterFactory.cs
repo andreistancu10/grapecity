@@ -15,11 +15,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
             {
                 filter.MayorPermissionsFilter = new DocumentMayorPermissionsFilter();
             }
+            // TODO: If the tests are ok, we can merge this 2 into a common Permission Filter class
             else if (UserExtension.HasRole(currentUser, RecipientType.HeadOfDepartment))
             {
                 filter.HeadOfDepartmentPermissionsFilter = new DocumentHeadOfDepartmentPermissionsFilter
                 {
                     // TODO:(!) Each user will be assigned to only one department
+                    UserId = currentUser.Id,
                     DepartmentId = currentUser.Departments.First() 
                 };
             }
@@ -27,8 +29,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
             {
                 filter.FunctionaryPermissionsFilter = new DocumentFunctionaryPermissionsFilter
                 {
-                    UserId = currentUser.Id,
                     // TODO:(!) Each user will be assigned to only one department
+                    UserId = currentUser.Id,
                     DepartmentId = currentUser.Departments.First()
                 };
             }
