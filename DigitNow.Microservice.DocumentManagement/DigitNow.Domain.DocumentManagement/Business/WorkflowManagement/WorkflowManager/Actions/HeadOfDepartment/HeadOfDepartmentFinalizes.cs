@@ -62,7 +62,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord, Document document)
         {
-            if (!IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses) || document.DocumentType == DocumentType.Incoming)
+            if (!IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
             {
                 TransitionNotAllowed(command);
                 return false;

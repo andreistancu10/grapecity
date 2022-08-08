@@ -60,46 +60,27 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateD
 
             shippableDocument.DeliveryDetails = deliveryDetails;
 
-            var departmentToReceiveDocument = default(long);
+            var departmentToReceiveDocument = await _catalogAdapterClient.GetDepartmentByCodeAsync(UserDepartment.Registry.Code, token);
 
-            if (document.DocumentType == DocumentType.Outgoing)
-            {
-                departmentToReceiveDocument = GetDestinationDepartmentFromHistory();
-            }
-            else
-            {
-                departmentToReceiveDocument = await GetDestinationDepartmentByCodeAsync(UserDepartment.Registry.Code, token);
-            }
-
-            document.DestinationDepartmentId = departmentToReceiveDocument;
-            document.RecipientId = await _identityService.GetHeadOfDepartmentUserIdAsync(departmentToReceiveDocument, token);
+            document.DestinationDepartmentId = departmentToReceiveDocument.Id;
+            document.RecipientId = await _identityService.GetHeadOfDepartmentUserIdAsync(departmentToReceiveDocument.Id, token);
             document.Status = DocumentStatus.Finalized;
 
-            var department = await _catalogAdapterClient.GetDepartmentByIdAsync(departmentToReceiveDocument, token);
+            if (deliveryDetails.DeliveryMode == (int)TransmissionMode.DirectTransmission && document.DocumentType == DocumentType.Outgoing)
+            {
+                return;
+            }
 
             var newWorkflowResponsible = new WorkflowHistoryLog
             {
                 DocumentId = document.Id,
                 DocumentStatus = DocumentStatus.Finalized,
                 RecipientType = RecipientType.Department.Id,
-                RecipientId = departmentToReceiveDocument,
-                RecipientName = $"Departamentul {department.Name}"
+                RecipientId = departmentToReceiveDocument.Id,
+                RecipientName = $"Departamentul {departmentToReceiveDocument.Name}"
             };
             
             await _dbContext.WorkflowHistoryLogs.AddAsync(newWorkflowResponsible, token);
-        }
-
-        private long GetDestinationDepartmentFromHistory()
-        {
-            return _dbContext.WorkflowHistoryLogs
-                .Where(x => x.RecipientType == RecipientType.Department.Id)
-                .OrderBy(x => x.CreatedAt)
-                .First().RecipientId;
-        }
-        private async Task<long> GetDestinationDepartmentByCodeAsync(string code, CancellationToken token)
-        {
-            var department = await _catalogAdapterClient.GetDepartmentByCodeAsync(code, token);
-            return department.Id;
         }
     }
 }
