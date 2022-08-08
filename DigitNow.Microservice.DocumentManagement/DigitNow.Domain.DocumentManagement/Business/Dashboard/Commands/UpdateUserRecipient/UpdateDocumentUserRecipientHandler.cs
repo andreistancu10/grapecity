@@ -45,7 +45,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                     Parameters = new object[] { request.UserId }
                 });
 
-            if (targetUser.Departments.Count() == 0)
+            if (!targetUser.Departments.Any())
                 return ResultObject.Error(new ErrorMessage
                 {
                     Message = $"The user with id {request.UserId} does not have any departments.",
