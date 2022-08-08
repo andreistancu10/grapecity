@@ -15,7 +15,7 @@ public class CreateIncomingDocumentCommand : ICommand<ResultObject>
     public ContactDetailDto ContactDetail { get; set; }
     public string ContentSummary { get; set; }
     public int NumberOfPages { get; set; }
-    public int RecipientId { get; set; } //TODO: Rename this to DepartmentId
+    public int RecipientId { get; set; } //TODO: Rename this to DestinationDepartmentId
     public int DocumentTypeId { get; set; }
     public string Detail { get; set; }
     public double ResolutionPeriod { get; set; }

@@ -18,7 +18,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.
         public string IdentificationNumber { get; set; }
         public string ContentSummary { get; set; }
         public int NumberOfPages { get; set; }
-        public int RecipientId { get; set; }
+        public int RecipientId { get; set; } // DestinationDepartmentId
         public int DocumentTypeId { get; set; }
         public string Detail { get; set; }
         public double ResolutionPeriod { get; set; }
