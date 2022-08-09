@@ -42,9 +42,24 @@ namespace DigitNow.Domain.DocumentManagement.Public.Documents
         [HttpPost("resolution")]
         public async Task<IActionResult> SetDocumentsResolutionAsync([FromBody] SetDocumentsResolutionRequest request)
         {
-            var query = _mapper.Map<SetDocumentsResolutionQuery>(request);
+            var command = _mapper.Map<SetDocumentsResolutionCommand>(request);
 
-            return await _mediator.Send(query)
+            //TODO: Refactor this or propper implement the SetDocumentsResolutionCommand
+            foreach (var document in request.Batch.Documents)
+            {
+                var workflowCommand = new CreateWorkflowDecisionCommand
+                {
+                    ActionType = 5,
+                    DocumentId = (int)document.Id,
+                    DocumentType = document.DocumentType,
+                    InitiatorType = 1,
+                    Remarks = request.Remarks,
+                    Resolution = (int?)request.Resolution
+                };
+                await _mediator.Send(workflowCommand);
+            }
+
+            return await _mediator.Send(command)
                 switch
                 {
                     null => NotFound(),
@@ -75,6 +90,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Documents
                 };
         }
 
+        //TODO: Refactor this submit-workflow  is a post call use the body"
         [HttpPost("{id}/submit-workflow")]
         public async Task<IActionResult> SubmitWorkflowDecision([FromRoute] int id, [FromBody] CreateWorkflowDecisionRequest request)
         {
