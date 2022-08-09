@@ -33,10 +33,10 @@ namespace DigitNow.Domain.DocumentManagement.Public.Documents
         {
             return await _mediator.Send(new GetDocumentResolutionByDocumentIdQuery { DocumentId = documentId })
                 switch
-                {
-                    null => NotFound(),
-                    var result => Ok(result)
-                };
+            {
+                null => NotFound(),
+                var result => Ok(result)
+            };
         }
 
         [HttpPost("resolution")]
@@ -44,27 +44,12 @@ namespace DigitNow.Domain.DocumentManagement.Public.Documents
         {
             var command = _mapper.Map<SetDocumentsResolutionCommand>(request);
 
-            //TODO: Refactor this or propper implement the SetDocumentsResolutionCommand
-            foreach (var document in request.Batch.Documents)
-            {
-                var workflowCommand = new CreateWorkflowDecisionCommand
-                {
-                    ActionType = 5,
-                    DocumentId = (int)document.Id,
-                    DocumentType = document.DocumentType,
-                    InitiatorType = 1,
-                    Remarks = request.Remarks,
-                    Resolution = (int?)request.Resolution
-                };
-                await _mediator.Send(workflowCommand);
-            }
-
             return await _mediator.Send(command)
                 switch
-                {
-                    null => NotFound(),
-                    var result => Ok(result)
-                };
+            {
+                null => NotFound(),
+                var result => Ok(result)
+            };
         }
 
         [HttpGet]
@@ -72,10 +57,10 @@ namespace DigitNow.Domain.DocumentManagement.Public.Documents
         {
             return await _mediator.Send(new GetDocsByRegistrationNumberQuery { RegistrationNumber = registrationNumber, Year = year })
                 switch
-                {
-                    null => NotFound(),
-                    var result => Ok(result)
-                };
+            {
+                null => NotFound(),
+                var result => Ok(result)
+            };
         }
 
 
@@ -84,13 +69,12 @@ namespace DigitNow.Domain.DocumentManagement.Public.Documents
         {
             return await _mediator.Send(new GetWorkflowInformationByDocumentIdQuery { DocumentId = documentId })
                 switch
-                {
-                    null => NotFound(),
-                    var result => Ok(result)
-                };
+            {
+                null => NotFound(),
+                var result => Ok(result)
+            };
         }
 
-        //TODO: Refactor this submit-workflow  is a post call use the body"
         [HttpPost("{id}/submit-workflow")]
         public async Task<IActionResult> SubmitWorkflowDecision([FromRoute] int id, [FromBody] CreateWorkflowDecisionRequest request)
         {
@@ -105,10 +89,10 @@ namespace DigitNow.Domain.DocumentManagement.Public.Documents
         {
             return await _mediator.Send(new GetWorkflowHistoryByDocumentIdQuery { DocumentId = documentId })
                 switch
-                {
-                    null => NotFound(),
-                    var result => Ok(result)
-                };
+            {
+                null => NotFound(),
+                var result => Ok(result)
+            };
         }
 
         [HttpPost("delivery-details/{documentId}")]
