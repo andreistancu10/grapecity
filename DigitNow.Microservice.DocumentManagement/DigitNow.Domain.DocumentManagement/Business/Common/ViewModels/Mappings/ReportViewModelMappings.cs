@@ -221,8 +221,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
         {
             public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
-                var incomingDocument = source.VirtualDocument as IncomingDocument;
-                if (incomingDocument != null)
+                if (source.VirtualDocument is IncomingDocument incomingDocument)
                 {
                     return new BasicViewModel(default, incomingDocument.IssuerName);
                 }
@@ -241,10 +240,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
 
             public BasicViewModel Resolve(VirtualReportAggregate<OutgoingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
-                var incomingDocument = source.VirtualDocument as OutgoingDocument;
-                if (incomingDocument != null)
+                if (source.VirtualDocument is OutgoingDocument outgoingDocument)
                 {
-                    return new BasicViewModel(default, incomingDocument.RecipientName);
+                    return new BasicViewModel(default, outgoingDocument.RecipientName);
                 }
                 return default;
             }
