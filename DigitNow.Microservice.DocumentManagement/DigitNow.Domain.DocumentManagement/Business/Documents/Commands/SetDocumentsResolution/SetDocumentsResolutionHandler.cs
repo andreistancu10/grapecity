@@ -27,9 +27,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.SetDocu
             _internalDocumentService = internalDocumentService;
             _incomingDocumentService = incomingDocumentService;
         }
-        public async Task<ResultObject> Handle(SetDocumentsResolutionCommand command, CancellationToken cancellationToken)
+        public async Task<ResultObject> Handle(SetDocumentsResolutionCommand request, CancellationToken cancellationToken)
         {
-            var documentBatchIds = command.Batch.Documents.Select(x => x.Id);
+            var documentBatchIds = request.Batch.Documents.Select(x => x.Id);
 
             var foundDocuments =  await _dbContext.Documents
                 .Where(x => documentBatchIds.Contains(x.Id))
@@ -37,8 +37,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.SetDocu
                 .ToListAsync(cancellationToken);
 
             var results = new List<bool>();
-            results.Add(await ProcessInternalDocumentsAsync(foundDocuments, command.Resolution, command.Remarks, cancellationToken));
-            results.Add(await ProcessIncomingDocumentsAsync(foundDocuments, command.Resolution, command.Remarks, cancellationToken));
+            results.Add(await ProcessInternalDocumentsAsync(foundDocuments, request.Resolution, request.Remarks, cancellationToken));
+            results.Add(await ProcessIncomingDocumentsAsync(foundDocuments, request.Resolution, request.Remarks, cancellationToken));
         
             if (results.Any(x => !x))
             {
