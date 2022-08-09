@@ -209,11 +209,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
 
             public int Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, int destMember, ResolutionContext context)
             {
-                var foundCategory = source.Categories.FirstOrDefault(x => x.Id == source.VirtualDocument.DocumentTypeId);
-                if (foundCategory != null)
-                {
-                    return foundCategory.ResolutionPeriod;
-                }
                 return default;
             }
 
