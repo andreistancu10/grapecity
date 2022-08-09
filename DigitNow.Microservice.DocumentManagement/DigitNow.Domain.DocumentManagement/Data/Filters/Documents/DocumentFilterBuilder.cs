@@ -19,7 +19,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Documents
             if (EntityFilter.RegistryTypeFilter != null)
             {
                 var foundSpecialRegistrerIds = _dbContext.SpecialRegisters
-                    .Where(x => EntityFilter.RegistryTypeFilter.RegistryTypes.Contains(x.Name))
+                    .Where(x => EntityFilter.RegistryTypeFilter.RegistryTypes.Contains(x.Id))
                     .Select(x => x.Id);
 
                 var targetDocumentIds = _dbContext.SpecialRegisterMappings
