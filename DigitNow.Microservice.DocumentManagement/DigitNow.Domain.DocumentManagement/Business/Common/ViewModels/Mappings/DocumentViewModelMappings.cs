@@ -98,7 +98,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 ExtractDepartment(source);
 
             private static BasicViewModel ExtractDepartment<T>(VirtualDocumentAggregate<T> source)
-                where T: VirtualDocument
+                where T : VirtualDocument
             {
                 var foundDepartment = source.Departments.FirstOrDefault(x => x.Id == source.VirtualDocument.Document.DestinationDepartmentId);
                 if (foundDepartment != null)
@@ -124,7 +124,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 ExtractUser(source);
 
             private static BasicViewModel ExtractUser<T>(VirtualDocumentAggregate<T> source)
-                where T: VirtualDocument
+                where T : VirtualDocument
             {
                 var foundUser = source.Users.FirstOrDefault(x => x.Id == source.VirtualDocument.Document.CreatedBy);
                 if (foundUser != null)
@@ -140,22 +140,33 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             IValueResolver<VirtualDocumentAggregate<InternalDocument>, DocumentViewModel, BasicViewModel>,
             IValueResolver<VirtualDocumentAggregate<OutgoingDocument>, DocumentViewModel, BasicViewModel>
         {
-            public BasicViewModel Resolve(VirtualDocumentAggregate<IncomingDocument> source, DocumentViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
-                ExtractUser(source);
+            public BasicViewModel Resolve(VirtualDocumentAggregate<IncomingDocument> source, DocumentViewModel destination, BasicViewModel destMember, ResolutionContext context)
+            {
+                var incomingDocument = source.VirtualDocument as IncomingDocument;
+                if (incomingDocument != null)
+                {
+                    return new BasicViewModel(default, incomingDocument.IssuerName);
+                }
+                return default;
+            }
 
-            public BasicViewModel Resolve(VirtualDocumentAggregate<InternalDocument> source, DocumentViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
-                ExtractUser(source);
 
-            public BasicViewModel Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
-                ExtractUser(source);
-
-            private static BasicViewModel ExtractUser<T>(VirtualDocumentAggregate<T> source)
-                where T : VirtualDocument
+            public BasicViewModel Resolve(VirtualDocumentAggregate<InternalDocument> source, DocumentViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
                 var foundUser = source.Users.FirstOrDefault(x => x.Id == source.VirtualDocument.Document.CreatedBy);
                 if (foundUser != null)
                 {
                     return new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
+                }
+                return default;
+            }
+
+            public BasicViewModel Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, BasicViewModel destMember, ResolutionContext context)
+            {
+                var incomingDocument = source.VirtualDocument as OutgoingDocument;
+                if (incomingDocument != null)
+                {
+                    return new BasicViewModel(default, incomingDocument.RecipientName);
                 }
                 return default;
             }

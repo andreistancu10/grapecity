@@ -216,23 +216,37 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
 
         private class MapUserFromAggregate :
             IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
-            IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
+            IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, BasicViewModel>,
+            IValueResolver<VirtualReportAggregate<OutgoingDocument>, ReportViewModel, BasicViewModel>
         {
-            public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
-                GetUserViewModel(source, source.VirtualDocument);
-
-            public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
-                GetUserViewModel(source, source.VirtualDocument);
-
-            private static BasicViewModel GetUserViewModel<T>(VirtualReportAggregate<T> documentAggregate, VirtualDocument virtualDocument)
-                where T : VirtualDocument
+            public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
-                var foundUser = documentAggregate.Users.FirstOrDefault(x => x.Id == virtualDocument.Document.CreatedBy);
+                var incomingDocument = source.VirtualDocument as IncomingDocument;
+                if (incomingDocument != null)
+                {
+                    return new BasicViewModel(default, incomingDocument.IssuerName);
+                }
+                return default;
+            }
+
+            public BasicViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
+            {
+                var foundUser = source.Users.FirstOrDefault(x => x.Id == source.VirtualDocument.Document.CreatedBy);
                 if (foundUser != null)
                 {
                     return new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
                 }
-                return null;
+                return default;
+            }
+
+            public BasicViewModel Resolve(VirtualReportAggregate<OutgoingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
+            {
+                var incomingDocument = source.VirtualDocument as OutgoingDocument;
+                if (incomingDocument != null)
+                {
+                    return new BasicViewModel(default, incomingDocument.RecipientName);
+                }
+                return default;
             }
         }
 
