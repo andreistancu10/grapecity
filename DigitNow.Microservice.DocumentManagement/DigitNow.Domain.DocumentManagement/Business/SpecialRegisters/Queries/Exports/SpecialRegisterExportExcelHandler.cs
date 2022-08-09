@@ -29,18 +29,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Queries.E
             var registers = await _specialRegisterService.FindAllAsync(cancellationToken);
             var result = new List<SpecialRegisterExportViewModel>();
 
-            await _specialRegisterRelationsFetcher.TriggerFetchersAsync(
-                new SpecialRegisterFetcherContext
-                {
-                    SpecialRegisters = registers
-                }, cancellationToken);
+            await _specialRegisterRelationsFetcher                
+                .TriggerFetchersAsync(cancellationToken);
 
             foreach (var specialRegister in registers)
             {
                 var aggregate = new SpecialRegisterViewModelAggregate
                 {
                     SpecialRegister = specialRegister,
-                    Categories = _specialRegisterRelationsFetcher.CategoryModels
+                    Categories = _specialRegisterRelationsFetcher.DocumentCategories
                 };
 
                 var specialRegisterViewModel = _mapper.Map<SpecialRegisterViewModel>(aggregate);

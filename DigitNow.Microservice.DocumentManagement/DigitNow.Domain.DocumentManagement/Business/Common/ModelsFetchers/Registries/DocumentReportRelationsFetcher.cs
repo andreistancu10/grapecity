@@ -1,51 +1,43 @@
-﻿using System;
-using System.Collections.Generic;
-using DigitNow.Domain.DocumentManagement.Business.Common.Models;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchers;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
+using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.GenericFetchers;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries
 {
-    internal sealed class DocumentReportRelationsFetcher : RelationalAggregateFetcher<DocumentsFetcherContext>
+    internal sealed class DocumentReportRelationsFetcher : BaseRelationsFetcher
     {
-        private readonly IServiceProvider _serviceProvider;
+        public IReadOnlyList<UserModel> DocumentUsers 
+            => GetItems<DocumentsUsersFetcher, UserModel>();
 
-        private IModelFetcher<UserModel, DocumentsFetcherContext> _documentsUsersFetcher;
-        private IModelFetcher<DocumentCategoryModel, DocumentsFetcherContext> _documentsCategoriesFetcher;
-        private IModelFetcher<DocumentCategoryModel, DocumentsFetcherContext> _documentsInternalCategoriesFetcher;
-        private IModelFetcher<DocumentDepartmentModel, DocumentsFetcherContext> _documentsDepartmentsFetcher;
-        private IModelFetcher<DocumentsSpecialRegisterMappingModel, DocumentsFetcherContext> _documentsSpecialRegisterMappingFetcher;
+        public IReadOnlyList<DocumentCategoryModel> DocumentCategories 
+            => GetItems<GenericDocumentsCategoriesFetcher, DocumentCategoryModel>();
 
-        public IReadOnlyList<UserModel> DocumentUsers => GetItems(_documentsUsersFetcher);
-        public IReadOnlyList<DocumentCategoryModel> DocumentCategories => GetItems(_documentsCategoriesFetcher);
-        public IReadOnlyList<DocumentCategoryModel> DocumentInternalCategories => GetItems(_documentsInternalCategoriesFetcher);
-        public IReadOnlyList<DocumentDepartmentModel> DocumentDepartments => GetItems(_documentsDepartmentsFetcher);
-        public IReadOnlyList<DocumentsSpecialRegisterMappingModel> DocumentSpecialRegisterMapping => GetItems(_documentsSpecialRegisterMappingFetcher);
+        public IReadOnlyList<DocumentCategoryModel> DocumentInternalCategories 
+            => GetItems<GenericDocumentsInternalCategoriesFetcher, DocumentCategoryModel>();
+
+        public IReadOnlyList<DocumentDepartmentModel> DocumentDepartments 
+            => GetItems<GenericDocumentsDepartmentsFetcher, DocumentDepartmentModel>();
+
+        public IReadOnlyList<DocumentsSpecialRegisterMappingModel> DocumentSpecialRegisterMapping 
+            => GetItems<DocumentsSpecialRegisterMappingFetcher, DocumentsSpecialRegisterMappingModel>();
 
         public DocumentReportRelationsFetcher(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
-            _serviceProvider = serviceProvider;
+            Aggregator
+                .UseGenericRemoteFetcher<GenericDocumentsCategoriesFetcher>()
+                .UseGenericRemoteFetcher<GenericDocumentsInternalCategoriesFetcher>()
+                .UseGenericRemoteFetcher<GenericDocumentsDepartmentsFetcher>();
         }
 
-        protected override void AddInternalFetchers()
+        public DocumentReportRelationsFetcher UseDocumentsContext(DocumentsFetcherContext context)
         {
-            _documentsSpecialRegisterMappingFetcher = new DocumentsSpecialRegisterMappingFetcher(_serviceProvider);
-            InternalFetchers.Add(_documentsSpecialRegisterMappingFetcher);
-        }
+            Aggregator
+                .UseRemoteFetcher<DocumentsUsersFetcher>(context)
+                .UseInternalFetcher<DocumentsSpecialRegisterMappingFetcher>(context);
 
-        protected override void AddRemoteFetchers()
-        {
-            _documentsUsersFetcher = new DocumentsUsersFetcher(_serviceProvider);
-            RemoteFetchers.Add(_documentsUsersFetcher);
-
-            _documentsCategoriesFetcher = new DocumentsCategoriesFetcher(_serviceProvider);
-            RemoteFetchers.Add(_documentsCategoriesFetcher);
-
-            _documentsInternalCategoriesFetcher = new DocumentsInternalCategoriesFetcher(_serviceProvider);
-            RemoteFetchers.Add(_documentsInternalCategoriesFetcher);
-
-            _documentsDepartmentsFetcher = new DocumentsDepartmentsFetcher(_serviceProvider);
-            RemoteFetchers.Add(_documentsDepartmentsFetcher);
+            return this;
         }
     }
 }

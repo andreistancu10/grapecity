@@ -4,6 +4,7 @@ using System.Linq;
 using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
+using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Export;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 
@@ -51,7 +52,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                .ForMember(c => c.CurrentStatus, opt => opt.MapFrom<MapDocumentCurrentStatus>())
                .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>())
                .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.ReportViewModel.DocumentCategory.Name))
-               .ForMember(c => c.Functionary, opt => opt.MapFrom(src => src.ReportViewModel.Functionary.Name))
+               .ForMember(c => c.Functionary, opt => opt.MapFrom<MapFunctionary>())
                .ForMember(c => c.AllocationDate, opt => opt.MapFrom(src => src.ReportViewModel.AllocationDate))
                .ForMember(c => c.ResolutionDate, opt => opt.MapFrom(src => src.ReportViewModel.ResolutionDate))
                .ForMember(c => c.Expired, opt => opt.MapFrom(src => src.ReportViewModel.Expired))
@@ -60,7 +61,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
 
         private class MapFunctionary :
             IValueResolver<VirtualReportAggregate<IncomingDocument>, ReportViewModel, BasicViewModel>,
-            IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, BasicViewModel>
+            IValueResolver<VirtualReportAggregate<InternalDocument>, ReportViewModel, BasicViewModel>,
+            IValueResolver<ReportViewModelAggregate, ExportReportViewModel, string>
         {
             public BasicViewModel Resolve(VirtualReportAggregate<IncomingDocument> source, ReportViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
@@ -80,6 +82,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                     return new BasicViewModel(lastWorkflowHistory.RecipientId, lastWorkflowHistory.RecipientName); ;
                 }
                 return null;
+            }
+
+            public string Resolve(ReportViewModelAggregate source, ExportReportViewModel destination, string destMember, ResolutionContext context)
+            {
+                var functionary = source.ReportViewModel.Functionary;
+                if (functionary != null)
+                {
+                    return functionary.Name;
+                }
+                return default;
             }
         }
 

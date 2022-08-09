@@ -5,28 +5,27 @@ using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.GenericF
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries
 {
-    internal sealed class UploadedFileRelationsFetcher : RelationalAggregateFetcher<UploadedFilesFetcherContext>
+    internal sealed class UploadedFileRelationsFetcher : BaseRelationsFetcher
     {
-        private readonly IServiceProvider _serviceProvider;
+        public IReadOnlyList<DocumentCategoryModel> UploadedFileCategoryModels 
+            => GetItems<GenericDocumentsCategoriesFetcher, DocumentCategoryModel>();
 
-        private IGenericCategoryModelFetcher<UploadedFilesFetcherContext> _uploadedFilesCategoriesFetcher;
-        private IModelFetcher<UserModel, UploadedFilesFetcherContext> _uploadedFilesUsersFetcher;
-
-        public IReadOnlyList<DocumentCategoryModel> UploadedFileCategoryModels => GetItems(_uploadedFilesCategoriesFetcher);
-        public IReadOnlyList<UserModel> UploadedFileUsers => GetItems(_uploadedFilesUsersFetcher);
+        public IReadOnlyList<UserModel> UploadedFileUsers 
+            => GetItems<UploadedFilesUsersFetcher, UserModel>();
 
         public UploadedFileRelationsFetcher(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
-            _serviceProvider = serviceProvider;
+            Aggregator
+                .UseGenericRemoteFetcher<GenericDocumentsCategoriesFetcher>();
         }
 
-        protected override void AddRemoteFetchers()
+        public UploadedFileRelationsFetcher UseUploadedFilesContext(UploadedFilesFetcherContext context)
         {
-            _uploadedFilesCategoriesFetcher = new GenericCategoryModelFetcher<UploadedFilesFetcherContext>(_serviceProvider);
-            RemoteFetchers.Add(_uploadedFilesCategoriesFetcher);
+            Aggregator
+                .UseRemoteFetcher<UploadedFilesUsersFetcher>(context);
 
-            _uploadedFilesUsersFetcher = new UploadedFilesUsersFetcher(_serviceProvider);
-            RemoteFetchers.Add(_uploadedFilesUsersFetcher);
+            return this;
         }
     }
 }

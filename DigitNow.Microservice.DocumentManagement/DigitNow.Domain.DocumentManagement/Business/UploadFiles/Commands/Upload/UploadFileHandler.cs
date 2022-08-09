@@ -44,10 +44,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Uploa
             };
 
             await _uploadedFileRelationsFetcher
-                .TriggerFetchersAsync(new UploadedFilesFetcherContext
-                {
-                    UploadFiles = uploadedFiles
-                }, cancellationToken);
+                .UseUploadedFilesContext(new UploadedFilesFetcherContext { UploadFiles = uploadedFiles})
+                .TriggerFetchersAsync(cancellationToken);
 
             var fileViewModel = uploadedFiles.Select(file =>
                     new VirtualFileAggregate

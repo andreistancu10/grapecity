@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
+using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Export;
 using DigitNow.Domain.DocumentManagement.Business.Reports.Queries;
 using DigitNow.Domain.DocumentManagement.Public.Reports.Models;
 using DigitNow.Domain.DocumentManagement.utils;

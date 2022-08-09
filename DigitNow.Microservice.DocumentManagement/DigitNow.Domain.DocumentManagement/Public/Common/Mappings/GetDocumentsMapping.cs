@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Archive.Queries;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
+using DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Queries.Exports;
 using DigitNow.Domain.DocumentManagement.Data.Filters.Documents;
 using DigitNow.Domain.DocumentManagement.Public.Dashboard.Models;
 
@@ -56,6 +57,9 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Mappings
                 .ForMember(m => m.Filter, opt => opt.MapFrom(src => src.Filter ?? new DocumentFilterDto()));
 
             CreateMap<GetDocumentsRequest, GetDocumentsOperationalArchiveQuery>()
+                .ForMember(m => m.Filter, opt => opt.MapFrom(src => src.Filter ?? new DocumentFilterDto()));
+
+            CreateMap<GetDocumentsRequest, DocumentsExportQuery>()
                 .ForMember(m => m.Filter, opt => opt.MapFrom(src => src.Filter ?? new DocumentFilterDto()));
         }
     }

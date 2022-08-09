@@ -1,31 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using AutoMapper;
-using DigitNow.Adapters.MS.Catalog;
+﻿using AutoMapper;
 using DigitNow.Domain.Catalog.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
-using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchers
+namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.GenericFetchers
 {
-    internal sealed class DocumentsInternalCategoriesFetcher : ModelFetcher<DocumentCategoryModel, DocumentsFetcherContext>
+    internal sealed class GenericDocumentsInternalCategoriesFetcher : ModelFetcher<DocumentCategoryModel, ModelFetcherContext>        
     {
         private readonly ICatalogClient _catalogClient;
         private readonly IMapper _mapper;
-        private readonly ICatalogAdapterClient _catalogAdapterClient;
 
-        public DocumentsInternalCategoriesFetcher(IServiceProvider serviceProvider)
+        public GenericDocumentsInternalCategoriesFetcher(IServiceProvider serviceProvider)
         {
             _catalogClient = serviceProvider.GetService<ICatalogClient>();
             _mapper = serviceProvider.GetService<IMapper>();
-            _catalogAdapterClient = serviceProvider.GetService<ICatalogAdapterClient>();
         }
 
-        protected override async Task<List<DocumentCategoryModel>> FetchInternalAsync(DocumentsFetcherContext context, CancellationToken cancellationToken)
+        protected override async Task<List<DocumentCategoryModel>> FetchInternalAsync(ModelFetcherContext context, CancellationToken cancellationToken)
         {
             var internalDocumentTypesResponse = await _catalogClient.InternalDocumentTypes.GetInternalDocumentTypesAsync(cancellationToken);
 
