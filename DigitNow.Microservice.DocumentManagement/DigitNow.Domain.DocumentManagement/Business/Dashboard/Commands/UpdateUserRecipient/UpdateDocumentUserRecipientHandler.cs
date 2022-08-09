@@ -5,7 +5,6 @@ using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
@@ -54,7 +53,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                 });
 
             await UpdateDocumentsAsync(request.DocumentIds, targetUser, cancellationToken);
-
+  
             await _mailSenderService.SendMail_DelegateDocumentToFunctionary(currentUser, targetUser, request.DocumentIds, cancellationToken);
             await _mailSenderService.SendMail_DelegateDocumentToFunctionarySupervisor(currentUser, targetUser, request.DocumentIds, cancellationToken);
 
@@ -64,10 +63,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
         private async Task UpdateDocumentsAsync(List<long> documentIds, User targetUser, CancellationToken token)
         {
             var foundDocuments = await _dbContext.Documents
+                .Include(x => x.WorkflowHistories)
                 .Where(x => documentIds.Contains(x.Id))
                 .ToListAsync(token);
-
-            var newWorkflowHistoryLogs = new List<WorkflowHistoryLog>();
 
             foreach (var foundDocument in foundDocuments)
             {
@@ -80,17 +78,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                 {
                     foundDocument.Status = foundDocument.DocumentType == DocumentType.Incoming ? DocumentStatus.InWorkDelegated : DocumentStatus.New;
                 }
-                
+
                 foundDocument.DestinationDepartmentId = targetUser.Departments.FirstOrDefault();
                 foundDocument.RecipientId = targetUser.Id;
 
                 var recipientType = isHeadOfDepartment ? RecipientType.HeadOfDepartment : RecipientType.Functionary;
-
-                newWorkflowHistoryLogs.Add(WorkflowHistoryLogFactory.Create(foundDocument, recipientType, targetUser, foundDocument.Status));
+                foundDocument.WorkflowHistories.Add(WorkflowHistoryLogFactory.Create(foundDocument, recipientType, targetUser, foundDocument.Status));
             }
 
             await _dbContext.BulkUpdateAsync(foundDocuments, token);
-            await _dbContext.BulkInsertAsync(newWorkflowHistoryLogs, token);
             await _dbContext.SaveChangesAsync(token);
         }
     }
