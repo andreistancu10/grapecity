@@ -8,13 +8,13 @@
         IModelFetcherAggregator UseGenericRemoteFetcher<TFetcher>()
             where TFetcher : IModelFetcher;
 
-        IModelFetcherAggregator UseRemoteFetcher<TFetcher>(IModelFetcherContext context)
+        IModelFetcherAggregator UseRemoteFetcher<TFetcher>(IModelFetcherContext fetcherContext)
             where TFetcher: IModelFetcher;
 
         IModelFetcherAggregator UseGenericInternalFetcher<TFetcher>()
             where TFetcher : IModelFetcher;
 
-        IModelFetcherAggregator UseInternalFetcher<TFetcher>(IModelFetcherContext context)
+        IModelFetcherAggregator UseInternalFetcher<TFetcher>(IModelFetcherContext fetcherContext)
             where TFetcher : IModelFetcher;
 
         Task<IModelFetcherAggregator> TriggerFetchersAsync(CancellationToken token);
@@ -24,8 +24,8 @@
     {
         private readonly IServiceProvider _serviceProvider;
 
-        private Dictionary<Type, ModelFetcherRegistryEntry> RemoteFetchers = new();
-        private Dictionary<Type, ModelFetcherRegistryEntry> InternalFetchers = new();
+        private readonly Dictionary<Type, ModelFetcherRegistryEntry> RemoteFetchers = new();
+        private readonly Dictionary<Type, ModelFetcherRegistryEntry> InternalFetchers = new();
 
         public ModelFetcherAggregator(IServiceProvider serviceProvider)
         {
@@ -98,34 +98,34 @@
             return this;
         }
 
-        public virtual async Task<IModelFetcherAggregator> TriggerFetchersAsync(CancellationToken cancellationToken)
+        public virtual async Task<IModelFetcherAggregator> TriggerFetchersAsync(CancellationToken token)
         {
             await Task.WhenAll(
-                TriggerRemoteFetchersAsync(cancellationToken),
-                TriggerInternalFetchersAsync(cancellationToken)
+                TriggerRemoteFetchersAsync(token),
+                TriggerInternalFetchersAsync(token)
             );
             return this;
         }
 
-        protected virtual async Task TriggerRemoteFetchersAsync(CancellationToken cancellationToken)
+        protected virtual async Task TriggerRemoteFetchersAsync(CancellationToken token)
         {
             var externalFetchTasks = new List<Task>();
             foreach (var entryPair in RemoteFetchers)
             {
                 var registryEntiry = entryPair.Value;
 
-                externalFetchTasks.Add(registryEntiry.ModelFetcher.FetchAsync(registryEntiry.ModelFetcherContext, cancellationToken));
+                externalFetchTasks.Add(registryEntiry.ModelFetcher.FetchAsync(registryEntiry.ModelFetcherContext, token));
             }
             await Task.WhenAll(externalFetchTasks);
         }
 
-        protected virtual async Task TriggerInternalFetchersAsync(CancellationToken cancellationToken)
+        protected virtual async Task TriggerInternalFetchersAsync(CancellationToken token)
         {
             foreach (var entryPair in InternalFetchers)
             {
                 var registryEntry = entryPair.Value;
 
-                await registryEntry.ModelFetcher.FetchAsync(registryEntry.ModelFetcherContext, cancellationToken);
+                await registryEntry.ModelFetcher.FetchAsync(registryEntry.ModelFetcherContext, token);
             }
         }
 

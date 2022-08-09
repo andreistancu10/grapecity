@@ -4,8 +4,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers
 {
     internal interface IModelFetcher
     {
-        Type ModelType { get; }
-
         IReadOnlyList<object> Items { get; }
 
         Task FetchAsync(object context, CancellationToken cancellationToken);
@@ -25,8 +23,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers
         where TContext : IModelFetcherContext
     {
         private List<T> _models = new List<T>();
-
-        public Type ModelType => typeof(T);
 
         public IReadOnlyList<T> Models => _models;
 

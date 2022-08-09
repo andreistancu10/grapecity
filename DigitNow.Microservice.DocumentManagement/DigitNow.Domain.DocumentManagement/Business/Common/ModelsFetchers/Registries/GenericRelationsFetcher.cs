@@ -10,7 +10,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
             private set;
         }
 
-        public BaseRelationsFetcher(IServiceProvider serviceProvider)
+        protected BaseRelationsFetcher(IServiceProvider serviceProvider)
         {
             Aggregator = new ModelFetcherAggregator(serviceProvider);
         }
