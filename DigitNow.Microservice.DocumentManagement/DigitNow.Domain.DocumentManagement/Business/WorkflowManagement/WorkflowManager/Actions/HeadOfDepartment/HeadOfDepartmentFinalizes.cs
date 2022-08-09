@@ -13,7 +13,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         protected override int[] allowedTransitionStatuses => new int[] 
         { 
             (int)DocumentStatus.New,
-            (int)DocumentStatus.InWorkUnallocated
+            (int)DocumentStatus.InWorkUnallocated,
+            (int)DocumentStatus.InWorkMayorDeclined
         };
 
         #region [ IWorkflowHandler ]
