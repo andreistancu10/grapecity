@@ -66,6 +66,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
                     DocumentType = DocumentType.Incoming,
                     IncomingDocument = newIncomingDocument,
                     DestinationDepartmentId = request.RecipientId,
+                    SourceDestinationDepartmentId = request.RecipientId,
                     RecipientId = headOfDepartment.Id
                 };
             
