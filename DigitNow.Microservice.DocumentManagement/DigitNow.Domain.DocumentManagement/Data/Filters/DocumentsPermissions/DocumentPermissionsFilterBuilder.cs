@@ -70,7 +70,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
                         (x.DestinationDepartmentId == RegistryOfficeDepartmentRightsFilter.DepartmentId)
                         &&
                         (
-                            (x.DocumentType == DocumentType.Incoming)
+                            (x.DocumentType == DocumentType.Incoming || x.DocumentType == DocumentType.Internal)
                             ||
                             (x.DocumentType == DocumentType.Outgoing && x.Status == DocumentStatus.Finalized)
                         )
@@ -91,7 +91,9 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
         {
             if (HeadOfDepartmentPermissionsFilter != null)
             {
-                EntityPredicates.Add(x => x.DestinationDepartmentId == HeadOfDepartmentPermissionsFilter.DepartmentId);
+                EntityPredicates.Add(x => x.DestinationDepartmentId == HeadOfDepartmentPermissionsFilter.DepartmentId 
+                || x.CreatedBy == HeadOfDepartmentPermissionsFilter.UserId 
+                || x.RecipientId == HeadOfDepartmentPermissionsFilter.UserId);
             }
         }
 
@@ -101,13 +103,8 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
             {
                 // Allow access to it's assigned documents
                 EntityPredicates.Add(x =>
-                    (x.RecipientId == FunctionaryPermissionsFilter.UserId)
-                    &&
-                    (x.DestinationDepartmentId == FunctionaryPermissionsFilter.DepartmentId)
-                );
-
-                // Allow access for additional documents with the following rules
-                EntityPredicates.Add(x =>
+                    (x.RecipientId == FunctionaryPermissionsFilter.UserId || x.CreatedBy == FunctionaryPermissionsFilter.UserId)
+                    ||
                     (x.DestinationDepartmentId == FunctionaryPermissionsFilter.DepartmentId)
                     &&
                     (
@@ -115,14 +112,14 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
                             (x.DocumentType == DocumentType.Incoming)
                             &&
                             (
-                                x.Status == DocumentStatus.InWorkAllocated 
-                                    || 
-                                x.Status == DocumentStatus.OpinionRequestedAllocated 
-                                    || 
-                                x.Status == DocumentStatus.InWorkDeclined 
-                                    || 
-                                x.Status == DocumentStatus.InWorkMayorCountersignature 
-                                    || 
+                                x.Status == DocumentStatus.InWorkAllocated
+                                    ||
+                                x.Status == DocumentStatus.OpinionRequestedAllocated
+                                    ||
+                                x.Status == DocumentStatus.InWorkDeclined
+                                    ||
+                                x.Status == DocumentStatus.InWorkMayorCountersignature
+                                    ||
                                 x.Status == DocumentStatus.Finalized
                             )
                         )

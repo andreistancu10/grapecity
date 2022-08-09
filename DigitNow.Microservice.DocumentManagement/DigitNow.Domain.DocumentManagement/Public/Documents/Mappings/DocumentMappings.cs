@@ -10,13 +10,13 @@ namespace DigitNow.Domain.DocumentManagement.Public.Documents.Mappings
     {
         public DocumentMappings()
         {
-            CreateMap<SetDocumentsResolutionRequest, SetDocumentsResolutionQuery>()
+            CreateMap<SetDocumentsResolutionRequest, SetDocumentsResolutionCommand>()
                 .ForMember(dest => dest.Batch, opt => opt.MapFrom<DocumentBatchMapper>());
         }
 
-        private class DocumentBatchMapper : IValueResolver<SetDocumentsResolutionRequest, SetDocumentsResolutionQuery, DocumentBatchModel>
+        private class DocumentBatchMapper : IValueResolver<SetDocumentsResolutionRequest, SetDocumentsResolutionCommand, DocumentBatchModel>
         {
-            public DocumentBatchModel Resolve(SetDocumentsResolutionRequest source, SetDocumentsResolutionQuery destination, DocumentBatchModel destMember, ResolutionContext context)
+            public DocumentBatchModel Resolve(SetDocumentsResolutionRequest source, SetDocumentsResolutionCommand destination, DocumentBatchModel destMember, ResolutionContext context)
             {
                 var documentBatchModel = new DocumentBatchModel
                 {

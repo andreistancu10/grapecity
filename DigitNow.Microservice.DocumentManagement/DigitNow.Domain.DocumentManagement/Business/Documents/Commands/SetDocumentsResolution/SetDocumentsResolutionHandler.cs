@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.SetDocumentsResolution
 {
     public class SetDocumentsResolutionHandler
-        : IQueryHandler<SetDocumentsResolutionQuery, ResultObject>
+        : ICommandHandler<SetDocumentsResolutionCommand, ResultObject>
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IMapper _mapper;
@@ -27,9 +27,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.SetDocu
             _internalDocumentService = internalDocumentService;
             _incomingDocumentService = incomingDocumentService;
         }
-        public async Task<ResultObject> Handle(SetDocumentsResolutionQuery query, CancellationToken cancellationToken)
+        public async Task<ResultObject> Handle(SetDocumentsResolutionCommand request, CancellationToken cancellationToken)
         {
-            var documentBatchIds = query.Batch.Documents.Select(x => x.Id);
+            var documentBatchIds = request.Batch.Documents.Select(x => x.Id);
 
             var foundDocuments =  await _dbContext.Documents
                 .Where(x => documentBatchIds.Contains(x.Id))
@@ -37,8 +37,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.SetDocu
                 .ToListAsync(cancellationToken);
 
             var results = new List<bool>();
-            results.Add(await ProcessInternalDocumentsAsync(foundDocuments, query.Resolution, query.Remarks, cancellationToken));
-            results.Add(await ProcessIncomingDocumentsAsync(foundDocuments, query.Resolution, query.Remarks, cancellationToken));
+            results.Add(await ProcessInternalDocumentsAsync(foundDocuments, request.Resolution, request.Remarks, cancellationToken));
+            results.Add(await ProcessIncomingDocumentsAsync(foundDocuments, request.Resolution, request.Remarks, cancellationToken));
         
             if (results.Any(x => !x))
             {

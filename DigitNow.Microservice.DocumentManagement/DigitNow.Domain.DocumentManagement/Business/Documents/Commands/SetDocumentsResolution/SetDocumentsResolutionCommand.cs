@@ -6,7 +6,7 @@ using HTSS.Platform.Core.CQRS;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.SetDocumentsResolution;
 
-public record SetDocumentsResolutionQuery : IQuery<ResultObject>
+public record SetDocumentsResolutionCommand : ICommand<ResultObject>
 {
     public DocumentBatchModel Batch { get; set; }
 

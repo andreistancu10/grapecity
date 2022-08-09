@@ -6,6 +6,7 @@
 using Microsoft.EntityFrameworkCore;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace DigitNow.Domain.DocumentManagement.Data
 {

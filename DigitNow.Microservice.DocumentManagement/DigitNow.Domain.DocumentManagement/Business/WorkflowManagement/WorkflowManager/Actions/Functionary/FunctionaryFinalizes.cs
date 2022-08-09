@@ -13,7 +13,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             (int)DocumentStatus.InWorkAllocated, 
             (int)DocumentStatus.InWorkDelegated, 
             (int)DocumentStatus.New, 
-            (int)DocumentStatus.InWorkDeclined 
+            (int)DocumentStatus.InWorkDeclined,
+            (int)DocumentStatus.InWorkMayorDeclined
         };
 
         #region [ IWorkflowHandler ]
