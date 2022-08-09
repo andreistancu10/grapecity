@@ -1,4 +1,4 @@
-﻿namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
+﻿namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Export
 {
     public class ExportReportViewModel
     {

@@ -1,28 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using DigitNow.Domain.Catalog.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
-using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchers
+namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.GenericFetchers
 {
-    internal sealed class UploadedFilesDocumentCategoriesFetcher : ModelFetcher<DocumentCategoryModel, UploadedFilesFetcherContext>
+    internal class GenericDocumentsTypesModelFetcher : ModelFetcher<DocumentCategoryModel, ModelFetcherContext>
     {
         private readonly ICatalogClient _catalogClient;
         private readonly IMapper _mapper;
 
-        public UploadedFilesDocumentCategoriesFetcher(IServiceProvider serviceProvider)
+        public GenericDocumentsTypesModelFetcher(IServiceProvider serviceProvider)
         {
             _catalogClient = serviceProvider.GetService<ICatalogClient>();
             _mapper = serviceProvider.GetService<IMapper>();
         }
 
-        protected override async Task<List<DocumentCategoryModel>> FetchInternalAsync(UploadedFilesFetcherContext context, CancellationToken cancellationToken)
+        protected override async Task<List<DocumentCategoryModel>> FetchInternalAsync(ModelFetcherContext context, CancellationToken cancellationToken)
         {
             var documentTypesResponse = await _catalogClient.DocumentTypes.GetDocumentTypesAsync(cancellationToken);
 

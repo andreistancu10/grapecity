@@ -39,10 +39,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetFil
             var uploadedFiles = await _uploadedFileService.FetchUploadedFiles(query.DocumentId, cancellationToken);
 
             await _uploadedFileRelationsFetcher
-                .TriggerFetchersAsync(new UploadedFilesFetcherContext
-                {
-                    UploadFiles = uploadedFiles
-                }, cancellationToken);
+                .UseUploadedFilesContext(new UploadedFilesFetcherContext { UploadFiles = uploadedFiles })
+                .TriggerFetchersAsync(cancellationToken);
 
             return uploadedFiles.Select(file =>
                 new VirtualFileAggregate
