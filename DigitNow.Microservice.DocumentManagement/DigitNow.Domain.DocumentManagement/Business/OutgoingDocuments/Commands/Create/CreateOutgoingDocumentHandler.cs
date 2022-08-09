@@ -87,6 +87,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands
         {
             var contactDetails = request.ContactDetail;
             contactDetails.IdentificationNumber = request.IdentificationNumber;
+            contactDetails.IssuerName = request.RecipientName;
 
             var contactDetailDto = _mapper.Map<IdentityContactDetail>(contactDetails);
             await _identityAdapterClient.CreateContactDetailsAsync(contactDetailDto, cancellationToken);

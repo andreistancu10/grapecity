@@ -70,7 +70,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
                         (x.DestinationDepartmentId == RegistryOfficeDepartmentRightsFilter.DepartmentId)
                         &&
                         (
-                            (x.DocumentType == DocumentType.Incoming)
+                            (x.DocumentType == DocumentType.Incoming || x.DocumentType == DocumentType.Internal)
                             ||
                             (x.DocumentType == DocumentType.Outgoing && x.Status == DocumentStatus.Finalized)
                         )

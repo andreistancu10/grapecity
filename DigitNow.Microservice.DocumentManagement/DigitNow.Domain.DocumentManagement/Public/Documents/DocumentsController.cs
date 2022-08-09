@@ -33,23 +33,23 @@ namespace DigitNow.Domain.DocumentManagement.Public.Documents
         {
             return await _mediator.Send(new GetDocumentResolutionByDocumentIdQuery { DocumentId = documentId })
                 switch
-                {
-                    null => NotFound(),
-                    var result => Ok(result)
-                };
+            {
+                null => NotFound(),
+                var result => Ok(result)
+            };
         }
 
         [HttpPost("resolution")]
         public async Task<IActionResult> SetDocumentsResolutionAsync([FromBody] SetDocumentsResolutionRequest request)
         {
-            var query = _mapper.Map<SetDocumentsResolutionQuery>(request);
+            var command = _mapper.Map<SetDocumentsResolutionCommand>(request);
 
-            return await _mediator.Send(query)
+            return await _mediator.Send(command)
                 switch
-                {
-                    null => NotFound(),
-                    var result => Ok(result)
-                };
+            {
+                null => NotFound(),
+                var result => Ok(result)
+            };
         }
 
         [HttpGet]
@@ -57,10 +57,10 @@ namespace DigitNow.Domain.DocumentManagement.Public.Documents
         {
             return await _mediator.Send(new GetDocsByRegistrationNumberQuery { RegistrationNumber = registrationNumber, Year = year })
                 switch
-                {
-                    null => NotFound(),
-                    var result => Ok(result)
-                };
+            {
+                null => NotFound(),
+                var result => Ok(result)
+            };
         }
 
 
@@ -69,10 +69,10 @@ namespace DigitNow.Domain.DocumentManagement.Public.Documents
         {
             return await _mediator.Send(new GetWorkflowInformationByDocumentIdQuery { DocumentId = documentId })
                 switch
-                {
-                    null => NotFound(),
-                    var result => Ok(result)
-                };
+            {
+                null => NotFound(),
+                var result => Ok(result)
+            };
         }
 
         [HttpPost("{id}/submit-workflow")]
@@ -89,10 +89,10 @@ namespace DigitNow.Domain.DocumentManagement.Public.Documents
         {
             return await _mediator.Send(new GetWorkflowHistoryByDocumentIdQuery { DocumentId = documentId })
                 switch
-                {
-                    null => NotFound(),
-                    var result => Ok(result)
-                };
+            {
+                null => NotFound(),
+                var result => Ok(result)
+            };
         }
 
         [HttpPost("delivery-details/{documentId}")]

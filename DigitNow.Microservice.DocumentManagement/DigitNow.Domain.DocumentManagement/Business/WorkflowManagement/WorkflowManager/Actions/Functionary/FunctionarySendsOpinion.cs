@@ -52,7 +52,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         private async Task<ICreateWorkflowHistoryCommand> CreateWorkflowHistoryForIncoming(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
         {
             var oldWorkflowResponsible = document.WorkflowHistories
-                .Where(x => x.RecipientType == RecipientType.Functionary.Id && x.DocumentStatus == DocumentStatus.InWorkAllocated)
+                .Where(x => (x.DocumentStatus == DocumentStatus.InWorkAllocated) 
+                            || x.DocumentStatus == DocumentStatus.InWorkUnallocated 
+                            || x.DocumentStatus == DocumentStatus.InWorkDelegatedUnallocated)
                 .OrderByDescending(x => x.CreatedAt)
                 .FirstOrDefault();
 

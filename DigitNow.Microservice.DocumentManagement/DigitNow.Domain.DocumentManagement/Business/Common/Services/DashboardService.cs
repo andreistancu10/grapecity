@@ -64,13 +64,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             var documents = await GetBuiltinDocumentsQuery()
                  .WhereAll((await GetActiveDocumentsExpressions(currentUser, filter, token)).ToPredicates())
+                 .OrderByDescending(x => x.CreatedAt)
                  .Skip((page - 1) * count)
                  .Take(count)
                  .AsNoTracking()
                  .ToListAsync(token);
 
             return _virtualDocumentService.ConvertDocumentsToVirtualDocuments(documents)
-                .OrderByDescending(x => x.CreatedAt)
                 .ToList();
         }
 
