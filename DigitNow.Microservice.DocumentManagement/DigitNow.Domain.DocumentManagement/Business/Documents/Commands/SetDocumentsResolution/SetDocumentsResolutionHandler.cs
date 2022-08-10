@@ -1,8 +1,6 @@
-﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
 
@@ -12,20 +10,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.SetDocu
         : ICommandHandler<SetDocumentsResolutionCommand, ResultObject>
     {
         private readonly DocumentManagementDbContext _dbContext;
-        private readonly IMapper _mapper;
-        private readonly IInternalDocumentService _internalDocumentService;
-        private readonly IIncomingDocumentService _incomingDocumentService;
+        private readonly IDocumentService _documentService;
 
         public SetDocumentsResolutionHandler(
             DocumentManagementDbContext dbContext,
-            IMapper mapper,
-            IInternalDocumentService internalDocumentService, 
-            IIncomingDocumentService incomingDocumentService)
+            IDocumentService documentService)
         {
             _dbContext = dbContext;
-            _mapper = mapper;
-            _internalDocumentService = internalDocumentService;
-            _incomingDocumentService = incomingDocumentService;
+            _documentService = documentService;
         }
         public async Task<ResultObject> Handle(SetDocumentsResolutionCommand request, CancellationToken cancellationToken)
         {
@@ -33,13 +25,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.SetDocu
 
             var foundDocuments =  await _dbContext.Documents
                 .Where(x => documentBatchIds.Contains(x.Id))
-                .Select(x => new Document { Id = x.Id, DocumentType = x.DocumentType })
+                .Select(x => x.Id)
                 .ToListAsync(cancellationToken);
 
-            var results = new List<bool>();
-            results.Add(await ProcessInternalDocumentsAsync(foundDocuments, request.Resolution, request.Remarks, cancellationToken));
-            results.Add(await ProcessIncomingDocumentsAsync(foundDocuments, request.Resolution, request.Remarks, cancellationToken));
-        
+            var results = new List<bool>
+            {
+                await ProcessDocumentsAsync(foundDocuments, query.Resolution, query.Remarks, cancellationToken)
+            };
+
             if (results.Any(x => !x))
             {
                 throw new InvalidOperationException("Cannot set document resolution!");
@@ -48,31 +41,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.SetDocu
             return ResultObject.Ok();
         }
 
-        private async Task<bool> ProcessInternalDocumentsAsync(IEnumerable<Document> documents, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken)
+        private async Task<bool> ProcessDocumentsAsync(IEnumerable<long> documents, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken)
         {
-            var foundInternalDocuments = documents
-                .Where(x => x.DocumentType == DocumentType.Internal)
-                .Select(x => x.Id)
-                .ToList();
-
-            if (foundInternalDocuments.Any())
+            if (documents.Any())
             {
-                await _internalDocumentService.SetResolutionAsync(foundInternalDocuments, resolutionType, remarks, cancellationToken);
-            }
-
-            return true;
-        }
-
-        private async Task<bool> ProcessIncomingDocumentsAsync(IEnumerable<Document> documents, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken)
-        {
-            var foundIncomingDocuments = documents
-                .Where(x => x.DocumentType == DocumentType.Incoming)
-                .Select(x => x.Id)
-                .ToList();
-
-            if (foundIncomingDocuments.Any())
-            {
-                await _incomingDocumentService.SetResolutionAsync(foundIncomingDocuments, resolutionType, remarks, cancellationToken);
+                await _documentService.SetResolutionAsync(documents, resolutionType, remarks, cancellationToken);
             }
 
             return true;
