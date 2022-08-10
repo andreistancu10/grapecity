@@ -30,7 +30,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.SetDocu
 
             var results = new List<bool>
             {
-                await ProcessDocumentsAsync(foundDocuments, query.Resolution, query.Remarks, cancellationToken)
+                await ProcessDocumentsAsync(foundDocuments, request.Resolution, request.Remarks, cancellationToken)
             };
 
             if (results.Any(x => !x))
