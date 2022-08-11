@@ -50,7 +50,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                     Remarks = command.Remarks
                 };
 
-                await PassDocumentToFunctionaryAsync(document, newWorkflowResponsible, command, token);
+                await PassDocumentToResponsibleUserAsync(document, newWorkflowResponsible, command, token);
             }
             else
             {
@@ -70,7 +70,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 Remarks = command.Remarks
             };
 
-            await PassDocumentToFunctionaryAsync(document, newWorkflowResponsible, command, token);
+            var oldWorkflowResponsible = document.WorkflowHistories
+                .Where(x => x.DocumentStatus == DocumentStatus.New)
+                .OrderByDescending(x => x.CreatedAt)
+                .FirstOrDefault();
+
+            await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
 
             return command;
         }

@@ -66,7 +66,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             var newWorkflowResponsible = new WorkflowHistoryLog
             {
-                DocumentStatus = document.DocumentType == DocumentType.Incoming ? DocumentStatus.InWorkDeclined : DocumentStatus.New,
+                DocumentStatus = DocumentStatus.InWorkDeclined,
                 DeclineReason = command.DeclineReason,
                 Remarks = command.Remarks
             };
