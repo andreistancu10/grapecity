@@ -1,4 +1,4 @@
-﻿#undef MIGRATION_ONLY
+﻿#define MIGRATION_ONLY
 
 #if    MIGRATION_ONLY
 #endif
@@ -38,10 +38,13 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<DocumentUploadedFile> DocumentUploadedFiles { get; set; }
         public DbSet<DeliveryDetail> DeliveryDetails { get; set; }
         public DbSet<WorkflowHistoryLog> WorkflowHistoryLogs { get; set; }
+        public DbSet<Form> Forms { get; set; }
+        public DbSet<FormField> FormFields { get; set; }
+        public DbSet<FormFieldValue> FormFieldValues { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasDefaultSchema(Schema);            
+            modelBuilder.HasDefaultSchema(Schema);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(DocumentManagementDbContext).Assembly);
         }
 
