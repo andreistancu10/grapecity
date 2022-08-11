@@ -150,9 +150,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: true, command.DocumentId, department.Id, document.Status, token);
         }
 
-        protected async Task PassDocumentToFunctionaryAsync(Document document, WorkflowHistoryLog newWorkflowResponsible, ICreateWorkflowHistoryCommand command, CancellationToken token)
+        protected async Task PassDocumentToResponsibleUserAsync(Document document, WorkflowHistoryLog newWorkflowResponsible, ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            var oldWorkflowResponsible = GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Functionary.Id);
+            var oldWorkflowResponsible = GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Functionary.Id || x.RecipientType == RecipientType.HeadOfDepartment.Id);
+
+            oldWorkflowResponsible.DocumentStatus = oldWorkflowResponsible.RecipientType == RecipientType.HeadOfDepartment.Id 
+                ? DocumentStatus.InWorkUnallocated 
+                : DocumentStatus.InWorkAllocated;
+
             await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
 
             document.WorkflowHistories.Add(newWorkflowResponsible);
