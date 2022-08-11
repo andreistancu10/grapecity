@@ -1,6 +1,7 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Microsoft.Extensions.DependencyInjection;
+using System.Linq.Expressions;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Filters.Documents
 {
@@ -66,9 +67,17 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Documents
 
         private void BuildFilterByDocumentState()
         {
-            if (EntityFilter.StatusFilter != null)
+            if (EntityFilter.StatusFilter != null && EntityFilter.StatusFilter.Status.Any())
             {
-                EntityPredicates.Add(document => document.Status == EntityFilter.StatusFilter.Status);
+                var statuses = EntityFilter.StatusFilter.Status;
+                if(statuses.Contains(DocumentStatus.Finalized) && statuses.Contains(DocumentStatus.InWorkMayorCountersignature))
+                {
+                    EntityPredicates.Add(document => document.Status == DocumentStatus.Finalized || document.Status == DocumentStatus.InWorkMayorCountersignature);
+                }
+                else
+                {
+                    EntityPredicates.Add(document => document.Status == statuses.First());
+                }
             }
         }
 

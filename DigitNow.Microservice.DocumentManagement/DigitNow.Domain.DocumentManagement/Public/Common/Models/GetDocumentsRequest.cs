@@ -71,7 +71,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Models
 
     public class DocumentStatusFilterDto
     {
-        public DocumentStatus Status { get; set; }
+        public List<DocumentStatus> Status { get; set; }
     }
 
     public class DocumentDepartmentFilterDto
