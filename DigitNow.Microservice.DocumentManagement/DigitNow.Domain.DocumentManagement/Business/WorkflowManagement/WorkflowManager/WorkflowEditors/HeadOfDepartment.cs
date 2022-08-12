@@ -1,4 +1,5 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.WorkflowManager.Actions.HeadOfDepartment;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.WorkflowManager.Actions.HeadOfDepartment;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
@@ -11,12 +12,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
 
         private readonly Dictionary<ActionType, IWorkflowHandler> actionStrategy = new Dictionary<ActionType, IWorkflowHandler>();
 
-        public HeadOfDepartment(IServiceProvider serviceProvider)
+        public HeadOfDepartment(IServiceProvider serviceProvider, IMailSenderService mailSenderService)
         {
-            actionStrategy.Add(ActionType.Allocate, new HeadOfDepartmentAllocatesRequest(serviceProvider));
+            actionStrategy.Add(ActionType.Allocate, new HeadOfDepartmentAllocatesRequest(serviceProvider, mailSenderService));
             actionStrategy.Add(ActionType.Decline, new HeadOfDepartmentDeclines(serviceProvider));
-            actionStrategy.Add(ActionType.MakeDecision, new HeadOfDepartmentMakesDecision(serviceProvider));
-            actionStrategy.Add(ActionType.AsksForOpinion, new HeadOfDepartmentAsksForOpinion(serviceProvider));
+            actionStrategy.Add(ActionType.MakeDecision, new HeadOfDepartmentMakesDecision(serviceProvider, mailSenderService));
+            actionStrategy.Add(ActionType.AsksForOpinion, new HeadOfDepartmentAsksForOpinion(serviceProvider, mailSenderService));
             actionStrategy.Add(ActionType.Finalizes, new HeadOfDepartmentFinalizes(serviceProvider));
             actionStrategy.Add(ActionType.AsksForApproval, new HeadOfDepartmentAsksForApproval(serviceProvider));
         }
