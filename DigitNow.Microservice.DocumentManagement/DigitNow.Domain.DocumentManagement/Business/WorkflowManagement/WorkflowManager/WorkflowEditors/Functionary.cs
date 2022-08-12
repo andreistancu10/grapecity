@@ -1,5 +1,6 @@
 ﻿namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.WorkflowEditors
 {
+    using DigitNow.Domain.DocumentManagement.Business.Common.Services;
     using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.WorkflowManager.Actions.Functionary;
     using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
     using HTSS.Platform.Core.CQRS;
@@ -16,12 +17,12 @@
         private readonly Dictionary<ActionType, IWorkflowHandler> actionStrategy 
             = new Dictionary<ActionType, IWorkflowHandler>();
 
-        public Functionary(IServiceProvider serviceProvider)
+        public Functionary(IServiceProvider serviceProvider, IMailSenderService mailSenderService)
         {
             actionStrategy.Add(ActionType.Decline, new FunctionaryDeclines(serviceProvider));
             actionStrategy.Add(ActionType.AskForOpinion, new FunctionaryAsksForOpinion(serviceProvider));
             actionStrategy.Add(ActionType.Finalize, new FunctionaryFinalizes(serviceProvider));
-            actionStrategy.Add(ActionType.AsksForApproval, new FunctionaryAsksForApproval(serviceProvider));
+            actionStrategy.Add(ActionType.AsksForApproval, new FunctionaryAsksForApproval(serviceProvider, mailSenderService));
             actionStrategy.Add(ActionType.SendOpinion, new FunctionarySendsOpinion(serviceProvider));
         }
 

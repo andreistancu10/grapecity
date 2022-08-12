@@ -1,4 +1,5 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
@@ -10,7 +11,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 {
     public class HeadOfDepartmentMakesDecision : BaseWorkflowManager, IWorkflowHandler
     {
-        public HeadOfDepartmentMakesDecision(IServiceProvider serviceProvider) : base(serviceProvider) { }
+        private readonly IMailSenderService _mailSenderService;
+        public HeadOfDepartmentMakesDecision(
+            IServiceProvider serviceProvider, 
+            IMailSenderService mailSenderService) : base(serviceProvider) 
+        {
+            _mailSenderService = mailSenderService;
+        }
         private enum Decision { Approved = 1, Declined = 2 };
 
         protected override int[] allowedTransitionStatuses => new int[] 
@@ -55,6 +62,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: false, command.DocumentId, userResponse.Id, DocumentStatus.InWorkMayorReview, token);
 
+            await _mailSenderService.SentMail_DepartmentSupervisorApprovalDecision(document, token);
+
             return command;
         }
 
@@ -72,8 +81,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             };
 
             await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
-
             document.WorkflowHistories.Add(newWorkflowResponsible);
+
+            await _mailSenderService.SentMail_DepartmentSupervisorRejectionDecision(document, token);
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord)
