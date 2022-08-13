@@ -24,6 +24,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         Task SendMail_ApprovalRequestedByFunctionary(User recipient, Document document, CancellationToken token);
         Task SentMail_DepartmentSupervisorApprovalDecision(Document document, CancellationToken token);
         Task SentMail_DepartmentSupervisorRejectionDecision(Document document, CancellationToken token);
+        Task SendMail_SendingReply(Document document, CancellationToken token);
     }
 
     public class MailSenderService : IMailSenderService
@@ -181,6 +182,22 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             {
                 var recipient = await _identityAdapterClient.GetUserByIdAsync(previousResponsible.CreatedBy, token);
                 await SendMail_WithRegistrationAndDateAsync(recipient, document, MailTemplateEnum.DepartmentSupervisorRejectionDecisionTemplate, token);
+            }
+        }
+
+        public async Task SendMail_SendingReply(Document document, CancellationToken token)
+        {
+            var department = await _catalogAdapterClient.GetDepartmentByCodeAsync("testIulia", token);
+            if(department != null)
+            {
+                var usersFromRegistry = await _identityAdapterClient.GetUsersByDepartment(department.Id, token);
+
+                var tasks = new List<Task>();
+                foreach (var targetUser in usersFromRegistry.Users)
+                {
+                    tasks.Add(SendMail_WithRegistrationAndDateAsync(targetUser, document, MailTemplateEnum.SendingReplyTemplate, token));
+                }
+                await Task.WhenAll(tasks);
             }
         }
 
