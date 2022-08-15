@@ -19,12 +19,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         Task SendMail_CreateIncomingDocument(User sender, long registrationId, DateTime date, CancellationToken token);
         Task SendMail_DistributeIncomingDocToFunctionary(User targetUser, Document document, CancellationToken token);
         Task SendMail_OpinionRequestedByAnotherDepartment(User targetUser, long departmentId, Document document, CancellationToken token);
-        Task SendMail_DeclineCompetenceOpinion(User targetUser, long departmentId, Document document, CancellationToken token);
+        Task SendMail_DeclineCompetenceOpinion(Document document, WorkflowHistoryLog historyLog, CancellationToken token);
         Task SendMail_ApprovalRequestedByFunctionary(long recipientId, Document document, CancellationToken token);
         Task SendMail_ApprovalRequestedByFunctionary(User recipient, Document document, CancellationToken token);
         Task SentMail_DepartmentSupervisorApprovalDecision(Document document, CancellationToken token);
         Task SentMail_DepartmentSupervisorRejectionDecision(Document document, CancellationToken token);
         Task SendMail_SendingReply(Document document, CancellationToken token);
+        Task SendMail_DeclineCompetence(Document document, WorkflowHistoryLog historyLog, CancellationToken token);
+        Task SendMail_MayorApprovalDecision(Document document, WorkflowHistoryLog historyLog, CancellationToken token);
+        Task SendMail_MayorRejectionDecision(Document document, WorkflowHistoryLog historyLog, CancellationToken token);
     }
 
     public class MailSenderService : IMailSenderService
@@ -126,31 +129,37 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             await _mailSender.SendMail(MailTemplateEnum.OpinionRequestedByAnotherDepartmentTemplate, targetUser.Email,
                 new
                 {
-                    Structure = department
+                    Structure = department.Name
                 },
                 new
                 {
-                    Structure = department,
+                    Structure = department.Name,
                     RegistryNumber = document.RegistrationNumber,
                     Date = document.RegistrationDate.ToShortDateString()
                 }, token);
         }
 
-        public async Task SendMail_DeclineCompetenceOpinion(User targetUser, long departmentId, Document document, CancellationToken token)
+        public async Task SendMail_DeclineCompetenceOpinion(Document document, WorkflowHistoryLog historyLog, CancellationToken token)
         {
-            var department = await _catalogAdapterClient.GetDepartmentByIdAsync(document.DestinationDepartmentId, token);
+            var recipientUserHistoryLog = await _identityAdapterClient.GetUserByIdAsync(historyLog.RecipientId, token);
+            if(recipientUserHistoryLog != null && recipientUserHistoryLog.Departments.Count() > 0)
+            {
+                var department = await _catalogAdapterClient.GetDepartmentByIdAsync(recipientUserHistoryLog.Departments.FirstOrDefault(), token);
+                var userWhoAdskedForOpinion = historyLog.CreatedBy;
+                var recipient = await _identityAdapterClient.GetUserByIdAsync(userWhoAdskedForOpinion, token);
 
-            await _mailSender.SendMail(MailTemplateEnum.DeclineCompetenceOpinionTemplate, targetUser.Email,
-               new
-               {
-                   Structure = department
-               },
-               new
-               {
-                   Structure = department,
-                   RegistryNumber = document.RegistrationNumber,
-                   Date = document.RegistrationDate.ToShortDateString()
-               }, token);
+                await _mailSender.SendMail(MailTemplateEnum.DeclineCompetenceOpinionTemplate, recipient.Email,
+                   new
+                   {
+                       Structure = department.Name
+                   },
+                   new
+                   {
+                       Structure = department.Name,
+                       RegistryNumber = document.RegistrationNumber,
+                       Date = document.RegistrationDate.ToShortDateString()
+                   }, token);
+            }
         }
 
         public async Task SendMail_ApprovalRequestedByFunctionary(long recipientId, Document document, CancellationToken token)
@@ -170,7 +179,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var previousResponsible = document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).Skip(1).FirstOrDefault();
             if (previousResponsible != null)
             {
-                var recipient = await _identityAdapterClient.GetUserByIdAsync(previousResponsible.CreatedBy, token);
+                var recipient = await _identityAdapterClient.GetUserByIdAsync(previousResponsible.RecipientId, token);
                 await SendMail_WithRegistrationAndDateAsync(recipient, document, MailTemplateEnum.DepartmentSupervisorApprovalDecisionTemplate, token);
             }
         }
@@ -180,7 +189,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var previousResponsible = document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).Skip(1).FirstOrDefault();
             if (previousResponsible != null)
             {
-                var recipient = await _identityAdapterClient.GetUserByIdAsync(previousResponsible.CreatedBy, token);
+                var recipient = await _identityAdapterClient.GetUserByIdAsync(previousResponsible.RecipientId, token);
                 await SendMail_WithRegistrationAndDateAsync(recipient, document, MailTemplateEnum.DepartmentSupervisorRejectionDecisionTemplate, token);
             }
         }
@@ -214,6 +223,42 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 RegistryNumber = document.RegistrationNumber,
                 Date = document.RegistrationDate.ToShortDateString()
             }, token);
+        }
+
+        public async Task SendMail_DeclineCompetence(Document document, WorkflowHistoryLog historyLog, CancellationToken token)
+        {
+            var userWhoRegisteredId = document.CreatedBy;
+
+            var userWhoRegistered = await _identityAdapterClient.GetUserByIdAsync(userWhoRegisteredId, token);
+            if (userWhoRegistered != null && userWhoRegistered.Departments.Any())
+            {
+                var department = await _catalogAdapterClient.GetDepartmentByIdAsync(userWhoRegistered.Departments.FirstOrDefault(), token);
+                await _mailSender.SendMail(MailTemplateEnum.DeclineCompetenceTemplate, userWhoRegistered.Email,
+                new
+                {
+                    Structure = department.Name
+                },
+                new
+                {
+                    Structure = department.Name,
+                    RegistryNumber = document.RegistrationNumber,
+                    Date = document.RegistrationDate.ToShortDateString()
+                }, token);
+            }
+        }
+
+        public async Task SendMail_MayorApprovalDecision(Document document, WorkflowHistoryLog historyLog, CancellationToken token)
+        {
+            var recipient = await _identityAdapterClient.GetUserByIdAsync(historyLog.RecipientId, token);
+
+            await SendMail_WithRegistrationAndDateAsync(recipient, document, MailTemplateEnum.MayorApprovalDecisionTemplate, token);
+        }
+
+        public async Task SendMail_MayorRejectionDecision(Document document, WorkflowHistoryLog historyLog, CancellationToken token)
+        {
+            var recipient = await _identityAdapterClient.GetUserByIdAsync(historyLog.RecipientId, token);
+
+            await SendMail_WithRegistrationAndDateAsync(recipient, document, MailTemplateEnum.MayorRejectionDecisionTemplate, token);
         }
 
         private class GetUsersByRoleAndDepartmentRequest : IGetUsersByRoleAndDepartmentRequest

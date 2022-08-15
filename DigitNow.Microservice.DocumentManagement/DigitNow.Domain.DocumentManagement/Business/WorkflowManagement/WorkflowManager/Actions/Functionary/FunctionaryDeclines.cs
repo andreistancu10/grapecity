@@ -1,4 +1,5 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
@@ -7,7 +8,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 {
     public class FunctionaryDeclines : BaseWorkflowManager, IWorkflowHandler
     {
-        public FunctionaryDeclines(IServiceProvider serviceProvider) : base(serviceProvider) { }
+        private readonly IMailSenderService _mailSenderService;
+        public FunctionaryDeclines(IServiceProvider serviceProvider, IMailSenderService mailSenderService) : base(serviceProvider) 
+        { 
+            _mailSenderService = mailSenderService;
+        }
         protected override int[] allowedTransitionStatuses => new int[] 
         { 
             (int)DocumentStatus.InWorkAllocated, 
@@ -58,6 +63,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 await PassDocumentToRegistry(document, command, token);
             }
 
+            await SendFunctonaryDeclinesMail(document, lastWorkFlowRecord, token);
+
             return command;
         }
 
@@ -76,8 +83,21 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 .FirstOrDefault();
 
             await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
-
+            await SendFunctonaryDeclinesMail(document, oldWorkflowResponsible, token);
+            
             return command;
+        }
+
+        private async Task SendFunctonaryDeclinesMail(Document document, WorkflowHistoryLog historyLog, CancellationToken token)
+        {
+            if (historyLog.DocumentStatus == DocumentStatus.OpinionRequestedAllocated)
+            {
+                await _mailSenderService.SendMail_DeclineCompetenceOpinion(document, historyLog, token);
+            }
+            else
+            {
+                await _mailSenderService.SendMail_DeclineCompetence(document, historyLog, token);
+            }
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord)

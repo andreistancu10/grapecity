@@ -16,7 +16,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
 
             factory.Add(RecipientType.HeadOfDepartment.Id, () => new HeadOfDepartment(serviceProvider, mailSenderService));
             factory.Add(RecipientType.Functionary.Id, () => new Functionary(serviceProvider, mailSenderService));
-            factory.Add(RecipientType.Mayor.Id, () => new Mayor(serviceProvider));
+            factory.Add(RecipientType.Mayor.Id, () => new Mayor(serviceProvider, mailSenderService));
         }
 
         public IWorkflowHandler Create(int userRole)
