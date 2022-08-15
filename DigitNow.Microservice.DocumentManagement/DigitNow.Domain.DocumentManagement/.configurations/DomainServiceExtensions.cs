@@ -92,6 +92,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<ISpecialRegisterService, SpecialRegisterService>();
             services.AddTransient<IFileService, FileService>(c => new FileService(true));
             services.AddTransient<IUploadedFileService, UploadedFileService>();
+            services.AddTransient<IObjectiveService, ObjectiveService>();
             
 
             return services;

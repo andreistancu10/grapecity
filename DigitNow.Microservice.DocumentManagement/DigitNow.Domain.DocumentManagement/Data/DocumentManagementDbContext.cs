@@ -1,4 +1,4 @@
-﻿#undef MIGRATION_ONLY
+﻿#define MIGRATION_ONLY
 
 #if    MIGRATION_ONLY
 #endif
@@ -6,6 +6,8 @@
 using Microsoft.EntityFrameworkCore;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using Microsoft.EntityFrameworkCore.Design;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 
 namespace DigitNow.Domain.DocumentManagement.Data
 {
@@ -37,6 +39,9 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<DocumentUploadedFile> DocumentUploadedFiles { get; set; }
         public DbSet<DeliveryDetail> DeliveryDetails { get; set; }
         public DbSet<WorkflowHistoryLog> WorkflowHistoryLogs { get; set; }
+        public DbSet<Objective> Objectives { get; set; }
+        public DbSet<GeneralObjective> GeneralObjectives { get; set; }
+        public DbSet<SpecificObjective> SpecificObjectives { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
