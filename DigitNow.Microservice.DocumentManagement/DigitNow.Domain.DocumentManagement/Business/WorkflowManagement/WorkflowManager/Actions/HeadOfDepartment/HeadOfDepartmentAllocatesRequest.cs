@@ -43,8 +43,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 .Create(document, RecipientType.Functionary, user, newDocumentStatus, default, command.Remarks));
 
             await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: false, command.DocumentId, user.Id, newDocumentStatus, token);
-
-            await _mailSenderService.SendMail_DistributeIncomingDocToFunctionary(user, document, token);
+            if(document.DocumentType == DocumentType.Incoming) 
+            {
+                await _mailSenderService.SendMail_DistributeIncomingDocToFunctionary(user, document, token);
+            }
 
             return command;
         }

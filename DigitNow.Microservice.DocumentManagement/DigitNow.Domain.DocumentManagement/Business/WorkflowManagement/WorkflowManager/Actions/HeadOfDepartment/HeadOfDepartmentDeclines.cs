@@ -1,4 +1,5 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
@@ -9,7 +10,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 {
     public class HeadOfDepartmentDeclines : BaseWorkflowManager, IWorkflowHandler
     {
-        public HeadOfDepartmentDeclines(IServiceProvider serviceProvider) : base(serviceProvider) { }
+        private readonly IMailSenderService _mailSenderService;
+        public HeadOfDepartmentDeclines(IServiceProvider serviceProvider, IMailSenderService mailSenderService) : base(serviceProvider) 
+        { 
+            _mailSenderService = mailSenderService;
+        }
 
         protected override int[] allowedTransitionStatuses => new int[] 
         { 
@@ -46,7 +51,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             document.DestinationDepartmentId = oldWorkflowResponsible.RecipientId;
 
             await PassDocumentToDepartment(document, command, token);
-
+            await SendHeadOfDepartmentDeclinesMail(document, lastWorkFlowRecord, token);
+          
             return command;
         }
 
@@ -57,8 +63,21 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 : DocumentStatus.NewDeclinedCompetence;
 
             await SetResponsibleBasedOnStatus(command, document, newDocumentStatus, token);
-
+            await SendHeadOfDepartmentDeclinesMail(document, lastWorkFlowRecord, token);
+           
             return command;
+        }
+
+        private async Task SendHeadOfDepartmentDeclinesMail(Document document, WorkflowHistoryLog historyLog, CancellationToken token)
+        {
+            if (historyLog.DocumentStatus == DocumentStatus.OpinionRequestedUnallocated)
+            {
+                await _mailSenderService.SendMail_DeclineCompetenceOpinion(document, historyLog, token);
+            }
+            else
+            {
+                await _mailSenderService.SendMail_DeclineCompetence(document, historyLog, token);
+            }
         }
 
         private async Task SetResponsibleBasedOnStatus(ICreateWorkflowHistoryCommand command, Document document, DocumentStatus status, CancellationToken token)

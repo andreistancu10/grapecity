@@ -1,4 +1,5 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.WorkflowManager.Actions.Mayor;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.WorkflowManager.Actions.Mayor;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
@@ -12,9 +13,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
         private readonly Dictionary<ActionType, IWorkflowHandler> actionStrategy
             = new Dictionary<ActionType, IWorkflowHandler>();
 
-        public Mayor(IServiceProvider serviceProvider)
+        public Mayor(IServiceProvider serviceProvider, IMailSenderService mailSenderService)
         {
-            actionStrategy.Add(ActionType.MakeDecision, new MayorMakesDecision(serviceProvider));
+            actionStrategy.Add(ActionType.MakeDecision, new MayorMakesDecision(serviceProvider, mailSenderService));
         }
         public async Task<ICreateWorkflowHistoryCommand> CreateWorkflowRecord(ICreateWorkflowHistoryCommand command, CancellationToken token)
         {

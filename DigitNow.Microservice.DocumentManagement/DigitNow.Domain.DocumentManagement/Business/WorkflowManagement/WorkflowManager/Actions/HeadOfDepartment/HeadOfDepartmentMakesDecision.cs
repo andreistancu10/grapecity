@@ -61,7 +61,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 .Create(document, RecipientType.Mayor, userResponse, DocumentStatus.InWorkMayorReview, command.DeclineReason, command.Remarks, command.OpinionRequestedUntil, command.Resolution));
 
             await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: false, command.DocumentId, userResponse.Id, DocumentStatus.InWorkMayorReview, token);
-
+            
             await _mailSenderService.SentMail_DepartmentSupervisorApprovalDecision(document, token);
 
             return command;

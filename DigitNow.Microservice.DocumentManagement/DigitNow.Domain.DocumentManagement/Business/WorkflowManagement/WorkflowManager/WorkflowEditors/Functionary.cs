@@ -19,7 +19,7 @@
 
         public Functionary(IServiceProvider serviceProvider, IMailSenderService mailSenderService)
         {
-            actionStrategy.Add(ActionType.Decline, new FunctionaryDeclines(serviceProvider));
+            actionStrategy.Add(ActionType.Decline, new FunctionaryDeclines(serviceProvider, mailSenderService));
             actionStrategy.Add(ActionType.AskForOpinion, new FunctionaryAsksForOpinion(serviceProvider));
             actionStrategy.Add(ActionType.Finalize, new FunctionaryFinalizes(serviceProvider));
             actionStrategy.Add(ActionType.AsksForApproval, new FunctionaryAsksForApproval(serviceProvider, mailSenderService));

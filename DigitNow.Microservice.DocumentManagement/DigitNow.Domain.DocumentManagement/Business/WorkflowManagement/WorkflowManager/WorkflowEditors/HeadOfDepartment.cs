@@ -15,7 +15,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Incomin
         public HeadOfDepartment(IServiceProvider serviceProvider, IMailSenderService mailSenderService)
         {
             actionStrategy.Add(ActionType.Allocate, new HeadOfDepartmentAllocatesRequest(serviceProvider, mailSenderService));
-            actionStrategy.Add(ActionType.Decline, new HeadOfDepartmentDeclines(serviceProvider));
+            actionStrategy.Add(ActionType.Decline, new HeadOfDepartmentDeclines(serviceProvider, mailSenderService));
             actionStrategy.Add(ActionType.MakeDecision, new HeadOfDepartmentMakesDecision(serviceProvider, mailSenderService));
             actionStrategy.Add(ActionType.AsksForOpinion, new HeadOfDepartmentAsksForOpinion(serviceProvider, mailSenderService));
             actionStrategy.Add(ActionType.Finalizes, new HeadOfDepartmentFinalizes(serviceProvider));

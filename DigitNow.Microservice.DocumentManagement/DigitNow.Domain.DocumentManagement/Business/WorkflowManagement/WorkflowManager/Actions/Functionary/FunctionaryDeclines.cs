@@ -58,6 +58,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 await PassDocumentToRegistry(document, command, token);
             }
 
+            await SendFunctonaryDeclinesMail(document, lastWorkFlowRecord, token);
+
             return command;
         }
 
@@ -78,7 +80,21 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
             document.WorkflowHistories.Add(newWorkflowResponsible);
 
+            await SendFunctonaryDeclinesMail(document, oldWorkflowResponsible, token);
+            
             return command;
+        }
+
+        private async Task SendFunctonaryDeclinesMail(Document document, WorkflowHistoryLog historyLog, CancellationToken token)
+        {
+            if (historyLog.DocumentStatus == DocumentStatus.OpinionRequestedAllocated)
+            {
+                await _mailSenderService.SendMail_DeclineCompetenceOpinion(document, historyLog, token);
+            }
+            else
+            {
+                await _mailSenderService.SendMail_DeclineCompetence(document, historyLog, token);
+            }
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord)
