@@ -1,5 +1,4 @@
 ﻿using HTSS.Platform.Core.Domain;
-using System;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities

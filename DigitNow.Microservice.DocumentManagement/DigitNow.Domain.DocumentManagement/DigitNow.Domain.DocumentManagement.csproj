@@ -88,8 +88,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="Data\Entities\FormFillingLogs\Configuration\" />
+	  <Folder Include="Data\Entities\FormFieldMappings\Configuration\" />
 	  <Folder Include="Data\Entities\FormFields\Configuration\" />
-	  <Folder Include="Data\Entities\FormFieldValues\Configuration\" />
+	  <Folder Include="Data\Entities\FormValues\Configuration\" />
 	  <Folder Include="Data\Entities\Forms\Configuration\" />
 	  <Folder Include="Migrations\" />
 	  <Folder Include="Public\Common\" />

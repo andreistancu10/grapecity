@@ -1,21 +1,17 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data.Entities.Forms;
+using HTSS.Platform.Core.Domain;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
-    public class FormField : ExtendedEntity
+    public class FormField : Entity
     {
-        public long OrderNumber { get; set; }
         public FieldType FieldType { get; set; }
-        public string Label { get; set; }
+        public string Name { get; set; }
         public string Context { get; set; }
-        public bool Required { get; set; }
-        public string InitialValue { get; set; }
-        public long FormId { get; set; }
 
         #region [ References ]
 
-        public Form Form { get; set; }
-        public List<FormFieldValue> FormFieldValues { get; set; }
+        public List<FormFieldMapping> FormFieldMappings { get; set; }
 
         #endregion
     }

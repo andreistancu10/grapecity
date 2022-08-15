@@ -40,7 +40,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<WorkflowHistoryLog> WorkflowHistoryLogs { get; set; }
         public DbSet<Form> Forms { get; set; }
         public DbSet<FormField> FormFields { get; set; }
-        public DbSet<FormFieldValue> FormFieldValues { get; set; }
+        public DbSet<FormValue> FormFieldValues { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
