@@ -50,7 +50,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FormFillingLog",
+                name: "FormFillingLogs",
                 schema: "DocumentMangement",
                 columns: table => new
                 {
@@ -64,9 +64,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FormFillingLog", x => x.Id);
+                    table.PrimaryKey("PK_FormFillingLogs", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_FormFillingLog_Forms_FormId",
+                        name: "FK_FormFillingLogs_Forms_FormId",
                         column: x => x.FormId,
                         principalSchema: "DocumentMangement",
                         principalTable: "Forms",
@@ -75,7 +75,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FormFieldMapping",
+                name: "FormFieldMappings",
                 schema: "DocumentMangement",
                 columns: table => new
                 {
@@ -92,16 +92,16 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_FormFieldMapping", x => x.Id);
+                    table.PrimaryKey("PK_FormFieldMappings", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_FormFieldMapping_FormFields_FormFieldId",
+                        name: "FK_FormFieldMappings_FormFields_FormFieldId",
                         column: x => x.FormFieldId,
                         principalSchema: "DocumentMangement",
                         principalTable: "FormFields",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_FormFieldMapping_Forms_FormId",
+                        name: "FK_FormFieldMappings_Forms_FormId",
                         column: x => x.FormId,
                         principalSchema: "DocumentMangement",
                         principalTable: "Forms",
@@ -125,17 +125,17 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 {
                     table.PrimaryKey("PK_FormFieldValues", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_FormFieldValues_FormFieldMapping_FormFieldMappingId",
+                        name: "FK_FormFieldValues_FormFieldMappings_FormFieldMappingId",
                         column: x => x.FormFieldMappingId,
                         principalSchema: "DocumentMangement",
-                        principalTable: "FormFieldMapping",
+                        principalTable: "FormFieldMappings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_FormFieldValues_FormFillingLog_FormFillingLogId",
+                        name: "FK_FormFieldValues_FormFillingLogs_FormFillingLogId",
                         column: x => x.FormFillingLogId,
                         principalSchema: "DocumentMangement",
-                        principalTable: "FormFillingLog",
+                        principalTable: "FormFillingLogs",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -147,15 +147,15 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_FormFieldMapping_FormFieldId",
+                name: "IX_FormFieldMappings_FormFieldId",
                 schema: "DocumentMangement",
-                table: "FormFieldMapping",
+                table: "FormFieldMappings",
                 column: "FormFieldId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FormFieldMapping_FormId",
+                name: "IX_FormFieldMappings_FormId",
                 schema: "DocumentMangement",
-                table: "FormFieldMapping",
+                table: "FormFieldMappings",
                 column: "FormId");
 
             migrationBuilder.CreateIndex(
@@ -183,9 +183,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 column: "FormId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FormFillingLog_FormId",
+                name: "IX_FormFillingLogs_FormId",
                 schema: "DocumentMangement",
-                table: "FormFillingLog",
+                table: "FormFillingLogs",
                 column: "FormId");
         }
 
@@ -196,11 +196,11 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 schema: "DocumentMangement");
 
             migrationBuilder.DropTable(
-                name: "FormFieldMapping",
+                name: "FormFieldMappings",
                 schema: "DocumentMangement");
 
             migrationBuilder.DropTable(
-                name: "FormFillingLog",
+                name: "FormFillingLogs",
                 schema: "DocumentMangement");
 
             migrationBuilder.DropTable(

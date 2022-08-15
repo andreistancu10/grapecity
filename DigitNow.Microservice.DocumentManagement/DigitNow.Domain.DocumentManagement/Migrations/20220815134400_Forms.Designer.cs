@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    [Migration("20220815131535_Forms")]
+    [Migration("20220815134400_Forms")]
     partial class Forms
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -415,7 +415,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.HasIndex("FormId");
 
-                    b.ToTable("FormFieldMapping", "DocumentMangement");
+                    b.ToTable("FormFieldMappings", "DocumentMangement");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.FormFillingLog", b =>
@@ -455,7 +455,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.HasIndex("FormId");
 
-                    b.ToTable("FormFillingLog", "DocumentMangement");
+                    b.ToTable("FormFillingLogs", "DocumentMangement");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.FormValue", b =>
