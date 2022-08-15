@@ -117,9 +117,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 }, token);
         }
 
-        public async Task SendMail_DistributeIncomingDocToFunctionary(User recipient, Document document , CancellationToken token)
+        public async Task SendMail_DistributeIncomingDocToFunctionary(User targetUser, Document document , CancellationToken token)
         {
-            await SendMail_WithRegistrationAndDateAsync(recipient, document, MailTemplateEnum.DistributionOfIncomingDocumentToFunctionaryTemplate, token);
+            await SendMail_WithRegistrationAndDateAsync(targetUser, document, MailTemplateEnum.DistributionOfIncomingDocumentToFunctionaryTemplate, token);
         }
 
         public async Task SendMail_OpinionRequestedByAnotherDepartment(User targetUser, long departmentId, Document document, CancellationToken token)
@@ -142,7 +142,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         public async Task SendMail_DeclineCompetenceOpinion(Document document, WorkflowHistoryLog historyLog, CancellationToken token)
         {
             var recipientUserHistoryLog = await _identityAdapterClient.GetUserByIdAsync(historyLog.RecipientId, token);
-            if(recipientUserHistoryLog != null && recipientUserHistoryLog.Departments.Count() > 0)
+            if(recipientUserHistoryLog != null && recipientUserHistoryLog.Departments.Any())
             {
                 var department = await _catalogAdapterClient.GetDepartmentByIdAsync(recipientUserHistoryLog.Departments.FirstOrDefault(), token);
                 var userWhoAdskedForOpinion = historyLog.CreatedBy;
