@@ -1,29 +1,23 @@
-﻿using AutoMapper;
-using DigitNow.Adapters.MS.Identity;
-using DigitNow.Domain.Authentication.Client;
-using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
-using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
-using DigitNow.Domain.DocumentManagement.Data.Filters;
-using DigitNow.Domain.DocumentManagement.Data.Filters.ConcreteFilters;
-using DigitNow.Domain.DocumentManagement.extensions.Role;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
+using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
+using DigitNow.Domain.DocumentManagement.Data.Filters.Documents;
+using DigitNow.Domain.DocumentManagement.Data.Filters;
+using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Documents;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IDashboardService
     {
-        Task<long> CountAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken);
+        Task<long> CountActiveDocumentsAsync(DocumentFilter filter, CancellationToken token);
+        Task<List<VirtualDocument>> GetActiveDocumentsAsync(DocumentFilter filter, int page, int count, CancellationToken token);
 
-        Task<long> CountAllArchiveDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken);
-
-        Task<List<VirtualDocument>> GetAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken cancellationToken);
-        Task<List<VirtualDocument>> GetAllArchiveDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken cancellationToken);
+        Task<long> CountArchivedDocumentsAsync(DocumentFilter filter, CancellationToken token);
+        Task<List<VirtualDocument>> GetArchivedDocumentsAsync(DocumentFilter filter, int page, int count, CancellationToken token);
     }
 
     public class DashboardService : IDashboardService
@@ -31,34 +25,22 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         #region [ Fields ]
 
         private readonly DocumentManagementDbContext _dbContext;
-        private readonly IMapper _mapper;
+        private readonly IServiceProvider _serviceProvider;
         private readonly IIdentityService _identityService;
-        private readonly IIdentityAdapterClient _identityAdapterClient;
-        private readonly IAuthenticationClient _authenticationClient;
         private readonly IVirtualDocumentService _virtualDocumentService;
-
-        #endregion
-
-        #region [ Properties ]
-
-        private static int PreviousYear => DateTime.UtcNow.Year - 1;
 
         #endregion
 
         #region [ Construction ]
 
         public DashboardService(DocumentManagementDbContext dbContext,
-            IMapper mapper,
+            IServiceProvider serviceProvider,
             IIdentityService identityService,
-            IIdentityAdapterClient identityAdapterClient,
-            IAuthenticationClient identityManager,
             IVirtualDocumentService virtualDocumentService)
         {
             _dbContext = dbContext;
-            _mapper = mapper;
+            _serviceProvider = serviceProvider;
             _identityService = identityService;
-            _identityAdapterClient = identityAdapterClient;
-            _authenticationClient = identityManager;
             _virtualDocumentService = virtualDocumentService;
         }
 
@@ -66,135 +48,132 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         #region [ IDashboardService ]
 
-        public Task<long> CountAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
-            => CountAllDocumentsByFlowAsync(FlowType.Documents, preprocessFilter, postprocessFilter, cancellationToken);
-
-        public Task<List<VirtualDocument>> GetAllDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken cancellationToken)
-            => GetAllDocumentsByFlowAsync(FlowType.Documents, preprocessFilter, postprocessFilter, page, count, cancellationToken);
-
-        public Task<long> CountAllArchiveDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
-            => CountAllDocumentsByFlowAsync(FlowType.ArchivedDocuments, preprocessFilter, postprocessFilter, cancellationToken);
-
-        public Task<List<VirtualDocument>> GetAllArchiveDocumentsAsync(DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken cancellationToken)
-            => GetAllDocumentsByFlowAsync(FlowType.ArchivedDocuments, preprocessFilter, postprocessFilter, page, count, cancellationToken);
-
-        private async Task<long> CountAllDocumentsByFlowAsync(FlowType flowType, DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, CancellationToken cancellationToken)
+        public async Task<long> CountActiveDocumentsAsync(DocumentFilter filter, CancellationToken token)
         {
-            var documentsQuery = BuildPreprocessDocumentsQueryAsync(flowType, preprocessFilter);
-            if (postprocessFilter.IsEmpty())
-                return await documentsQuery.CountAsync(cancellationToken);
+            var currentUser = await _identityService.GetCurrentUserAsync(token);
 
-            var lightweightDocuments = await documentsQuery
-                .Select(x => new Document { Id = x.Id, DocumentType = x.DocumentType })
-                .ToListAsync(cancellationToken);
-
-            return await _virtualDocumentService.CountVirtualDocuments(lightweightDocuments, postprocessFilter, cancellationToken);
+            return await GetBuiltinDocumentsQuery()
+                .WhereAll((await GetActiveDocumentsExpressions(currentUser, filter, token)).ToPredicates())
+                .AsNoTracking()
+                .CountAsync(token);
         }
 
-        private async Task<List<VirtualDocument>> GetAllDocumentsByFlowAsync(FlowType flowType, DocumentPreprocessFilter preprocessFilter, DocumentPostprocessFilter postprocessFilter, int page, int count, CancellationToken token)
+        public async Task<List<VirtualDocument>> GetActiveDocumentsAsync(DocumentFilter filter, int page, int count, CancellationToken token)
         {
-            var documentsQuery = BuildPreprocessDocumentsQueryAsync(flowType, preprocessFilter);
+            var currentUser = await _identityService.GetCurrentUserAsync(token);
 
-            var documents = await documentsQuery.OrderByDescending(x => x.CreatedAt)
+            var documents = await GetBuiltinDocumentsQuery()
+                 .WhereAll((await GetActiveDocumentsExpressions(currentUser, filter, token)).ToPredicates())
+                 .OrderByDescending(x => x.CreatedAt)
                  .Skip((page - 1) * count)
                  .Take(count)
-                 .Select(x => new Document { Id = x.Id, DocumentType = x.DocumentType })
+                 .AsNoTracking()
                  .ToListAsync(token);
 
-            var virtualDocuments = await _virtualDocumentService.FetchVirtualDocuments(documents, postprocessFilter, token);
+            return _virtualDocumentService.ConvertDocumentsToVirtualDocuments(documents)
+                .ToList();
+        }
 
-            return virtualDocuments
+        public async Task<long> CountArchivedDocumentsAsync(DocumentFilter filter, CancellationToken token)
+        {
+            var currentUser = await _identityService.GetCurrentUserAsync(token);
+
+            return await GetBuiltinDocumentsQuery()
+                .WhereAll((await GetArchivedDocumentsExpressions(currentUser, filter, token)).ToPredicates())
+                .CountAsync(token);
+        }
+
+        public async Task<List<VirtualDocument>> GetArchivedDocumentsAsync(DocumentFilter filter, int page, int count, CancellationToken token)
+        {
+            var currentUser = await _identityService.GetCurrentUserAsync(token);
+
+            var documents = await GetBuiltinDocumentsQuery()
+                 .WhereAll((await GetArchivedDocumentsExpressions(currentUser, filter, token)).ToPredicates())
+                 .Skip((page - 1) * count)
+                 .Take(count)
+                 .ToListAsync(token);
+
+            return _virtualDocumentService.ConvertDocumentsToVirtualDocuments(documents)
                 .OrderByDescending(x => x.CreatedAt)
                 .ToList();
         }
 
         #endregion
 
-        #region [ Relationships ]
+        #region [ ActiveDocuments - Filters ]
 
-        private async Task<IEnumerable<long>> GetRelatedUserIdsAsync(UserModel userModel, CancellationToken cancellationToken) =>
-            (await GetRelatedUsersAsync(userModel, cancellationToken)).Select(x => x.Id);
-
-        private async Task<IList<UserModel>> GetRelatedUsersAsync(UserModel userModel, CancellationToken cancellationToken)
+        private async Task<DataExpressions<Document>> GetActiveDocumentsExpressions(UserModel currentUser, DocumentFilter filter, CancellationToken token)
         {
-            if (userModel.HasRole(RecipientType.HeadOfDepartment))
-            {
-                //TODO: Get all users by departmentId
-                var usersResponse = await _identityAdapterClient.GetUsersAsync(cancellationToken);
+            var dataExpressions = new DataExpressions<Document>();
 
-                return usersResponse.Users
-                    .Select(x => _mapper.Map<UserModel>(x))
-                    .Append(userModel)
-                    .ToList();
-            }
+            dataExpressions.AddRange(await GetActiveDocumentsExpressionsAsync(filter, token));
+            dataExpressions.AddRange(await GetDocumentsUserRightsExpressionsAsync(currentUser, token));
 
-            return new List<UserModel> { userModel };
+            return dataExpressions;
         }
 
-        private async Task<UserModel> GetCurrentUserAsync(CancellationToken cancellationToken)
+        private Task<DataExpressions<Document>> GetActiveDocumentsExpressionsAsync(DocumentFilter filter, CancellationToken token)
         {
-            var userId = _identityService.GetCurrentUserId();
+            var filterComponent = new ActiveDocumentsFilterComponent(_serviceProvider);
+            var filterComponentContext = new ActiveDocumentsFilterComponentContext
+            {
+                DocumentFilter = filter
+            };
 
-            var getUserByIdResponse = await _identityAdapterClient.GetUserByIdAsync(userId, cancellationToken);
-            if (getUserByIdResponse == null)
-                throw new InvalidOperationException($"User with identifier '{userId}' was not found!");
-
-            return _mapper.Map<UserModel>(getUserByIdResponse);
+            return filterComponent.ExtractDataExpressionsAsync(filterComponentContext, token);
         }
 
         #endregion
 
-        #region [ Utils - Preprocessing Filters ]
+        #region [ ArchivedDocuments - Filters ]
 
-        private enum FlowType
+        private async Task<DataExpressions<Document>> GetArchivedDocumentsExpressions(UserModel currentUser, DocumentFilter filter, CancellationToken token)
         {
-            Documents,
-            ArchivedDocuments
+            var dataExpressions = new DataExpressions<Document>();
+
+            dataExpressions.AddRange(await GetArchivedDocumentsExpressionsAsync(filter, token));
+            dataExpressions.AddRange(await GetDocumentsUserRightsExpressionsAsync(currentUser, token));
+
+            return dataExpressions;
         }
 
-        private static IList<Expression<Func<Document, bool>>> GetDocumentsPreprocessBuiltinPredicates() =>
-            PredicateFactory.CreatePredicatesList<Document>(x => x.CreatedAt.Year >= PreviousYear && !x.IsArchived);
-
-        private static IList<Expression<Func<Document, bool>>> GetArchivedDocumentsPreprocessBuiltinPredicates() =>
-            PredicateFactory.CreatePredicatesList<Document>(x => x.IsArchived);
-
-        private IList<Expression<Func<Document, bool>>> GetDocumentsPreprocessPredicates(DocumentPreprocessFilter preprocessFilter) =>
-            ExpressionFilterBuilderRegistry.GetDocumentPreprocessFilterBuilder(_dbContext, preprocessFilter).Build();
-
-        private IList<Expression<Func<Document, bool>>> GetPreprocessPredicates(DocumentPreprocessFilter preprocessFilter)
+        private Task<DataExpressions<Document>> GetArchivedDocumentsExpressionsAsync(DocumentFilter filter, CancellationToken token)
         {
-            var preprocessPredicates = GetDocumentsPreprocessBuiltinPredicates();
-            if (!preprocessFilter.IsEmpty())
+            var filterComponent = new ArchivedDocumentsFilterComponent(_serviceProvider);
+            var filterComponentContext = new ArchivedDocumentsFilterComponentContext
             {
-                GetDocumentsPreprocessPredicates(preprocessFilter).ForEach(predicate => preprocessPredicates.Add(predicate));
-            }
-            return preprocessPredicates;
-        }
-        private IList<Expression<Func<Document, bool>>> GetArchivedPreprocessPredicates(DocumentPreprocessFilter preprocessFilter)
-        {
-            var preprocessPredicates = GetArchivedDocumentsPreprocessBuiltinPredicates();
-            if (!preprocessFilter.IsEmpty())
-            {
-                GetDocumentsPreprocessPredicates(preprocessFilter).ForEach(predicate => preprocessPredicates.Add(predicate));
-            }
-            return preprocessPredicates;
+                DocumentFilter = filter
+            };
+
+            return filterComponent.ExtractDataExpressionsAsync(filterComponentContext, token);
         }
 
-        private IQueryable<Document> BuildPreprocessDocumentsQueryAsync(FlowType flowType, DocumentPreprocessFilter documentFilter)
+        #endregion
+
+        #region [ Shared - Filters ]
+
+        private Task<DataExpressions<Document>> GetDocumentsUserRightsExpressionsAsync(UserModel currentUser, CancellationToken token)
         {
-            var documentsQuery = _dbContext.Documents.AsQueryable();
-            switch (flowType)
+            var rightsComponent = new DocumentPermissionsFilterComponent(_serviceProvider);
+            var rightsComponentContext = new DocumentPermissionsFilterComponentContext
             {
-                case FlowType.Documents:
-                    documentsQuery = documentsQuery.WhereAll(GetPreprocessPredicates(documentFilter));
-                    break;
-                case FlowType.ArchivedDocuments:
-                    documentsQuery = documentsQuery.WhereAll(GetArchivedPreprocessPredicates(documentFilter));
-                    break;
+                CurrentUser = currentUser,
+                UserPermissionsFilter = DataFilterFactory.BuildDocumentUserRightsFilter(currentUser)
+            };
 
-            }
+            return rightsComponent.ExtractDataExpressionsAsync(rightsComponentContext, token);
+        }
 
-            return documentsQuery;
+        #endregion
+
+        #region [ Helpers ]
+
+        private IQueryable<Document> GetBuiltinDocumentsQuery()
+        {
+            return _dbContext.Documents
+                 .Include(x => x.IncomingDocument)
+                 .Include(x => x.InternalDocument)
+                 .Include(x => x.OutgoingDocument);
         }
 
         #endregion

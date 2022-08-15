@@ -13,7 +13,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         public HeadOfDepartmentAsksForOpinion(IServiceProvider serviceProvider) : base(serviceProvider) {}
         protected override int[] allowedTransitionStatuses => new int[] 
         { 
-            (int)DocumentStatus.New 
+            (int)DocumentStatus.New,
+            (int)DocumentStatus.InWorkUnallocated,
+            (int)DocumentStatus.InWorkMayorDeclined
         };
 
         #region [ IWorkflowHandler ]
@@ -39,7 +41,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord, Document document)
         {
-            if (command.RecipientId <= 0 || !IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses) || document.DocumentType == DocumentType.Incoming)
+            if (command.RecipientId <= 0 || !IsTransitionAllowed(lastWorkFlowRecord, allowedTransitionStatuses))
             {
                 TransitionNotAllowed(command);
                 return false;

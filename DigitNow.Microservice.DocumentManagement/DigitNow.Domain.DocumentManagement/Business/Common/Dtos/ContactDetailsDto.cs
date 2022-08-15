@@ -5,6 +5,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos
     public class ContactDetailDto
     {
         public string? IdentificationNumber { get; set; }
+        public string? IssuerName { get; set; }
         public int CountryId { get; set; }
         public int CountyId { get; set; }
         public int CityId { get; set; }

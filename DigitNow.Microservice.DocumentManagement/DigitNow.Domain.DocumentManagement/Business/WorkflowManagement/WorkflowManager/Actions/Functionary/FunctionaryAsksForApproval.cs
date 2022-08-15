@@ -19,7 +19,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             (int)DocumentStatus.InWorkDelegated, 
             (int)DocumentStatus.OpinionRequestedAllocated, 
             (int)DocumentStatus.New, 
-            (int)DocumentStatus.InWorkDeclined 
+            (int)DocumentStatus.InWorkDeclined,
+            (int)DocumentStatus.InWorkMayorDeclined
         };
 
         #region [ IWorkflowHandler ]
@@ -50,7 +51,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             var newWorkflowResponsible = new WorkflowHistoryLog
             {
                 DocumentStatus = DocumentStatus.InWorkApprovalRequested,
-                Resolution = command.Resolution
+                Resolution = command.Resolution,
+                Remarks = command.Remarks
             };
 
             await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
@@ -75,7 +77,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 return command;
             }
 
-            document.WorkflowHistories.Add(WorkflowHistoryLogFactory.Create(document, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkApprovalRequested));
+            document.WorkflowHistories.Add(WorkflowHistoryLogFactory.Create(document, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkApprovalRequested, default, command.Remarks, default, command.Resolution));
 
             document.Status = DocumentStatus.InWorkApprovalRequested;
             document.RecipientId = headOfDepartment.Id;

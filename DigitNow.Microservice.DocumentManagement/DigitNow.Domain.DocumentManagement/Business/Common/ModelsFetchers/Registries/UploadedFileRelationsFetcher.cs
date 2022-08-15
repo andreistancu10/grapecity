@@ -1,33 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using DigitNow.Domain.DocumentManagement.Business.Common.Models;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchers;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
+using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.GenericFetchers;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries
 {
-    internal sealed class UploadedFileRelationsFetcher : RelationalAggregateFetcher<UploadedFilesFetcherContext>
+    internal sealed class UploadedFileRelationsFetcher : BaseRelationsFetcher
     {
-        private readonly IServiceProvider _serviceProvider;
+        public IReadOnlyList<DocumentCategoryModel> UploadedFileCategoryModels 
+            => GetItems<GenericDocumentsCategoriesFetcher, DocumentCategoryModel>();
 
-        private IModelFetcher<DocumentCategoryModel, UploadedFilesFetcherContext> _uploadedFilesCategoriesFetcher;
-        private IModelFetcher<UserModel, UploadedFilesFetcherContext> _uploadedFilesUsersFetcher;
-
-        public IReadOnlyList<DocumentCategoryModel> UploadedFileCategoryModels => GetItems(_uploadedFilesCategoriesFetcher);
-        public IReadOnlyList<UserModel> UploadedFileUsers => GetItems(_uploadedFilesUsersFetcher);
+        public IReadOnlyList<UserModel> UploadedFileUsers 
+            => GetItems<UploadedFilesUsersFetcher, UserModel>();
 
         public UploadedFileRelationsFetcher(IServiceProvider serviceProvider)
+            : base(serviceProvider)
         {
-            _serviceProvider = serviceProvider;
+            Aggregator
+                .UseGenericRemoteFetcher<GenericDocumentsCategoriesFetcher>();
         }
 
-        protected override void AddRemoteFetchers()
+        public UploadedFileRelationsFetcher UseUploadedFilesContext(UploadedFilesFetcherContext context)
         {
-            _uploadedFilesCategoriesFetcher = new UploadedFilesDocumentCategoriesFetcher(_serviceProvider);
-            RemoteFetchers.Add(_uploadedFilesCategoriesFetcher);
-            
-            _uploadedFilesUsersFetcher = new UploadedFilesUsersFetcher(_serviceProvider);
-            RemoteFetchers.Add(_uploadedFilesUsersFetcher);
+            Aggregator
+                .UseRemoteFetcher<UploadedFilesUsersFetcher>(context);
+
+            return this;
         }
     }
 }

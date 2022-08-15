@@ -1,9 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.Models;
+﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
-using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 
@@ -102,7 +98,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 ExtractDepartment(source);
 
             private static BasicViewModel ExtractDepartment<T>(VirtualDocumentAggregate<T> source)
-                where T: VirtualDocument
+                where T : VirtualDocument
             {
                 var foundDepartment = source.Departments.FirstOrDefault(x => x.Id == source.VirtualDocument.Document.DestinationDepartmentId);
                 if (foundDepartment != null)
@@ -128,7 +124,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 ExtractUser(source);
 
             private static BasicViewModel ExtractUser<T>(VirtualDocumentAggregate<T> source)
-                where T: VirtualDocument
+                where T : VirtualDocument
             {
                 var foundUser = source.Users.FirstOrDefault(x => x.Id == source.VirtualDocument.Document.CreatedBy);
                 if (foundUser != null)
@@ -144,22 +140,31 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             IValueResolver<VirtualDocumentAggregate<InternalDocument>, DocumentViewModel, BasicViewModel>,
             IValueResolver<VirtualDocumentAggregate<OutgoingDocument>, DocumentViewModel, BasicViewModel>
         {
-            public BasicViewModel Resolve(VirtualDocumentAggregate<IncomingDocument> source, DocumentViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
-                ExtractUser(source);
+            public BasicViewModel Resolve(VirtualDocumentAggregate<IncomingDocument> source, DocumentViewModel destination, BasicViewModel destMember, ResolutionContext context)
+            {
+                if (source.VirtualDocument is IncomingDocument incomingDocument)
+                {
+                    return new BasicViewModel(default, incomingDocument.IssuerName);
+                }
+                return default;
+            }
 
-            public BasicViewModel Resolve(VirtualDocumentAggregate<InternalDocument> source, DocumentViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
-                ExtractUser(source);
 
-            public BasicViewModel Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
-                ExtractUser(source);
-
-            private static BasicViewModel ExtractUser<T>(VirtualDocumentAggregate<T> source)
-                where T : VirtualDocument
+            public BasicViewModel Resolve(VirtualDocumentAggregate<InternalDocument> source, DocumentViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
                 var foundUser = source.Users.FirstOrDefault(x => x.Id == source.VirtualDocument.Document.CreatedBy);
                 if (foundUser != null)
                 {
                     return new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
+                }
+                return default;
+            }
+
+            public BasicViewModel Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, BasicViewModel destMember, ResolutionContext context)
+            {
+                if (source.VirtualDocument is OutgoingDocument incomingDocument)
+                {
+                    return new BasicViewModel(default, incomingDocument.RecipientName);
                 }
                 return default;
             }
@@ -208,32 +213,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
         {
             public int Resolve(VirtualDocumentAggregate<IncomingDocument> source, DocumentViewModel destination, int destMember, ResolutionContext context)
             {
-                var foundCategory = source.Categories.FirstOrDefault(x => x.Id == source.VirtualDocument.DocumentTypeId);
-                if (foundCategory != null)
-                {
-                    return foundCategory.ResolutionPeriod;
-                }
-                return default;
+                return (int)source.VirtualDocument.ResolutionPeriod;
             }
 
             public int Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, int destMember, ResolutionContext context)
             {
-                var foundCategory = source.Categories.FirstOrDefault(x => x.Id == source.VirtualDocument.DocumentTypeId);
-                if (foundCategory != null)
-                {
-                    return foundCategory.ResolutionPeriod;
-                }
                 return default;
             }
 
             public int Resolve(VirtualDocumentAggregate<InternalDocument> source, DocumentViewModel destination, int destMember, ResolutionContext context)
             {
-                var foundCategory = source.InternalCategories.FirstOrDefault(x => x.Id == source.VirtualDocument.InternalDocumentTypeId);
-                if (foundCategory != null)
-                {
-                    return foundCategory.ResolutionPeriod;
-                }
-                return default;
+                return source.VirtualDocument.DeadlineDaysNumber;
             }
         }
 
@@ -248,7 +238,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
 
             public bool Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, bool destMember, ResolutionContext context)
             {
-                return source.VirtualDocument.Document.Status == DocumentStatus.Finalized || source.VirtualDocument.Document.Status == DocumentStatus.InWorkCountersignature;
+                return source.VirtualDocument.Document.Status == DocumentStatus.Finalized || source.VirtualDocument.Document.Status == DocumentStatus.InWorkMayorCountersignature;
             }
         }
     }

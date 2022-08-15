@@ -11,7 +11,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
     {
         Task<InternalDocument> AddAsync(InternalDocument internalDocument, CancellationToken cancellationToken);
         Task<List<InternalDocument>> FindAllAsync(Expression<Func<InternalDocument, bool>> predicate, CancellationToken cancellationToken);
-        Task SetResolutionAsync(IEnumerable<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken);
     }
 
     public class InternalDocumentService : IInternalDocumentService
@@ -59,42 +58,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
                 .Include(x => x.Document)
                 .Where(predicate)
                 .ToListAsync(cancellationToken);
-        }
-
-        public async Task SetResolutionAsync(IEnumerable<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken)
-        {
-            var dbInternalDocuments = await _dbContext.InternalDocuments
-                .Include(x => x.Document)
-                .Where(x => documentIds.Contains(x.DocumentId))
-                .ToListAsync(cancellationToken);
-            if (!dbInternalDocuments.Any()) return;
-
-            var foundResolutions = await _dbContext.DocumentResolutions
-                    .Where(x => documentIds.Contains(x.DocumentId))
-                    .ToListAsync(cancellationToken);
-
-            foreach (var dbInternalDocument in dbInternalDocuments)
-            {
-                var foundResolution = foundResolutions.FirstOrDefault(x => x.DocumentId == dbInternalDocument.DocumentId);
-                if (foundResolution == null)
-                {
-                    await _dbContext.DocumentResolutions
-                        .AddAsync(DocumentResolutionFactory.Create(dbInternalDocument, resolutionType, remarks), cancellationToken);
-                }
-                else
-                {
-                    foundResolution.ResolutionType = resolutionType;
-                    foundResolution.Remarks = remarks;
-
-                    await _dbContext.DocumentResolutions
-                        .SingleUpdateAsync(foundResolution, cancellationToken);
-                }
-
-                dbInternalDocument.Document.Status = DocumentStatus.Finalized;
-                await _dbContext.Documents.SingleUpdateAsync(dbInternalDocument.Document, cancellationToken);
-            }
-
-            await _dbContext.SaveChangesAsync(cancellationToken);
         }
     }
 }

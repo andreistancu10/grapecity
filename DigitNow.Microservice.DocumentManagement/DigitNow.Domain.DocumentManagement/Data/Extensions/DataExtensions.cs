@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using HTSS.Platform.Core.Domain;
+﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Extensions

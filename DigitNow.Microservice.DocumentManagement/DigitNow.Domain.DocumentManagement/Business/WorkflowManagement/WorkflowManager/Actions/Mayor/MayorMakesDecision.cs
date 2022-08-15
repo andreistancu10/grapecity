@@ -12,9 +12,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         public MayorMakesDecision(IServiceProvider serviceProvider) : base(serviceProvider) { }
         private enum Decision { Approved = 1, Declined = 2 };
 
-        protected override int[] allowedTransitionStatuses => new int[] 
-        { 
-            (int)DocumentStatus.InWorkMayorReview 
+        protected override int[] allowedTransitionStatuses => new int[]
+        {
+            (int)DocumentStatus.InWorkMayorReview
         };
 
         #region [ IWorkflowHandler ]
@@ -65,24 +65,24 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             document.DestinationDepartmentId = departmentToReceiveDocument;
             document.RecipientId = await IdentityService.GetHeadOfDepartmentUserIdAsync(departmentToReceiveDocument, token);
-            document.Status = DocumentStatus.InWorkCountersignature;
+            document.Status = DocumentStatus.InWorkMayorCountersignature;
 
             await PassDocumentToDepartment(document, command, token);
         }
 
         private async Task MayorApprovedIncomingDocumentAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
         {
-            var oldWorkflowResponsible = GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Functionary.Id);
+            var oldWorkflowResponsible = GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Functionary.Id || x.RecipientType == RecipientType.HeadOfDepartment.Id);
 
             var newWorkflowResponsible = new WorkflowHistoryLog
             {
-                DocumentStatus = DocumentStatus.InWorkCountersignature,
+                DocumentStatus = DocumentStatus.InWorkMayorCountersignature,
                 Remarks = command.Remarks
             };
 
             await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
 
-            document.Status = DocumentStatus.InWorkCountersignature;
+            document.Status = DocumentStatus.InWorkMayorCountersignature;
             document.WorkflowHistories.Add(newWorkflowResponsible);
         }
 

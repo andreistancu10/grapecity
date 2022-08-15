@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
+using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Export;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateUserRecipient;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
+using DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Queries.Exports;
 using DigitNow.Domain.DocumentManagement.Public.Dashboard.Models;
 using HTSS.Platform.Core.Files;
 using HTSS.Platform.Infrastructure.Api.Tools;
@@ -19,9 +20,9 @@ public class DashboardController : ApiController
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
-    private readonly IExportService<DocumentViewModel> _exportService;
+    private readonly IExportService<ExportDocumentViewModel> _exportService;
 
-    public DashboardController(IMediator mediator, IMapper mapper, IExportService<DocumentViewModel> exportService)
+    public DashboardController(IMediator mediator, IMapper mapper, IExportService<ExportDocumentViewModel> exportService)
     {
         _mediator = mediator;        
         _mapper = mapper;
@@ -53,9 +54,9 @@ public class DashboardController : ApiController
     [HttpPost("export-excel")]
     public async Task<IActionResult> ExportExcelAsync([FromBody] GetDocumentsRequest request, CancellationToken cancellationToken)
     {
-        var command = _mapper.Map<GetDocumentsQuery>(request);
+        var command = _mapper.Map<DocumentsExportQuery>(request);
         var result = await _mediator.Send(command, cancellationToken);
-        var fileResult = await _exportService.CreateExcelFile("Documents", "DocumentsSheet", result.Items);
+        var fileResult = await _exportService.CreateExcelFile("Documents", "DocumentsSheet", result);
 
         return File(fileResult.Content, fileResult.ContentType, fileResult.Name);
     }

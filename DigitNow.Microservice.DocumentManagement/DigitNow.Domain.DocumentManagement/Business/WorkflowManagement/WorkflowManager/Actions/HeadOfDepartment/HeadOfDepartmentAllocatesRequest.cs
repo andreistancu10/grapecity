@@ -33,7 +33,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             document.WorkflowHistories
                 .Add(WorkflowHistoryLogFactory
-                .Create(document, RecipientType.Functionary, user, newDocumentStatus));
+                .Create(document, RecipientType.Functionary, user, newDocumentStatus, default, command.Remarks));
 
             await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: false, command.DocumentId, user.Id, newDocumentStatus, token);
 

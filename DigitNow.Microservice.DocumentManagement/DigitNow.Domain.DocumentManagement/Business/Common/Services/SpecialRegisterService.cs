@@ -13,6 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         Task<SpecialRegister> CreateAsync(SpecialRegister specialRegister, CancellationToken cancellationToken);
         Task<SpecialRegister> UpdateAsync(SpecialRegister specialRegister, CancellationToken cancellationToken);
         Task<PagedList<SpecialRegister>> FindAllAsync(GetSpecialRegistersQuery request, CancellationToken cancellationToken);
+        Task<List<SpecialRegister>> FindAllAsync(CancellationToken cancellationToken);
         Task<bool> AnyAsync(Expression<Func<SpecialRegister, bool>> predicate, CancellationToken cancellationToken);
         Task<SpecialRegister> FindAsync(Expression<Func<SpecialRegister, bool>> predicate, CancellationToken cancellationToken);
     }
@@ -52,6 +53,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var pagedResult = await descriptor.PaginateAsync(request.PageNumber, request.PageSize, cancellationToken);
 
             return pagedResult;
+        }
+
+        public async Task<List<SpecialRegister>> FindAllAsync(CancellationToken cancellationToken)
+        {
+            return await _dbContext.SpecialRegisters.ToListAsync(cancellationToken);
         }
 
         public Task<bool> AnyAsync(Expression<Func<SpecialRegister, bool>> predicate, CancellationToken cancellationToken)

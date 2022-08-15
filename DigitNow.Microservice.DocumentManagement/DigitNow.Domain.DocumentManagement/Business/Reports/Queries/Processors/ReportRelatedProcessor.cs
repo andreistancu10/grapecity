@@ -36,7 +36,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors
                 return new List<ReportViewModel>();
             }
 
-            var virtualDocuments = await _virtualDocumentService.FetchVirtualDocuments(documents, cancellationToken);
+            var virtualDocuments = _virtualDocumentService.ConvertDocumentsToVirtualDocuments(documents);
 
             return await _documentMappingService.MapToReportViewModelAsync(virtualDocuments, cancellationToken);
         }
@@ -49,6 +49,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors
                 await _dbContext.Documents
                     .AsNoTracking()
                     .Include(c => c.IncomingDocument)
+                    .Include(c => c.WorkflowHistories)
                     .Where(c => c.DocumentType == DocumentType.Incoming && c.Status != DocumentStatus.Finalized)
                     .ToListAsync(cancellationToken);
 
@@ -76,6 +77,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors
             var internalDocuments = await _dbContext.Documents
                 .AsNoTracking()
                 .Include(c => c.InternalDocument)
+                .Include(c => c.WorkflowHistories)
                 .Where(c => c.DocumentType == DocumentType.Internal && c.Status != DocumentStatus.Finalized)
                 .ToListAsync(cancellationToken);
 

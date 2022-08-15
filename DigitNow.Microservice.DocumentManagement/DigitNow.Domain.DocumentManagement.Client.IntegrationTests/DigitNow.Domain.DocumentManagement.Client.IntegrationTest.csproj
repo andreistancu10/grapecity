@@ -17,7 +17,7 @@
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="6.6.0" />
     <PackageReference Include="HTSS.Platform.Infrastructure.BusinessValidators.MassTransit" Version="1.0.1" />
-    <PackageReference Include="HTSS.Platform.Infrastructure.MassTransit" Version="6.0.1" />
+    <PackageReference Include="HTSS.Platform.Infrastructure.MassTransit" Version="6.0.4" />
     <PackageReference Include="HTSS.Platform.Infrastructure.MassTransit.MultiTenant" Version="6.0.3" />
     <PackageReference Include="HTSS.Platform.Infrastructure.ModelValidators.MassTransit" Version="1.0.1" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers
 {
@@ -35,10 +32,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers
 
         public async Task FetchAsync(TContext context, CancellationToken cancellationToken)
         {
-            try
-            {
-                _models = await FetchInternalAsync(context, cancellationToken);
-            } catch { }
+            _models = await FetchInternalAsync(context, cancellationToken);
         }
 
         async Task IModelFetcher.FetchAsync(object context, CancellationToken cancellationToken)

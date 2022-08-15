@@ -21,6 +21,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries.
         public int RecipientTypeId { get; set; }
         public int DocumentTypeId { get; set; }
         public string DocumentTypeDetail { get; set; }
+        public string IdentificationNumber { get; set; }
 
         public ContactDetailDto ContactDetails { get; set; }
         public DeliveryDetailDto DeliveryDetails { get; set; }

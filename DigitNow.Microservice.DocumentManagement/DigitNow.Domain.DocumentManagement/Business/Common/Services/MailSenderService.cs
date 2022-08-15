@@ -52,11 +52,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .Where(x => documentIds.Contains(x.Id))
                 .Select(x => x.RegistrationNumber)
                 .ToArrayAsync(token);
-
-
+            
             await _mailSender.SendMail(MailTemplateEnum.DelegateDocumentToFunctionaryTemplate, delegatedUser.Email, new
             {
-                UserName = currentUser.UserName,
+                UserName = $"{currentUser.LastName} {currentUser.FirstName}",
                 RegistryNumbers = string.Join(',', registryNumbers)
             }, token);
         }
@@ -68,15 +67,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .Select(x => x.RegistrationNumber)
                 .ToArrayAsync(token);
 
-            var userResponse = await _identityAdapterClient.GetUsersByRoleAndDepartment(RecipientType.HeadOfDepartment.Code, delegatedUser.Departments.First(), token);
+            var userResponse = await _identityAdapterClient.GetUsersByRoleAndDepartment(RecipientType.HeadOfDepartment.Code, delegatedUser.Departments.FirstOrDefault(), token);
 
             var tasks = new List<Task>();
             foreach (var targetUser in userResponse.Users)
             {
                 tasks.Add(_mailSender.SendMail(MailTemplateEnum.DelegateDocumentToFunctionarySupervisorTemplate, targetUser.Email, new
                 {
-                    UserName = currentUser.UserName,
-                    DelegateUserName = delegatedUser.UserName,
+                    UserName = $"{currentUser.LastName} {currentUser.FirstName}",
+                    DelegateUserName = $"{delegatedUser.LastName} {delegatedUser.FirstName}",
                     DocumentJustification = string.Join(',', registryNumbers) 
                 }, token));
             }

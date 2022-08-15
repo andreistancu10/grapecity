@@ -214,6 +214,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<long>("RegistrationNumber")
                         .HasColumnType("bigint");
 
+                    b.Property<long>("SourceDestinationDepartmentId")
+                        .HasColumnType("bigint");
+
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
