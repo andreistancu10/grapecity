@@ -1,6 +1,4 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Dtos;
-using System;
-using System.Collections.Generic;
 
 namespace DigitNow.Domain.DocumentManagement.Business.InternalDocuments.Queries.GetById
 {
