@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    [Migration("20220816074951_fgx4")]
-    partial class fgx4
+    [Migration("20220816091224_Add_SCIM_DB_Structure")]
+    partial class Add_SCIM_DB_Structure
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -1171,7 +1171,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Objectives.Objective", "Objective")
                         .WithOne("SpecificObjective")
                         .HasForeignKey("DigitNow.Domain.DocumentManagement.Data.Entities.Objectives.SpecificObjective", "ObjectiveId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("AssociatedGeneralObjective");
