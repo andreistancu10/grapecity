@@ -1,11 +1,13 @@
-﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
-using HTSS.Platform.Core.CQRS;
+﻿using HTSS.Platform.Core.CQRS;
 
 namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands.Create
 {
-    public class CreateGeneralObjectiveCommand: ICommand<ResultObject>
+    public class CreateGeneralObjectiveCommand : ICommand<ResultObject>
     {
-        public string Title { get;set; }
-        public string Details { get;set; }
+        public string Title { get; set; }
+        public string Details { get; set; }
+        public string ModificationMotive { get; set; }
+
+        public List<long> UploadedFileIds { get; set; }
     }
 }

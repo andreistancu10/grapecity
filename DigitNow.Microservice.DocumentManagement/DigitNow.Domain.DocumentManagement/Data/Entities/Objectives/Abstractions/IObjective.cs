@@ -8,5 +8,6 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities.Objectives.Abstractio
         public ObjectiveState State { get; set; }
         public string Title { get; set; }
         public string Details { get; set; }
+        public string ModificationMotive { get; set; }
     }
 }

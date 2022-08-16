@@ -1,4 +1,5 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
@@ -10,41 +11,32 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
     public class CreateGeneralObjectiveHandler : ICommandHandler<CreateGeneralObjectiveCommand, ResultObject>
     {
         private readonly DocumentManagementDbContext _dbContext;
-        private readonly IObjectiveService _objectiveService;
+        private readonly IGeneralObjectiveService _generalObjectiveService;
+        private readonly IMapper _mapper;
+        private readonly IUploadedFileService _uploadedFileService;
 
-        public CreateGeneralObjectiveHandler(DocumentManagementDbContext dbContext, IObjectiveService objectiveService)
+        public CreateGeneralObjectiveHandler(DocumentManagementDbContext dbContext, IGeneralObjectiveService generalObjectiveService)
         {
             _dbContext = dbContext;
-            _objectiveService = objectiveService;
+            _generalObjectiveService = generalObjectiveService;
         }
         public async Task<ResultObject> Handle(CreateGeneralObjectiveCommand request, CancellationToken cancellationToken)
         {
 
-            var generalObjective = new GeneralObjective{};
-           
-            try
+            var generalObjective = new GeneralObjective
             {
-                generalObjective.Objective = new Objective
+                Objective = new Objective()
                 {
-                    State = ObjectiveState.Active,
                     Title = request.Title,
-                    Details = request.Details
-                };
+                    Details = request.Details,
+                    ModificationMotive = request.ModificationMotive,
+                }
+            };
 
-                await _objectiveService.AddAsync(generalObjective.Objective, cancellationToken);
-                await _dbContext.AddAsync(generalObjective, cancellationToken);
-                await _dbContext.SaveChangesAsync(cancellationToken);
+            await _generalObjectiveService.AddAsync(generalObjective, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
-            } catch (Exception ex)
-            {
-                return ResultObject.Error(new ErrorMessage
-                {
-                    Message = ex.InnerException?.Message
-                });
-            }
-
-            return ResultObject.Created(generalObjective.ObjectiveId);
+            return ResultObject.Created(generalObjective.Id);
         }
-
     }
 }
