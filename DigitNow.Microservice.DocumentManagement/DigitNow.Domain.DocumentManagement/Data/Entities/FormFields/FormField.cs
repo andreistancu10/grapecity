@@ -1,4 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.Entities.Forms;
+﻿using DigitNow.Domain.DocumentManagement.utils;
 using HTSS.Platform.Core.Domain;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
@@ -12,7 +12,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         #region [ References ]
 
         //public List<FormFieldMapping> FormFieldMappings { get; set; }
-
+         
         #endregion
     }
 }
