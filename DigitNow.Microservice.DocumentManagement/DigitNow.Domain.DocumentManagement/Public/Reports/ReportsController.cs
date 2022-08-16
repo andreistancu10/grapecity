@@ -66,7 +66,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Reports
             return File(fileResult.Content, fileResult.ContentType, fileResult.Name);
         }
 
-        private string GetDocumentFileName(string fileName, DateTime fromDate, DateTime toDate) =>
+        private static string GetDocumentFileName(string fileName, DateTime fromDate, DateTime toDate) =>
             $"{fileName} {fromDate.ToString("dd-MM-yyyy")} - {toDate.ToString("dd-MM-yyyy")}";
     }
 }
