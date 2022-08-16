@@ -11,7 +11,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
 
         #region [ References ]
 
-        public List<FormFieldMapping> FormFieldMappings { get; set; }
+        //public List<FormFieldMapping> FormFieldMappings { get; set; }
 
         #endregion
     }
