@@ -5,10 +5,26 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
-    public partial class Forms : Migration
+    public partial class DynamicForms : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "FormFields",
+                schema: "DocumentMangement",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    FieldType = table.Column<int>(type: "int", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Context = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FormFields", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Forms",
                 schema: "DocumentMangement",
@@ -27,61 +43,13 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "FormFields",
-                schema: "DocumentMangement",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FieldType = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Context = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    FormId = table.Column<long>(type: "bigint", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FormFields", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_FormFields_Forms_FormId",
-                        column: x => x.FormId,
-                        principalSchema: "DocumentMangement",
-                        principalTable: "Forms",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "FormFillingLogs",
-                schema: "DocumentMangement",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<long>(type: "bigint", nullable: false),
-                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
-                    FormId = table.Column<long>(type: "bigint", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_FormFillingLogs", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_FormFillingLogs_Forms_FormId",
-                        column: x => x.FormId,
-                        principalSchema: "DocumentMangement",
-                        principalTable: "Forms",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "FormFieldMappings",
                 schema: "DocumentMangement",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Key = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Label = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Context = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Order = table.Column<int>(type: "int", nullable: false),
@@ -110,6 +78,31 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "FormFillingLogs",
+                schema: "DocumentMangement",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<long>(type: "bigint", nullable: false),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
+                    FormId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FormFillingLogs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_FormFillingLogs_Forms_FormId",
+                        column: x => x.FormId,
+                        principalSchema: "DocumentMangement",
+                        principalTable: "Forms",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "FormFieldValues",
                 schema: "DocumentMangement",
                 columns: table => new
@@ -118,8 +111,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     FormFillingLogId = table.Column<long>(type: "bigint", nullable: false),
-                    FormFieldMappingId = table.Column<long>(type: "bigint", nullable: false),
-                    FormId = table.Column<long>(type: "bigint", nullable: true)
+                    FormFieldMappingId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -138,12 +130,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         principalTable: "FormFillingLogs",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_FormFieldValues_Forms_FormId",
-                        column: x => x.FormId,
-                        principalSchema: "DocumentMangement",
-                        principalTable: "Forms",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateIndex(
@@ -159,12 +145,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 column: "FormId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_FormFields_FormId",
-                schema: "DocumentMangement",
-                table: "FormFields",
-                column: "FormId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_FormFieldValues_FormFieldMappingId",
                 schema: "DocumentMangement",
                 table: "FormFieldValues",
@@ -175,12 +155,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 schema: "DocumentMangement",
                 table: "FormFieldValues",
                 column: "FormFillingLogId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_FormFieldValues_FormId",
-                schema: "DocumentMangement",
-                table: "FormFieldValues",
-                column: "FormId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_FormFillingLogs_FormId",

@@ -11,10 +11,10 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
 
         #region [ References ]
 
-        public List<FormField> FormFields { get; set; }
-        public List<FormValue> FormFieldValues { get; set; }
-        public List<FormFieldMapping> FormFieldMappings { get; set; }
-        public List<FormFillingLog> FormFillingLogs { get; set; }
+        //public List<FormField> FormFields { get; set; }
+        //public List<FormValue> FormFieldValues { get; set; }
+        //public List<FormFieldMapping> FormFieldMappings { get; set; }
+        //public List<FormFillingLog> FormFillingLogs { get; set; }
 
         #endregion
     }
