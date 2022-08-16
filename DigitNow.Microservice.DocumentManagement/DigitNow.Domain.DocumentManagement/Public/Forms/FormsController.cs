@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Forms.Queries;
 using DigitNow.Domain.DocumentManagement.Business.Forms.Queries.Filter;
+using DigitNow.Domain.DocumentManagement.Business.Forms.Queries.GetById;
 using DigitNow.Domain.DocumentManagement.Public.Forms.Models;
 using Domain.Localization.Client;
 using HTSS.Platform.Infrastructure.Api.Tools;
@@ -39,14 +40,20 @@ namespace DigitNow.Domain.DocumentManagement.Public.Forms
 
             return Ok(result);
         }
-        
-        [HttpGet("getById")]
-        public async Task<IActionResult> GetByIdAsync([FromQuery] FilterFormsRequest request, CancellationToken cancellationToken)
-        {
-            var query = _mapper.Map<FilterFormsQuery>(request);
-            var result = await _mediator.Send(query, cancellationToken);
 
-            return Ok(result);
+        [HttpGet("getById/{id:long}")]
+        public async Task<IActionResult> GetByIdAsync([FromQuery] long id, CancellationToken cancellationToken)
+        {
+            var query = new GetFormByIdQuery
+            {
+                Id = id
+            };
+
+            return await _mediator.Send(query, cancellationToken) switch
+            {
+                null => NotFound(),
+                var result => Ok(result)
+            };
         }
     }
 }
