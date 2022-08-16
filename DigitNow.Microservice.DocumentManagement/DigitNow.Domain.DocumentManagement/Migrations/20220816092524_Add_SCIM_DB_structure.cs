@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
-    public partial class AddObjective : Migration
+    public partial class Add_SCIM_DB_structure : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -43,10 +43,11 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
                     ObjectiveType = table.Column<int>(type: "int", nullable: false),
-                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     State = table.Column<int>(type: "int", nullable: false),
-                    Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Details = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Details = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ModificationMotive = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -54,7 +55,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "GeneralObjectives",
+                name: "GeneralObjective",
                 schema: "DocumentMangement",
                 columns: table => new
                 {
@@ -68,9 +69,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GeneralObjectives", x => x.Id);
+                    table.PrimaryKey("PK_GeneralObjective", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_GeneralObjectives_Objective_ObjectiveId",
+                        name: "FK_GeneralObjective_Objective_ObjectiveId",
                         column: x => x.ObjectiveId,
                         principalSchema: "DocumentMangement",
                         principalTable: "Objective",
@@ -112,7 +113,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SpecificObjectives",
+                name: "SpecificObjective",
                 schema: "DocumentMangement",
                 columns: table => new
                 {
@@ -124,32 +125,57 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
                     ObjectiveId = table.Column<long>(type: "bigint", nullable: false),
                     DepartmentId = table.Column<long>(type: "bigint", nullable: false),
-                    FunctionaryId = table.Column<long>(type: "bigint", nullable: false),
                     GeneralObjectiveId = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SpecificObjectives", x => x.Id);
+                    table.PrimaryKey("PK_SpecificObjective", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SpecificObjectives_GeneralObjectives_GeneralObjectiveId",
+                        name: "FK_SpecificObjective_GeneralObjective_GeneralObjectiveId",
                         column: x => x.GeneralObjectiveId,
                         principalSchema: "DocumentMangement",
-                        principalTable: "GeneralObjectives",
+                        principalTable: "GeneralObjective",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.NoAction);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_SpecificObjectives_Objective_ObjectiveId",
+                        name: "FK_SpecificObjective_Objective_ObjectiveId",
                         column: x => x.ObjectiveId,
                         principalSchema: "DocumentMangement",
                         principalTable: "Objective",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SpecificObjectiveFunctionary",
+                schema: "DocumentMangement",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<long>(type: "bigint", nullable: false),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
+                    SpecificObjectiveId = table.Column<long>(type: "bigint", nullable: false),
+                    FunctionaryId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SpecificObjectiveFunctionary", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SpecificObjectiveFunctionary_SpecificObjective_SpecificObjectiveId",
+                        column: x => x.SpecificObjectiveId,
+                        principalSchema: "DocumentMangement",
+                        principalTable: "SpecificObjective",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_GeneralObjectives_ObjectiveId",
+                name: "IX_GeneralObjective_ObjectiveId",
                 schema: "DocumentMangement",
-                table: "GeneralObjectives",
+                table: "GeneralObjective",
                 column: "ObjectiveId",
                 unique: true);
 
@@ -166,17 +192,23 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 column: "UploadedFileId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SpecificObjectives_GeneralObjectiveId",
+                name: "IX_SpecificObjective_GeneralObjectiveId",
                 schema: "DocumentMangement",
-                table: "SpecificObjectives",
+                table: "SpecificObjective",
                 column: "GeneralObjectiveId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SpecificObjectives_ObjectiveId",
+                name: "IX_SpecificObjective_ObjectiveId",
                 schema: "DocumentMangement",
-                table: "SpecificObjectives",
+                table: "SpecificObjective",
                 column: "ObjectiveId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SpecificObjectiveFunctionary_SpecificObjectiveId",
+                schema: "DocumentMangement",
+                table: "SpecificObjectiveFunctionary",
+                column: "SpecificObjectiveId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -186,7 +218,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 schema: "DocumentMangement");
 
             migrationBuilder.DropTable(
-                name: "SpecificObjectives",
+                name: "SpecificObjectiveFunctionary",
                 schema: "DocumentMangement");
 
             migrationBuilder.DropTable(
@@ -194,7 +226,11 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 schema: "DocumentMangement");
 
             migrationBuilder.DropTable(
-                name: "GeneralObjectives",
+                name: "SpecificObjective",
+                schema: "DocumentMangement");
+
+            migrationBuilder.DropTable(
+                name: "GeneralObjective",
                 schema: "DocumentMangement");
 
             migrationBuilder.DropTable(
