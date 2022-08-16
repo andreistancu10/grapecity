@@ -39,20 +39,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private readonly IMailSender _mailSender;
         private readonly IIdentityAdapterClient _identityAdapterClient;
         private readonly ICatalogAdapterClient _catalogAdapterClient;
-        private readonly IAuthenticationClient _authenticationClient;
 
         public MailSenderService(
             DocumentManagementDbContext dbContext, 
             IMailSender mailSender,
             IIdentityAdapterClient identityAdapterClient,
-            ICatalogAdapterClient catalogAdapterClient,
-            IAuthenticationClient authenticationClient)
+            ICatalogAdapterClient catalogAdapterClient)
         {
             _dbContext = dbContext;
             _mailSender = mailSender;
             _identityAdapterClient = identityAdapterClient;
             _catalogAdapterClient = catalogAdapterClient;
-            _authenticationClient = authenticationClient;
         }
 
         public async Task SendMail_SendBulkDocumentsTemplate(User headOfDepartmentUser, IList<long> documentIds, CancellationToken token)
@@ -205,7 +202,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var department = await _catalogAdapterClient.GetDepartmentByCodeAsync("registratura", token);
             if (department != null)
             {
-                //TODO: use method from authentiocationClient  await _authenticationClient.GetUsersByDepartment(department.Id, token);
+                //use method from authentiocationClient  await _authenticationClient.GetUsersByDepartment(department.Id, token);
                 var usersFromRegistry = await _identityAdapterClient.GetUsersByDepartment(department.Id, token);
 
                 var tasks = new List<Task>();
