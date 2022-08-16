@@ -27,10 +27,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors
         public async Task<List<ReportViewModel>> ProcessDocumentsAsync(DateTime fromDate, DateTime toDate, CancellationToken cancellationToken)
         {
             var documents = new List<Document>();
-            
-            documents.AddRange(await GetEligibleInternalDocumentsAsync(fromDate, toDate, cancellationToken));
-            documents.AddRange(await GetEligibleIncomingDocumentsAsync(fromDate, toDate, cancellationToken));
 
+            documents.AddRange(await GetEligibleIncomingDocumentsAsync(fromDate, toDate, cancellationToken));
+            documents.AddRange(await GetEligibleInternalDocumentsAsync(fromDate, toDate, cancellationToken));
+            
             if (!documents.Any())
             {
                 return new List<ReportViewModel>();
@@ -43,51 +43,41 @@ namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors
 
         private async Task<IEnumerable<Document>> GetEligibleIncomingDocumentsAsync(DateTime fromDate, DateTime toDate, CancellationToken cancellationToken)
         {
-            var categories = await _catalogClient.DocumentTypes.GetDocumentTypesAsync(cancellationToken);
-
             var incomingDocuments =
                 await _dbContext.Documents
                     .AsNoTracking()
                     .Include(c => c.IncomingDocument)
+                    .Include(c => c.SpecialRegisterMappings)
+                        .ThenInclude(x => x.SpecialRegister)
                     .Include(c => c.WorkflowHistories)
                     .Where(c => c.DocumentType == DocumentType.Incoming && c.Status != DocumentStatus.Finalized)
+                    .Where(x => 
+                        (x.RegistrationDate.AddDays(x.IncomingDocument.ResolutionPeriod) > fromDate)
+                        &&
+                        (x.RegistrationDate.AddDays(x.IncomingDocument.ResolutionPeriod) < toDate)
+                    )
                     .ToListAsync(cancellationToken);
 
-            var eligibleDocuments = incomingDocuments
-                .Where(c =>
-                    c.RegistrationDate.AddDays(
-                        (c.IncomingDocument.ResolutionPeriod > 0
-                            ? c.IncomingDocument.ResolutionPeriod
-                            : categories.DocumentTypes.First(d => d.Id == c.IncomingDocument.DocumentTypeId).ResolutionPeriod)
-                        + 1) > fromDate
-                    &&
-                    c.RegistrationDate.AddDays(
-                        (c.IncomingDocument.ResolutionPeriod > 0
-                            ? c.IncomingDocument.ResolutionPeriod
-                            : categories.DocumentTypes.First(d => d.Id == c.IncomingDocument.DocumentTypeId).ResolutionPeriod)
-                        + 1) < toDate);
-
-            return eligibleDocuments;
+            return incomingDocuments;
         }
 
         private async Task<IEnumerable<Document>> GetEligibleInternalDocumentsAsync(DateTime fromDate, DateTime toDate, CancellationToken cancellationToken)
         {
-            var internalCategories = await _catalogClient.InternalDocumentTypes.GetInternalDocumentTypesAsync(cancellationToken);
-
             var internalDocuments = await _dbContext.Documents
                 .AsNoTracking()
                 .Include(c => c.InternalDocument)
+                .Include(c => c.SpecialRegisterMappings)
+                        .ThenInclude(x => x.SpecialRegister)
                 .Include(c => c.WorkflowHistories)
                 .Where(c => c.DocumentType == DocumentType.Internal && c.Status != DocumentStatus.Finalized)
+                .Where(x =>
+                        (x.RegistrationDate.AddDays(x.InternalDocument.DeadlineDaysNumber) > fromDate)
+                        &&
+                        (x.RegistrationDate.AddDays(x.InternalDocument.DeadlineDaysNumber) < toDate)
+                )
                 .ToListAsync(cancellationToken);
 
-            var eligibleDocuments = internalDocuments
-                .Where(c =>
-                    c.RegistrationDate.AddDays(internalCategories.InternalDocumentTypes.First(d => d.Id == c.InternalDocument.InternalDocumentTypeId).ResolutionPeriod) > fromDate
-                    &&
-                    c.RegistrationDate.AddDays(internalCategories.InternalDocumentTypes.First(d => d.Id == c.InternalDocument.InternalDocumentTypeId).ResolutionPeriod) < toDate);
-
-            return eligibleDocuments;
+            return internalDocuments;
         }
     }
 }

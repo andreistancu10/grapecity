@@ -161,7 +161,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                     Categories = _documentReportRelationsFetcher.DocumentCategories,
                     InternalCategories = _documentReportRelationsFetcher.DocumentInternalCategories,
                     Departments = _documentReportRelationsFetcher.DocumentDepartments,
-                    SpecialRegisterMapping = _documentReportRelationsFetcher.DocumentSpecialRegisterMapping.FirstOrDefault(c => c.DocumentId == childDocument.DocumentId)
                 };
 
                 result.Add(_mapper.Map<VirtualReportAggregate<T>, ReportViewModel>(aggregate));

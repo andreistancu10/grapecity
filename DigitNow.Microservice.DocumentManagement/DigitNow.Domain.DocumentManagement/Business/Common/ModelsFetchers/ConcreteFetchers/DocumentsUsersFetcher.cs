@@ -28,10 +28,20 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
                 .Select(x => x.CreatedBy)
                 .ToList();
 
+            var recipientsUsers = context.Documents
+                .Where(x => x.Document != null && x.Document.RecipientId.HasValue)
+                .Select(x => x.Document.RecipientId.Value)
+                .ToList();
+
+            var targetUsers = new List<long>();
+            targetUsers.AddRange(createdByUsers);
+            targetUsers.AddRange(recipientsUsers);
+            targetUsers = targetUsers.Distinct().ToList();
+
             var usersList = await _identityAdapterClient.GetUsersAsync(cancellationToken);
 
             var relatedUsers = usersList.Users
-                .Where(x => createdByUsers.Contains(x.Id))
+                .Where(x => targetUsers.Contains(x.Id))
                 .Select(x => new UserModel
                 {
                     Id = x.Id,

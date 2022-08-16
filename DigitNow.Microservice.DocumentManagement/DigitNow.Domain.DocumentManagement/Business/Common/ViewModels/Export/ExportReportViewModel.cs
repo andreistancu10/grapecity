@@ -2,7 +2,6 @@
 {
     public class ExportReportViewModel
     {
-        public long Id { get; set; }
         public int RegistrationNumber { get; set; }
         public DateTime RegistrationDate { get; set; }
         public string SpecialRegister { get; set; }
