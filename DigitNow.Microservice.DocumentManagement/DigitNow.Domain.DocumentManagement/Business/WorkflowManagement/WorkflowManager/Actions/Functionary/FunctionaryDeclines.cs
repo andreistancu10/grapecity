@@ -89,11 +89,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         {
             if (historyLog.DocumentStatus == DocumentStatus.OpinionRequestedAllocated)
             {
-                await _mailSenderService.SendMail_DeclineCompetenceOpinion(document, historyLog, token);
+                await MailSenderService.SendMail_DeclineCompetenceOpinion(document, historyLog, token);
             }
             else
             {
-                await _mailSenderService.SendMail_DeclineCompetence(document, historyLog, token);
+                await MailSenderService.SendMail_DeclineCompetence(document, historyLog, token);
             }
         }
 

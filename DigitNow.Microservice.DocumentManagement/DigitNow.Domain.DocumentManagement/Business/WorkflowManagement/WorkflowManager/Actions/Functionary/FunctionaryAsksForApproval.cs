@@ -1,5 +1,4 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
-using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
@@ -11,14 +10,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 {
     public class FunctionaryAsksForApproval : BaseWorkflowManager, IWorkflowHandler
     {
-        private readonly IMailSenderService _mailSenderService;
-        public FunctionaryAsksForApproval(
-            IServiceProvider serviceProvider, 
-            IMailSenderService mailSenderService) 
-            : base(serviceProvider) 
-        {
-            _mailSenderService = mailSenderService;
-        }
+        public FunctionaryAsksForApproval(IServiceProvider serviceProvider): base(serviceProvider) { }
 
         protected override int[] allowedTransitionStatuses => new int[] 
         { 
@@ -65,7 +57,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
             document.WorkflowHistories.Add(newWorkflowResponsible);
             
-            await _mailSenderService.SendMail_ApprovalRequestedByFunctionary(newWorkflowResponsible.RecipientId, document, token);
+            await MailSenderService.SendMail_ApprovalRequestedByFunctionary(newWorkflowResponsible.RecipientId, document, token);
 
             return command;
         }
@@ -91,7 +83,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             document.Status = DocumentStatus.InWorkApprovalRequested;
             document.RecipientId = headOfDepartment.Id;
 
-            await _mailSenderService.SendMail_ApprovalRequestedByFunctionary(headOfDepartment, document, token);
+            await MailSenderService.SendMail_ApprovalRequestedByFunctionary(headOfDepartment, document, token);
             return command;
         }
 

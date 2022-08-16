@@ -45,7 +45,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             await PassDocumentToDepartment(document, command, token);
 
             ResetDateAsOpinionWasSent(document);
-
+            await MailSenderService.SendMail_OpinionFunctionaryReply(document, token);
             return command;
         }
 
@@ -75,6 +75,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             document.WorkflowHistories.Add(newWorkflowResponsible);
 
             ResetDateAsOpinionWasSent(document);
+            await MailSenderService.SendMail_OpinionFunctionaryReply(document, token);
 
             return command;
         }

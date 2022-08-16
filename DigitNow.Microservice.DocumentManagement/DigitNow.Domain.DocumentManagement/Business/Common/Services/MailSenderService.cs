@@ -1,6 +1,7 @@
 ﻿using DigitNow.Adapters.MS.Catalog;
 using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
+using DigitNow.Domain.Authentication.Client;
 using DigitNow.Domain.Authentication.Contracts.Users.GetUsersByFilter;
 using DigitNow.Domain.DocumentManagement.Business.Common.Notifications.Mail;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
@@ -28,6 +29,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         Task SendMail_DeclineCompetence(Document document, WorkflowHistoryLog historyLog, CancellationToken token);
         Task SendMail_MayorApprovalDecision(Document document, WorkflowHistoryLog historyLog, CancellationToken token);
         Task SendMail_MayorRejectionDecision(Document document, WorkflowHistoryLog historyLog, CancellationToken token);
+        Task SendMail_OpinionSupervisorToFunctionary(User targetUser, Document document, CancellationToken token);
+        Task SendMail_OpinionFunctionaryReply(Document document, CancellationToken token);
     }
 
     public class MailSenderService : IMailSenderService
@@ -36,17 +39,20 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private readonly IMailSender _mailSender;
         private readonly IIdentityAdapterClient _identityAdapterClient;
         private readonly ICatalogAdapterClient _catalogAdapterClient;
+        private readonly IAuthenticationClient _authenticationClient;
 
         public MailSenderService(
             DocumentManagementDbContext dbContext, 
             IMailSender mailSender,
             IIdentityAdapterClient identityAdapterClient,
-            ICatalogAdapterClient catalogAdapterClient)
+            ICatalogAdapterClient catalogAdapterClient,
+            IAuthenticationClient authenticationClient)
         {
             _dbContext = dbContext;
             _mailSender = mailSender;
             _identityAdapterClient = identityAdapterClient;
             _catalogAdapterClient = catalogAdapterClient;
+            _authenticationClient = authenticationClient;
         }
 
         public async Task SendMail_SendBulkDocumentsTemplate(User headOfDepartmentUser, IList<long> documentIds, CancellationToken token)
@@ -119,7 +125,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task SendMail_DistributeIncomingDocToFunctionary(User targetUser, Document document , CancellationToken token)
         {
-            await SendMail_WithRegistrationAndDateAsync(targetUser, document, MailTemplateEnum.DistributionOfIncomingDocumentToFunctionaryTemplate, token);
+            await SendMail_WithRegistrationAndDateAsync(targetUser.Email, document, MailTemplateEnum.DistributionOfIncomingDocumentToFunctionaryTemplate, token);
         }
 
         public async Task SendMail_OpinionRequestedByAnotherDepartment(User targetUser, long departmentId, Document document, CancellationToken token)
@@ -166,12 +172,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             var recipient = await _identityAdapterClient.GetUserByIdAsync(recipientId, token);
 
-            await SendMail_WithRegistrationAndDateAsync(recipient, document, MailTemplateEnum.ApprovalRequestByFunctionaryTemplate, token);
+            await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.ApprovalRequestByFunctionaryTemplate, token);
         }
 
         public async Task SendMail_ApprovalRequestedByFunctionary(User recipient, Document document, CancellationToken token)
         {
-            await SendMail_WithRegistrationAndDateAsync(recipient, document, MailTemplateEnum.ApprovalRequestByFunctionaryTemplate, token);
+            await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.ApprovalRequestByFunctionaryTemplate, token);
         }
 
         public async Task SentMail_DepartmentSupervisorApprovalDecision(Document document, CancellationToken token)
@@ -180,7 +186,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             if (previousResponsible != null)
             {
                 var recipient = await _identityAdapterClient.GetUserByIdAsync(previousResponsible.RecipientId, token);
-                await SendMail_WithRegistrationAndDateAsync(recipient, document, MailTemplateEnum.DepartmentSupervisorApprovalDecisionTemplate, token);
+                await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.DepartmentSupervisorApprovalDecisionTemplate, token);
             }
         }
 
@@ -190,29 +196,30 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             if (previousResponsible != null)
             {
                 var recipient = await _identityAdapterClient.GetUserByIdAsync(previousResponsible.RecipientId, token);
-                await SendMail_WithRegistrationAndDateAsync(recipient, document, MailTemplateEnum.DepartmentSupervisorRejectionDecisionTemplate, token);
+                await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.DepartmentSupervisorRejectionDecisionTemplate, token);
             }
         }
 
         public async Task SendMail_SendingReply(Document document, CancellationToken token)
         {
             var department = await _catalogAdapterClient.GetDepartmentByCodeAsync("registratura", token);
-            if(department != null)
+            if (department != null)
             {
+                //TODO: use method from authentiocationClient  await _authenticationClient.GetUsersByDepartment(department.Id, token);
                 var usersFromRegistry = await _identityAdapterClient.GetUsersByDepartment(department.Id, token);
 
                 var tasks = new List<Task>();
                 foreach (var targetUser in usersFromRegistry.Users)
                 {
-                    tasks.Add(SendMail_WithRegistrationAndDateAsync(targetUser, document, MailTemplateEnum.SendingReplyTemplate, token));
+                    tasks.Add(SendMail_WithRegistrationAndDateAsync(targetUser.Email, document, MailTemplateEnum.SendingReplyTemplate, token));
                 }
                 await Task.WhenAll(tasks);
             }
         }
 
-        private async Task SendMail_WithRegistrationAndDateAsync(User recipient, Document document, MailTemplateEnum mailTemplate, CancellationToken token)
+        private async Task SendMail_WithRegistrationAndDateAsync(string recipient, Document document, MailTemplateEnum mailTemplate, CancellationToken token)
         {
-            await _mailSender.SendMail(mailTemplate, recipient.Email,
+            await _mailSender.SendMail(mailTemplate, recipient,
             new
             {
                 RegistryNumber = document.RegistrationNumber,
@@ -251,14 +258,40 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             var recipient = await _identityAdapterClient.GetUserByIdAsync(historyLog.RecipientId, token);
 
-            await SendMail_WithRegistrationAndDateAsync(recipient, document, MailTemplateEnum.MayorApprovalDecisionTemplate, token);
+            await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.MayorApprovalDecisionTemplate, token);
         }
 
         public async Task SendMail_MayorRejectionDecision(Document document, WorkflowHistoryLog historyLog, CancellationToken token)
         {
             var recipient = await _identityAdapterClient.GetUserByIdAsync(historyLog.RecipientId, token);
 
-            await SendMail_WithRegistrationAndDateAsync(recipient, document, MailTemplateEnum.MayorRejectionDecisionTemplate, token);
+            await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.MayorRejectionDecisionTemplate, token);
+        }
+
+        public async Task SendMail_OpinionSupervisorToFunctionary(User targetUser, Document document, CancellationToken token)
+        {
+            await SendMail_WithRegistrationAndDateAsync(targetUser.Email, document, MailTemplateEnum.OpinionSupervisorToFunctionaryTemplate, token);
+        }
+
+        public async Task SendMail_OpinionFunctionaryReply(Document document, CancellationToken token)
+        {
+            var historyLog = document.WorkflowHistories.FirstOrDefault(x => x.DocumentStatus == DocumentStatus.OpinionRequestedAllocated);
+
+            var supervisorWhoSentForOpinion = await _identityAdapterClient.GetUserByIdAsync(historyLog.CreatedBy, token);
+            var department = await _catalogAdapterClient.GetDepartmentByIdAsync(supervisorWhoSentForOpinion.Departments.FirstOrDefault(), token);
+            await _mailSender.SendMail(MailTemplateEnum.OpinionFunctionaryReplyTemplate, supervisorWhoSentForOpinion.Email,
+            new
+            {
+                RegistryNumber = document.RegistrationNumber,
+                Date = document.RegistrationDate.ToShortDateString()
+            },
+            new
+            {
+                Structure = department.Name,
+                RegistryNumber = document.RegistrationNumber,
+                Date = document.RegistrationDate.ToShortDateString(),
+               
+            }, token);
         }
 
         private class GetUsersByRoleAndDepartmentRequest : IGetUsersByRoleAndDepartmentRequest
