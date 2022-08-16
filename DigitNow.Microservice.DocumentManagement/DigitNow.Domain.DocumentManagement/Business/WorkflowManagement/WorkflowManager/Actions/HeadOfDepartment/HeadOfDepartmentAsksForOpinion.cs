@@ -1,5 +1,4 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
-using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
@@ -11,13 +10,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 {
     public class HeadOfDepartmentAsksForOpinion : BaseWorkflowManager, IWorkflowHandler
     {
-        private readonly IMailSenderService _mailSenderService;
-        public HeadOfDepartmentAsksForOpinion(
-            IServiceProvider serviceProvider, 
-            IMailSenderService mailSenderService) : base(serviceProvider) 
-        {
-            _mailSenderService = mailSenderService;
-        }
+        public HeadOfDepartmentAsksForOpinion(IServiceProvider serviceProvider) : base(serviceProvider) { }
         protected override int[] allowedTransitionStatuses => new int[] 
         { 
             (int)DocumentStatus.New,
@@ -41,7 +34,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: false, command.DocumentId, headOfDepartment.Id, DocumentStatus.OpinionRequestedUnallocated, token);
            
-            await _mailSenderService.SendMail_OpinionRequestedByAnotherDepartment(headOfDepartment, document.DestinationDepartmentId, document, token);
+            await MailSenderService.SendMail_OpinionRequestedByAnotherDepartment(headOfDepartment, document.DestinationDepartmentId, document, token);
            
             return command;
         }

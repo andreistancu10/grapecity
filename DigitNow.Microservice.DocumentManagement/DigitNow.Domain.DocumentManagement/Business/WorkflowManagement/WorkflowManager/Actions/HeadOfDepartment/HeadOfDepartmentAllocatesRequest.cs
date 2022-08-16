@@ -1,21 +1,14 @@
-﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
+using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
-using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.WorkflowManager.Actions.HeadOfDepartment
 {
     public class HeadOfDepartmentAllocatesRequest : BaseWorkflowManager, IWorkflowHandler
     {
-        private readonly IMailSenderService _mailSenderService;
-        public HeadOfDepartmentAllocatesRequest(
-            IServiceProvider serviceProvider,
-            IMailSenderService mailSenderService) : base(serviceProvider)
-        {
-            _mailSenderService = mailSenderService;
-        }
+        public HeadOfDepartmentAllocatesRequest(IServiceProvider serviceProvider) : base(serviceProvider) { }
         protected override int[] allowedTransitionStatuses => new int[] 
         { 
             (int)DocumentStatus.InWorkUnallocated, 
@@ -43,9 +36,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 .Create(document, RecipientType.Functionary, user, newDocumentStatus, default, command.Remarks));
 
             await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: false, command.DocumentId, user.Id, newDocumentStatus, token);
-            if(document.DocumentType == DocumentType.Incoming) 
+            
+            if(lastWorkflowRecord.DocumentStatus == DocumentStatus.OpinionRequestedUnallocated && newDocumentStatus == DocumentStatus.OpinionRequestedAllocated)
             {
-                await _mailSenderService.SendMail_DistributeIncomingDocToFunctionary(user, document, token);
+                await MailSenderService.SendMail_OpinionSupervisorToFunctionary(user, document, token);
+            }
+            if(document.DocumentType == DocumentType.Incoming && newDocumentStatus == DocumentStatus.InWorkAllocated) 
+            {
+                await MailSenderService.SendMail_DistributeIncomingDocToFunctionary(user, document, token);
             }
 
             return command;

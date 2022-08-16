@@ -1,5 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Services;
-using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
+﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseManager;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
@@ -8,11 +7,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 {
     public class FunctionaryDeclines : BaseWorkflowManager, IWorkflowHandler
     {
-        private readonly IMailSenderService _mailSenderService;
-        public FunctionaryDeclines(IServiceProvider serviceProvider, IMailSenderService mailSenderService) : base(serviceProvider) 
-        { 
-            _mailSenderService = mailSenderService;
-        }
+        public FunctionaryDeclines(IServiceProvider serviceProvider) : base(serviceProvider) { }
         protected override int[] allowedTransitionStatuses => new int[] 
         { 
             (int)DocumentStatus.InWorkAllocated, 
@@ -92,11 +87,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         {
             if (historyLog.DocumentStatus == DocumentStatus.OpinionRequestedAllocated)
             {
-                await _mailSenderService.SendMail_DeclineCompetenceOpinion(document, historyLog, token);
+                await MailSenderService.SendMail_DeclineCompetenceOpinion(document, historyLog, token);
             }
             else
             {
-                await _mailSenderService.SendMail_DeclineCompetence(document, historyLog, token);
+                await MailSenderService.SendMail_DeclineCompetence(document, historyLog, token);
             }
         }
 
