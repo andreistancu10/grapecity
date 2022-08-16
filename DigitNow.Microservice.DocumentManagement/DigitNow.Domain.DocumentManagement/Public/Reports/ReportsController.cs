@@ -44,7 +44,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Reports
             if (reportResult == null) return NotFound();
 
             var documentNameResponse = await _localizationManger.Translate(request.LanguageId, "dms.reports.expired-document-name", cancellationToken);
-            var documentFileName = $"{documentNameResponse.Translation} {request.FromDate.ToString("dd-MM-yyyy")} - {request.ToDate.ToString("dd-MM-yyyy")}";
+            var documentFileName = GetDocumentFileName(documentNameResponse.Translation, request.FromDate, request.ToDate);
 
             var fileResult = await _exportService.CreateExcelFile(documentFileName, documentNameResponse.Translation, reportResult);
 
@@ -59,11 +59,14 @@ namespace DigitNow.Domain.DocumentManagement.Public.Reports
             if (reportResult == null) return NotFound();
 
             var documentNameResponse = await _localizationManger.Translate(request.LanguageId, "dms.reports.to-expire-document-name", cancellationToken);
-            var documentFileName = $"{documentNameResponse.Translation} {request.FromDate.ToString("dd-MM-yyyy")} - {request.ToDate.ToString("dd-MM-yyyy")}";
+            var documentFileName = GetDocumentFileName(documentNameResponse.Translation, request.FromDate, request.ToDate);
 
             var fileResult = await _exportService.CreateExcelFile(documentFileName, documentNameResponse.Translation, reportResult);
 
             return File(fileResult.Content, fileResult.ContentType, fileResult.Name);
         }
+
+        private string GetDocumentFileName(string fileName, DateTime fromDate, DateTime toDate) =>
+            $"{fileName} {fromDate.ToString("dd-MM-yyyy")} - {toDate.ToString("dd-MM-yyyy")}";
     }
 }
