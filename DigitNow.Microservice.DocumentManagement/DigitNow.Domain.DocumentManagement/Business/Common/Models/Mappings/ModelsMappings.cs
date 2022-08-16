@@ -24,7 +24,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings
             CreateMap<IInternalDocumentTypeResponse, InternalDocumentCategoryModel>();
             CreateMap<IInternalDocumentTypeResponse, DocumentCategoryModel>();
             CreateMap<SpecialRegisterMapping, SpecialRegisterMappingModel>();
-            CreateMap<SpecialRegisterMapping, DocumentsSpecialRegisterMappingModel>();
 
             CreateMap<DocumentType, DocumentCategoryModel>();
             CreateMap<DocumentType, InternalDocumentCategoryModel>();

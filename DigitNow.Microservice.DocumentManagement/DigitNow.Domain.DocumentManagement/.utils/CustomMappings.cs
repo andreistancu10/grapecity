@@ -15,7 +15,7 @@ namespace DigitNow.Domain.DocumentManagement.utils
         public static readonly Dictionary<DocumentStatus, string> DocumentStatusTranslations = new()
         {
             { DocumentStatus.InWorkUnallocated, "dms.document.status.in-work-unallocated" },
-            { DocumentStatus.InWorkAllocated, "dms.document.status.in-work-Allocated" },
+            { DocumentStatus.InWorkAllocated, "dms.document.status.in-work-allocated" },
             { DocumentStatus.OpinionRequestedUnallocated, "dms.document.status.opinion-requested-unallocated" },
             { DocumentStatus.OpinionRequestedAllocated, "dms.document.status.opinion-requested-allocated" },
             { DocumentStatus.InWorkApprovalRequested, "dms.document.status.in-work-approval-requested" },
