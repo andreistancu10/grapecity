@@ -18,8 +18,18 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
 
         public Form Form { get; set; }
         public FormField FormField { get; set; }
-        //public FormValue FormValue { get; set; }
+
+        //public List<FormValue> FormValues { get; set; }
 
         #endregion
+
+        public FormFieldMapping()
+        {
+        }
+
+        public FormFieldMapping(long id)
+        {
+            Id = id;
+        }
     }
 }
