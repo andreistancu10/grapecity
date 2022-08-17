@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Data;
 using HTSS.Platform.Core.CQRS;
@@ -32,11 +33,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Forms.Queries.GetById
                 return null;
             }
 
-            var formFieldMappings = await _dbContext.FormFieldMappings
-                .Where(c => c.FormId == form.Id)
-                .Include(c => c.FormField)
-                .ToListAsync(cancellationToken);
-
+            var formFieldMappings = await _formsService.GetFormFieldMappingsByFormIdAsync(request.Id, cancellationToken);
             var formFields = formFieldMappings.Select(c => c.FormField).ToList();
 
             //TODO: determine whether to use Fetchers or leave it as it is. NOTE: Fetchers code already written.
@@ -44,13 +41,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Forms.Queries.GetById
 
             foreach (var mapping in formFieldMappings)
             {
-               var viewModel= _mapper.Map<FormControlViewModel>(new FormControlAggregate
+                var viewModel = _mapper.Map<FormControlViewModel>(new FormControlAggregate
                 {
                     FormFields = formFields,
                     FormFieldMapping = mapping
                 });
 
-               viewModels.Add(viewModel);
+                viewModels.Add(viewModel);
             }
 
             return viewModels;
