@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Forms.Commands;
-using DigitNow.Domain.DocumentManagement.Business.Forms.Queries.GetById;
+using DigitNow.Domain.DocumentManagement.Business.Forms.Queries.GetFormById;
 using DigitNow.Domain.DocumentManagement.Public.Forms.Models;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Forms.Mappings

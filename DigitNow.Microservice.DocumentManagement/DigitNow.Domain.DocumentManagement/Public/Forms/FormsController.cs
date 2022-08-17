@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Forms.Commands;
 using DigitNow.Domain.DocumentManagement.Business.Forms.Queries.Filter;
-using DigitNow.Domain.DocumentManagement.Business.Forms.Queries.GetById;
+using DigitNow.Domain.DocumentManagement.Business.Forms.Queries.GetFormById;
 using DigitNow.Domain.DocumentManagement.Public.Forms.Models;
 using Domain.Localization.Client;
 using HTSS.Platform.Infrastructure.Api.Tools;

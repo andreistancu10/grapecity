@@ -6,9 +6,9 @@ using DigitNow.Domain.DocumentManagement.Data;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Forms.Queries.GetById
+namespace DigitNow.Domain.DocumentManagement.Business.Forms.Queries.GetFormById
 {
-    public class GetFormByIdHandler : IQueryHandler<GetFormByIdQuery, List<FormControlViewModel>>
+    public class GetFormByIdHandler : IQueryHandler<GetFormByIdQuery, GetFormByIdResponse>
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IMapper _mapper;
@@ -24,7 +24,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Forms.Queries.GetById
             _formsService = formsService;
         }
 
-        public async Task<List<FormControlViewModel>> Handle(GetFormByIdQuery request, CancellationToken cancellationToken)
+        public async Task<GetFormByIdResponse> Handle(GetFormByIdQuery request, CancellationToken cancellationToken)
         {
             var form = await _dbContext.Forms.FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
 
@@ -37,7 +37,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Forms.Queries.GetById
             var formFields = formFieldMappings.Select(c => c.FormField).ToList();
 
             //TODO: determine whether to use Fetchers or leave it as it is. NOTE: Fetchers code already written.
-            var viewModels = new List<FormControlViewModel>();
+            var formControlViewModels = new List<FormControlViewModel>();
 
             foreach (var mapping in formFieldMappings)
             {
@@ -47,10 +47,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Forms.Queries.GetById
                     FormFieldMapping = mapping
                 });
 
-                viewModels.Add(viewModel);
+                formControlViewModels.Add(viewModel);
             }
 
-            return viewModels;
+            var formResponse = _mapper.Map<GetFormByIdResponse>(form);
+            formResponse.FormControls = formControlViewModels;
+
+            return formResponse;
         }
     }
 }
