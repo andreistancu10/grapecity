@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    [Migration("20220816132343_DynamicForms")]
+    [Migration("20220817112426_DynamicForms")]
     partial class DynamicForms
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -413,6 +413,32 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("FormFieldMappings", "DocumentMangement");
                 });
 
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.FormFieldValue", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<long>("FormFieldMappingId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("FormFillingLogId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FormFieldMappingId");
+
+                    b.HasIndex("FormFillingLogId");
+
+                    b.ToTable("FormFieldValues", "DocumentMangement");
+                });
+
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.FormFillingLog", b =>
                 {
                     b.Property<long>("Id")
@@ -451,32 +477,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.HasIndex("FormId");
 
                     b.ToTable("FormFillingLogs", "DocumentMangement");
-                });
-
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.FormValue", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
-
-                    b.Property<long>("FormFieldMappingId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("FormFillingLogId")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FormFieldMappingId");
-
-                    b.HasIndex("FormFillingLogId");
-
-                    b.ToTable("FormFieldValues", "DocumentMangement");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", b =>
@@ -981,18 +981,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("FormField");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.FormFillingLog", b =>
-                {
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Form", "Form")
-                        .WithMany()
-                        .HasForeignKey("FormId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Form");
-                });
-
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.FormValue", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.FormFieldValue", b =>
                 {
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.FormFieldMapping", "FormFieldMapping")
                         .WithMany()
@@ -1009,6 +998,17 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("FormFieldMapping");
 
                     b.Navigation("FormFillingLog");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.FormFillingLog", b =>
+                {
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Form", "Form")
+                        .WithMany()
+                        .HasForeignKey("FormId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Form");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", b =>
