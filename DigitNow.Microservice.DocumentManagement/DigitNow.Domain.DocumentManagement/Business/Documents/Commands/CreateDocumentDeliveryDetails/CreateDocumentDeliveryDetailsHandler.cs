@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DigitNow.Adapters.MS.Catalog;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
@@ -15,17 +16,19 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateD
         private readonly IMapper _mapper;
         private readonly ICatalogAdapterClient _catalogAdapterClient;
         private readonly IIdentityService _identityService;
-
+        private readonly IMailSenderService _mailSenderService;
         public CreateDocumentDeliveryDetailsHandler(
             DocumentManagementDbContext dbContext, 
             IMapper mapper, 
             ICatalogAdapterClient catalogAdapterClient,
-            IIdentityService identityService)
+            IIdentityService identityService,
+            IMailSenderService mailSenderService)
         {
             _dbContext = dbContext;
             _mapper = mapper;
             _catalogAdapterClient = catalogAdapterClient;
             _identityService = identityService;
+            _mailSenderService = mailSenderService;
         }
 
         public async Task<ResultObject> Handle(CreateDocumentDeliveryDetailsCommand request, CancellationToken cancellationToken)
@@ -46,6 +49,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateD
             }
 
             await _dbContext.SaveChangesAsync(cancellationToken);
+
+            if(deliveryDetails.DeliveryMode == (int)TransmissionMode.Post || deliveryDetails.DeliveryMode == (int)TransmissionMode.Widnow)
+            {
+                await _mailSenderService.SendMail_SendingReply(document, cancellationToken);
+            }
 
             return new ResultObject(ResultStatusCode.Ok);
         }

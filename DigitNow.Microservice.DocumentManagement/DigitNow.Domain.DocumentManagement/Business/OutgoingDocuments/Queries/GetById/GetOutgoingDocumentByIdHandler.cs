@@ -1,7 +1,5 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Data;
+﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,29 +7,42 @@ namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries.
 {
     public class GetOutgoingDocumentByIdHandler : IQueryHandler<GetOutgoingDocumentByIdQuery, GetOutgoingDocumentByIdResponse>
     {
-        private readonly DocumentManagementDbContext _dbContext;
+        private readonly IDocumentService _documentService;
         private readonly IMapper _mapper;
 
-        public GetOutgoingDocumentByIdHandler(IMapper mapper, DocumentManagementDbContext dbContext)
+        public GetOutgoingDocumentByIdHandler(
+            IMapper mapper, 
+            IDocumentService documentService)
         {
             _mapper = mapper;
-            _dbContext = dbContext;
+            _documentService = documentService;
         }
         
         public async Task<GetOutgoingDocumentByIdResponse> Handle(GetOutgoingDocumentByIdQuery request, CancellationToken cancellationToken)
         {
-            var foundOutgoingDocument = await _dbContext.OutgoingDocuments
-                .AsNoTracking()
-                .Include(x => x.Document.WorkflowHistories)
-                .Include(x => x.ContactDetail)
-                .Include(x => x.DeliveryDetails)
-                .Include(x => x.ConnectedDocuments)
-                .ThenInclude(x => x.Document)
-                .FirstOrDefaultAsync(c => c.DocumentId == request.Id, cancellationToken);
-            
-            if (foundOutgoingDocument == null) return null;
+            var getByIdQuery = await _documentService.GetByIdQueryAsync(request.Id, cancellationToken, applyPermissions: true);
 
-            return _mapper.Map<GetOutgoingDocumentByIdResponse>(foundOutgoingDocument);
+            var foundDocument = await getByIdQuery
+                .Include(x => x.WorkflowHistories)
+                .Include(x => x.OutgoingDocument)
+                .Include(x => x.OutgoingDocument.ContactDetail)
+                .Include(x => x.OutgoingDocument.DeliveryDetails)
+                .Include(x => x.OutgoingDocument.ConnectedDocuments)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (foundDocument == null)
+            {
+                var existsIdQuery = await _documentService.GetByIdQueryAsync(request.Id, cancellationToken, applyPermissions: false);
+                var itExists = await existsIdQuery.CountAsync(cancellationToken) == 1;
+                if (itExists)
+                {
+                    throw new AccessViolationException("Access rights are not met for this resource!");
+                }
+
+                return null;
+            }
+
+            return _mapper.Map<GetOutgoingDocumentByIdResponse>(foundDocument.OutgoingDocument);
         }
     }
 }

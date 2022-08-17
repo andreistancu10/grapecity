@@ -66,9 +66,9 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Documents
 
         private void BuildFilterByDocumentState()
         {
-            if (EntityFilter.StatusFilter != null)
+            if (EntityFilter.StatusFilter != null && EntityFilter.StatusFilter.Status.Any())
             {
-                EntityPredicates.Add(document => document.Status == EntityFilter.StatusFilter.Status);
+                EntityPredicates.Add(document => EntityFilter.StatusFilter.Status.Contains(document.Status));
             }
         }
 

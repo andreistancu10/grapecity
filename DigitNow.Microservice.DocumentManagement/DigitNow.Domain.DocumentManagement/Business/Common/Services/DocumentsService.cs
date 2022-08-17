@@ -1,10 +1,12 @@
 ﻿using DigitNow.Adapters.MS.Catalog;
 using DigitNow.Adapters.MS.Catalog.Poco;
-using DigitNow.Adapters.MS.Identity;
+using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
+using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Documents;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
+using DigitNow.Domain.DocumentManagement.Data.Filters;
 using DigitNow.Domain.DocumentManagement.Domain.Business.Common.Factories;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
@@ -14,26 +16,79 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 {
     public interface IDocumentService
     {
+        // Create
         Task<Document> AddAsync(Document newDocument, CancellationToken token);
-        Task<Document> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken token, params Expression<Func<Document, object>>[] includes);
-        Task<List<Document>> FindAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken token);
 
-        IQueryable<Document> FindAllQueryable(Expression<Func<Document, bool>> predicate);
-        Task<int> CountAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken token);
+        // Read
+        Task<IQueryable<Document>> GetByIdQueryAsync(long documentId, CancellationToken token, bool applyPermissions = false);
+        Task<IQueryable<Document>> FindByFilterQueryAsync(CancellationToken token, bool applyPermissions = false);
+        Task<IQueryable<Document>> FindByRegistrationQueryAsync(long registrationNumber, int registrationYear, CancellationToken token, bool applyPermissions = false);
+        
+        // Update
         Task SetResolutionAsync(IEnumerable<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken);
+
+        // Delete
     }
 
     public class DocumentService : IDocumentService
     {
         protected readonly DocumentManagementDbContext _dbContext;
+        private readonly IServiceProvider _serviceProvider;
         private readonly ICatalogAdapterClient _catalogAdapterClient;
         private readonly IIdentityService _identityService;
 
-        public DocumentService(DocumentManagementDbContext dbContext, ICatalogAdapterClient catalogAdapterClient, IIdentityService identityService)
+        public DocumentService(DocumentManagementDbContext dbContext,
+            IServiceProvider serviceProvider,
+            ICatalogAdapterClient catalogAdapterClient,
+            IIdentityService identityService)
         {
             _dbContext = dbContext;
+            _serviceProvider = serviceProvider;
             _catalogAdapterClient = catalogAdapterClient;
             _identityService = identityService;
+        }
+
+        public async Task<IQueryable<Document>> GetByIdQueryAsync(long documentId, CancellationToken token, bool applyPermissions = false)
+        {
+            var query = _dbContext.Documents.AsQueryable();
+
+            if (applyPermissions)
+            {
+                var dataPermissionsExpressions = await GetPermissionsDataExpressionsAsync(token);
+
+                query = query.WhereAll(dataPermissionsExpressions.ToPredicates());
+            }
+
+            return query.Where(x => x.Id == documentId);
+        }
+
+        public async Task<IQueryable<Document>> FindByFilterQueryAsync(CancellationToken token, bool applyPermissions = false)
+        {
+            var query = _dbContext.Documents.AsQueryable();
+
+            if (applyPermissions)
+            {
+                var dataPermissionsExpressions = await GetPermissionsDataExpressionsAsync(token);
+
+                query = query.WhereAll(dataPermissionsExpressions.ToPredicates());
+            }
+
+            return query;
+        }
+
+        public async Task<IQueryable<Document>> FindByRegistrationQueryAsync(long registrationNumber, int registrationYear, CancellationToken token, bool applyPermissions = false)
+        {
+            var query = _dbContext.Documents.AsQueryable();
+
+            if (applyPermissions)
+            {
+                var dataPermissionsExpressions = await GetPermissionsDataExpressionsAsync(token);
+
+                query = query.WhereAll(dataPermissionsExpressions.ToPredicates());
+            }
+
+            return query
+                .Where(x => x.RegistrationNumber == registrationNumber && x.RegistrationDate.Year == registrationYear);
         }
 
         public async Task<Document> AddAsync(Document newDocument, CancellationToken token)
@@ -60,27 +115,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             }
 
             return newDocument;
-        }
-
-        public Task<Document> FindAsync(Expression<Func<Document, bool>> predicate, CancellationToken token, params Expression<Func<Document, object>>[] includes)
-        {
-            return _dbContext.Documents
-                .Includes(includes)
-                .FirstOrDefaultAsync(predicate, token);
-        }
-
-        public Task<List<Document>> FindAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken token)
-        {
-            return _dbContext.Documents
-                .Where(predicate)
-                .AsNoTracking()
-                .ToListAsync(token);
-        }
-
-        public IQueryable<Document> FindAllQueryable(Expression<Func<Document, bool>> predicate)
-        {
-            return _dbContext.Documents
-                .Where(predicate);
         }
 
         public Task<int> CountAllAsync(Expression<Func<Document, bool>> predicate, CancellationToken token)
@@ -163,5 +197,23 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
+
+        #region [ Utils ]
+
+        private async Task<DataExpressions<Document>> GetPermissionsDataExpressionsAsync(CancellationToken token)
+        {
+            var currentUser = await _identityService.GetCurrentUserAsync(token);
+
+            var permissionComponent = new DocumentPermissionsFilterComponent(_serviceProvider);
+            var permissionComponentContext = new DocumentPermissionsFilterComponentContext
+            {
+                CurrentUser = currentUser,
+                UserPermissionsFilter = DataFilterFactory.BuildDocumentUserRightsFilter(currentUser)
+            };
+
+            return await permissionComponent.ExtractDataExpressionsAsync(permissionComponentContext, token);
+        }
+
+        #endregion
     }
 }

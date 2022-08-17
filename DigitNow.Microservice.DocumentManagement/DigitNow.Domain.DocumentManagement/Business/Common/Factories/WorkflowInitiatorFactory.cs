@@ -1,8 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.IncomingDocument.WorkflowEditors;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
-using System;
-using System.Collections.Generic;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
 {

@@ -34,8 +34,8 @@
 		<Compile Include=".utils\LanguagesUtils.cs" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="DigitNow.Domain.Authentication.Client" Version="6.0.8" />
-		<PackageReference Include="DigitNow.Domain.Authentication.Contracts" Version="6.0.8" />
+		<PackageReference Include="DigitNow.Domain.Authentication.Client" Version="6.0.9" />
+		<PackageReference Include="DigitNow.Domain.Authentication.Contracts" Version="6.0.9" />
 		<PackageReference Include="DigitNow.Domain.Catalog.Client" Version="6.0.10" />
 		<PackageReference Include="DigitNow.Domain.Catalog.Contracts" Version="6.0.10" />
 		<PackageReference Include="Domain.Localization.Client" Version="6.0.1" />

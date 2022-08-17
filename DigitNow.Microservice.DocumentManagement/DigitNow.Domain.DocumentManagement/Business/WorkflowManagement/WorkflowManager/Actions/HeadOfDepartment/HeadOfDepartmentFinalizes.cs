@@ -7,8 +7,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 {
     public class HeadOfDepartmentFinalizes : BaseWorkflowManager, IWorkflowHandler
     {
-        public HeadOfDepartmentFinalizes(IServiceProvider serviceProvider) 
-            : base(serviceProvider) { }
+        public HeadOfDepartmentFinalizes(IServiceProvider serviceProvider) : base(serviceProvider) { }
 
         protected override int[] allowedTransitionStatuses => new int[] 
         { 

@@ -2,6 +2,7 @@
 using DigitNow.Adapters.MS.Identity;
 using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data;
@@ -20,6 +21,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
         protected readonly IIdentityAdapterClient IdentityAdapterClient;
         protected readonly IIdentityService IdentityService;
         protected readonly ICatalogAdapterClient CatalogAdapterClient;
+        protected readonly IMailSenderService MailSenderService;
 
         protected BaseWorkflowManager(IServiceProvider serviceProvider)
         {
@@ -27,6 +29,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             IdentityAdapterClient = serviceProvider.GetService<IIdentityAdapterClient>();
             IdentityService = serviceProvider.GetService<IIdentityService>();
             CatalogAdapterClient = serviceProvider.GetService<ICatalogAdapterClient>();
+            MailSenderService = serviceProvider.GetService<IMailSenderService>();
         }
 
         protected abstract int[] allowedTransitionStatuses { get; }
@@ -52,7 +55,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
 
         public static bool IsTransitionAllowed(WorkflowHistoryLog lastWorkFlowRecord, int[] allowedTransitionStatuses)
         {
-            if (lastWorkFlowRecord == null || !allowedTransitionStatuses.Contains((int)lastWorkFlowRecord.DocumentStatus))
+            if (lastWorkFlowRecord == null || !allowedTransitionStatuses.Contains((int)lastWorkFlowRecord.Document.Status))
             {
                 return false;
             }
@@ -150,9 +153,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: true, command.DocumentId, department.Id, document.Status, token);
         }
 
-        protected async Task PassDocumentToFunctionaryAsync(Document document, WorkflowHistoryLog newWorkflowResponsible, ICreateWorkflowHistoryCommand command, CancellationToken token)
+        protected async Task PassDocumentToResponsibleUserAsync(Document document, WorkflowHistoryLog newWorkflowResponsible, ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            var oldWorkflowResponsible = GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Functionary.Id);
+            var oldWorkflowResponsible = GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Functionary.Id 
+                    || (x.RecipientType == RecipientType.HeadOfDepartment.Id && x.DocumentStatus != DocumentStatus.OpinionRequestedUnallocated));
+
+            newWorkflowResponsible.DocumentStatus = oldWorkflowResponsible.RecipientType == RecipientType.HeadOfDepartment.Id 
+                ? DocumentStatus.InWorkUnallocated 
+                : DocumentStatus.InWorkAllocated;
+
             await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
 
             document.WorkflowHistories.Add(newWorkflowResponsible);

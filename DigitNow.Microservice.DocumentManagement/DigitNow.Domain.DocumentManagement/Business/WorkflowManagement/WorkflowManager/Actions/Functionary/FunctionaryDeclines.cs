@@ -50,13 +50,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                     Remarks = command.Remarks
                 };
 
-                await PassDocumentToFunctionaryAsync(document, newWorkflowResponsible, command, token);
+                await PassDocumentToResponsibleUserAsync(document, newWorkflowResponsible, command, token);
             }
             else
             {
                 document.Status = DocumentStatus.NewDeclinedCompetence;
                 await PassDocumentToRegistry(document, command, token);
             }
+
+            await SendFunctonaryDeclinesMail(document, lastWorkFlowRecord, token);
 
             return command;
         }
@@ -70,9 +72,30 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 Remarks = command.Remarks
             };
 
-            await PassDocumentToFunctionaryAsync(document, newWorkflowResponsible, command, token);
+            var oldWorkflowResponsible = document.WorkflowHistories
+                .Where(x => x.DocumentStatus == DocumentStatus.New)
+                .OrderByDescending(x => x.CreatedAt)
+                .FirstOrDefault();
+
+            await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
+
+            document.WorkflowHistories.Add(newWorkflowResponsible);
+
+            await SendFunctonaryDeclinesMail(document, oldWorkflowResponsible, token);
 
             return command;
+        }
+
+        private async Task SendFunctonaryDeclinesMail(Document document, WorkflowHistoryLog historyLog, CancellationToken token)
+        {
+            if (historyLog.DocumentStatus == DocumentStatus.OpinionRequestedAllocated)
+            {
+                await MailSenderService.SendMail_DeclineCompetenceOpinion(document, historyLog, token);
+            }
+            else
+            {
+                await MailSenderService.SendMail_DeclineCompetence(document, historyLog, token);
+            }
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord)

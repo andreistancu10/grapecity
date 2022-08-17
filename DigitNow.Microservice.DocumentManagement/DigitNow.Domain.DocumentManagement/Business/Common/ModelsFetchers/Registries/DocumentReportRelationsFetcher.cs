@@ -19,9 +19,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
         public IReadOnlyList<DocumentDepartmentModel> DocumentDepartments 
             => GetItems<GenericDocumentsDepartmentsFetcher, DocumentDepartmentModel>();
 
-        public IReadOnlyList<DocumentsSpecialRegisterMappingModel> DocumentSpecialRegisterMapping 
-            => GetItems<DocumentsSpecialRegisterMappingFetcher, DocumentsSpecialRegisterMappingModel>();
-
         public DocumentReportRelationsFetcher(IServiceProvider serviceProvider)
             : base(serviceProvider)
         {
@@ -34,8 +31,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
         public DocumentReportRelationsFetcher UseDocumentsContext(DocumentsFetcherContext context)
         {
             Aggregator
-                .UseRemoteFetcher<DocumentsUsersFetcher>(context)
-                .UseInternalFetcher<DocumentsSpecialRegisterMappingFetcher>(context);
+                .UseRemoteFetcher<DocumentsUsersFetcher>(context);
 
             return this;
         }

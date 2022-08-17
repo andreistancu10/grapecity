@@ -10,8 +10,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 {
     public class FunctionaryAsksForApproval : BaseWorkflowManager, IWorkflowHandler
     {
-        public FunctionaryAsksForApproval(IServiceProvider serviceProvider) 
-            : base(serviceProvider) { }
+        public FunctionaryAsksForApproval(IServiceProvider serviceProvider): base(serviceProvider) { }
 
         protected override int[] allowedTransitionStatuses => new int[] 
         { 
@@ -51,11 +50,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             var newWorkflowResponsible = new WorkflowHistoryLog
             {
                 DocumentStatus = DocumentStatus.InWorkApprovalRequested,
-                Resolution = command.Resolution
+                Resolution = command.Resolution,
+                Remarks = command.Remarks
             };
 
             await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
             document.WorkflowHistories.Add(newWorkflowResponsible);
+            
+            await MailSenderService.SendMail_ApprovalRequestedByFunctionary(newWorkflowResponsible.RecipientId, document, token);
 
             return command;
         }
@@ -76,11 +78,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 return command;
             }
 
-            document.WorkflowHistories.Add(WorkflowHistoryLogFactory.Create(document, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkApprovalRequested));
+            document.WorkflowHistories.Add(WorkflowHistoryLogFactory.Create(document, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkApprovalRequested, default, command.Remarks, default, command.Resolution));
 
             document.Status = DocumentStatus.InWorkApprovalRequested;
             document.RecipientId = headOfDepartment.Id;
 
+            await MailSenderService.SendMail_ApprovalRequestedByFunctionary(headOfDepartment, document, token);
             return command;
         }
 
