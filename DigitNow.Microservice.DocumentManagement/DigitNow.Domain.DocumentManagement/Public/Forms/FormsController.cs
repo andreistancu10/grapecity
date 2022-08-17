@@ -1,7 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
-using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Forms.Queries;
+﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Forms.Commands;
 using DigitNow.Domain.DocumentManagement.Business.Forms.Queries.Filter;
 using DigitNow.Domain.DocumentManagement.Business.Forms.Queries.GetById;
 using DigitNow.Domain.DocumentManagement.Public.Forms.Models;
@@ -50,6 +48,18 @@ namespace DigitNow.Domain.DocumentManagement.Public.Forms
             };
 
             return await _mediator.Send(query, cancellationToken) switch
+            {
+                null => NotFound(),
+                var result => Ok(result)
+            };
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveFormDataAsync([FromBody] SaveFormDataRequest request, CancellationToken cancellationToken)
+        {
+            var command = _mapper.Map<SaveFormDataCommand>(request);
+
+            return await _mediator.Send(command, cancellationToken) switch
             {
                 null => NotFound(),
                 var result => Ok(result)
