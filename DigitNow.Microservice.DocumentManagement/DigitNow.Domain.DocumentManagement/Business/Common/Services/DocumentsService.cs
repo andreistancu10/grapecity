@@ -50,12 +50,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
         public async Task<IQueryable<Document>> GetByIdQueryAsync(long documentId, CancellationToken token, bool applyPermissions = false)
         {
-            var dataPermissionsExpressions = await GetPermissionsDataExpressionsAsync(token);
-
             var query = _dbContext.Documents.AsQueryable();
 
             if (applyPermissions)
             {
+                var dataPermissionsExpressions = await GetPermissionsDataExpressionsAsync(token);
+
                 query = query.WhereAll(dataPermissionsExpressions.ToPredicates());
             }
 
@@ -64,12 +64,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
         public async Task<IQueryable<Document>> FindByFilterQueryAsync(CancellationToken token, bool applyPermissions = false)
         {
-            var dataPermissionsExpressions = await GetPermissionsDataExpressionsAsync(token);
-
             var query = _dbContext.Documents.AsQueryable();
 
             if (applyPermissions)
             {
+                var dataPermissionsExpressions = await GetPermissionsDataExpressionsAsync(token);
+
                 query = query.WhereAll(dataPermissionsExpressions.ToPredicates());
             }
 
@@ -78,12 +78,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
         public async Task<IQueryable<Document>> FindByRegistrationQueryAsync(long registrationNumber, int registrationYear, CancellationToken token, bool applyPermissions = false)
         {
-            var dataPermissionsExpressions = await GetPermissionsDataExpressionsAsync(token);
-
             var query = _dbContext.Documents.AsQueryable();
 
             if (applyPermissions)
             {
+                var dataPermissionsExpressions = await GetPermissionsDataExpressionsAsync(token);
+
                 query = query.WhereAll(dataPermissionsExpressions.ToPredicates());
             }
 
