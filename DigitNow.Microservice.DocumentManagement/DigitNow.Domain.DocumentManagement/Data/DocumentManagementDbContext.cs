@@ -42,8 +42,8 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<Form> Forms { get; set; }
         public DbSet<FormField> FormFields { get; set; }
         public DbSet<FormFieldMapping> FormFieldMappings { get; set; }
-        public DbSet<FormFieldValue> FormFieldValues { get; set; }
         public DbSet<FormFillingLog> FormFillingLogs { get; set; }
+        public DbSet<FormFieldValue> FormFieldValues { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

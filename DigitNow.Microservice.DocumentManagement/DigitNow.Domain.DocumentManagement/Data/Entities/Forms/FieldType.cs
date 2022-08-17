@@ -2,6 +2,11 @@
 {
     public enum FieldType
     {
-
+        Input,
+        Number,
+        Date,
+        CountryDropdown,
+        DistrictDropdown,
+        CityDropdown,
     }
 }

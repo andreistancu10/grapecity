@@ -17,5 +17,14 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         //public List<FormFillingLog> FormFillingLogs { get; set; }
 
         #endregion
+
+        public Form()
+        {
+        }
+
+        public Form(long id)
+        {
+            Id = id;
+        }
     }
 }
