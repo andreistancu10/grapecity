@@ -20,7 +20,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries.
         
         public async Task<GetOutgoingDocumentByIdResponse> Handle(GetOutgoingDocumentByIdQuery request, CancellationToken cancellationToken)
         {
-            var getByIdQuery = await _documentService.GetByIdAsync(request.Id, cancellationToken, applyPermissions: true);
+            var getByIdQuery = await _documentService.GetByIdQueryAsync(request.Id, cancellationToken, applyPermissions: true);
 
             var foundDocument = await getByIdQuery
                 .Include(x => x.WorkflowHistories)
@@ -32,7 +32,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Queries.
 
             if (foundDocument == null)
             {
-                var existsIdQuery = await _documentService.GetByIdAsync(request.Id, cancellationToken, applyPermissions: false);
+                var existsIdQuery = await _documentService.GetByIdQueryAsync(request.Id, cancellationToken, applyPermissions: false);
                 var itExists = await existsIdQuery.CountAsync(cancellationToken) == 1;
                 if (itExists)
                 {
