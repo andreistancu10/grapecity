@@ -6,6 +6,12 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Business\Forms\Maping\**" />
+	  <EmbeddedResource Remove="Business\Forms\Maping\**" />
+	  <None Remove="Business\Forms\Maping\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 	<ItemGroup>
@@ -89,7 +95,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Business\Forms\Maping\" />
 	  <Folder Include="Business\Forms\Queries\Common\" />
 	  <Folder Include="Data\Entities\FormFillingLogs\Configuration\" />
 	  <Folder Include="Migrations\" />

@@ -8,13 +8,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Forms.Queries.GetById
 {
-    public class GetByIdHandler : IQueryHandler<GetFormByIdQuery, List<FormControlViewModel>>
+    public class GetFormByIdHandler : IQueryHandler<GetFormByIdQuery, List<FormControlViewModel>>
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IMapper _mapper;
         private readonly IFormsServices _formsService;
 
-        public GetByIdHandler(
+        public GetFormByIdHandler(
             IMapper mapper,
             IFormsServices formsService,
             DocumentManagementDbContext dbContext)
