@@ -1,7 +1,5 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Data;
+﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,26 +7,39 @@ namespace DigitNow.Domain.DocumentManagement.Business.InternalDocuments.Queries.
 {
     public class GetInternalDocumentByIdHandler : IQueryHandler<GetInternalDocumentByIdQuery, GetInternalDocumentByIdResponse>
     {
-        private readonly DocumentManagementDbContext _dbContext;
+        private readonly IDocumentService _documentService;
         private readonly IMapper _mapper;
 
-        public GetInternalDocumentByIdHandler(IMapper mapper, DocumentManagementDbContext dbContext)
+        public GetInternalDocumentByIdHandler(
+            IMapper mapper, 
+            IDocumentService documentService)
         {
             _mapper = mapper;
-            _dbContext = dbContext;
+            _documentService = documentService;
         }
         
         public async Task<GetInternalDocumentByIdResponse> Handle(GetInternalDocumentByIdQuery request, CancellationToken cancellationToken)
         {
-            var foundInternalDocument = await _dbContext.InternalDocuments
-                .AsNoTracking()
-                .Include(x => x.Document)
-                .Include(x => x.Document.WorkflowHistories)
-                .FirstOrDefaultAsync(c => c.DocumentId == request.Id, cancellationToken);
-            
-            if (foundInternalDocument == null) return null;
+            var getByIdQuery = await _documentService.GetByIdAsync(request.Id, cancellationToken, applyPermissions: true);
 
-            return _mapper.Map<GetInternalDocumentByIdResponse>(foundInternalDocument);
+            var foundDocument = await getByIdQuery
+                .Include(x => x.WorkflowHistories)
+                .Include(x => x.InternalDocument)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (foundDocument == null)
+            {
+                var existsIdQuery = await _documentService.GetByIdAsync(request.Id, cancellationToken, applyPermissions: false);
+                var itExists = await existsIdQuery.CountAsync(cancellationToken) == 1;
+                if (itExists)
+                {
+                    throw new AccessViolationException("Access rights are not met for this resource!");
+                }
+
+                return null;
+            }
+
+            return _mapper.Map<GetInternalDocumentByIdResponse>(foundDocument.InternalDocument);
         }
     }
 }
