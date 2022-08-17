@@ -34,6 +34,7 @@ public class UpdateSpecialRegisterHandler : ICommandHandler<UpdateSpecialRegiste
 
         specialRegister.DocumentCategoryId = command.DocumentCategoryId;
         specialRegister.Observations = command.Observations;
+        specialRegister.Name = command.Name;
         await _specialRegisterService.UpdateAsync(specialRegister, cancellationToken);
 
         return ResultObject.Ok();

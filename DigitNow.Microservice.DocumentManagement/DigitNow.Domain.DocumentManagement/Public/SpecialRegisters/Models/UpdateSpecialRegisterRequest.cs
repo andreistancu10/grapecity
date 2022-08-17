@@ -4,5 +4,6 @@
     {
         public int DocumentCategoryId { get; set; }
         public string Observations { get; set; }
+        public string Name { get; set; }
     }
 }
