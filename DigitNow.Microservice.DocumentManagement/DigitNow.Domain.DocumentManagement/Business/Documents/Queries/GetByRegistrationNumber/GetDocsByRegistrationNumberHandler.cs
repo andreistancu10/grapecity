@@ -16,8 +16,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetByReg
         }
         public async Task<GetDocsByRegistrationNumberResponse> Handle(GetDocsByRegistrationNumberQuery request, CancellationToken cancellationToken)
         {
-            request.Year = request.Year <= 0 ? DateTime.Now.Year : request.Year;
-            var documents = await _documentService.FindAsync(x => x.RegistrationNumber == request.RegistrationNumber && x.CreatedAt.Year == request.Year, cancellationToken);
+            var targetYear = request.Year <= 0 ? DateTime.Now.Year : request.Year;
+
+            var documents = await _documentService.FindByRegistrationAsync(request.RegistrationNumber, targetYear, cancellationToken);
 
             return _mapper.Map<GetDocsByRegistrationNumberResponse>(documents);
         }
