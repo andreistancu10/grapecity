@@ -1,19 +1,17 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
+using DigitNow.Domain.DocumentManagement.Data.Extensions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IGeneralObjectiveService
     {
         Task<GeneralObjective> AddAsync(GeneralObjective generalObjective, CancellationToken cancellationToken);
+        Task UpdateAsync(GeneralObjective generalObjective, CancellationToken cancellationToken);
+        Task<GeneralObjective> FindAsync(Expression<Func<GeneralObjective, bool>> predicate, CancellationToken token, params Expression<Func<GeneralObjective, object>>[] includes);
         Task<List<GeneralObjective>> FindAllAsync(Expression<Func<GeneralObjective, bool>> predicate, CancellationToken cancellationToken);
     }
     public class GeneralObjectiveService : IGeneralObjectiveService
@@ -36,7 +34,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             generalObjective.Objective.ObjectiveType = ObjectiveType.General;
             generalObjective.Objective.State = ObjectiveState.Active;
-           
 
             await _objectiveService.AddAsync(generalObjective.Objective, cancellationToken);
             await _dbContext.AddAsync(generalObjective, cancellationToken);
@@ -45,12 +42,26 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return generalObjective;
         }
 
-        public Task<List<GeneralObjective>> FindAllAsync(Expression<Func<GeneralObjective, bool>> predicate, CancellationToken cancellationToken)
+        public async Task<List<GeneralObjective>> FindAllAsync(Expression<Func<GeneralObjective, bool>> predicate, CancellationToken cancellationToken)
         {
-            return _dbContext.GeneralObjectives
+            return await _dbContext.GeneralObjectives
                .Include(x => x.Objective)
                .Where(predicate)
                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<GeneralObjective> FindAsync(Expression<Func<GeneralObjective, bool>> predicate, CancellationToken token, params Expression<Func<GeneralObjective, object>>[] includes)
+        {
+            return await _dbContext.GeneralObjectives
+               .Includes(includes)
+               .FirstOrDefaultAsync(predicate, token); 
+        }
+
+        public async Task UpdateAsync(GeneralObjective generalObjective, CancellationToken cancellationToken)
+        {
+            await _dbContext.SingleUpdateAsync(generalObjective, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
         }
     }
 }

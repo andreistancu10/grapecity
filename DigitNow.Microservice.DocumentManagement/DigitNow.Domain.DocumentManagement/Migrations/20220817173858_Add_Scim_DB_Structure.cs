@@ -5,32 +5,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
-    public partial class Add_SCIM_DB_structure : Migration
+    public partial class Add_Scim_DB_Structure : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "BasicUploadedFile",
-                schema: "DocumentMangement",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedBy = table.Column<long>(type: "bigint", nullable: false),
-                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ContentType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RelativePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    AbsolutePath = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Guid = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_BasicUploadedFile", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "Objective",
                 schema: "DocumentMangement",
@@ -97,17 +75,17 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 {
                     table.PrimaryKey("PK_ObjectiveUploadedFile", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ObjectiveUploadedFile_BasicUploadedFile_UploadedFileId",
-                        column: x => x.UploadedFileId,
-                        principalSchema: "DocumentMangement",
-                        principalTable: "BasicUploadedFile",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_ObjectiveUploadedFile_Objective_ObjectiveId",
                         column: x => x.ObjectiveId,
                         principalSchema: "DocumentMangement",
                         principalTable: "Objective",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ObjectiveUploadedFile_UploadedFile_UploadedFileId",
+                        column: x => x.UploadedFileId,
+                        principalSchema: "DocumentMangement",
+                        principalTable: "UploadedFile",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -130,6 +108,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_SpecificObjective", x => x.Id);
+                    table.UniqueConstraint("AK_SpecificObjective_ObjectiveId", x => x.ObjectiveId);
                     table.ForeignKey(
                         name: "FK_SpecificObjective_GeneralObjective_GeneralObjectiveId",
                         column: x => x.GeneralObjectiveId,
@@ -168,7 +147,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         column: x => x.SpecificObjectiveId,
                         principalSchema: "DocumentMangement",
                         principalTable: "SpecificObjective",
-                        principalColumn: "Id",
+                        principalColumn: "ObjectiveId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -198,13 +177,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 column: "GeneralObjectiveId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SpecificObjective_ObjectiveId",
-                schema: "DocumentMangement",
-                table: "SpecificObjective",
-                column: "ObjectiveId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_SpecificObjectiveFunctionary_SpecificObjectiveId",
                 schema: "DocumentMangement",
                 table: "SpecificObjectiveFunctionary",
@@ -219,10 +191,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             migrationBuilder.DropTable(
                 name: "SpecificObjectiveFunctionary",
-                schema: "DocumentMangement");
-
-            migrationBuilder.DropTable(
-                name: "BasicUploadedFile",
                 schema: "DocumentMangement");
 
             migrationBuilder.DropTable(

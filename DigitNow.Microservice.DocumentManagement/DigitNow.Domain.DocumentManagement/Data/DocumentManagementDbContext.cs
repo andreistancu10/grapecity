@@ -1,13 +1,13 @@
-﻿#define MIGRATION_ONLY
+﻿#undef MIGRATION_ONLY
 
 #if    MIGRATION_ONLY
 #endif
 
-using Microsoft.EntityFrameworkCore;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-using Microsoft.EntityFrameworkCore.Design;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace DigitNow.Domain.DocumentManagement.Data
 {
@@ -37,15 +37,17 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<SpecialRegisterMapping> SpecialRegisterMappings { get; set; }
         public DbSet<UploadedFile> UploadedFiles { get; set; }
         public DbSet<DocumentUploadedFile> DocumentUploadedFiles { get; set; }
+        public DbSet<ObjectiveUploadedFile> ObjectiveUploadedFiles { get; set; }
         public DbSet<DeliveryDetail> DeliveryDetails { get; set; }
         public DbSet<WorkflowHistoryLog> WorkflowHistoryLogs { get; set; }
         public DbSet<Objective> Objectives { get; set; }
         public DbSet<GeneralObjective> GeneralObjectives { get; set; }
         public DbSet<SpecificObjective> SpecificObjectives { get; set; }
+        public DbSet<SpecificObjectiveFunctionary> SpecificObjectiveFunctionarys { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasDefaultSchema(Schema);            
+            modelBuilder.HasDefaultSchema(Schema);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(DocumentManagementDbContext).Assembly);
         }
 

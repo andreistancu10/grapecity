@@ -12,13 +12,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IGeneralObjectiveService _generalObjectiveService;
-        private readonly IMapper _mapper;
         private readonly IUploadedFileService _uploadedFileService;
 
-        public CreateGeneralObjectiveHandler(DocumentManagementDbContext dbContext, IGeneralObjectiveService generalObjectiveService)
+        public CreateGeneralObjectiveHandler(DocumentManagementDbContext dbContext,
+            IGeneralObjectiveService generalObjectiveService,
+            IUploadedFileService uploadedFileService)
         {
             _dbContext = dbContext;
             _generalObjectiveService = generalObjectiveService;
+            _uploadedFileService = uploadedFileService;
         }
         public async Task<ResultObject> Handle(CreateGeneralObjectiveCommand request, CancellationToken cancellationToken)
         {
@@ -34,6 +36,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
             };
 
             await _generalObjectiveService.AddAsync(generalObjective, cancellationToken);
+            if(request.UploadedFileIds.Any())
+                await _uploadedFileService.CreateObjectiveUploadedFilesAsync(request.UploadedFileIds, generalObjective.Objective, cancellationToken).ConfigureAwait(false);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return ResultObject.Created(generalObjective.Id);

@@ -2,6 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
+using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Linq.Expressions;
@@ -41,11 +42,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 await _dbContext.SaveChangesAsync(token);
                 await dbContextTransaction.CommitAsync(token);
             }
-            catch
+            catch (Exception ex)
             {
-                //TODO: Log error
                 await dbContextTransaction.RollbackAsync(token);
-                throw;
+                throw new Exception(ex.InnerException?.Message);
             }
             finally
             {
@@ -82,7 +82,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private async Task SetSpecificObjectiveCodeAsync(Objective objective, CancellationToken token)
         {
             var lastSpecificObjective = await _dbContext.SpecificObjectives
-                    .Where(item => item.GeneralObjectiveId == objective.SpecificObjective.ObjectiveId)
+                    .Where(item => item.GeneralObjectiveId == objective.SpecificObjective.GeneralObjectiveId)
                     .Include(o => o.Objective)
                     .OrderByDescending(p => p.CreatedAt)
                     .FirstOrDefaultAsync(token);
@@ -90,7 +90,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var sb = new StringBuilder();
             if (lastSpecificObjective == null)
             {
-                var generalObjective = await FindAsync(item => item.Id == objective.SpecificObjective.ObjectiveId, token);
+                var generalObjective = await FindAsync(item => item.Id == objective.SpecificObjective.GeneralObjectiveId, token);
                 sb.Append(generalObjective.Code.Replace("OG", "OS"));
                 sb.Append(".1");
             }
@@ -98,6 +98,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             {
                 string[] subs = lastSpecificObjective.Objective.Code.Split('.');
                 sb.Append(subs[0]);
+                sb.Append('.');
                 sb.Append(int.Parse(subs[1]) + 1);
             }
             objective.Code = sb.ToString();

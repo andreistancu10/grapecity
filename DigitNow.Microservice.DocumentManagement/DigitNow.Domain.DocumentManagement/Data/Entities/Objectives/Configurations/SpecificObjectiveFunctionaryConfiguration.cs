@@ -18,6 +18,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities.Objectives.Configurat
 
             builder.HasOne(item => item.SpecificObjective)
                  .WithMany(item => item.SpecificObjectiveFunctionarys)
+                 .HasPrincipalKey(x => x.ObjectiveId)
                  .HasForeignKey(item => item.SpecificObjectiveId);
         }
     }

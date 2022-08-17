@@ -88,10 +88,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Business\GeneralObjectives\Queries\" />
 	  <Folder Include="Migrations\" />
 	  <Folder Include="Public\Common\" />
-	  <Folder Include="Public\SpecialObjective\" />
 	</ItemGroup>
 
 </Project>

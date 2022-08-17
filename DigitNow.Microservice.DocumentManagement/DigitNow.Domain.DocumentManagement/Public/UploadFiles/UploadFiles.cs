@@ -1,8 +1,5 @@
-﻿using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload;
-using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.DownloadFile;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetFiles;
 using DigitNow.Domain.DocumentManagement.Public.UploadFiles.Models;
@@ -32,10 +29,10 @@ namespace DigitNow.Domain.DocumentManagement.Public.UploadFiles
         {
             return await _mediator.Send(_mapper.Map<UploadFileCommand>(request))
                 switch
-                {
-                    null => NotFound(),
-                    var result => Ok(result)
-                };
+            {
+                null => NotFound(),
+                var result => Ok(result)
+            };
         }
 
         [HttpGet("download/{fileId:int}")]
@@ -61,7 +58,5 @@ namespace DigitNow.Domain.DocumentManagement.Public.UploadFiles
                 _ => Ok(result)
             };
         }
-
-
     }
 }

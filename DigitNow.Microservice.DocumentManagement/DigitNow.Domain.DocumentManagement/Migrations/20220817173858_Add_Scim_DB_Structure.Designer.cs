@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    [Migration("20220816092524_Add_SCIM_DB_structure")]
-    partial class Add_SCIM_DB_structure
+    [Migration("20220817173858_Add_Scim_DB_Structure")]
+    partial class Add_Scim_DB_Structure
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -481,56 +481,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("InternalDocument", "DocumentMangement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Objectives.BasicUploadedFile", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("Id")
-                        .HasColumnOrder(1);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
-
-                    b.Property<string>("AbsolutePath")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContentType")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("CreatedAt")
-                        .HasColumnOrder(2);
-
-                    b.Property<long>("CreatedBy")
-                        .HasColumnType("bigint")
-                        .HasColumnName("CreatedBy")
-                        .HasColumnOrder(3);
-
-                    b.Property<Guid>("Guid")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("ModifiedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("ModifiedAt")
-                        .HasColumnOrder(4);
-
-                    b.Property<long>("ModifiedBy")
-                        .HasColumnType("bigint")
-                        .HasColumnName("ModifiedBy")
-                        .HasColumnOrder(5);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RelativePath")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("BasicUploadedFile", "DocumentMangement");
-                });
-
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Objectives.GeneralObjective", b =>
                 {
                     b.Property<long>("Id")
@@ -719,9 +669,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("GeneralObjectiveId");
-
-                    b.HasIndex("ObjectiveId")
-                        .IsUnique();
 
                     b.ToTable("SpecificObjective", "DocumentMangement");
                 });
@@ -1149,7 +1096,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Objectives.BasicUploadedFile", "UploadedFile")
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.UploadedFile", "UploadedFile")
                         .WithMany()
                         .HasForeignKey("UploadedFileId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -1184,6 +1131,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Objectives.SpecificObjective", "SpecificObjective")
                         .WithMany("SpecificObjectiveFunctionarys")
                         .HasForeignKey("SpecificObjectiveId")
+                        .HasPrincipalKey("ObjectiveId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

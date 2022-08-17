@@ -9,6 +9,9 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities.Objectives.Configurat
         {
             builder.ToTable(nameof(SpecificObjective), DocumentManagementDbContext.Schema);
 
+            builder.Property(p => p.DepartmentId).IsRequired();
+            builder.Property(p => p.GeneralObjectiveId).IsRequired();
+
             builder.HasOne(item => item.Objective)
                 .WithOne(item => item.SpecificObjective)
                 .OnDelete(DeleteBehavior.Restrict)
