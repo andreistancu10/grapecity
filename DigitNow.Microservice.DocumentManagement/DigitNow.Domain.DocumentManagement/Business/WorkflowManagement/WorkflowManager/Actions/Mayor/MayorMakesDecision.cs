@@ -63,14 +63,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 .OrderBy(x => x.CreatedAt)
                 .FirstOrDefault();
 
-            var departmentToReceiveDocument = oldWorkflowResponsible.RecipientId;
+            if (oldWorkflowResponsible != null)
+            {
+                var departmentToReceiveDocument = oldWorkflowResponsible.RecipientId;
 
-            document.DestinationDepartmentId = departmentToReceiveDocument;
-            document.RecipientId = await IdentityService.GetHeadOfDepartmentUserIdAsync(departmentToReceiveDocument, token);
-            document.Status = DocumentStatus.InWorkMayorCountersignature;
+                document.DestinationDepartmentId = departmentToReceiveDocument;
+                document.RecipientId = await IdentityService.GetHeadOfDepartmentUserIdAsync(departmentToReceiveDocument, token);
+                document.Status = DocumentStatus.InWorkMayorCountersignature;
 
-            await PassDocumentToDepartment(document, command, token);
-            await MailSenderService.SendMail_MayorApprovalDecision(document, oldWorkflowResponsible, token);
+                await PassDocumentToDepartment(document, command, token);
+                await MailSenderService.SendMail_MayorApprovalDecision(document, oldWorkflowResponsible, token);
+            }
         }
 
         private async Task MayorApprovedIncomingDocumentAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
