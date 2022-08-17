@@ -10,7 +10,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 {
     public class HeadOfDepartmentAsksForOpinion : BaseWorkflowManager, IWorkflowHandler
     {
-        public HeadOfDepartmentAsksForOpinion(IServiceProvider serviceProvider) : base(serviceProvider) {}
+        public HeadOfDepartmentAsksForOpinion(IServiceProvider serviceProvider) : base(serviceProvider) { }
         protected override int[] allowedTransitionStatuses => new int[] 
         { 
             (int)DocumentStatus.New,
@@ -33,7 +33,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 .Create(document, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.OpinionRequestedUnallocated, string.Empty, command.Remarks, command.OpinionRequestedUntil));
 
             await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: false, command.DocumentId, headOfDepartment.Id, DocumentStatus.OpinionRequestedUnallocated, token);
-
+           
+            await MailSenderService.SendMail_OpinionRequestedByAnotherDepartment(headOfDepartment, document.DestinationDepartmentId, document, token);
+           
             return command;
         }
 

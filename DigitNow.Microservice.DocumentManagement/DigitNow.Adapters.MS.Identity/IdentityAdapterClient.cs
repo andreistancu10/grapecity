@@ -9,6 +9,8 @@ namespace DigitNow.Adapters.MS.Identity
         Task CreateContactDetailsAsync(IdentityContactDetail contactDetail, CancellationToken cancellationToken);
         Task<LegalEntity> GetCurrentLegalEntityAsync(CancellationToken cancellationToken);
         Task<UserList> GetUsersByRoleAndDepartment(string roleCode, long departmentId, CancellationToken cancellationToken);
+        Task<UserList> GetUsersByDepartment(long departmentId, CancellationToken cancellationToken);
+
     }
 
     public class IdentityAdapterClient : IIdentityAdapterClient
@@ -35,5 +37,8 @@ namespace DigitNow.Adapters.MS.Identity
 
         public Task<UserList> GetUsersByRoleAndDepartment(string roleCode, long departmentId, CancellationToken cancellationToken) => 
             _identityHttpClient.GetAsync<UserList>($"userExtensions/role/{roleCode}/department/{departmentId}", cancellationToken);
+
+        public Task<UserList> GetUsersByDepartment(long departmentId, CancellationToken cancellationToken) =>
+            _identityHttpClient.GetAsync<UserList>($"userExtensions/department/{departmentId}", cancellationToken);
     }
 }
