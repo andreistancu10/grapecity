@@ -1,4 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.Entities.Forms;
+﻿using DigitNow.Domain.DocumentManagement.utils;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities.Seed
 {
