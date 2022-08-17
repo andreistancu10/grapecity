@@ -20,9 +20,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
         Task<Document> AddAsync(Document newDocument, CancellationToken token);
 
         // Read
-        Task<IQueryable<Document>> GetByIdAsync(long documentId, CancellationToken token, bool applyPermissions = false);
-        Task<IQueryable<Document>> FindByFilter(CancellationToken token, bool applyPermissions = false);
-        Task<IQueryable<Document>> FindByRegistrationAsync(long registrationNumber, int registrationYear, CancellationToken token, bool applyPermissions = false);
+        Task<IQueryable<Document>> GetByIdQueryAsync(long documentId, CancellationToken token, bool applyPermissions = false);
+        Task<IQueryable<Document>> FindByFilterQueryAsync(CancellationToken token, bool applyPermissions = false);
+        Task<IQueryable<Document>> FindByRegistrationQueryAsync(long registrationNumber, int registrationYear, CancellationToken token, bool applyPermissions = false);
         
         // Update
         Task SetResolutionAsync(IEnumerable<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken);
@@ -48,7 +48,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             _identityService = identityService;
         }
 
-        public async Task<IQueryable<Document>> GetByIdAsync(long documentId, CancellationToken token, bool applyPermissions = true)
+        public async Task<IQueryable<Document>> GetByIdQueryAsync(long documentId, CancellationToken token, bool applyPermissions = false)
         {
             var dataPermissionsExpressions = await GetPermissionsDataExpressionsAsync(token);
 
@@ -62,7 +62,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             return query.Where(x => x.Id == documentId);
         }
 
-        public async Task<IQueryable<Document>> FindByFilter(CancellationToken token, bool applyPermissions = true)
+        public async Task<IQueryable<Document>> FindByFilterQueryAsync(CancellationToken token, bool applyPermissions = false)
         {
             var dataPermissionsExpressions = await GetPermissionsDataExpressionsAsync(token);
 
@@ -76,7 +76,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             return query;
         }
 
-        public async Task<IQueryable<Document>> FindByRegistrationAsync(long registrationNumber, int registrationYear, CancellationToken token, bool applyPermissions = true)
+        public async Task<IQueryable<Document>> FindByRegistrationQueryAsync(long registrationNumber, int registrationYear, CancellationToken token, bool applyPermissions = false)
         {
             var dataPermissionsExpressions = await GetPermissionsDataExpressionsAsync(token);
 
