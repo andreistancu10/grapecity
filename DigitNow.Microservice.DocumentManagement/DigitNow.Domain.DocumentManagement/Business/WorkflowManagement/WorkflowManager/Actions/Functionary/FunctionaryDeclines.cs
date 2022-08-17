@@ -80,8 +80,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
             document.WorkflowHistories.Add(newWorkflowResponsible);
 
+            document.WorkflowHistories.Add(newWorkflowResponsible);
+
             await SendFunctonaryDeclinesMail(document, oldWorkflowResponsible, token);
-            
+
             return command;
         }
 
