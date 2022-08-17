@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Data;
+using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,29 +7,42 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.
 {
     public class GetIncomingDocumentByIdHandler : IQueryHandler<GetIncomingDocumentByIdQuery, GetIncomingDocumentByIdResponse>
     {
-        private readonly DocumentManagementDbContext _dbContext;
         private readonly IMapper _mapper;
+        private readonly IDocumentService _documentService;
 
-        public GetIncomingDocumentByIdHandler(IMapper mapper, DocumentManagementDbContext dbContext)
+        public GetIncomingDocumentByIdHandler(
+            IMapper mapper, 
+            IDocumentService documentService)
         {
             _mapper = mapper;
-            _dbContext = dbContext;
+            _documentService = documentService;
         }
 
         public async Task<GetIncomingDocumentByIdResponse> Handle(GetIncomingDocumentByIdQuery request, CancellationToken cancellationToken)
         {
-            var foundIncomingDocument = await _dbContext.IncomingDocuments
-                .AsNoTracking()
-                .Include(x=>x.ContactDetail)
-                .Include(x=>x.DeliveryDetails)
-                .Include(x=>x.Document.WorkflowHistories)
-                .Include(x=>x.ConnectedDocuments)
-                .ThenInclude(x => x.Document)
-                .FirstOrDefaultAsync(c => c.DocumentId == request.Id, cancellationToken);
+            var getByIdQuery = await _documentService.GetByIdQueryAsync(request.Id, cancellationToken, applyPermissions: true);
+                
+            var foundDocument = await getByIdQuery
+                .Include(x => x.WorkflowHistories)
+                .Include(x => x.IncomingDocument)
+                .Include(x => x.IncomingDocument.ContactDetail)
+                .Include(x => x.IncomingDocument.DeliveryDetails)
+                .Include(x => x.IncomingDocument.ConnectedDocuments)
+                .FirstOrDefaultAsync(cancellationToken);
 
-            if (foundIncomingDocument == null) return null;
+            if (foundDocument == null)
+            {
+                var existsIdQuery = await _documentService.GetByIdQueryAsync(request.Id, cancellationToken, applyPermissions: false);
+                var itExists = await existsIdQuery.CountAsync(cancellationToken) == 1;
+                if (itExists)
+                {
+                    throw new AccessViolationException("Access rights are not met for this resource!");
+                }
 
-            return _mapper.Map<GetIncomingDocumentByIdResponse>(foundIncomingDocument);
+                return null;
+            }
+
+            return _mapper.Map<GetIncomingDocumentByIdResponse>(foundDocument.IncomingDocument);
         }
     }
 }
