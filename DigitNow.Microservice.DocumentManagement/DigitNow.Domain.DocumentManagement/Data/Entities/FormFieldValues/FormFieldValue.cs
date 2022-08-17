@@ -2,7 +2,7 @@
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
-    public class FormValue : Entity
+    public class FormFieldValue : Entity
     {
         public string Value { get; set; }
         public long FormFillingLogId { get; set; }

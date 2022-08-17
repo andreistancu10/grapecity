@@ -14,5 +14,14 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         //public List<FormFieldMapping> FormFieldMappings { get; set; }
          
         #endregion
+
+        public FormField()
+        {
+        }
+
+        public FormField(long id)
+        {
+            Id = id;
+        }
     }
 }
