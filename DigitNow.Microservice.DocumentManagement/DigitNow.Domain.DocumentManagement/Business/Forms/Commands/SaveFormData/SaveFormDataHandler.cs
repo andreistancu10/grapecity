@@ -25,7 +25,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Forms.Commands
 
                 var formFieldMappings = await _formsService.GetFormFieldMappingsByFormIdAsync(request.FormId, cancellationToken);
                 var fillingLog = new FormFillingLog { FormId = request.FormId };
-                var formValues = new List<FormValue>();
+                var formValues = new List<FormFieldValue>();
 
                 await _dbContext.FormFillingLogs.AddAsync(fillingLog, cancellationToken);
 
@@ -35,7 +35,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Forms.Commands
 
                     if (formFieldMapping != null)
                     {
-                        formValues.Add(new FormValue
+                        formValues.Add(new FormFieldValue
                         {
                             FormFieldMappingId = formFieldMapping.Id,
                             FormFillingLog = fillingLog,
