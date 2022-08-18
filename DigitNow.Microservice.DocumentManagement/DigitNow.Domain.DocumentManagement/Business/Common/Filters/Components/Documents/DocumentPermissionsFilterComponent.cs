@@ -35,7 +35,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
 
             var filter = new DocumentPermissionsFilter
             {
-                UserContextFilter = new DocumentUserContextFilter { DepartmentId = currentUser.Departments.First() },
+                UserContextFilter = new DocumentUserContextFilter { DepartmentId = currentUser.Departments.First().Id },
                 DepartmentsPermissionsFilter = await BuildDepartmentsPermissionsFilterAsync(token),
                 UserPermissionsFilter = context.UserPermissionsFilter
             };

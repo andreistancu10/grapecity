@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using DigitNow.Adapters.MS.Catalog;
-using DigitNow.Adapters.MS.Identity;
-using DigitNow.Adapters.MS.Identity.Poco;
+using DigitNow.Domain.Authentication.Client;
+using DigitNow.Domain.Authentication.Contracts.Users.GetUserById;
+using DigitNow.Domain.Authentication.Contracts.Users.GetUsersByFilter;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using Microsoft.AspNetCore.Http;
@@ -16,44 +17,53 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
         bool TryGetCurrentUserId(out int userId);
         Task<RecipientType> GetCurrentUserFirstRoleAsync(CancellationToken token);
 
-        Task<User> FetchMayorAsync(CancellationToken token);
-        Task<long> FetchMayorIdAsync(CancellationToken token);
+        Task<UserModel> GetUserByIdAsync(long userId, CancellationToken token);
 
-        Task<User> GetHeadOfDepartmentUserAsync(long departmentId, CancellationToken token);
+        Task<UserModel> GetMayorAsync(CancellationToken token);
+
+        Task<UserModel> GetHeadOfDepartmentUserAsync(long departmentId, CancellationToken token);
         Task<long> GetHeadOfDepartmentUserIdAsync(long departmentId, CancellationToken token);
 
-        Task<User> GetHeadOfDepartmentUserAsync(string departmentCode, CancellationToken token);
+        Task<UserModel> GetHeadOfDepartmentUserAsync(string departmentCode, CancellationToken token);
         Task<long> GetHeadOfDepartmentUserIdAsync(string departmentCode, CancellationToken token);
+
+        Task<IList<UserModel>> GetUsersWithinDepartment(long departmentId, CancellationToken token);
+        Task<IList<UserModel>> GetUsersWithinDepartment(string departmentCode, CancellationToken token);
+    }
+
+    public class Test : IGetUserByIdRequest
+    {
+        public long Id { get; set; }
     }
 
     public class IdentityService : IIdentityService
     {
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccesor;
-        private readonly IIdentityAdapterClient _identityAdapterClient;
+        private readonly IAuthenticationClient _authenticationClient;
         private readonly ICatalogAdapterClient _catalogAdapterClient;
 
         public IdentityService(
             IMapper mapper,
             IHttpContextAccessor httpContextAccessor,
-            IIdentityAdapterClient identityAdapterClient,
-            ICatalogAdapterClient catalogAdapterClient)
+            ICatalogAdapterClient catalogAdapterClient,
+            IAuthenticationClient authenticationClient)
         {
             _mapper = mapper;
             _httpContextAccesor = httpContextAccessor;
-            _identityAdapterClient = identityAdapterClient;
             _catalogAdapterClient = catalogAdapterClient;
+            _authenticationClient = authenticationClient;
         }
 
         public async Task<UserModel> GetCurrentUserAsync(CancellationToken token)
         {
             var currentUserId = GetCurrentUserId();
 
-            var getUserByIdResponse = await _identityAdapterClient.GetUserByIdAsync(currentUserId, token);
+            var getUserByIdResponse = await _authenticationClient.Users.GetUserByIdAsync(new Test { Id = currentUserId }, token);
             if (getUserByIdResponse == null)
                 throw new InvalidOperationException($"User with identifier '{currentUserId}' was not found!");
 
-            return _mapper.Map<UserModel>(getUserByIdResponse);
+            return _mapper.Map<UserModel>(getUserByIdResponse.User);
         }
 
         public long GetCurrentUserId()
@@ -74,46 +84,52 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
         public async Task<RecipientType> GetCurrentUserFirstRoleAsync(CancellationToken token)
         {
-            var userId = GetCurrentUserId();
-            var user = await _identityAdapterClient.GetUserByIdAsync(userId, token);
+            var user = await GetUserByIdAsync(GetCurrentUserId(), token);
 
             //TODO: refactor this BS
-            if (user.Departments.Contains(UserDepartment.MayorDepartment.Id) && user.Roles.Contains(RecipientType.HeadOfDepartment.Code))
+            if (user.Departments.Select(x => x.Id).Contains(UserDepartment.MayorDepartment.Id) 
+                && 
+                user.Roles.Select(x => x.Code).Contains(RecipientType.HeadOfDepartment.Code))
             {
                 return RecipientType.Mayor;
             }
 
-            var userRole = user.Roles.Intersect(RecipientType.ListOfTypes.Select(x => x.Code)).FirstOrDefault();
+            var userRole = user.Roles.Select(x => x.Code).Intersect(RecipientType.ListOfTypes.Select(x => x.Code)).FirstOrDefault();
 
             return RecipientType.ListOfTypes.FirstOrDefault(role => role.Code == userRole) ?? new RecipientType { Id = 0 };
         }
 
-
-        [Obsolete("Refactor this once the Identity & Catalog SDKs are completed")]
-        public Task<User> FetchMayorAsync(CancellationToken token) =>
-            GetHeadOfDepartmentUserAsync(UserDepartment.MayorDepartment.Code, token);
-
-        [Obsolete("Refactor this once the Identity & Catalog SDKs are completed")]
-        public async Task<long> FetchMayorIdAsync(CancellationToken token)
+        public async Task<UserModel> GetUserByIdAsync(long userId, CancellationToken token)
         {
-            var foundUser = await FetchMayorAsync(token);
-            if (foundUser != null)
+            var response = await _authenticationClient.Users.GetUserByIdAsync(new GetUserByIdRequest
             {
-                return foundUser.Id;
-            }
-            return default;
+                Id = userId
+            }, token);
+
+            return _mapper.Map<UserModel>(response.User);
         }
 
-        [Obsolete("Refactor this once the Identity & Catalog SDKs are completed")]
-        public async Task<User> GetHeadOfDepartmentUserAsync(long departmentId, CancellationToken token)
+        public async Task<UserModel> GetMayorAsync(CancellationToken token)
         {
-            var usersResponse = await _identityAdapterClient.GetUsersAsync(token);
-            var allUsers = usersResponse.Users;
+            var mayorDepartment = _catalogAdapterClient.GetDepartmentByCodeAsync("cabinetPrimar", token);
 
-            return allUsers.FirstOrDefault(u => u.Departments.Contains(departmentId) && u.Roles.Contains(RecipientType.HeadOfDepartment.Code));
+            return await GetHeadOfDepartmentUserAsync(mayorDepartment.Id, token);
         }
 
-        [Obsolete("Refactor this once the Identity & Catalog SDKs are completed")]
+        public async Task<UserModel> GetHeadOfDepartmentUserAsync(long departmentId, CancellationToken token)
+        {
+            var response = await _authenticationClient.Users.GetUsersByFilterAsync(new GetUsersByFilterRequest
+            {
+                RoleFilter = new GetUsersByRoleFilter { Code = RecipientType.HeadOfDepartment.Code },
+                DepartmentFilter = new GetUsersByDepartmentFilter { Id = departmentId }
+            }, token);
+
+            // TODO: Can be found multiple head of department. Review this 
+            var foundUser = response.Users.FirstOrDefault();
+
+            return _mapper.Map<UserModel>(foundUser);
+        }
+
         public async Task<long> GetHeadOfDepartmentUserIdAsync(long departmentId, CancellationToken token)
         {
             var foundUser = await GetHeadOfDepartmentUserAsync(departmentId, token);
@@ -124,15 +140,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             return default;
         }
 
-        [Obsolete("Refactor this once the Identity & Catalog SDKs are completed")]
-        public async Task<User> GetHeadOfDepartmentUserAsync(string departmentCode, CancellationToken token)
+        public async Task<UserModel> GetHeadOfDepartmentUserAsync(string departmentCode, CancellationToken token)
         {
             var foundDepartment = await _catalogAdapterClient.GetDepartmentByCodeAsync(departmentCode, token);
 
             return await GetHeadOfDepartmentUserAsync(foundDepartment.Id, token);
         }
 
-        [Obsolete("Refactor this once the Identity & Catalog SDKs are completed")]
         public async Task<long> GetHeadOfDepartmentUserIdAsync(string departmentCode, CancellationToken token)
         {
             var foundUser = await GetHeadOfDepartmentUserAsync(departmentCode, token);
@@ -141,6 +155,23 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
                 return foundUser.Id;
             }
             return default;
+        }
+
+        public async Task<IList<UserModel>> GetUsersWithinDepartment(long departmentId, CancellationToken token)
+        {
+            var response = await _authenticationClient.Users.GetUsersByFilterAsync(new GetUsersByFilterRequest
+            {
+                DepartmentFilter = new GetUsersByDepartmentFilter { Id = departmentId }
+            }, token);
+
+            return _mapper.Map<IList<UserModel>>(response.Users);
+        }
+
+        public async Task<IList<UserModel>> GetUsersWithinDepartment(string departmentCode, CancellationToken token)
+        {
+            var department = await _catalogAdapterClient.GetDepartmentByCodeAsync(departmentCode, token);
+
+            return await GetUsersWithinDepartment(department.Id, token);
         }
     }
 }
