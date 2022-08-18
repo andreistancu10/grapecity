@@ -22,11 +22,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
         }
         public async Task<ResultObject> Handle(UpdateSpecificObjectiveCommand request, CancellationToken cancellationToken)
         {
-            var initialSpecificObjective = await _specificObjectiveService.FindAsync(item => item.ObjectiveId == request.ObjectiveId,
-                cancellationToken,
+            var initialSpecificObjective = _specificObjectiveService.FindQuery(item => item.ObjectiveId == request.ObjectiveId,
                  new Expression<Func<SpecificObjective, object>>[] { item => item.Objective,
                      item => item.Objective.ObjectiveUploadedFiles,
-                     item => item.SpecificObjectiveFunctionarys});
+                     item => item.SpecificObjectiveFunctionarys}).FirstOrDefault();
 
             if (initialSpecificObjective == null)
                 return ResultObject.Error(new ErrorMessage

@@ -20,12 +20,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Queries
 
         public async Task<GetSpecificObjectiveByIdResponse> Handle(GetSpecificObjectiveByIdQuery request, CancellationToken cancellationToken)
         {
-            var specificObjective = await _specificObjectiveService.FindAsync(item => item.ObjectiveId == request.ObjectiveId,
-                cancellationToken,
+            var specificObjective = _specificObjectiveService.FindQuery(item => item.ObjectiveId == request.ObjectiveId,
                new Expression<Func<SpecificObjective, object>>[] { item => item.Objective,
                    item => item.Objective.ObjectiveUploadedFiles,
                    item => item.AssociatedGeneralObjective.Objective,
-                   item => item.SpecificObjectiveFunctionarys});
+                   item => item.SpecificObjectiveFunctionarys}).FirstOrDefault();
 
             if (specificObjective == null) return null;
 

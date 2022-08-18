@@ -11,8 +11,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         Task<SpecificObjective> AddAsync(SpecificObjective specificObjective, CancellationToken cancellationToken);
         Task UpdateAsync(SpecificObjective specificObjective, CancellationToken cancellationToken);
-        Task<SpecificObjective> FindAsync(Expression<Func<SpecificObjective, bool>> predicate, CancellationToken token, params Expression<Func<SpecificObjective, object>>[] includes);
-        Task<List<SpecificObjective>> FindAllAsync(Expression<Func<SpecificObjective, bool>> predicate, CancellationToken cancellationToken);
+        IQueryable<SpecificObjective> FindQuery(Expression<Func<SpecificObjective, bool>> predicate, params Expression<Func<SpecificObjective, object>>[] includes);
+        IQueryable<SpecificObjective> FindAllQuery(Expression<Func<SpecificObjective, bool>> predicate);
     }
     public class SpecificObjectiveService : ISpecificObjectiveService
     {
@@ -42,7 +42,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             specificObjective.Objective.SpecificObjective = specificObjective;
             await _objectiveService.AddAsync(specificObjective.Objective, cancellationToken);
 
-            var generalObjective = await _generalObjectiveService.FindAsync(x => x.ObjectiveId == specificObjective.GeneralObjectiveId, cancellationToken);
+            var generalObjective = _generalObjectiveService.FindQuery(x => x.ObjectiveId == specificObjective.GeneralObjectiveId).FirstOrDefaultAsync(cancellationToken).Result;
 
             if (generalObjective.SpecificObjectives == null)
                 generalObjective.SpecificObjectives = new List<SpecificObjective>() { specificObjective };
@@ -57,19 +57,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return specificObjective;
         }
 
-        public async Task<List<SpecificObjective>> FindAllAsync(Expression<Func<SpecificObjective, bool>> predicate, CancellationToken cancellationToken)
+        public IQueryable<SpecificObjective> FindAllQuery(Expression<Func<SpecificObjective, bool>> predicate)
         {
-            return await _dbContext.SpecificObjectives
+            return _dbContext.SpecificObjectives
               .Include(x => x.Objective)
-              .Where(predicate)
-              .ToListAsync(cancellationToken);
+              .Where(predicate);
         }
 
-        public async Task<SpecificObjective> FindAsync(Expression<Func<SpecificObjective, bool>> predicate, CancellationToken token, params Expression<Func<SpecificObjective, object>>[] includes)
+        public IQueryable<SpecificObjective> FindQuery(Expression<Func<SpecificObjective, bool>> predicate, params Expression<Func<SpecificObjective, object>>[] includes)
         {
-            return await _dbContext.SpecificObjectives
+            return _dbContext.SpecificObjectives
                .Includes(includes)
-               .FirstOrDefaultAsync(predicate, token);
+               .Where(predicate);
         }
 
         public async Task UpdateAsync(SpecificObjective specificObjective, CancellationToken cancellationToken)

@@ -13,8 +13,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     public interface IObjectiveService
     {
         Task<Objective> AddAsync(Objective objective, CancellationToken token);
-        Task<Objective> FindAsync(Expression<Func<Objective, bool>> predicate, CancellationToken token, params Expression<Func<Objective, object>>[] includes);
-        Task<List<Objective>> FindAllAsync(Expression<Func<Objective, bool>> predicate, CancellationToken token);
+        IQueryable<Objective> FindQuery(Expression<Func<Objective, bool>> predicate, params Expression<Func<Objective, object>>[] includes);
+        IQueryable<Objective> FindAllQuery(Expression<Func<Objective, bool>> predicate);
     }
     public class ObjectiveService : IObjectiveService
     {
@@ -55,19 +55,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return objective;
         }
 
-        public Task<Objective> FindAsync(Expression<Func<Objective, bool>> predicate, CancellationToken token, params Expression<Func<Objective, object>>[] includes)
+        public IQueryable<Objective> FindQuery(Expression<Func<Objective, bool>> predicate,params Expression<Func<Objective, object>>[] includes)
         {
             return _dbContext.Objectives
                 .Includes(includes)
-                .FirstOrDefaultAsync(predicate, token);
+                .Where(predicate);
         }
 
-        public Task<List<Objective>> FindAllAsync(Expression<Func<Objective, bool>> predicate, CancellationToken token)
+        public IQueryable<Objective> FindAllQuery(Expression<Func<Objective, bool>> predicate)
         {
             return _dbContext.Objectives
                 .Where(predicate)
-                .AsNoTracking()
-                .ToListAsync(token);
+                .AsNoTracking();
         }
 
         private async Task SetGeneralObjectiveCodeAsync(Objective objective, CancellationToken token)
@@ -90,7 +89,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var sb = new StringBuilder();
             if (lastSpecificObjective == null)
             {
-                var generalObjective = await FindAsync(item => item.Id == objective.SpecificObjective.GeneralObjectiveId, token);
+                var generalObjective = FindQuery(item => item.Id == objective.SpecificObjective.GeneralObjectiveId).FirstOrDefaultAsync(token).Result;
                 sb.Append(generalObjective.Code.Replace("OG", "OS"));
                 sb.Append(".1");
             }

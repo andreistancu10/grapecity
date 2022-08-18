@@ -19,9 +19,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
         }
         public async Task<ResultObject> Handle(UpdateGeneralObjectiveCommand request, CancellationToken cancellationToken)
         {
-            var initialGeneralObjective = await _generalObjectiveService.FindAsync(item => item.ObjectiveId == request.ObjectiveId,
-                cancellationToken,
-                 new Expression<Func<GeneralObjective, object>>[] { item => item.Objective, item => item.Objective.ObjectiveUploadedFiles });
+            var initialGeneralObjective = _generalObjectiveService.FindQuery(item => item.ObjectiveId == request.ObjectiveId,
+                 new Expression<Func<GeneralObjective, object>>[] { item => item.Objective, item => item.Objective.ObjectiveUploadedFiles }).FirstOrDefault();
 
             if (initialGeneralObjective == null)
                 return ResultObject.Error(new ErrorMessage
