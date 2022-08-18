@@ -3,6 +3,7 @@
     public class GetAllGeneralActiveObjectiveResponse
     {
         public long Id { get; set; }
+        public string Title { get; set; }
         public string Code { get; set; }
     }
 }

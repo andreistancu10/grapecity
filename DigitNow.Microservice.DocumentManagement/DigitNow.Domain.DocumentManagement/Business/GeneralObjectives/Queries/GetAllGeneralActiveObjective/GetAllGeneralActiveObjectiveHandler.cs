@@ -22,6 +22,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.
         {
             var generalObjectives = await _generalObjectiveService.FindQuery()
                 .Where(item => item.Objective.State != ObjectiveState.Inactive)
+                .Include(item => item.Objective)
                 .ToListAsync(cancellationToken);
 
             if (generalObjectives == null) return null;
