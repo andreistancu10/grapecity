@@ -2,6 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 using HTSS.Platform.Core.CQRS;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.GetById
@@ -20,8 +21,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.
 
         public async Task<GetGeneralObjectiveByIdResponse> Handle(GetGeneralObjectiveByIdQuery request, CancellationToken cancellationToken)
         {
-            var generalObjective = _generalObjectiveService.FindQuery(item => item.ObjectiveId == request.ObjectiveId,
-               new Expression<Func<GeneralObjective, object>>[] { item => item.Objective, item => item.Objective.ObjectiveUploadedFiles }).FirstOrDefault();
+            var generalObjective = await _generalObjectiveService.FindQuery()
+                .Where(item => item.ObjectiveId == request.ObjectiveId)
+                .Include(item => item.Objective).ThenInclude(item => item.ObjectiveUploadedFiles )
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (generalObjective == null) return null;
 

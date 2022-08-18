@@ -1,8 +1,7 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 using HTSS.Platform.Core.CQRS;
-using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Queries.GetById
 {
@@ -20,11 +19,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Queries
 
         public async Task<GetSpecificObjectiveByIdResponse> Handle(GetSpecificObjectiveByIdQuery request, CancellationToken cancellationToken)
         {
-            var specificObjective = _specificObjectiveService.FindQuery(item => item.ObjectiveId == request.ObjectiveId,
-               new Expression<Func<SpecificObjective, object>>[] { item => item.Objective,
-                   item => item.Objective.ObjectiveUploadedFiles,
-                   item => item.AssociatedGeneralObjective.Objective,
-                   item => item.SpecificObjectiveFunctionarys}).FirstOrDefault();
+            var specificObjective = await _specificObjectiveService.FindQuery()
+                .Where(item => item.ObjectiveId == request.ObjectiveId)
+                .Include(item => item.Objective)
+                .ThenInclude(item => item.ObjectiveUploadedFiles)
+                .Include(item => item.AssociatedGeneralObjective.Objective)
+                .Include(item => item.SpecificObjectiveFunctionarys).FirstOrDefaultAsync(cancellationToken);
 
             if (specificObjective == null) return null;
 

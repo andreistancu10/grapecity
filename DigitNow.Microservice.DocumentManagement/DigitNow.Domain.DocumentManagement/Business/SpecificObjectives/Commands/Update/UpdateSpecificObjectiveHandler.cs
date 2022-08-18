@@ -2,6 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Commands.Update
@@ -22,10 +23,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
         }
         public async Task<ResultObject> Handle(UpdateSpecificObjectiveCommand request, CancellationToken cancellationToken)
         {
-            var initialSpecificObjective = _specificObjectiveService.FindQuery(item => item.ObjectiveId == request.ObjectiveId,
-                 new Expression<Func<SpecificObjective, object>>[] { item => item.Objective,
-                     item => item.Objective.ObjectiveUploadedFiles,
-                     item => item.SpecificObjectiveFunctionarys}).FirstOrDefault();
+            var initialSpecificObjective = await _specificObjectiveService.FindQuery()
+                .Where(item => item.ObjectiveId == request.ObjectiveId)
+                .Include(item => item.Objective)
+                .ThenInclude(item => item.ObjectiveUploadedFiles)
+                .Include(item => item.SpecificObjectiveFunctionarys)
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (initialSpecificObjective == null)
                 return ResultObject.Error(new ErrorMessage

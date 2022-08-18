@@ -2,6 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using HTSS.Platform.Core.CQRS;
+using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.GetAll
 {
@@ -19,7 +20,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.
 
         public async Task<List<GetAllGeneralActiveObjectiveResponse>> Handle(GetAllGeneralActiveObjectiveQuery request, CancellationToken cancellationToken)
         {
-            var generalObjectives = _generalObjectiveService.FindAllQuery(item => item.Objective.State != ObjectiveState.Inactive).ToList();
+            var generalObjectives = await _generalObjectiveService.FindQuery()
+                .Where(item => item.Objective.State != ObjectiveState.Inactive)
+                .ToListAsync(cancellationToken);
 
             if (generalObjectives == null) return null;
 

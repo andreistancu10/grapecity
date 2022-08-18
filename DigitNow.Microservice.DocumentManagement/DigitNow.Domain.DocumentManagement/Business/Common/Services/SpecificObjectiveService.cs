@@ -11,8 +11,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         Task<SpecificObjective> AddAsync(SpecificObjective specificObjective, CancellationToken cancellationToken);
         Task UpdateAsync(SpecificObjective specificObjective, CancellationToken cancellationToken);
-        IQueryable<SpecificObjective> FindQuery(Expression<Func<SpecificObjective, bool>> predicate, params Expression<Func<SpecificObjective, object>>[] includes);
-        IQueryable<SpecificObjective> FindAllQuery(Expression<Func<SpecificObjective, bool>> predicate);
+        IQueryable<SpecificObjective> FindQuery();
     }
     public class SpecificObjectiveService : ISpecificObjectiveService
     {
@@ -42,7 +41,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             specificObjective.Objective.SpecificObjective = specificObjective;
             await _objectiveService.AddAsync(specificObjective.Objective, cancellationToken);
 
-            var generalObjective = _generalObjectiveService.FindQuery(x => x.ObjectiveId == specificObjective.GeneralObjectiveId).FirstOrDefaultAsync(cancellationToken).Result;
+            var generalObjective = await _generalObjectiveService.FindQuery().Where(x => x.ObjectiveId == specificObjective.GeneralObjectiveId).FirstOrDefaultAsync(cancellationToken);
 
             if (generalObjective.SpecificObjectives == null)
                 generalObjective.SpecificObjectives = new List<SpecificObjective>() { specificObjective };
@@ -64,11 +63,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
               .Where(predicate);
         }
 
-        public IQueryable<SpecificObjective> FindQuery(Expression<Func<SpecificObjective, bool>> predicate, params Expression<Func<SpecificObjective, object>>[] includes)
+        public IQueryable<SpecificObjective> FindQuery()
         {
-            return _dbContext.SpecificObjectives
-               .Includes(includes)
-               .Where(predicate);
+            return _dbContext.SpecificObjectives.AsQueryable();
         }
 
         public async Task UpdateAsync(SpecificObjective specificObjective, CancellationToken cancellationToken)

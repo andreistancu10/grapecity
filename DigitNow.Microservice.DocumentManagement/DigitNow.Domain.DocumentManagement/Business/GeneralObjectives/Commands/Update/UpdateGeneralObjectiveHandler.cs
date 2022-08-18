@@ -1,8 +1,7 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Services;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
-using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands.Update
 {
@@ -19,8 +18,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
         }
         public async Task<ResultObject> Handle(UpdateGeneralObjectiveCommand request, CancellationToken cancellationToken)
         {
-            var initialGeneralObjective = _generalObjectiveService.FindQuery(item => item.ObjectiveId == request.ObjectiveId,
-                 new Expression<Func<GeneralObjective, object>>[] { item => item.Objective, item => item.Objective.ObjectiveUploadedFiles }).FirstOrDefault();
+            var initialGeneralObjective = await _generalObjectiveService.FindQuery().Where(item => item.ObjectiveId == request.ObjectiveId)
+                .Include(item => item.Objective)
+                .ThenInclude(item => item.ObjectiveUploadedFiles)
+                .FirstOrDefaultAsync(cancellationToken);
 
             if (initialGeneralObjective == null)
                 return ResultObject.Error(new ErrorMessage
@@ -29,7 +30,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
                     TranslationCode = "documentManagement.generalObjective.update.validation.entityNotFound",
                     Parameters = new object[] { request.ObjectiveId }
                 });
-
 
             initialGeneralObjective.Objective.Title = request.Title;
             initialGeneralObjective.Objective.State = request.State;

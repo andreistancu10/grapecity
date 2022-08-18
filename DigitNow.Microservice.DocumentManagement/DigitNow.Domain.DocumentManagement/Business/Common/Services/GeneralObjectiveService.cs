@@ -11,8 +11,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         Task<GeneralObjective> AddAsync(GeneralObjective generalObjective, CancellationToken cancellationToken);
         Task UpdateAsync(GeneralObjective generalObjective, CancellationToken cancellationToken);
-        IQueryable<GeneralObjective> FindQuery(Expression<Func<GeneralObjective, bool>> predicate, params Expression<Func<GeneralObjective, object>>[] includes);
-        IQueryable<GeneralObjective> FindAllQuery(Expression<Func<GeneralObjective, bool>> predicate);
+        IQueryable<GeneralObjective> FindQuery();
     }
     public class GeneralObjectiveService : IGeneralObjectiveService
     {
@@ -42,18 +41,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return generalObjective;
         }
 
-        public IQueryable<GeneralObjective> FindAllQuery(Expression<Func<GeneralObjective, bool>> predicate)
+        public IQueryable<GeneralObjective> FindQuery()
         {
-            return _dbContext.GeneralObjectives
-               .Include(x => x.Objective)
-               .Where(predicate);
-        }
-
-        public IQueryable<GeneralObjective> FindQuery(Expression<Func<GeneralObjective, bool>> predicate, params Expression<Func<GeneralObjective, object>>[] includes)
-        {
-            return _dbContext.GeneralObjectives
-               .Includes(includes)
-               .Where(predicate);
+            return _dbContext.GeneralObjectives.AsQueryable();
         }
 
         public async Task UpdateAsync(GeneralObjective generalObjective, CancellationToken cancellationToken)

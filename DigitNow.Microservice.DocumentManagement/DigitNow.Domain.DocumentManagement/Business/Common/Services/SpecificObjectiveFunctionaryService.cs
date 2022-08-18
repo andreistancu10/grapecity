@@ -9,7 +9,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         Task AddRangeAsync(long objectiveId, List<long> functionaryIds, CancellationToken cancellationToken);
         Task UpdateRangeAsync(long objectiveId, List<long> functionaryIds, CancellationToken cancellationToken);
-        Task<List<SpecificObjectiveFunctionary>> FindAllAsyncByObjectiveId(Expression<Func<SpecificObjectiveFunctionary, bool>> predicate, CancellationToken cancellationToken);
+        IQueryable<SpecificObjectiveFunctionary> FindQuery();
     }
     public class SpecificObjectiveFunctionaryService : ISpecificObjectiveFunctionaryService
     {
@@ -37,18 +37,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task<List<SpecificObjectiveFunctionary>> FindAllAsyncByObjectiveId(Expression<Func<SpecificObjectiveFunctionary, bool>> predicate, CancellationToken cancellationToken)
+        public IQueryable<SpecificObjectiveFunctionary> FindQuery()
         {
-            return await _dbContext.SpecificObjectiveFunctionarys
-               .Where(predicate)
-               .ToListAsync(cancellationToken);
+            return _dbContext.SpecificObjectiveFunctionarys.AsQueryable();
         }
 
         public async Task UpdateRangeAsync(long objectiveId, List<long> functionaryIds, CancellationToken cancellationToken)
         {
             if (!functionaryIds.Any()) return;
 
-            var initialSpecificObjectiveFunctionary = await FindAllAsyncByObjectiveId(item => item.SpecificObjectiveId == objectiveId, cancellationToken);
+            var initialSpecificObjectiveFunctionary = await FindQuery().Where(item => item.SpecificObjectiveId == objectiveId).ToListAsync(cancellationToken);
 
             if (initialSpecificObjectiveFunctionary.Count != 0)
             {
