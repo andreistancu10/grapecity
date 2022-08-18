@@ -44,7 +44,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
             await _specificObjectiveService.UpdateAsync(initialSpecificObjective, cancellationToken);
 
             if (request.SpecificObjectiveFunctionaryIds != null)
-                await _specificObjectiveFunctionaryService.UpdateRangeAsync(request.SpecificObjectiveFunctionaryIds, initialSpecificObjective, cancellationToken);
+                await _specificObjectiveFunctionaryService.UpdateRangeAsync(initialSpecificObjective.ObjectiveId, request.SpecificObjectiveFunctionaryIds, cancellationToken);
 
             if (request.UploadedFileIds.Any())
             {

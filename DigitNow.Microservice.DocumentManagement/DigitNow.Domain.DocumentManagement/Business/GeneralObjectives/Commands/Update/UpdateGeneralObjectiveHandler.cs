@@ -11,9 +11,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
         private readonly IGeneralObjectiveService _generalObjectiveService;
         private readonly IUploadedFileService _uploadedFileService;
 
-        public UpdateGeneralObjectiveHandler(IGeneralObjectiveService generalObjectiveService)
+        public UpdateGeneralObjectiveHandler(IGeneralObjectiveService generalObjectiveService,
+            IUploadedFileService uploadedFileService)
         {
             _generalObjectiveService = generalObjectiveService;
+            _uploadedFileService = uploadedFileService;
         }
         public async Task<ResultObject> Handle(UpdateGeneralObjectiveCommand request, CancellationToken cancellationToken)
         {

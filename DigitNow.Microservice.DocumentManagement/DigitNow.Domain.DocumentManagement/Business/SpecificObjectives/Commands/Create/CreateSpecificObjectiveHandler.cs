@@ -28,17 +28,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
                 {
                     Title = request.Title,
                     Details = request.Details,
-                    ModificationMotive = request.ModificationMotive,
                 }
             };
 
             await _specificObjectiveService.AddAsync(specificObjective, cancellationToken);
 
             if (request.SpecificObjectiveFunctionaryIds != null)
-                await _specificObjectiveFunctionaryService.AddRangeAsync(request.SpecificObjectiveFunctionaryIds, specificObjective, cancellationToken);
+                await _specificObjectiveFunctionaryService.AddRangeAsync(specificObjective.ObjectiveId, request.SpecificObjectiveFunctionaryIds, cancellationToken);
 
             if (request.UploadedFileIds.Any())
-                await _uploadedFileService.CreateObjectiveUploadedFilesAsync(request.UploadedFileIds, specificObjective.Objective, cancellationToken).ConfigureAwait(false);
+                await _uploadedFileService.CreateObjectiveUploadedFilesAsync(request.UploadedFileIds, specificObjective.Objective, cancellationToken);
 
             return ResultObject.Created(specificObjective.Id);
         }

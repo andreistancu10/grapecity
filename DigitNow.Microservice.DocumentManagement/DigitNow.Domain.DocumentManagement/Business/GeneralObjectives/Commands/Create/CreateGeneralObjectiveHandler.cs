@@ -31,13 +31,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
                 {
                     Title = request.Title,
                     Details = request.Details,
-                    ModificationMotive = request.ModificationMotive,
                 }
             };
 
             await _generalObjectiveService.AddAsync(generalObjective, cancellationToken);
-            if(request.UploadedFileIds.Any())
-                await _uploadedFileService.CreateObjectiveUploadedFilesAsync(request.UploadedFileIds, generalObjective.Objective, cancellationToken).ConfigureAwait(false);
+            if (request.UploadedFileIds.Any())
+                await _uploadedFileService.CreateObjectiveUploadedFilesAsync(request.UploadedFileIds, generalObjective.Objective, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return ResultObject.Created(generalObjective.Id);

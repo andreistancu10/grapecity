@@ -42,18 +42,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             specificObjective.Objective.SpecificObjective = specificObjective;
             await _objectiveService.AddAsync(specificObjective.Objective, cancellationToken);
 
-            if (specificObjective.GeneralObjectiveId != 0)
-            {
-                var generalObjective = await _generalObjectiveService.FindAsync(x => x.ObjectiveId == specificObjective.GeneralObjectiveId, cancellationToken);
+            var generalObjective = await _generalObjectiveService.FindAsync(x => x.ObjectiveId == specificObjective.GeneralObjectiveId, cancellationToken);
 
-                if (generalObjective.SpecificObjectives == null)
-                    generalObjective.SpecificObjectives = new List<SpecificObjective>() { specificObjective };
-                else
-                    generalObjective.SpecificObjectives.Add(specificObjective);
+            if (generalObjective.SpecificObjectives == null)
+                generalObjective.SpecificObjectives = new List<SpecificObjective>() { specificObjective };
+            else
+                generalObjective.SpecificObjectives.Add(specificObjective);
 
-                
-                specificObjective.AssociatedGeneralObjective = generalObjective;
-            }
+            specificObjective.AssociatedGeneralObjective = generalObjective;
 
             await _dbContext.SpecificObjectives.AddAsync(specificObjective, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);

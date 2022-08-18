@@ -42,10 +42,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 await _dbContext.SaveChangesAsync(token);
                 await dbContextTransaction.CommitAsync(token);
             }
-            catch (Exception ex)
+            catch
             {
                 await dbContextTransaction.RollbackAsync(token);
-                throw new Exception(ex.InnerException?.Message);
+                throw;
             }
             finally
             {

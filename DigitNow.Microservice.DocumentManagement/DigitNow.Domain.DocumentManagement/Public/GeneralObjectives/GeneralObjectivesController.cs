@@ -26,7 +26,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.GeneralObjectives
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateGeneralObjective([FromBody] CreateGeneralObjectiveRequest request)
+        public async Task<IActionResult> Create([FromBody] CreateGeneralObjectiveRequest request)
         {
             var command = _mapper.Map<CreateGeneralObjectiveCommand>(request);
 
@@ -34,7 +34,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.GeneralObjectives
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> UpdateGeneralObjective([FromBody] UpdateGeneralObjectiveRequest request)
+        public async Task<IActionResult> Update([FromBody] UpdateGeneralObjectiveRequest request)
         {
             var command = _mapper.Map<UpdateGeneralObjectiveCommand>(request);
 
@@ -42,7 +42,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.GeneralObjectives
         }
 
         [HttpGet("{id:long}")]
-        public async Task<IActionResult> GetGeneralObjectiveByIdAsync([FromRoute] long id)
+        public async Task<IActionResult> GetById([FromRoute] long id)
         {
             return await _mediator.Send(new GetGeneralObjectiveByIdQuery(id))
                 switch
@@ -52,8 +52,8 @@ namespace DigitNow.Domain.DocumentManagement.Public.GeneralObjectives
             };
         }
 
-        [HttpGet("getAllGeneralActiveObjective")]
-        public async Task<ActionResult<List<GetAllGeneralActiveObjectiveResponse>>> GetAllGeneralActiveObjective(CancellationToken cancellationToken)
+        [HttpGet("getAllActive")]
+        public async Task<ActionResult<List<GetAllGeneralActiveObjectiveResponse>>> GetAllActiveObjective(CancellationToken cancellationToken)
         {
             return await _mediator.Send(new GetAllGeneralActiveObjectiveQuery(), cancellationToken)
                 switch

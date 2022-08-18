@@ -1,15 +1,14 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
 using System.Linq.Expressions;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface ISpecificObjectiveFunctionaryService
     {
-        Task AddRangeAsync(List<long> functionaryIds, SpecificObjective specificObjective, CancellationToken cancellationToken);
-        Task UpdateRangeAsync(List<long> functionaryIds, SpecificObjective specificObjective, CancellationToken cancellationToken);
+        Task AddRangeAsync(long objectiveId, List<long> functionaryIds, CancellationToken cancellationToken);
+        Task UpdateRangeAsync(long objectiveId, List<long> functionaryIds, CancellationToken cancellationToken);
         Task<List<SpecificObjectiveFunctionary>> FindAllAsyncByObjectiveId(Expression<Func<SpecificObjectiveFunctionary, bool>> predicate, CancellationToken cancellationToken);
     }
     public class SpecificObjectiveFunctionaryService : ISpecificObjectiveFunctionaryService
@@ -20,7 +19,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             _dbContext = dbContext;
         }
-        public async Task AddRangeAsync(List<long> functionaryIds, SpecificObjective specificObjective, CancellationToken cancellationToken)
+        public async Task AddRangeAsync(long objectiveId, List<long> functionaryIds, CancellationToken cancellationToken)
         {
             if (!functionaryIds.Any()) return;
 
@@ -30,9 +29,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 specificObjectiveFunctionaryToInsert.Add(
                     new SpecificObjectiveFunctionary()
                     {
-                        SpecificObjectiveId = specificObjective.ObjectiveId,
+                        SpecificObjectiveId = objectiveId,
                         FunctionaryId = functionaryId,
-                        SpecificObjective = specificObjective
                     });
             }
             await _dbContext.AddRangeAsync(specificObjectiveFunctionaryToInsert, cancellationToken);
@@ -46,13 +44,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                .ToListAsync(cancellationToken);
         }
 
-        public async Task UpdateRangeAsync(List<long> functionaryIds, SpecificObjective specificObjective, CancellationToken cancellationToken)
+        public async Task UpdateRangeAsync(long objectiveId, List<long> functionaryIds, CancellationToken cancellationToken)
         {
             if (!functionaryIds.Any()) return;
 
-            var initialSpecificObjectiveFunctionary = await FindAllAsyncByObjectiveId(item => item.SpecificObjectiveId == specificObjective.ObjectiveId, cancellationToken);
+            var initialSpecificObjectiveFunctionary = await FindAllAsyncByObjectiveId(item => item.SpecificObjectiveId == objectiveId, cancellationToken);
 
-            if (initialSpecificObjectiveFunctionary != null && initialSpecificObjectiveFunctionary.Count != 0)
+            if (initialSpecificObjectiveFunctionary.Count != 0)
             {
                 var initialFunctionaryIds = initialSpecificObjectiveFunctionary.Select(x => x.FunctionaryId).ToList();
                 var functionaryIdsToRemove = initialFunctionaryIds.Except(functionaryIds);
@@ -62,7 +60,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                     var itemsToDelete = initialSpecificObjectiveFunctionary.Where(x => functionaryIdsToRemove.Any(y => y == x.FunctionaryId)).ToArray();
                     _dbContext.SpecificObjectiveFunctionarys.RemoveRange(itemsToDelete);
                 }
-                functionaryIds = functionaryIds.Except(initialFunctionaryIds).ToList(); 
+                functionaryIds = functionaryIds.Except(initialFunctionaryIds).ToList();
             }
 
             var specificObjectiveFunctionaryToInsert = new List<SpecificObjectiveFunctionary>();
@@ -71,9 +69,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 specificObjectiveFunctionaryToInsert.Add(
                     new SpecificObjectiveFunctionary()
                     {
-                        SpecificObjectiveId = specificObjective.ObjectiveId,
+                        SpecificObjectiveId = objectiveId,
                         FunctionaryId = specificObjectiveFunctionaryId,
-                        SpecificObjective = specificObjective
                     });
             }
             await _dbContext.AddRangeAsync(specificObjectiveFunctionaryToInsert, cancellationToken);

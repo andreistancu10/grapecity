@@ -26,7 +26,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.SpecialObjective
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateSpecificObjective([FromBody] CreateSpecificObjectiveRequest request)
+        public async Task<IActionResult> Create([FromBody] CreateSpecificObjectiveRequest request)
         {
             var command = _mapper.Map<CreateSpecificObjectiveCommand>(request);
 
@@ -34,7 +34,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.SpecialObjective
         }
 
         [HttpPut("update")]
-        public async Task<IActionResult> UpdateSpecificObjective([FromBody] UpdateSpecificObjectiveRequest request)
+        public async Task<IActionResult> Update([FromBody] UpdateSpecificObjectiveRequest request)
         {
             var command = _mapper.Map<UpdateSpecificObjectiveCommand>(request);
 
@@ -42,7 +42,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.SpecialObjective
         }
 
         [HttpGet("{id:long}")]
-        public async Task<IActionResult> GetSpecificObjectiveByIdAsync([FromRoute] long id)
+        public async Task<IActionResult> GetById([FromRoute] long id)
         {
             return await _mediator.Send(new GetSpecificObjectiveByIdQuery(id))
                 switch

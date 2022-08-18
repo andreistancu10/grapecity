@@ -3,6 +3,6 @@
     public enum ObjectiveType
     {
         General = 1,
-        Specific
+        Specific = 2
     }
 }

@@ -8,7 +8,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
         public long GeneralObjectiveId { get; set; }
         public string Title { get; set; }
         public string Details { get; set; }
-        public string ModificationMotive { get; set; }
         public List<long> UploadedFileIds { get; set; }
         public List<long> SpecificObjectiveFunctionaryIds { get; set; }
     }
