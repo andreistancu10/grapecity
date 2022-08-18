@@ -40,7 +40,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Forms
         }
 
         [HttpGet("{id:long}")]
-        public async Task<IActionResult> GetByIdAsync([FromQuery] long id, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetByIdAsync([FromRoute] long id, CancellationToken cancellationToken)
         {
             var query = new GetFormByIdQuery
             {

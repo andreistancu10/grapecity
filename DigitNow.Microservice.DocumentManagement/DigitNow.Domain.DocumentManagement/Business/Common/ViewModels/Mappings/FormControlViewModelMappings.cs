@@ -9,7 +9,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
         {
             CreateMap<FormControlAggregate, FormControlViewModel>()
                 .ForMember(c => c.FormId, opt => opt.MapFrom(src => src.FormFieldMapping.FormId))
-                .ForMember(c => c.Id, opt => opt.MapFrom(src => src))
+                .ForMember(c => c.Id, opt => opt.MapFrom(src => src.FormFieldMapping.Id))
                 .ForMember(c => c.Key, opt => opt.MapFrom(src => src.FormFieldMapping.Key))
                 .ForMember(c => c.Label, opt => opt.MapFrom(src => src.FormFieldMapping.Label))
                 .ForMember(c => c.InitialValue, opt => opt.MapFrom(src => src.FormFieldMapping.InitialValue))
