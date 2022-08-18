@@ -6,7 +6,6 @@
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include=".configurations\HostedServices\ConfigureApiBusHostedService.cs" />
     <Compile Include=".configurations\Masstransit\ConfigureMassTransitExtensions.cs" />

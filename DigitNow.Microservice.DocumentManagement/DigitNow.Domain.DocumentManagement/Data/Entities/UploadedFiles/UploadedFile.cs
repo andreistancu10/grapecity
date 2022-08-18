@@ -1,6 +1,8 @@
-﻿namespace DigitNow.Domain.DocumentManagement.Data.Entities
+﻿using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.UploadedFiles;
+
+namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
-    public class UploadedFile : ExtendedEntity
+    public class UploadedFile : ExtendedEntity, IUploadedFile
     {
         public long DocumentCategoryId { get; set; }
         public string Name { get; set; }
