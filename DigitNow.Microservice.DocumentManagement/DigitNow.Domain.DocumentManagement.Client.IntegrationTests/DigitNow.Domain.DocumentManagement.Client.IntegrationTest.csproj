@@ -6,9 +6,6 @@
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-	<PropertyGroup>
-		<GeneratedMSBuildEditorConfigFile>$(IntermediateOutputPath)\$(MSBuildProjectName).GeneratedMSBuildEditorConfig.editorconfig</GeneratedMSBuildEditorConfigFile>
-	</PropertyGroup>
   <ItemGroup>
     <Compile Include=".configurations\HostedServices\ConfigureApiBusHostedService.cs" />
     <Compile Include=".configurations\Masstransit\ConfigureMassTransitExtensions.cs" />
