@@ -22,9 +22,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
         Task<UserModel> GetMayorAsync(CancellationToken token);
 
         Task<UserModel> GetHeadOfDepartmentUserAsync(long departmentId, CancellationToken token);
-        Task<long> GetHeadOfDepartmentUserIdAsync(long departmentId, CancellationToken token);
-
         Task<UserModel> GetHeadOfDepartmentUserAsync(string departmentCode, CancellationToken token);
+
+        Task<long> GetHeadOfDepartmentUserIdAsync(long departmentId, CancellationToken token);
         Task<long> GetHeadOfDepartmentUserIdAsync(string departmentCode, CancellationToken token);
 
         Task<IList<UserModel>> GetUsersWithinDepartment(long departmentId, CancellationToken token);
@@ -130,6 +130,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             return _mapper.Map<UserModel>(foundUser);
         }
 
+        public async Task<IList<UserModel>> GetUsersWithinDepartment(long departmentId, CancellationToken token)
+        {
+            var response = await _authenticationClient.Users.GetUsersByFilterAsync(new GetUsersByFilterRequest
+            {
+                DepartmentFilter = new GetUsersByDepartmentFilter { Id = departmentId }
+            }, token);
+
+            return _mapper.Map<IList<UserModel>>(response.Users);
+        }
+
         public async Task<long> GetHeadOfDepartmentUserIdAsync(long departmentId, CancellationToken token)
         {
             var foundUser = await GetHeadOfDepartmentUserAsync(departmentId, token);
@@ -155,16 +165,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
                 return foundUser.Id;
             }
             return default;
-        }
-
-        public async Task<IList<UserModel>> GetUsersWithinDepartment(long departmentId, CancellationToken token)
-        {
-            var response = await _authenticationClient.Users.GetUsersByFilterAsync(new GetUsersByFilterRequest
-            {
-                DepartmentFilter = new GetUsersByDepartmentFilter { Id = departmentId }
-            }, token);
-
-            return _mapper.Map<IList<UserModel>>(response.Users);
         }
 
         public async Task<IList<UserModel>> GetUsersWithinDepartment(string departmentCode, CancellationToken token)

@@ -37,7 +37,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     public class MailSenderService : IMailSenderService
     {
         private readonly DocumentManagementDbContext _dbContext;
-        private readonly IMapper _mapper;
         private readonly IMailSender _mailSender;
         private readonly ICatalogAdapterClient _catalogAdapterClient;
         private readonly IAuthenticationClient _authenticationClient;
@@ -45,14 +44,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public MailSenderService(
             DocumentManagementDbContext dbContext, 
-            IMapper mapper,
             IMailSender mailSender,
             ICatalogAdapterClient catalogAdapterClient,
             IAuthenticationClient authenticationClient,
             IIdentityService identityService)
         {
             _dbContext = dbContext;
-            _mapper = mapper;
             _mailSender = mailSender;
             _catalogAdapterClient = catalogAdapterClient;
             _authenticationClient = authenticationClient;
@@ -212,7 +209,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             {
                 tasks.Add(SendMail_WithRegistrationAndDateAsync(departmentUser.Email, document, MailTemplateEnum.SendingReplyTemplate, token));
             }
-            await Task.WhenAll(tasks);            
+            await Task.WhenAll(tasks);
         }
 
         private Task SendMail_WithRegistrationAndDateAsync(string recipient, Document document, MailTemplateEnum mailTemplate, CancellationToken token)
