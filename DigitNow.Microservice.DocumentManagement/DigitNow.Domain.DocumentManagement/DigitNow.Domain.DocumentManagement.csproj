@@ -6,6 +6,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Business\Common\Export\Pdf\Templates\Html\registration_proof_template.html" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 	<ItemGroup>
@@ -25,6 +29,9 @@
 		<Compile Include=".utils\DocumentTypeTranslation.cs" />
 		<Compile Include=".utils\FilterDescriptor.cs" />
 		<Compile Include=".utils\LanguagesUtils.cs" />
+	</ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Include="Business\Common\Export\Pdf\Templates\Html\registration_proof_template.html" />
 	</ItemGroup>
 	<ItemGroup>
 		<PackageReference Include="DigitNow.Domain.Authentication.Client" Version="6.0.10" />
@@ -67,9 +74,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="Business\Common\Export\Pdf\Templates\Html\registration_proof_template.html">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
 		<None Update="domain.DocumentManagementSettings.Development.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
