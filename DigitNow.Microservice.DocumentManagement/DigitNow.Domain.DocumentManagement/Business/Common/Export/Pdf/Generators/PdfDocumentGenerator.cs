@@ -7,7 +7,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generato
 {
     public interface IPdfDocumentGenerator
     {
-        Task<FileContent> GeneratePdf(DocumentPdfDetails documentPdfDetails, string pathFile, string fileName);
+        FileContent GeneratePdf(DocumentPdfDetails documentPdfDetails, string fileName);
     }
     public class PdfDocumentGenerator: IPdfDocumentGenerator
     {
@@ -17,9 +17,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generato
             _pdfGenerator = pdfGenerator;
         }
 
-        public Task<FileContent> GeneratePdf(DocumentPdfDetails documentPdfDetails, string pathFile, string fileName)
+        public FileContent GeneratePdf(DocumentPdfDetails documentPdfDetails, string fileName)
         {
             return _pdfGenerator
+             .SetTemplateName("registration_proof_template.html")
              .SetToken(new PdfToken("{{institutionHeader}}", documentPdfDetails.InstitutionHeader != null ? documentPdfDetails.InstitutionHeader : "" ))
              .SetToken(new PdfToken("{{senderName}}", documentPdfDetails.IssuerName))
              .SetToken(new PdfToken("{{cityHall}}", documentPdfDetails.CityHall))
@@ -29,8 +30,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generato
              .SetToken(new PdfToken("{{resolutionPeriodText}}", documentPdfDetails.ResolutionPeriod.HasValue ?
                     $"Termenul maxim de solutionare este {documentPdfDetails.ResolutionPeriod} zile" : ""))
              .SetToken(new PdfToken("{{currentDate}}", DateTime.UtcNow.ToShortDateString()))
-             .GenerateAsync(pathFile, fileName);
-
+             .Generate(fileName);
         }
     }
 }
