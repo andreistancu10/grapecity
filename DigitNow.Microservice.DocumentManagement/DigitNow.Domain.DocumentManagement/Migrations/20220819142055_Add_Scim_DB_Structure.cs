@@ -48,6 +48,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_GeneralObjective", x => x.Id);
+                    table.UniqueConstraint("AK_GeneralObjective_ObjectiveId", x => x.ObjectiveId);
                     table.ForeignKey(
                         name: "FK_GeneralObjective_Objective_ObjectiveId",
                         column: x => x.ObjectiveId,
@@ -114,7 +115,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         column: x => x.GeneralObjectiveId,
                         principalSchema: "DocumentMangement",
                         principalTable: "GeneralObjective",
-                        principalColumn: "Id",
+                        principalColumn: "ObjectiveId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_SpecificObjective_Objective_ObjectiveId",
@@ -150,13 +151,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         principalColumn: "ObjectiveId",
                         onDelete: ReferentialAction.Cascade);
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_GeneralObjective_ObjectiveId",
-                schema: "DocumentMangement",
-                table: "GeneralObjective",
-                column: "ObjectiveId",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_ObjectiveUploadedFile_ObjectiveId",

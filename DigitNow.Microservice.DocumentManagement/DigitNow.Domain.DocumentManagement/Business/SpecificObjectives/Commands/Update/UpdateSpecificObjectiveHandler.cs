@@ -55,7 +55,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
                 await _uploadedFileService.CreateObjectiveUploadedFilesAsync(request.UploadedFileIds.Except(uploadedFileIds), initialSpecificObjective.Objective, cancellationToken).ConfigureAwait(false);
             }
 
-            return ResultObject.Created(initialSpecificObjective.Id);
+            return ResultObject.Created(initialSpecificObjective.ObjectiveId);
         }
     }
 }

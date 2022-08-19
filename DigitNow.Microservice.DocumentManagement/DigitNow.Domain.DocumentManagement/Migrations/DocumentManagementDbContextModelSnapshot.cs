@@ -516,9 +516,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ObjectiveId")
-                        .IsUnique();
-
                     b.ToTable("GeneralObjective", "DocumentMangement");
                 });
 
@@ -1110,6 +1107,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Objectives.GeneralObjective", "AssociatedGeneralObjective")
                         .WithMany("SpecificObjectives")
                         .HasForeignKey("GeneralObjectiveId")
+                        .HasPrincipalKey("ObjectiveId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
