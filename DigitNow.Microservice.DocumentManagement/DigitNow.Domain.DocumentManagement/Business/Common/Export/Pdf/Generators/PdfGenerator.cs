@@ -53,7 +53,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generato
         private static string GetTemplateContent(string templateName)
         {
             var templateResourceName = _currentAssemblyResourceNames.FirstOrDefault(x => x.EndsWith(templateName));
-            if (templateResourceName == null) throw new ArgumentNullException();
+            if (templateResourceName == null) throw new ArgumentNullException("No template resource name");
 
             var stream = _currentAssembly.GetManifestResourceStream(templateResourceName);
 
