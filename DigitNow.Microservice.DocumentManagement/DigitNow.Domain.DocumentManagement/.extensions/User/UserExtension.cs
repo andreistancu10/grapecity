@@ -7,7 +7,7 @@ namespace DigitNow.Domain.DocumentManagement.extensions.Role
     {
         public static bool HasRole(this UserModel userModel, RecipientType role)
         {
-            return userModel.Roles.Contains(role.Code);
+            return userModel.Roles.Select(x => x.Code).Contains(role.Code);
         }
     }
 }

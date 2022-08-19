@@ -22,7 +22,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             if (!Validate(command, lastWorkflowRecord))
                 return command;
 
-            var user = await IdentityAdapterClient.GetUserByIdAsync((long)command.RecipientId, token);
+            var user = await IdentityService.GetUserByIdAsync((long)command.RecipientId, token);
 
             if (!UserExists(user, command))
                 return command;

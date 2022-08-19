@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using DigitNow.Domain.Authentication.Client;
+﻿using DigitNow.Domain.Authentication.Client;
+using DigitNow.Domain.Authentication.Contracts.Users.GetUsersByFilter;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,9 +21,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
                 .Select(x => x.CreatedBy)
                 .ToList();
 
-            var usersList = await _authenticationClient.GetUsersWithExtensions(cancellationToken);
+            var usersResponse = await _authenticationClient.Users.GetUsersByFilterAsync(new GetUsersByFilterRequest(),cancellationToken);
 
-            var relatedUsers = usersList.UserExtensions
+            var relatedUsers = usersResponse.Users
                 .Where(x => createdByUsers.Contains(x.Id))
                 .Select(x => new UserModel
                 {

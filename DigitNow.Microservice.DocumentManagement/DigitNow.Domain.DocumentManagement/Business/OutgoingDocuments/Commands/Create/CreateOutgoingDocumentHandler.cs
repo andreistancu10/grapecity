@@ -1,6 +1,4 @@
 ﻿using AutoMapper;
-using DigitNow.Adapters.MS.Identity;
-using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
@@ -9,6 +7,9 @@ using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Adapters.MS.Catalog;
+using DigitNow.Domain.Authentication.Contracts;
+using DigitNow.Domain.Authentication.Contracts.ContactDetails.Create;
+using DigitNow.Domain.Authentication.Client;
 
 namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Create
 {
@@ -17,21 +18,21 @@ namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IMapper _mapper;
         private readonly IOutgoingDocumentService _outgoingDocumentService;
-        private readonly IIdentityAdapterClient _identityAdapterClient;
+        private readonly IAuthenticationClient _authenticationClient;
         private readonly IUploadedFileService _uploadedFileService;
         private readonly ICatalogAdapterClient _catalogAdapterClient;
 
         public CreateOutgoingDocumentHandler(DocumentManagementDbContext dbContext,
             IMapper mapper,
             IOutgoingDocumentService outgoingDocumentService,
-            IIdentityAdapterClient identityAdapterClient,
+            IAuthenticationClient authenticationClient,
             IUploadedFileService uploadedFileService,
             ICatalogAdapterClient catalogAdapterClient)
         {
             _dbContext = dbContext;
             _mapper = mapper;
             _outgoingDocumentService = outgoingDocumentService;
-            _identityAdapterClient = identityAdapterClient;
+            _authenticationClient = authenticationClient;
             _uploadedFileService = uploadedFileService;
             _catalogAdapterClient = catalogAdapterClient;
         }
@@ -89,8 +90,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands
             contactDetails.IdentificationNumber = request.IdentificationNumber;
             contactDetails.IssuerName = request.RecipientName;
 
-            var contactDetailDto = _mapper.Map<IdentityContactDetail>(contactDetails);
-            await _identityAdapterClient.CreateContactDetailsAsync(contactDetailDto, cancellationToken);
+            await _authenticationClient.ContactDetails.CreateAsync(new CreateContactDetailRequest
+            {
+                ContactDetailModel = _mapper.Map<ContactDetailModel>(contactDetails)
+            }, cancellationToken);
         }
     }
 }

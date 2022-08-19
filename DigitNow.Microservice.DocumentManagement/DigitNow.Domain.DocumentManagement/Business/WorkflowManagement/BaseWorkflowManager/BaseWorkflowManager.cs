@@ -1,7 +1,7 @@
 ﻿using DigitNow.Adapters.MS.Catalog;
-using DigitNow.Adapters.MS.Identity;
-using DigitNow.Adapters.MS.Identity.Poco;
+using DigitNow.Domain.Authentication.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
@@ -18,7 +18,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
     public abstract class BaseWorkflowManager
     {
         protected readonly DocumentManagementDbContext DbContext;
-        protected readonly IIdentityAdapterClient IdentityAdapterClient;
+        protected readonly IAuthenticationClient AuthenticationClient;
         protected readonly IIdentityService IdentityService;
         protected readonly ICatalogAdapterClient CatalogAdapterClient;
         protected readonly IMailSenderService MailSenderService;
@@ -26,7 +26,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
         protected BaseWorkflowManager(IServiceProvider serviceProvider)
         {
             DbContext = serviceProvider.GetService<DocumentManagementDbContext>();
-            IdentityAdapterClient = serviceProvider.GetService<IIdentityAdapterClient>();
+            AuthenticationClient = serviceProvider.GetService<IAuthenticationClient>();
             IdentityService = serviceProvider.GetService<IIdentityService>();
             CatalogAdapterClient = serviceProvider.GetService<ICatalogAdapterClient>();
             MailSenderService = serviceProvider.GetService<IMailSenderService>();
@@ -104,7 +104,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             });
         }
 
-        protected virtual bool UserExists(User user, ICreateWorkflowHistoryCommand command)
+        protected virtual bool UserExists(UserModel user, ICreateWorkflowHistoryCommand command)
         {
             if (user == null)
             {

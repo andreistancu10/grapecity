@@ -1,4 +1,4 @@
-﻿using DigitNow.Adapters.MS.Identity.Poco;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using System;
 
 namespace DigitNow.Domain.DocumentManagement.extensions.Autocorrect
@@ -15,7 +15,7 @@ namespace DigitNow.Domain.DocumentManagement.extensions.Autocorrect
             };
         }
         
-        public static string FormatUserNameByRole(this User user, string role)
+        public static string FormatUserNameByRole(this UserModel user, string role)
         {
             switch (role)
             {

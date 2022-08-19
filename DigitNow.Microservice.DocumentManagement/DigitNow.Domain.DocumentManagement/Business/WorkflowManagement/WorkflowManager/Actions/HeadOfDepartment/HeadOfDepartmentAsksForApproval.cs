@@ -24,7 +24,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             if (!Validate(command, lastWorkflowRecord, document))
                 return command;
 
-            var userResponse = await IdentityService.FetchMayorAsync(token);
+            var userResponse = await IdentityService.GetMayorAsync(token);
 
             if (!UserExists(userResponse, command))
                 return command;

@@ -27,8 +27,8 @@
 		<Compile Include=".utils\LanguagesUtils.cs" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="DigitNow.Domain.Authentication.Client" Version="6.0.9" />
-		<PackageReference Include="DigitNow.Domain.Authentication.Contracts" Version="6.0.9" />
+		<PackageReference Include="DigitNow.Domain.Authentication.Client" Version="6.0.10" />
+		<PackageReference Include="DigitNow.Domain.Authentication.Contracts" Version="6.0.10" />
 		<PackageReference Include="DigitNow.Domain.Catalog.Client" Version="6.0.10" />
 		<PackageReference Include="DigitNow.Domain.Catalog.Contracts" Version="6.0.10" />
 		<PackageReference Include="Domain.Localization.Client" Version="6.0.1" />
@@ -83,7 +83,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\DigitNow.Adapters.MS.Catalog\DigitNow.Adapters.MS.Catalog.csproj" />
-		<ProjectReference Include="..\DigitNow.Adapters.MS.Identity\DigitNow.Adapters.MS.Identity.csproj" />
 		<ProjectReference Include="..\DigitNow.Domain.DocumentManagement.Contracts\DigitNow.Domain.DocumentManagement.Contracts.csproj" />
 	</ItemGroup>
 

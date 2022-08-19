@@ -7,6 +7,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
 {
     internal static class DataFilterFactory
     {
+        //TODO: Refactor this method after we will add roles on each department
         public static DocumentUserPermissionsFilters BuildDocumentUserRightsFilter(UserModel currentUser)
         {
             var filter = new DocumentUserPermissionsFilters();
@@ -15,23 +16,21 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Factories
             {
                 filter.MayorPermissionsFilter = new DocumentMayorPermissionsFilter();
             }
-            // TODO: If the tests are ok, we can merge this 2 into a common Permission Filter class
+            // TODO: If the tests are ok, we can merge this 2 into a common Permission Filter class            
             else if (UserExtension.HasRole(currentUser, RecipientType.HeadOfDepartment))
             {
                 filter.HeadOfDepartmentPermissionsFilter = new DocumentHeadOfDepartmentPermissionsFilter
                 {
-                    // TODO:(!) Each user will be assigned to only one department
                     UserId = currentUser.Id,
-                    DepartmentId = currentUser.Departments.First() 
+                    DepartmentIds = currentUser.Departments.Select(x => x.Id).ToList()
                 };
             }
             else if (UserExtension.HasRole(currentUser, RecipientType.Functionary))
             {
                 filter.FunctionaryPermissionsFilter = new DocumentFunctionaryPermissionsFilter
                 {
-                    // TODO:(!) Each user will be assigned to only one department
                     UserId = currentUser.Id,
-                    DepartmentId = currentUser.Departments.First()
+                    DepartmentIds = currentUser.Departments.Select(x => x.Id).ToList()
                 };
             }
 

@@ -44,7 +44,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
         private async Task<ICreateWorkflowHistoryCommand> ApplicationApproved(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
         {
-            var userResponse = await IdentityService.FetchMayorAsync(token);
+            var userResponse = await IdentityService.GetMayorAsync(token);
 
             if (!UserExists(userResponse, command))
                 return command;
