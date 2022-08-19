@@ -202,7 +202,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var department = await _catalogAdapterClient.GetDepartmentByCodeAsync("registratura", token);
             if (department == null) return;
 
-            var departmentUsers = await _identityService.GetUsersWithinDepartment(department.Id, token);
+            var departmentUsers = await _identityService.GetUsersWithinDepartmentAsync(department.Id, token);
 
             var tasks = new List<Task>();
             foreach (var departmentUser in departmentUsers)

@@ -27,8 +27,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
         Task<long> GetHeadOfDepartmentUserIdAsync(long departmentId, CancellationToken token);
         Task<long> GetHeadOfDepartmentUserIdAsync(string departmentCode, CancellationToken token);
 
-        Task<IList<UserModel>> GetUsersWithinDepartment(long departmentId, CancellationToken token);
-        Task<IList<UserModel>> GetUsersWithinDepartment(string departmentCode, CancellationToken token);
+        Task<IList<UserModel>> GetUsersWithinDepartmentAsync(long departmentId, CancellationToken token);
+        Task<IList<UserModel>> GetUsersWithinDepartmentAsync(string departmentCode, CancellationToken token);
     }
 
     public class Test : IGetUserByIdRequest
@@ -130,7 +130,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             return _mapper.Map<UserModel>(foundUser);
         }
 
-        public async Task<IList<UserModel>> GetUsersWithinDepartment(long departmentId, CancellationToken token)
+        public async Task<IList<UserModel>> GetUsersWithinDepartmentAsync(long departmentId, CancellationToken token)
         {
             var response = await _authenticationClient.Users.GetUsersByFilterAsync(new GetUsersByFilterRequest
             {
@@ -167,11 +167,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             return default;
         }
 
-        public async Task<IList<UserModel>> GetUsersWithinDepartment(string departmentCode, CancellationToken token)
+        public async Task<IList<UserModel>> GetUsersWithinDepartmentAsync(string departmentCode, CancellationToken token)
         {
             var department = await _catalogAdapterClient.GetDepartmentByCodeAsync(departmentCode, token);
 
-            return await GetUsersWithinDepartment(department.Id, token);
+            return await GetUsersWithinDepartmentAsync(department.Id, token);
         }
     }
 }
