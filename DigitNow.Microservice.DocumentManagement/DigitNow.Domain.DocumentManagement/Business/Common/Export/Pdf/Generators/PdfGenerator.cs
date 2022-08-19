@@ -14,17 +14,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generato
 
     public class PdfGenerator : IPdfGenerator
     {
-        private static Assembly _currentAssembly;
-        private static string[] _currentAssemblyResourceNames;
+        private static Assembly _currentAssembly = typeof(PdfGenerator).Assembly;
+        private static string[] _currentAssemblyResourceNames = _currentAssembly.GetManifestResourceNames();
         
         private readonly List<PdfToken> _tokens = new List<PdfToken>();
         private string _templateName;
-
-        static PdfGenerator()
-        {
-            _currentAssembly = typeof(PdfGenerator).Assembly;
-            _currentAssemblyResourceNames = _currentAssembly.GetManifestResourceNames();
-        }
 
         public IPdfGenerator SetTemplateName(string templateName)
         {
@@ -46,7 +40,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generato
                 html = html.Replace(item.TokenName, item.TokenValue);
             }
 
-            //TODO: Get segment from configuration
             var localDistPath = Path.Combine(Directory.GetCurrentDirectory(), "temp");
 
             var pdfContent = CustomPdfDocument
@@ -57,10 +50,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generato
             return new FileContent(pdfName, "application/pdf", pdfContent);
         }
 
-        private string GetTemplateContent(string templateName)
+        private static string GetTemplateContent(string templateName)
         {
-            var templateResourceName = _currentAssemblyResourceNames.Where(x => x.EndsWith(templateName)).FirstOrDefault();
-            if (templateResourceName == null) throw new Exception();
+            var templateResourceName = _currentAssemblyResourceNames.FirstOrDefault(x => x.EndsWith(templateName));
+            if (templateResourceName == null) throw new ArgumentNullException();
 
             var stream = _currentAssembly.GetManifestResourceStream(templateResourceName);
 
