@@ -1,6 +1,4 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.UploadedFiles;
-
-namespace DigitNow.Domain.DocumentManagement.Data.Entities
 using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 
