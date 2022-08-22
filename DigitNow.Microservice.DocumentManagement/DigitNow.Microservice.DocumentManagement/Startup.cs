@@ -6,6 +6,7 @@ using DigitNow.Microservice.DocumentManagement.configurations.Consul;
 using DigitNow.Microservice.DocumentManagement.configurations.DistributedCache;
 using DigitNow.Microservice.DocumentManagement.configurations.Masstransit;
 using DigitNow.Microservice.DocumentManagement.configurations.Swagger;
+using DigitNow.Microservice.DocumentManagement.configurations.Syncfusion;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
@@ -56,7 +57,7 @@ public class Startup
     {
         if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
-        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(Configuration.GetValue<string>("Syncfusion:LicenseKey"));
+        app.AddSyncfusionConfigurations(Configuration);
 
         app.UseConsulConfigurations(env);
         app.UseSwaggerConfigurations(env);

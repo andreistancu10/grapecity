@@ -18,6 +18,7 @@
 		<Compile Include=".configurations\Swagger\ConfigureSwaggerExtensions.cs" />
 		<Compile Include=".configurations\Swagger\SwaggerOptions.cs" />
 		<Compile Include=".configurations\Swagger\SwaggerSetup.cs" />
+		<Compile Include=".configurations\Syncfusion\ConfigureSyncfusionExtensions.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
