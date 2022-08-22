@@ -1,6 +1,6 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Internal;
-using DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Poco;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Poco;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents;
+using Syncfusion.HtmlConverter;
 using System.Reflection;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generators
@@ -39,15 +39,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generato
             {
                 html = html.Replace(item.TokenName, item.TokenValue);
             }
+            HtmlToPdfConverter htmlConverter = new HtmlToPdfConverter(HtmlRenderingEngine.Blink);
+            var pdfDocument = htmlConverter.Convert(html, "");
+            MemoryStream stream = new MemoryStream();
+            pdfDocument.Save(stream);
+            pdfDocument.Close(true);
+            var pdfBytes = stream.ToArray();
 
-            var localDistPath = Path.Combine(Directory.GetCurrentDirectory(), "temp");
+            return new FileContent(pdfName, "application/pdf", pdfBytes);
 
-            var pdfContent = CustomPdfDocument
-                .Containing(html)
-                .WithGlobalSetting("tempFolder", localDistPath)
-                .Content();
-
-            return new FileContent(pdfName, "application/pdf", pdfContent);
         }
 
         private static string GetTemplateContent(string templateName)

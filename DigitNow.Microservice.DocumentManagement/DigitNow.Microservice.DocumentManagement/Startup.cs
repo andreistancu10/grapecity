@@ -56,6 +56,8 @@ public class Startup
     {
         if (env.IsDevelopment()) app.UseDeveloperExceptionPage();
 
+        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(Configuration.GetValue<string>("Syncfusion:LicenseKey"));
+
         app.UseConsulConfigurations(env);
         app.UseSwaggerConfigurations(env);
         app.UseSerilogRequestLogging();
