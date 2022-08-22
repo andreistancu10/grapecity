@@ -1,6 +1,5 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using System.Collections.Generic;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates
 {

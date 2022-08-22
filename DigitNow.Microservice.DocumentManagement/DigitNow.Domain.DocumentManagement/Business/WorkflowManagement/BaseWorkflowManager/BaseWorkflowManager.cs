@@ -40,6 +40,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
         {
             var document = await DbContext.Documents
                 .Include(x => x.WorkflowHistories)
+                .Include(x => x.DocumentActions)
                 .FirstAsync(x => x.Id == command.DocumentId, token);
             var lastWorkFlowRecord = document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).FirstOrDefault();
 
@@ -151,8 +152,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
 
         protected async Task PassDocumentToResponsibleUserAsync(Document document, WorkflowHistoryLog newWorkflowResponsible, ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            var oldWorkflowResponsible = GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Functionary.Id 
-                    || (x.RecipientType == RecipientType.HeadOfDepartment.Id && x.DocumentStatus != DocumentStatus.OpinionRequestedUnallocated));
+            var oldWorkflowResponsible = GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Functionary.Id
+        || (x.RecipientType == RecipientType.HeadOfDepartment.Id && x.DocumentStatus != DocumentStatus.OpinionRequestedUnallocated));
 
             newWorkflowResponsible.DocumentStatus = oldWorkflowResponsible.RecipientType == RecipientType.HeadOfDepartment.Id 
                 ? DocumentStatus.InWorkUnallocated 

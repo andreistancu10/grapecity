@@ -38,7 +38,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(c => c.ResolutionPeriod, opt => opt.MapFrom<MapDocumentResolutionPeriod>())
                 .ForMember(c => c.DocumentCategory, opt => opt.MapFrom<MapDocumentCategory>())
                 .ForMember(c => c.IsDispatched, opt => opt.MapFrom<MapDocumentIsDispatched>())
-                .ForMember(c => c.IdentificationNumber, opt => opt.MapFrom(src => src.VirtualDocument.IdentificationNumber));
+                .ForMember(c => c.IdentificationNumber, opt => opt.MapFrom(src => src.VirtualDocument.IdentificationNumber))
+                .ForMember(c => c.Editable, opt => opt.MapFrom<MapDocumentEditable>());
 
             CreateMap<VirtualDocumentAggregate<InternalDocument>, DocumentViewModel>()
                 .ForMember(c => c.DocumentId, opt => opt.MapFrom(src => src.VirtualDocument.Document.Id))
@@ -51,7 +52,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(c => c.DocumentType, opt => opt.MapFrom<MapDocumentType>())
                 .ForMember(c => c.User, opt => opt.MapFrom<MapDocumentUser>())
                 .ForMember(c => c.ResolutionPeriod, opt => opt.MapFrom<MapDocumentResolutionPeriod>())
-                .ForMember(c => c.DocumentCategory, opt => opt.MapFrom<MapDocumentCategory>());
+                .ForMember(c => c.DocumentCategory, opt => opt.MapFrom<MapDocumentCategory>())
+                .ForMember(c => c.Editable, opt => opt.MapFrom<MapDocumentEditable>());
         }
 
         private class MapDocumentType :
@@ -241,25 +243,31 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             {
                 return source.VirtualDocument.Document.Status == DocumentStatus.Finalized || source.VirtualDocument.Document.Status == DocumentStatus.InWorkMayorCountersignature;
             }
-        }        
-        
-        
+        }
+
         private class MapDocumentEditable :
             IValueResolver<VirtualDocumentAggregate<IncomingDocument>, DocumentViewModel, bool>,
-            IValueResolver<VirtualDocumentAggregate<OutgoingDocument>, DocumentViewModel, bool>
+            IValueResolver<VirtualDocumentAggregate<OutgoingDocument>, DocumentViewModel, bool>,
+            IValueResolver<VirtualDocumentAggregate<InternalDocument>, DocumentViewModel, bool>
         {
             public bool Resolve(VirtualDocumentAggregate<IncomingDocument> source, DocumentViewModel destination, bool destMember, ResolutionContext context)
+                => IsDocumentEditable(source);
+
+            public bool Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, bool destMember, ResolutionContext context)
+                => IsDocumentEditable(source);
+
+            public bool Resolve(VirtualDocumentAggregate<InternalDocument> source, DocumentViewModel destination, bool destMember, ResolutionContext context)
+                => IsDocumentEditable(source);
+
+            private static bool IsDocumentEditable<T>(VirtualDocumentAggregate<T> source)
+                 where T : VirtualDocument
             {
-                if (source.VirtualDocument.Document.RecipientId == source.CurrentUser.Id || source.CurrentUser.Departments.Contains(source.VirtualDocument.Document.DestinationDepartmentId))
+                if (source.VirtualDocument.Document.RecipientId == source.CurrentUser.Id 
+                    || source.CurrentUser.Departments.Contains(source.VirtualDocument.Document.DestinationDepartmentId))
                 {
                     return true;
                 }
                 return false;
-            }
-
-            public bool Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, bool destMember, ResolutionContext context)
-            {
-                return source.VirtualDocument.Document.Status == DocumentStatus.Finalized || source.VirtualDocument.Document.Status == DocumentStatus.InWorkMayorCountersignature;
             }
         }
     }
