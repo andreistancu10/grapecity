@@ -3,6 +3,7 @@ using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload;
 using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
@@ -11,6 +12,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         Task<UploadedFile> CreateAsync(UploadFileCommand request, Guid newGuid, string relativeFilePath, string absoluteFilePath, CancellationToken cancellationToken);
         Task CreateDocumentUploadedFilesAsync(IEnumerable<long> uploadedFileIds, Document document, CancellationToken cancellationToken);
+        Task CreateObjectiveUploadedFilesAsync(IEnumerable<long> uploadedFileIds, Objective objective, CancellationToken cancellationToken);
         Task UpdateDocumentUploadedFilesAsync(List<long> uploadedFileIds, Document document, CancellationToken cancellationToken);
         Task<List<UploadedFile>> GetUploadedFilesAsync(IEnumerable<long> ids, CancellationToken cancellationToken);
         Task<List<UploadedFile>> FetchUploadedFiles(long documentId, CancellationToken cancellationToken);
@@ -57,6 +59,20 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             });
 
             await _dbContext.DocumentUploadedFiles.AddRangeAsync(documentUploadedFiles, cancellationToken);
+        }
+
+        public async Task CreateObjectiveUploadedFilesAsync(IEnumerable<long> uploadedFileIds, Objective objective, CancellationToken cancellationToken)
+        {
+            var uploadedFiles = await GetUploadedFilesAsync(uploadedFileIds, cancellationToken);
+
+            var objectiveUploadedFiles = uploadedFiles.Select(file => new ObjectiveUploadedFile
+            {
+                UploadedFile = file,
+                Objective = objective
+            });
+
+            await _dbContext.ObjectiveUploadedFiles.AddRangeAsync(objectiveUploadedFiles, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
         public async Task UpdateDocumentUploadedFilesAsync(List<long> uploadedFileIds, Document document, CancellationToken cancellationToken)

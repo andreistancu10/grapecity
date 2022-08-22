@@ -6,6 +6,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Business\Common\Export\Pdf\Templates\Html\registration_proof_template.html" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 	<ItemGroup>
@@ -27,8 +31,11 @@
 		<Compile Include=".utils\LanguagesUtils.cs" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="DigitNow.Domain.Authentication.Client" Version="6.0.9" />
-		<PackageReference Include="DigitNow.Domain.Authentication.Contracts" Version="6.0.9" />
+	  <EmbeddedResource Include="Business\Common\Export\Pdf\Templates\Html\registration_proof_template.html" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="DigitNow.Domain.Authentication.Client" Version="6.0.10" />
+		<PackageReference Include="DigitNow.Domain.Authentication.Contracts" Version="6.0.10" />
 		<PackageReference Include="DigitNow.Domain.Catalog.Client" Version="6.0.10" />
 		<PackageReference Include="DigitNow.Domain.Catalog.Contracts" Version="6.0.10" />
 		<PackageReference Include="Domain.Localization.Client" Version="6.0.1" />
@@ -67,9 +74,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="Business\Common\Export\Pdf\Templates\Html\registration_proof_template.html">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
 		<None Update="domain.DocumentManagementSettings.Development.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
@@ -83,7 +87,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\DigitNow.Adapters.MS.Catalog\DigitNow.Adapters.MS.Catalog.csproj" />
-		<ProjectReference Include="..\DigitNow.Adapters.MS.Identity\DigitNow.Adapters.MS.Identity.csproj" />
 		<ProjectReference Include="..\DigitNow.Domain.DocumentManagement.Contracts\DigitNow.Domain.DocumentManagement.Contracts.csproj" />
 	</ItemGroup>
 

@@ -78,6 +78,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 .FirstOrDefault();
 
             await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
+            document.WorkflowHistories.Add(newWorkflowResponsible);
 
             document.WorkflowHistories.Add(newWorkflowResponsible);
 

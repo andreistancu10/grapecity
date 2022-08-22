@@ -1,8 +1,5 @@
-﻿using System.Runtime.InteropServices;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload;
-using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.DownloadFile;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetFiles;
 using DigitNow.Domain.DocumentManagement.Public.UploadFiles.Models;
