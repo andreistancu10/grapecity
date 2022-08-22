@@ -1,9 +1,9 @@
 ﻿
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetByRegistrationNumber
+namespace DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetByRegistrationFilter
 {
-    public class GetDocsByRegistrationNumberResponse
+    public class GetDocumentByRegistrationFilterResponse
     {
         public int DocumentId { get; set; }
 
