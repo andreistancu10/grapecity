@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateDocumentDeliveryDetails;
 using DigitNow.Domain.DocumentManagement.Business.Documents.Commands.SetDocumentsResolution;
-using DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetByRegistrationNumber;
+using DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetByRegistrationFilter;
 using DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetWorkflowHistoryByDocumentId;
 using DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetWorkflowInformation;
 using DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries;
@@ -55,7 +55,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Documents
         [HttpGet]
         public async Task<IActionResult> GetByRegistrationNumber([FromQuery] int registrationNumber, [FromQuery] int year)
         {
-            return await _mediator.Send(new GetDocsByRegistrationNumberQuery { RegistrationNumber = registrationNumber, Year = year })
+            return await _mediator.Send(new GetDocumentByRegistrationFilterQuery { RegistrationNumber = registrationNumber, RegistrationYear = year })
                 switch
             {
                 null => NotFound(),
