@@ -60,6 +60,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             }
 
             return query.Where(x => x.Id == documentId);
+        }        
+        
+        public async Task<bool> CheckDocumentPermissionsAsync(long documentId, CancellationToken token)
+        {
+            var query = _dbContext.Documents.AsQueryable();
+
+            var dataPermissionsExpressions = await GetPermissionsDataExpressionsAsync(token);
+
+            query = query.WhereAll(dataPermissionsExpressions.ToPredicates());
+
+            return await query.Where(x => x.Id == documentId)
+                              .AnyAsync(token);
         }
 
         public async Task<IQueryable<Document>> FindByFilterQueryAsync(CancellationToken token, bool applyPermissions = false)

@@ -22,7 +22,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(c => c.User, opt => opt.MapFrom<MapDocumentUser>())
                 .ForMember(c => c.DocumentCategory, opt => opt.MapFrom<MapDocumentCategory>())
                 .ForMember(c => c.IsDispatched, opt => opt.MapFrom<MapDocumentIsDispatched>())
-                .ForMember(c => c.IdentificationNumber, opt => opt.MapFrom(src => src.VirtualDocument.IdentificationNumber));
+                .ForMember(c => c.IdentificationNumber, opt => opt.MapFrom(src => src.VirtualDocument.IdentificationNumber))
+                .ForMember(c => c.Editable, opt => opt.MapFrom<MapDocumentEditable>());
 
             CreateMap<VirtualDocumentAggregate<OutgoingDocument>, DocumentViewModel>()
                 .ForMember(c => c.DocumentId, opt => opt.MapFrom(src => src.VirtualDocument.Document.Id))
@@ -234,6 +235,26 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             public bool Resolve(VirtualDocumentAggregate<IncomingDocument> source, DocumentViewModel destination, bool destMember, ResolutionContext context)
             {
                 return source.VirtualDocument.Document.Status == DocumentStatus.Finalized;
+            }
+
+            public bool Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, bool destMember, ResolutionContext context)
+            {
+                return source.VirtualDocument.Document.Status == DocumentStatus.Finalized || source.VirtualDocument.Document.Status == DocumentStatus.InWorkMayorCountersignature;
+            }
+        }        
+        
+        
+        private class MapDocumentEditable :
+            IValueResolver<VirtualDocumentAggregate<IncomingDocument>, DocumentViewModel, bool>,
+            IValueResolver<VirtualDocumentAggregate<OutgoingDocument>, DocumentViewModel, bool>
+        {
+            public bool Resolve(VirtualDocumentAggregate<IncomingDocument> source, DocumentViewModel destination, bool destMember, ResolutionContext context)
+            {
+                if (source.VirtualDocument.Document.RecipientId == source.CurrentUser.Id || source.CurrentUser.Departments.Contains(source.VirtualDocument.Document.DestinationDepartmentId))
+                {
+                    return true;
+                }
+                return false;
             }
 
             public bool Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, bool destMember, ResolutionContext context)

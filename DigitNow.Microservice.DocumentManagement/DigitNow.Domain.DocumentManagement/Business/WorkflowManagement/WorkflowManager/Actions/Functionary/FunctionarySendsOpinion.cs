@@ -75,6 +75,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             document.WorkflowHistories.Add(newWorkflowResponsible);
 
             ResetDateAsOpinionWasSent(document);
+            DeleteActionAfterBeingProcessed(document, UserActionsOnDocument.AsksForOpinion);
+
             await MailSenderService.SendMail_OpinionFunctionaryReply(document, token);
 
             return command;
