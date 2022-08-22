@@ -1,5 +1,6 @@
-﻿using System.Linq;
+﻿using System.Text.Json;
 using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.FileUsageContexts;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
@@ -8,7 +9,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
     {
         public FileViewModelMappings()
         {
-            CreateMap<VirtualFileAggregate, FileViewModel>()
+            CreateMap<VirtualFileAggregate, DocumentFileViewModel>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.UploadedFile.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.UploadedFile.Name))
                 .ForMember(dest => dest.UploadDate, opt => opt.MapFrom(src => src.UploadedFile.CreatedAt))
@@ -17,9 +18,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
         }
 
         private class MapUploadedBy :
-            IValueResolver<VirtualFileAggregate, FileViewModel, BasicViewModel>
+            IValueResolver<VirtualFileAggregate, DocumentFileViewModel, BasicViewModel>
         {
-            public BasicViewModel Resolve(VirtualFileAggregate source, FileViewModel destination, BasicViewModel destMember,
+            public BasicViewModel Resolve(VirtualFileAggregate source, DocumentFileViewModel destination, BasicViewModel destMember,
                 ResolutionContext context)
             {
                 var foundUser = source.Users.FirstOrDefault(x => x.Id == source.UploadedFile.CreatedBy);
@@ -31,12 +32,22 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
         }
 
         private class MapCategory :
-            IValueResolver<VirtualFileAggregate, FileViewModel, BasicViewModel>
+            IValueResolver<VirtualFileAggregate, DocumentFileViewModel, BasicViewModel>
         {
-            public BasicViewModel Resolve(VirtualFileAggregate source, FileViewModel destination, BasicViewModel destMember,
+            public BasicViewModel Resolve(VirtualFileAggregate source, DocumentFileViewModel destination, BasicViewModel destMember,
                 ResolutionContext context)
             {
-                var foundCategory = source.Categories.FirstOrDefault(x => x.Id == source.UploadedFile.DocumentCategoryId);
+                var usageContext = JsonSerializer.Deserialize<DocumentUsageContext>(source.UploadedFile.UsageContext, new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                });
+
+                if (usageContext == null)
+                {
+                    return null;
+                }
+
+                var foundCategory = source.Categories.FirstOrDefault(x => x.Id == usageContext.DocumentCategoryId);
 
                 return foundCategory != null ?
                     new BasicViewModel(foundCategory.Id, foundCategory.Name) :

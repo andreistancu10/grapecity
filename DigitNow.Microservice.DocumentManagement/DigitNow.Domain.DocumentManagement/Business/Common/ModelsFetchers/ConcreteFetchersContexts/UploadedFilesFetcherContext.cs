@@ -1,4 +1,5 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
+﻿using DigitNow.Domain.DocumentManagement.Data;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts
 {

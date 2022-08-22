@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload;
+using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -13,7 +14,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         Task UpdateDocumentUploadedFilesAsync(List<long> uploadedFileIds, Document document, CancellationToken cancellationToken);
         Task<List<UploadedFile>> GetUploadedFilesAsync(IEnumerable<long> ids, CancellationToken cancellationToken);
         Task<List<UploadedFile>> FetchUploadedFiles(long documentId, CancellationToken cancellationToken);
-
         Task<bool> AssociateUploadedFileToDocumentAsync(long uploadedFileId, long documentId,
             CancellationToken cancellationToken);
     }
@@ -32,7 +32,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         public async Task<UploadedFile> CreateAsync(
             UploadFileCommand request,
             Guid newGuid,
-            string relativeFilePath, 
+            string relativeFilePath,
             string absoluteFilePath,
             CancellationToken cancellationToken)
         {
@@ -87,11 +87,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         public async Task<bool> AssociateUploadedFileToDocumentAsync(long uploadedFileId, long documentId,
             CancellationToken cancellationToken)
         {
-            var uploadedFileExist = await _dbContext.UploadedFiles.AnyAsync(c => c.Id == uploadedFileId, cancellationToken);
+            var uploadedFile = await _dbContext.UploadedFiles.FirstOrDefaultAsync(c => c.Id == uploadedFileId, cancellationToken);
             var documentExist = await _dbContext.Documents.AnyAsync(c => c.Id == documentId, cancellationToken);
 
-
-            if (!(uploadedFileExist && documentExist))
+            if (!(uploadedFile is { UsageLocation: UsageLocation.DocumentForm } && documentExist))
             {
                 return false;
             }

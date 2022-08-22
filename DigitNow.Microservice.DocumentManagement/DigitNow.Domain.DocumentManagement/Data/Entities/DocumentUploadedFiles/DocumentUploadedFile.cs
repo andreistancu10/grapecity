@@ -1,4 +1,6 @@
-﻿namespace DigitNow.Domain.DocumentManagement.Data.Entities
+﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
+
+namespace DigitNow.Domain.DocumentManagement.Data
 {
     public class DocumentUploadedFile : ExtendedEntity
     {

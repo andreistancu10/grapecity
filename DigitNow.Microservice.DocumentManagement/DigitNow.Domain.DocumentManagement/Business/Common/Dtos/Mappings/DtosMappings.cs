@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos.Mappings

@@ -1,8 +1,6 @@
-﻿using System;
-
-namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
+﻿namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
 {
-    public class FileViewModel
+    public class DocumentFileViewModel
     {
         public long Id { get; set; }
         public string Name { get; set; }

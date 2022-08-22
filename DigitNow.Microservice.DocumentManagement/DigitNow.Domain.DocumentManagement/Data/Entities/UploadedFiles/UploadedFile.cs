@@ -1,8 +1,12 @@
-﻿namespace DigitNow.Domain.DocumentManagement.Data.Entities
+﻿using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
+
+namespace DigitNow.Domain.DocumentManagement.Data
 {
     public class UploadedFile : ExtendedEntity
     {
-        public long DocumentCategoryId { get; set; }
+        public UsageLocation UsageLocation { get; set; }
+        public string UsageContext { get; set; }
         public string Name { get; set; }
         public string ContentType { get; set; }
         public string RelativePath { get; set; }

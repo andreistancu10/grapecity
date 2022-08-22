@@ -1,15 +1,17 @@
 ﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.FileUsageContexts;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
+using DigitNow.Domain.DocumentManagement.Data;
 using HTSS.Platform.Core.CQRS;
 
 namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload
 {
-    public class UploadFileHandler : ICommandHandler<UploadFileCommand, FileViewModel>
+    public class UploadFileHandler : ICommandHandler<UploadFileCommand, DocumentFileViewModel>
     {
         private readonly IMapper _mapper;
         private readonly IFileService _fileService;
@@ -24,19 +26,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Uploa
             _uploadedFileRelationsFetcher = new UploadedFileRelationsFetcher(serviceProvider);
         }
 
-        public async Task<FileViewModel> Handle(UploadFileCommand command, CancellationToken cancellationToken)
+        public async Task<DocumentFileViewModel> Handle(UploadFileCommand command, CancellationToken cancellationToken)
         {
             var newGuid = Guid.NewGuid();
             var (relativePath, absolutePath) = await _fileService.UploadFileAsync(command.File, newGuid.ToString());
             var newUploadedFile = await _uploadedFileService.CreateAsync(command, newGuid, relativePath, absolutePath, cancellationToken);
-
-            if (command.DocumentId != null)
-            {
-                await _uploadedFileService.AssociateUploadedFileToDocumentAsync(
-                     newUploadedFile.Id,
-                     (long)command.DocumentId,
-                     cancellationToken);
-            }
 
             var uploadedFiles = new List<UploadedFile>
             {
@@ -44,7 +38,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Uploa
             };
 
             await _uploadedFileRelationsFetcher
-                .UseUploadedFilesContext(new UploadedFilesFetcherContext { UploadFiles = uploadedFiles})
+                .UseUploadedFilesContext(new UploadedFilesFetcherContext { UploadFiles = uploadedFiles })
                 .TriggerFetchersAsync(cancellationToken);
 
             var fileViewModel = uploadedFiles.Select(file =>
@@ -54,7 +48,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Uploa
                         Categories = _uploadedFileRelationsFetcher.UploadedFileCategoryModels,
                         Users = _uploadedFileRelationsFetcher.UploadedFileUsers
                     })
-                .Select(aggregate => _mapper.Map<VirtualFileAggregate, FileViewModel>(aggregate))
+                .Select(aggregate => _mapper.Map<VirtualFileAggregate, DocumentFileViewModel>(aggregate))
                 .FirstOrDefault();
 
             return fileViewModel;

@@ -32,10 +32,10 @@ namespace DigitNow.Domain.DocumentManagement.Public.UploadFiles
         {
             return await _mediator.Send(_mapper.Map<UploadFileCommand>(request))
                 switch
-                {
-                    null => NotFound(),
-                    var result => Ok(result)
-                };
+            {
+                null => NotFound(),
+                var result => Ok(result)
+            };
         }
 
         [HttpGet("download/{fileId:int}")]
@@ -50,10 +50,10 @@ namespace DigitNow.Domain.DocumentManagement.Public.UploadFiles
             };
         }
 
-        [HttpGet("get-files/{documentId:int}")]
+        [HttpGet("get-files/document-usage/{documentId:int}")]
         public async Task<IActionResult> GetFilesAsync([FromRoute] int documentId)
         {
-            var result = await _mediator.Send(new GetFilesQuery(documentId));
+            var result = await _mediator.Send(new GetFilesForDocumentQuery(documentId));
 
             return result switch
             {
@@ -61,7 +61,5 @@ namespace DigitNow.Domain.DocumentManagement.Public.UploadFiles
                 _ => Ok(result)
             };
         }
-
-
     }
 }

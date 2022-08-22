@@ -88,6 +88,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="Data\Entities\DocumentUploadedFiles\Entities\" />
 	  <Folder Include="Migrations\" />
 	  <Folder Include="Public\Common\" />
 	</ItemGroup>
