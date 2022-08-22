@@ -3,11 +3,11 @@ using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetByRegistrationNumber
 {
-    public class GetDocsByRegistrationNumberMapping : Profile
+    public class GetDocumentByRegistrationNumberMapping : Profile
     {
-        public GetDocsByRegistrationNumberMapping()
+        public GetDocumentByRegistrationNumberMapping()
         {
-            CreateMap<Document, GetDocsByRegistrationNumberResponse>()
+            CreateMap<Document, GetDocumentByRegistrationNumberResponse>()
                 .ForMember(c => c.DocumentId, opt => opt.MapFrom(src => src.Id));
         }
     }
