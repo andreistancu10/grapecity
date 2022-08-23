@@ -26,11 +26,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetFil
             _uploadedFileRelationsFetcher = new UploadedFileRelationsFetcher(serviceProvider);
         }
 
-        public async Task<List<DocumentFileViewModel>> Handle(GetFilesForEntityQuery query, CancellationToken cancellationToken)
+        public async Task<List<DocumentFileViewModel>> Handle(GetFilesForEntityQuery request, CancellationToken cancellationToken)
         {
-            var uploadedFiles = query.TargetEntity switch
+            var uploadedFiles = request.TargetEntity switch
             {
-                (int)TargetEntity.Document => await _uploadedFileService.FetchUploadedFilesForDocument(query.TargetId, cancellationToken),
+                (int)TargetEntity.Document => await _uploadedFileService.FetchUploadedFilesForDocument(request.TargetId, cancellationToken),
                 _ => throw new InvalidEnumArgumentException()
             };
 

@@ -2,7 +2,6 @@
 using DigitNow.Domain.Authentication.Contracts;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos.Mappings
 {
@@ -14,7 +13,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos.Mappings
             CreateMap<WorkflowHistoryLog, WorkflowHistoryLogDto>().ReverseMap();
             CreateMap<ContactDetail, ContactDetailDto>().ReverseMap();
             CreateMap<UploadedFileMapping, DocumentUploadedFileDto>().ReverseMap();
-            //CreateMap<ObjectiveUploadedFile, ObjectiveUploadedFileDto>().ReverseMap();
 
             CreateMap<ConnectedDocument, ConnectedDocumentDto>()
                 .ForMember(x => x.RegistrationNumber, opt => opt.MapFrom(src => src.Document.RegistrationNumber))
