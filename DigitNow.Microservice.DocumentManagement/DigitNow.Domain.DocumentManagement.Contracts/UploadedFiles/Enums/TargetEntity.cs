@@ -1,8 +1,8 @@
 ﻿namespace DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums
 {
-    public enum UsageLocation
+    public enum TargetEntity
     {
-        DocumentForm,
-        Other
+        Document,
+        SpecificObjective
     }
 }

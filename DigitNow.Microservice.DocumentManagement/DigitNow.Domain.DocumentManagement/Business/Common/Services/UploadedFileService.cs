@@ -10,14 +10,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IUploadedFileService
     {
-        Task<UploadedFile> CreateAsync(UploadFileCommand request, Guid newGuid, string relativeFilePath, string absoluteFilePath, CancellationToken cancellationToken);
-        Task CreateDocumentUploadedFilesAsync(IEnumerable<long> uploadedFileIds, Document document, CancellationToken cancellationToken);
+        Task<UploadedFile> CreateAsync(UploadFileCommand command, Guid newGuid, string relativeFilePath, string absoluteFilePath, CancellationToken cancellationToken);
+        Task UpdateUploadedFilesWithTargetIdAsync(IEnumerable<long> uploadedFileIds, Document document, CancellationToken cancellationToken);
         Task CreateObjectiveUploadedFilesAsync(IEnumerable<long> uploadedFileIds, Objective objective, CancellationToken cancellationToken);
         Task UpdateDocumentUploadedFilesAsync(List<long> uploadedFileIds, Document document, CancellationToken cancellationToken);
-        Task<List<UploadedFile>> GetUploadedFilesAsync(IEnumerable<long> ids, CancellationToken cancellationToken);
-        Task<List<UploadedFile>> FetchUploadedFiles(long documentId, CancellationToken cancellationToken);
-        Task<bool> AssociateUploadedFileToDocumentAsync(long uploadedFileId, long documentId,
+        Task<List<UploadedFileMapping>> GetUploadedFileMappingsAsync(IEnumerable<long> ids,
             CancellationToken cancellationToken);
+        Task<List<UploadedFile>> FetchUploadedFilesForDocument(long documentId, CancellationToken cancellationToken);
     }
 
     public class UploadedFileService : IUploadedFileService
@@ -32,42 +31,63 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         }
 
         public async Task<UploadedFile> CreateAsync(
-            UploadFileCommand request,
+            UploadFileCommand command,
             Guid newGuid,
             string relativeFilePath,
             string absoluteFilePath,
             CancellationToken cancellationToken)
         {
-            var newFile = _mapper.Map<UploadedFile>(request);
-            newFile.Guid = newGuid;
-            newFile.RelativePath = relativeFilePath;
-            newFile.AbsolutePath = absoluteFilePath;
+            var newUploadedFile = _mapper.Map<UploadedFile>(command);
+            newUploadedFile.Guid = newGuid;
+            newUploadedFile.RelativePath = relativeFilePath;
+            newUploadedFile.AbsolutePath = absoluteFilePath;
 
-            await _dbContext.UploadedFiles.AddAsync(newFile, cancellationToken);
+            await _dbContext.UploadedFiles.AddAsync(newUploadedFile, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
-            return newFile;
+            if (command.DocumentCategoryId != null)
+            {
+                var newDocumentFileMapping = new DocumentFileMapping
+                {
+                    DocumentCategoryId = (long)command.DocumentCategoryId,
+                    UploadedFileId = newUploadedFile.Id
+                };
+
+                await _dbContext.DocumentFileMappings.AddAsync(newDocumentFileMapping, cancellationToken);
+                await _dbContext.SaveChangesAsync(cancellationToken);
+            }
+
+            var uploadedFileMapping = new UploadedFileMapping
+            {
+                UploadedFileId = newUploadedFile.Id,
+                TargetEntity = command.TargetEntity,
+            };
+
+            if (command.TargetId != null)
+            {
+                uploadedFileMapping.TargetId = (long)command.TargetId;
+            }
+
+            await _dbContext.UploadedFileMappings.AddAsync(uploadedFileMapping, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return newUploadedFile;
         }
 
-        public async Task CreateDocumentUploadedFilesAsync(IEnumerable<long> uploadedFileIds, Document document, CancellationToken cancellationToken)
+        public async Task UpdateUploadedFilesWithTargetIdAsync(IEnumerable<long> uploadedFileIds, Document document, CancellationToken cancellationToken)
         {
-            var uploadedFiles = await GetUploadedFilesAsync(uploadedFileIds, cancellationToken);
-            var documentUploadedFiles = uploadedFiles.Select(c => new DocumentUploadedFile
-            {
-                UploadedFile = c,
-                Document = document
-            });
-
-            await _dbContext.DocumentUploadedFiles.AddRangeAsync(documentUploadedFiles, cancellationToken);
+            var uploadedFiles = await GetUploadedFileMappingsAsync(uploadedFileIds, cancellationToken);
+            uploadedFiles.ForEach(c => c.TargetId = document.Id);
+            _dbContext.UploadedFileMappings.UpdateRange(uploadedFiles);
         }
 
         public async Task CreateObjectiveUploadedFilesAsync(IEnumerable<long> uploadedFileIds, Objective objective, CancellationToken cancellationToken)
         {
-            var uploadedFiles = await GetUploadedFilesAsync(uploadedFileIds, cancellationToken);
+            var uploadedFiles = await GetUploadedFileMappingsAsync(uploadedFileIds, cancellationToken);
 
             var objectiveUploadedFiles = uploadedFiles.Select(file => new ObjectiveUploadedFile
             {
-                UploadedFile = file,
+                UploadedFile = file.UploadedFile,
                 Objective = objective
             });
 
@@ -81,46 +101,28 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var uploadedFileIdsToRemove = currentlyPresentIds.Where(c => !uploadedFileIds.Contains(c));
             var documentUploadedFilesToRemove = document.DocumentUploadedFiles.Where(c => uploadedFileIdsToRemove.Contains(c.UploadedFileId));
             var idsToAdd = uploadedFileIds.Where(c => !currentlyPresentIds.Contains(c));
-            _dbContext.DocumentUploadedFiles.RemoveRange(documentUploadedFilesToRemove);
+            _dbContext.UploadedFileMappings.RemoveRange(documentUploadedFilesToRemove);
 
-            await CreateDocumentUploadedFilesAsync(idsToAdd, document, cancellationToken);
+            await UpdateUploadedFilesWithTargetIdAsync(idsToAdd, document, cancellationToken);
         }
 
-        public async Task<List<UploadedFile>> GetUploadedFilesAsync(IEnumerable<long> ids, CancellationToken cancellationToken)
+        public async Task<List<UploadedFileMapping>> GetUploadedFileMappingsAsync(IEnumerable<long> ids, CancellationToken cancellationToken)
         {
-            return await _dbContext.UploadedFiles.Where(c => ids.Contains(c.Id)).ToListAsync(cancellationToken);
-        }
-
-        public Task<List<UploadedFile>> FetchUploadedFiles(long documentId, CancellationToken cancellationToken)
-        {
-            return _dbContext.DocumentUploadedFiles
-                .AsNoTracking()
-                .Where(c => c.DocumentId == documentId)
-                .Select(c => c.UploadedFile)
+            return await _dbContext.UploadedFileMappings
+                .Include(c => c.UploadedFile)
+                .Where(c => ids.Contains(c.Id))
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<bool> AssociateUploadedFileToDocumentAsync(long uploadedFileId, long documentId,
-            CancellationToken cancellationToken)
+        public Task<List<UploadedFile>> FetchUploadedFilesForDocument(long documentId, CancellationToken cancellationToken)
         {
-            var uploadedFile = await _dbContext.UploadedFiles.FirstOrDefaultAsync(c => c.Id == uploadedFileId, cancellationToken);
-            var documentExist = await _dbContext.Documents.AnyAsync(c => c.Id == documentId, cancellationToken);
-
-            if (!(uploadedFile is { UsageLocation: UsageLocation.DocumentForm } && documentExist))
-            {
-                return false;
-            }
-
-            var newDocumentUploadedFile = new DocumentUploadedFile
-            {
-                UploadedFileId = uploadedFileId,
-                DocumentId = documentId
-            };
-
-            await _dbContext.DocumentUploadedFiles.AddAsync(newDocumentUploadedFile, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
-
-            return true;
+            return _dbContext.UploadedFileMappings
+                .AsNoTracking()
+                .Include(c => c.UploadedFile)
+                .ThenInclude(c => c.UploadedFileMapping)
+                .Where(c => c.TargetId == documentId && c.TargetEntity == TargetEntity.Document)
+                .Select(c => c.UploadedFile)
+                .ToListAsync(cancellationToken);
         }
     }
 }

@@ -36,7 +36,7 @@ public class CreateInternalDocumentHandler : ICommandHandler<CreateInternalDocum
 
         await _internalDocumentService.AddAsync(newInternalDocument, cancellationToken);
 
-        await _uploadedFileService.CreateDocumentUploadedFilesAsync(request.UploadedFileIds, newInternalDocument.Document, cancellationToken);
+        await _uploadedFileService.UpdateUploadedFilesWithTargetIdAsync(request.UploadedFileIds, newInternalDocument.Document, cancellationToken);
 
         var department = await _catalogAdapterClient.GetDepartmentByIdAsync(request.DestinationDepartmentId, cancellationToken);
 

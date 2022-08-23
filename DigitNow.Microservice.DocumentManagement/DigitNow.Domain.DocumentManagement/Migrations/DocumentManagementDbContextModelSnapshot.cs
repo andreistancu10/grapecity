@@ -23,51 +23,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.DocumentUploadedFile", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("Id")
-                        .HasColumnOrder(1);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("CreatedAt")
-                        .HasColumnOrder(2);
-
-                    b.Property<long>("CreatedBy")
-                        .HasColumnType("bigint")
-                        .HasColumnName("CreatedBy")
-                        .HasColumnOrder(3);
-
-                    b.Property<long>("DocumentId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("ModifiedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("ModifiedAt")
-                        .HasColumnOrder(4);
-
-                    b.Property<long>("ModifiedBy")
-                        .HasColumnType("bigint")
-                        .HasColumnName("ModifiedBy")
-                        .HasColumnOrder(5);
-
-                    b.Property<long>("UploadedFileId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DocumentId");
-
-                    b.HasIndex("UploadedFileId");
-
-                    b.ToTable("DocumentUploadedFile", "DocumentMangement");
-                });
-
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.ConnectedDocument", b =>
                 {
                     b.Property<long>("Id")
@@ -274,6 +229,27 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Document", "DocumentMangement");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.DocumentFileMapping", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<long>("DocumentCategoryId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("UploadedFileId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UploadedFileId");
+
+                    b.ToTable("DocumentFileMappings", "DocumentMangement");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.DocumentResolution", b =>
@@ -578,51 +554,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("Objective", "DocumentMangement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Objectives.ObjectiveUploadedFile", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("Id")
-                        .HasColumnOrder(1);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("CreatedAt")
-                        .HasColumnOrder(2);
-
-                    b.Property<long>("CreatedBy")
-                        .HasColumnType("bigint")
-                        .HasColumnName("CreatedBy")
-                        .HasColumnOrder(3);
-
-                    b.Property<DateTime>("ModifiedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("ModifiedAt")
-                        .HasColumnOrder(4);
-
-                    b.Property<long>("ModifiedBy")
-                        .HasColumnType("bigint")
-                        .HasColumnName("ModifiedBy")
-                        .HasColumnOrder(5);
-
-                    b.Property<long>("ObjectiveId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long>("UploadedFileId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ObjectiveId");
-
-                    b.HasIndex("UploadedFileId");
-
-                    b.ToTable("ObjectiveUploadedFile", "DocumentMangement");
-                });
-
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Objectives.SpecificObjective", b =>
                 {
                     b.Property<long>("Id")
@@ -712,6 +643,51 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.HasIndex("SpecificObjectiveId");
 
                     b.ToTable("SpecificObjectiveFunctionary", "DocumentMangement");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.ObjectiveUploadedFile", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("Id")
+                        .HasColumnOrder(1);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedAt")
+                        .HasColumnOrder(2);
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("CreatedBy")
+                        .HasColumnOrder(3);
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("ModifiedAt")
+                        .HasColumnOrder(4);
+
+                    b.Property<long>("ModifiedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("ModifiedBy")
+                        .HasColumnOrder(5);
+
+                    b.Property<long>("ObjectiveId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("UploadedFileId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ObjectiveId");
+
+                    b.HasIndex("UploadedFileId");
+
+                    b.ToTable("ObjectiveUploadedFile", "DocumentMangement");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.OutgoingDocument", b =>
@@ -995,34 +971,64 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<string>("RelativePath")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UsageContext")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UsageLocation")
-                        .HasColumnType("int");
+                    b.Property<long>("UploadedFileMappingId")
+                        .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
                     b.ToTable("UploadedFile", "DocumentMangement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.DocumentUploadedFile", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.UploadedFileMapping", b =>
                 {
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Document", "Document")
-                        .WithMany("DocumentUploadedFiles")
-                        .HasForeignKey("DocumentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("Id")
+                        .HasColumnOrder(1);
 
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.UploadedFile", "UploadedFile")
-                        .WithMany()
-                        .HasForeignKey("UploadedFileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
-                    b.Navigation("Document");
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedAt")
+                        .HasColumnOrder(2);
 
-                    b.Navigation("UploadedFile");
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("CreatedBy")
+                        .HasColumnOrder(3);
+
+                    b.Property<long?>("DocumentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("ModifiedAt")
+                        .HasColumnOrder(4);
+
+                    b.Property<long>("ModifiedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("ModifiedBy")
+                        .HasColumnOrder(5);
+
+                    b.Property<int>("TargetEntity")
+                        .HasColumnType("int");
+
+                    b.Property<long>("TargetId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("UploadedFileId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentId");
+
+                    b.HasIndex("UploadedFileId")
+                        .IsUnique();
+
+                    b.ToTable("UploadedFileMapping", "DocumentMangement");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.ConnectedDocument", b =>
@@ -1042,6 +1048,17 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasForeignKey("OutgoingDocumentId");
 
                     b.Navigation("Document");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.DocumentFileMapping", b =>
+                {
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.UploadedFile", "UploadedFile")
+                        .WithMany()
+                        .HasForeignKey("UploadedFileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UploadedFile");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", b =>
@@ -1089,25 +1106,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("Objective");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Objectives.ObjectiveUploadedFile", b =>
-                {
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Objectives.Objective", "Objective")
-                        .WithMany("ObjectiveUploadedFiles")
-                        .HasForeignKey("ObjectiveId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.UploadedFile", "UploadedFile")
-                        .WithMany()
-                        .HasForeignKey("UploadedFileId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Objective");
-
-                    b.Navigation("UploadedFile");
-                });
-
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Objectives.SpecificObjective", b =>
                 {
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Objectives.GeneralObjective", "AssociatedGeneralObjective")
@@ -1137,6 +1135,25 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .IsRequired();
 
                     b.Navigation("SpecificObjective");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.ObjectiveUploadedFile", b =>
+                {
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Objectives.Objective", "Objective")
+                        .WithMany("ObjectiveUploadedFiles")
+                        .HasForeignKey("ObjectiveId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.UploadedFile", "UploadedFile")
+                        .WithMany()
+                        .HasForeignKey("UploadedFileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Objective");
+
+                    b.Navigation("UploadedFile");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.OutgoingDocument", b =>
@@ -1194,6 +1211,21 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("Document");
                 });
 
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.UploadedFileMapping", b =>
+                {
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Document", null)
+                        .WithMany("DocumentUploadedFiles")
+                        .HasForeignKey("DocumentId");
+
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.UploadedFile", "UploadedFile")
+                        .WithOne("UploadedFileMapping")
+                        .HasForeignKey("DigitNow.Domain.DocumentManagement.Data.UploadedFileMapping", "UploadedFileId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("UploadedFile");
+                });
+
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Document", b =>
                 {
                     b.Navigation("DocumentUploadedFiles");
@@ -1236,6 +1268,11 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.OutgoingDocument", b =>
                 {
                     b.Navigation("ConnectedDocuments");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.UploadedFile", b =>
+                {
+                    b.Navigation("UploadedFileMapping");
                 });
 #pragma warning restore 612, 618
         }

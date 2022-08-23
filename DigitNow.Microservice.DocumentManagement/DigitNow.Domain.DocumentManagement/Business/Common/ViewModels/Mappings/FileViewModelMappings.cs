@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.FileUsageContexts;
+﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
@@ -37,17 +35,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             public BasicViewModel Resolve(VirtualFileAggregate source, DocumentFileViewModel destination, BasicViewModel destMember,
                 ResolutionContext context)
             {
-                var usageContext = JsonSerializer.Deserialize<DocumentUsageContext>(source.UploadedFile.UsageContext, new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                });
+                var foundDocumentCategoryId = source.DocumentFileMappings?.FirstOrDefault(c => c.UploadedFileId == source.UploadedFile.Id)?.DocumentCategoryId;
 
-                if (usageContext == null)
+                if (foundDocumentCategoryId == null)
                 {
                     return null;
                 }
 
-                var foundCategory = source.Categories.FirstOrDefault(x => x.Id == usageContext.DocumentCategoryId);
+                var foundCategory = source.Categories.FirstOrDefault(x => x.Id == foundDocumentCategoryId);
 
                 return foundCategory != null ?
                     new BasicViewModel(foundCategory.Id, foundCategory.Name) :

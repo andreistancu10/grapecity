@@ -11,18 +11,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Mappings
         {
             CreateMap<UploadFileCommand, UploadedFile>()
                 .ForMember(c => c.ContentType, opt => opt.MapFrom(src => src.File.ContentType))
-                .ForMember(c => c.UsageContext, opt => opt.MapFrom<MapUsageContext>())
                 ;
             CreateMap<UploadedFile, UploadFileResponse>()
                 .ForMember(c => c.FileId, opt => opt.MapFrom(dest => dest.Id));
-        }
-
-        private class MapUsageContext : IValueResolver<UploadFileCommand, UploadedFile, string>
-        {
-            public string Resolve(UploadFileCommand source, UploadedFile destination, string destMember, ResolutionContext context)
-            {
-                return JsonSerializer.Serialize(source.UsageContext);
-            }
         }
     }
 }

@@ -5,8 +5,9 @@ namespace DigitNow.Domain.DocumentManagement.Public.UploadFiles.Models
 {
     public class UploadFileRequest
     {
-        public string UsageContext { get; set; }
-        public UsageLocation UsageLocation { get; set; }
+        public long? DocumentCategoryId { get; set; }
+        public long? TargetId { get; set; }
+        public TargetEntity TargetEntity { get; set; }
         public string Name { get; set; }
         public IFormFile File { get; set; }
     }

@@ -47,10 +47,10 @@ namespace DigitNow.Domain.DocumentManagement.Public.UploadFiles
             };
         }
 
-        [HttpGet("get-files/document-usage/{documentId:int}")]
-        public async Task<IActionResult> GetFilesAsync([FromRoute] int documentId)
+        [HttpGet("get-files/{targetEntity:int}/{entityId:int}")]
+        public async Task<IActionResult> GetFilesAsync([FromRoute] int targetEntity, [FromRoute] int entityId)
         {
-            var result = await _mediator.Send(new GetFilesForDocumentQuery(documentId));
+            var result = await _mediator.Send(new GetFilesForEntityQuery(targetEntity, entityId));
 
             return result switch
             {

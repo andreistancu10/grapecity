@@ -5,10 +5,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
 {
     internal class UploadedFilesFetcherContext : ModelFetcherContext
     {
-        public IList<UploadedFile> UploadFiles
+        public IList<UploadedFile> UploadedFiles
         {
-            get => this[nameof(UploadFiles)] as IList<UploadedFile>;
-            set => this[nameof(UploadFiles)] = value;
+            get => this[nameof(UploadedFiles)] as IList<UploadedFile>;
+            set => this[nameof(UploadedFiles)] = value;
         }
     }
 }

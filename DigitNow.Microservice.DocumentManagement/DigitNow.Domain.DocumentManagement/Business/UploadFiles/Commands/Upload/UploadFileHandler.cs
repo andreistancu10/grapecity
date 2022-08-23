@@ -38,7 +38,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Uploa
             };
 
             await _uploadedFileRelationsFetcher
-                .UseUploadedFilesContext(new UploadedFilesFetcherContext { UploadFiles = uploadedFiles })
+                .UseUploadedFilesContext(new UploadedFilesFetcherContext { UploadedFiles = uploadedFiles })
                 .TriggerFetchersAsync(cancellationToken);
 
             var fileViewModel = uploadedFiles.Select(file =>
@@ -46,7 +46,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Uploa
                     {
                         UploadedFile = file,
                         Categories = _uploadedFileRelationsFetcher.UploadedFileCategoryModels,
-                        Users = _uploadedFileRelationsFetcher.UploadedFileUsers
+                        Users = _uploadedFileRelationsFetcher.UploadedFileUsers,
+                        DocumentFileMappings = _uploadedFileRelationsFetcher.DocumentFileMappings
                     })
                 .Select(aggregate => _mapper.Map<VirtualFileAggregate, DocumentFileViewModel>(aggregate))
                 .FirstOrDefault();

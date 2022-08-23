@@ -36,14 +36,15 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<SpecialRegister> SpecialRegisters { get; set; }
         public DbSet<SpecialRegisterMapping> SpecialRegisterMappings { get; set; }
         public DbSet<UploadedFile> UploadedFiles { get; set; }
-        public DbSet<DocumentUploadedFile> DocumentUploadedFiles { get; set; }
+        public DbSet<UploadedFileMapping> UploadedFileMappings { get; set; }
+        public DbSet<DocumentFileMapping> DocumentFileMappings { get; set; }
         public DbSet<ObjectiveUploadedFile> ObjectiveUploadedFiles { get; set; }
         public DbSet<DeliveryDetail> DeliveryDetails { get; set; }
         public DbSet<WorkflowHistoryLog> WorkflowHistoryLogs { get; set; }
         public DbSet<Objective> Objectives { get; set; }
         public DbSet<GeneralObjective> GeneralObjectives { get; set; }
         public DbSet<SpecificObjective> SpecificObjectives { get; set; }
-        public DbSet<SpecificObjectiveFunctionary> SpecificObjectiveFunctionarys { get; set; }
+        public DbSet<SpecificObjectiveFunctionary> SpecificObjectiveFunctionarys { get; set; } //TODO: Fix typo. Correct value SpecificObjectiveFunctionaries
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

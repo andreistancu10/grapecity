@@ -47,7 +47,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands
             await _outgoingDocumentService.AddAsync(newOutgoingDocument, cancellationToken);
 
             await AttachConnectedDocumentsAsync(request, newOutgoingDocument, cancellationToken);
-            await _uploadedFileService.CreateDocumentUploadedFilesAsync(request.UploadedFileIds, newOutgoingDocument.Document, cancellationToken);
+            await _uploadedFileService.UpdateUploadedFilesWithTargetIdAsync(request.UploadedFileIds, newOutgoingDocument.Document, cancellationToken);
 
             var department = await _catalogAdapterClient.GetDepartmentByIdAsync(request.DestinationDepartmentId, cancellationToken);
 

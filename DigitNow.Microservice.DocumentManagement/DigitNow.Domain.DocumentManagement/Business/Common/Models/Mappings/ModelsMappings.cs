@@ -30,6 +30,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings
 
             CreateMap<DocumentType, DocumentCategoryModel>();
             CreateMap<DocumentType, InternalDocumentCategoryModel>();
+
+            CreateMap<DocumentFileMapping, DocumentFileMappingModel>();
         }
     }
 }

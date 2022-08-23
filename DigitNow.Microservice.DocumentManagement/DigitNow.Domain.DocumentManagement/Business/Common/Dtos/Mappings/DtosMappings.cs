@@ -13,7 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos.Mappings
             CreateMap<DeliveryDetail, DeliveryDetailDto>().ReverseMap();
             CreateMap<WorkflowHistoryLog, WorkflowHistoryLogDto>().ReverseMap();
             CreateMap<ContactDetail, ContactDetailDto>().ReverseMap();
-            CreateMap<DocumentUploadedFile, DocumentUploadedFileDto>().ReverseMap();
+            CreateMap<UploadedFileMapping, DocumentUploadedFileDto>().ReverseMap();
             CreateMap<ObjectiveUploadedFile, ObjectiveUploadedFileDto>().ReverseMap();
 
             CreateMap<ConnectedDocument, ConnectedDocumentDto>()
