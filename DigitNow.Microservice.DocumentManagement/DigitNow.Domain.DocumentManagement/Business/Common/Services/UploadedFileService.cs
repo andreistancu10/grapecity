@@ -11,10 +11,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     public interface IUploadedFileService
     {
         Task<UploadedFile> CreateAsync(UploadFileCommand command, Guid newGuid, string relativeFilePath, string absoluteFilePath, CancellationToken cancellationToken);
-        Task UpdateUploadedFilesWithTargetIdAsync(IEnumerable<long> uploadedFileIds, Document document, CancellationToken cancellationToken);
-        Task CreateObjectiveUploadedFilesAsync(IEnumerable<long> uploadedFileIds, Objective objective, CancellationToken cancellationToken);
+        Task UpdateUploadedFilesWithTargetIdForDocumentAsync(IEnumerable<long> uploadedFileIds, Document document, CancellationToken cancellationToken);
+        Task UpdateUploadedFilesWithTargetIdForObjectiveAsync(IEnumerable<long> uploadedFileIds, Objective objective, CancellationToken cancellationToken);
         Task UpdateDocumentUploadedFilesAsync(List<long> uploadedFileIds, Document document, CancellationToken cancellationToken);
         Task<List<UploadedFileMapping>> GetUploadedFileMappingsAsync(IEnumerable<long> ids,
+            TargetEntity targetEntity,
             CancellationToken cancellationToken);
         Task<List<UploadedFile>> FetchUploadedFilesForDocument(long documentId, CancellationToken cancellationToken);
     }
@@ -77,25 +78,20 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return newUploadedFile;
         }
 
-        public async Task UpdateUploadedFilesWithTargetIdAsync(IEnumerable<long> uploadedFileIds, Document document, CancellationToken cancellationToken)
+        public async Task UpdateUploadedFilesWithTargetIdForDocumentAsync(IEnumerable<long> uploadedFileIds, Document document, CancellationToken cancellationToken)
         {
-            var uploadedFiles = await GetUploadedFileMappingsAsync(uploadedFileIds, cancellationToken);
-            uploadedFiles.ForEach(c => c.TargetId = document.Id);
-            _dbContext.UploadedFileMappings.UpdateRange(uploadedFiles);
+            var uploadedFileMappings = await GetUploadedFileMappingsAsync(uploadedFileIds, TargetEntity.Document, cancellationToken);
+            uploadedFileMappings.ForEach(c => c.TargetId = document.Id);
+            _dbContext.UploadedFileMappings.UpdateRange(uploadedFileMappings);
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task CreateObjectiveUploadedFilesAsync(IEnumerable<long> uploadedFileIds, Objective objective, CancellationToken cancellationToken)
+        public async Task UpdateUploadedFilesWithTargetIdForObjectiveAsync(IEnumerable<long> uploadedFileIds, Objective objective, CancellationToken cancellationToken)
         {
-            var uploadedFiles = await GetUploadedFileMappingsAsync(uploadedFileIds, cancellationToken);
-
-            var objectiveUploadedFiles = uploadedFiles.Select(file => new ObjectiveUploadedFile
-            {
-                UploadedFile = file.UploadedFile,
-                Objective = objective
-            });
-
-            await _dbContext.ObjectiveUploadedFiles.AddRangeAsync(objectiveUploadedFiles, cancellationToken);
+            var uploadedFileMappings = await GetUploadedFileMappingsAsync(uploadedFileIds, TargetEntity.Objective, cancellationToken);
+            uploadedFileMappings.ForEach(c => c.TargetId = objective.Id);
             await _dbContext.SaveChangesAsync(cancellationToken);
+            _dbContext.UploadedFileMappings.UpdateRange(uploadedFileMappings);
         }
 
         public async Task UpdateDocumentUploadedFilesAsync(List<long> uploadedFileIds, Document document, CancellationToken cancellationToken)
@@ -106,14 +102,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var idsToAdd = uploadedFileIds.Where(c => !currentlyPresentIds.Contains(c));
             _dbContext.UploadedFileMappings.RemoveRange(documentUploadedFilesToRemove);
 
-            await UpdateUploadedFilesWithTargetIdAsync(idsToAdd, document, cancellationToken);
+            await UpdateUploadedFilesWithTargetIdForDocumentAsync(idsToAdd, document, cancellationToken);
         }
 
-        public async Task<List<UploadedFileMapping>> GetUploadedFileMappingsAsync(IEnumerable<long> ids, CancellationToken cancellationToken)
+        public async Task<List<UploadedFileMapping>> GetUploadedFileMappingsAsync(IEnumerable<long> ids, TargetEntity targetEntity, CancellationToken cancellationToken)
         {
             return await _dbContext.UploadedFileMappings
                 .Include(c => c.UploadedFile)
-                .Where(c => ids.Contains(c.Id))
+                .Where(c => ids.Contains(c.Id) && c.TargetEntity == targetEntity)
                 .ToListAsync(cancellationToken);
         }
 

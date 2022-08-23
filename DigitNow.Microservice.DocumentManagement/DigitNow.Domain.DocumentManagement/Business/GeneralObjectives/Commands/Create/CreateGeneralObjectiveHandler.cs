@@ -27,7 +27,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
 
             var generalObjective = new GeneralObjective
             {
-                Objective = new Objective()
+                Objective = new Objective
                 {
                     Title = request.Title,
                     Details = request.Details,
@@ -35,8 +35,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
             };
 
             await _generalObjectiveService.AddAsync(generalObjective, cancellationToken);
+            
             if (request.UploadedFileIds.Any())
-                await _uploadedFileService.CreateObjectiveUploadedFilesAsync(request.UploadedFileIds, generalObjective.Objective, cancellationToken);
+            {
+                await _uploadedFileService.UpdateUploadedFilesWithTargetIdForObjectiveAsync(request.UploadedFileIds,
+                    generalObjective.Objective, cancellationToken);
+            }
+
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return ResultObject.Created(generalObjective.Id);

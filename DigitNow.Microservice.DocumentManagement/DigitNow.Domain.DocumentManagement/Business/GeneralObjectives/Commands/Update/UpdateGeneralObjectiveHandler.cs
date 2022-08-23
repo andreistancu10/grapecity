@@ -1,4 +1,5 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
@@ -18,9 +19,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
         }
         public async Task<ResultObject> Handle(UpdateGeneralObjectiveCommand request, CancellationToken cancellationToken)
         {
-            var initialGeneralObjective = await _generalObjectiveService.FindQuery().Where(item => item.ObjectiveId == request.ObjectiveId)
+            var initialGeneralObjective = await _generalObjectiveService.FindQuery()
+                .Where(item => item.ObjectiveId == request.ObjectiveId)
                 .Include(item => item.Objective)
-                .ThenInclude(item => item.ObjectiveUploadedFiles)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (initialGeneralObjective == null)
@@ -31,6 +32,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
                     Parameters = new object[] { request.ObjectiveId }
                 });
 
+            var fileMappings =  await _uploadedFileService.GetUploadedFileMappingsAsync(new List<long>
+            {
+                initialGeneralObjective.Id
+            }, TargetEntity.Objective, cancellationToken);
+
             initialGeneralObjective.Objective.Title = request.Title;
             initialGeneralObjective.Objective.State = request.State;
             initialGeneralObjective.Objective.Details = request.Details;
@@ -40,9 +46,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
 
             if (request.UploadedFileIds.Any())
             {
-                var uploadedFileIds = initialGeneralObjective.Objective.ObjectiveUploadedFiles.Select(item => item.UploadedFileId);
+                var uploadedFileIds = fileMappings.Select(item => item.UploadedFileId);
 
-                await _uploadedFileService.CreateObjectiveUploadedFilesAsync(request.UploadedFileIds.Except(uploadedFileIds), initialGeneralObjective.Objective, cancellationToken).ConfigureAwait(false);
+                await _uploadedFileService.UpdateUploadedFilesWithTargetIdForObjectiveAsync(request.UploadedFileIds.Except(uploadedFileIds), initialGeneralObjective.Objective, cancellationToken).ConfigureAwait(false);
             }
 
             return ResultObject.Ok(initialGeneralObjective.Id);

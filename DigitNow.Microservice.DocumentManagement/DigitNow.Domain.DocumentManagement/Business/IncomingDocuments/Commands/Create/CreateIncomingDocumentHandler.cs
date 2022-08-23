@@ -48,9 +48,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
         public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
         {
             if (!string.IsNullOrWhiteSpace(request.IdentificationNumber))
+            {
                 await CreateContactDetailsAsync(request, cancellationToken);
+            }
 
             var headOfDepartment = await _identityService.GetHeadOfDepartmentUserAsync(request.RecipientId, cancellationToken);
+
             if (headOfDepartment == null)
                 return ResultObject.Error(new ErrorMessage
                 {
@@ -58,7 +61,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
                     TranslationCode = "catalog.headOfdepartment.backend.update.validation.entityNotFound",
                     Parameters = new object[] { request.RecipientId }
                 });
-
 
             var newIncomingDocument = _mapper.Map<IncomingDocument>(request);
 
@@ -76,7 +78,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
                 };
             
                 await _incomingDocumentService.AddAsync(newIncomingDocument, cancellationToken);
-                await _uploadedFileService.UpdateUploadedFilesWithTargetIdAsync(request.UploadedFileIds, newIncomingDocument.Document, cancellationToken);
+                await _uploadedFileService.UpdateUploadedFilesWithTargetIdForDocumentAsync(request.UploadedFileIds, newIncomingDocument.Document, cancellationToken);
 
                 var newWorkflowHistroryLog = WorkflowHistoryLogFactory.Create(newIncomingDocument.Document, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkUnallocated);
                 await _dbContext.WorkflowHistoryLogs.AddAsync(newWorkflowHistroryLog, cancellationToken);

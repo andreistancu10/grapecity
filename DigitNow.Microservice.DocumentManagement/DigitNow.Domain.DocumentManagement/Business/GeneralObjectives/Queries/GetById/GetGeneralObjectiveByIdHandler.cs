@@ -23,10 +23,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.
         {
             var generalObjective = await _generalObjectiveService.FindQuery()
                 .Where(item => item.ObjectiveId == request.ObjectiveId)
-                .Include(item => item.Objective).ThenInclude(item => item.ObjectiveUploadedFiles )
+                .Include(item => item.Objective)
+                .ThenInclude(item => item.ObjectiveUploadedFiles )
                 .FirstOrDefaultAsync(cancellationToken);
 
-            if (generalObjective == null) return null;
+            if (generalObjective == null)
+            {
+                return null;
+            }
+
+
 
             return _mapper.Map<GetGeneralObjectiveByIdResponse>(generalObjective);
         }

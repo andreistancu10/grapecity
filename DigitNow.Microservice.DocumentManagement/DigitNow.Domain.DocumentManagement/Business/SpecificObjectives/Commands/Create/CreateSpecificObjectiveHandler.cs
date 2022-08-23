@@ -37,7 +37,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
                 await _specificObjectiveFunctionaryService.AddRangeAsync(specificObjective.ObjectiveId, request.SpecificObjectiveFunctionaryIds, cancellationToken);
 
             if (request.UploadedFileIds.Any())
-                await _uploadedFileService.CreateObjectiveUploadedFilesAsync(request.UploadedFileIds, specificObjective.Objective, cancellationToken);
+                await _uploadedFileService.UpdateUploadedFilesWithTargetIdForObjectiveAsync(request.UploadedFileIds, specificObjective.Objective, cancellationToken);
 
             return ResultObject.Created(specificObjective.Id);
         }

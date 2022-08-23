@@ -14,7 +14,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos.Mappings
             CreateMap<WorkflowHistoryLog, WorkflowHistoryLogDto>().ReverseMap();
             CreateMap<ContactDetail, ContactDetailDto>().ReverseMap();
             CreateMap<UploadedFileMapping, DocumentUploadedFileDto>().ReverseMap();
-            CreateMap<ObjectiveUploadedFile, ObjectiveUploadedFileDto>().ReverseMap();
+            //CreateMap<ObjectiveUploadedFile, ObjectiveUploadedFileDto>().ReverseMap();
 
             CreateMap<ConnectedDocument, ConnectedDocumentDto>()
                 .ForMember(x => x.RegistrationNumber, opt => opt.MapFrom(src => src.Document.RegistrationNumber))

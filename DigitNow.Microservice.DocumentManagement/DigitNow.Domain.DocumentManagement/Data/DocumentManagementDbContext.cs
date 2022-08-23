@@ -38,7 +38,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<UploadedFile> UploadedFiles { get; set; }
         public DbSet<UploadedFileMapping> UploadedFileMappings { get; set; }
         public DbSet<DocumentFileMapping> DocumentFileMappings { get; set; }
-        public DbSet<ObjectiveUploadedFile> ObjectiveUploadedFiles { get; set; }
+        //public DbSet<ObjectiveUploadedFile> ObjectiveUploadedFiles { get; set; }
         public DbSet<DeliveryDetail> DeliveryDetails { get; set; }
         public DbSet<WorkflowHistoryLog> WorkflowHistoryLogs { get; set; }
         public DbSet<Objective> Objectives { get; set; }

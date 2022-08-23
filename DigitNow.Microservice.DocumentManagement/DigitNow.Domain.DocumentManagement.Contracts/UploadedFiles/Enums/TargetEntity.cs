@@ -3,6 +3,6 @@
     public enum TargetEntity
     {
         Document,
-        SpecificObjective
+        Objective
     }
 }
