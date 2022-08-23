@@ -263,7 +263,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                  where T : VirtualDocument
             {
                 if (source.VirtualDocument.Document.RecipientId == source.CurrentUser.Id 
-                    || source.CurrentUser.Departments.Contains(source.VirtualDocument.Document.DestinationDepartmentId))
+                    || source.CurrentUser.Departments.Select(x => x.Id).Contains(source.VirtualDocument.Document.DestinationDepartmentId))
                 {
                     return true;
                 }

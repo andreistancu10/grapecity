@@ -71,8 +71,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             }
             else
             {
-                var responsibleUser = await IdentityAdapterClient.GetUserByIdAsync(recipientId, token);
-                document.DestinationDepartmentId = responsibleUser.Departments.First();
+                var responsibleUser = await IdentityService.GetUserByIdAsync(recipientId, token);
+                document.DestinationDepartmentId = responsibleUser.Departments.First().Id;
                 document.RecipientId = recipientId;
             }
 
@@ -183,7 +183,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
                 {
                     Action = action,
                     ResposibleId = currentUser.Id,
-                    DepartmentId = makeDocumentVisibleForDepartment ? currentUser.Departments.First() : null
+                    DepartmentId = makeDocumentVisibleForDepartment ? currentUser.Departments.First().Id : null
                 });
         }
 
