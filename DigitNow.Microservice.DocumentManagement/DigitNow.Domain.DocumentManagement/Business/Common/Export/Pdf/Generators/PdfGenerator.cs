@@ -51,15 +51,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generato
 
             try
             {
-                return ExportByBlink(html, pdfName);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, ex.Message);
-            }
-
-            try
-            {
                 return ExportByWebKit(html, pdfName);
             }
             catch (Exception ex)
@@ -68,29 +59,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generato
             }
 
             return null;
-        }
-
-        private FileContent ExportByBlink(string html, string pdfName)
-        {
-            HtmlToPdfConverter htmlConverter = new HtmlToPdfConverter(HtmlRenderingEngine.Blink);
-            BlinkConverterSettings blinkConverterSettings = new BlinkConverterSettings();
-
-            string contentRootPath = _webHostEnvironment.ContentRootPath;
-            string path = Path.Combine(contentRootPath, "BlinkBinariesWindows");
-            blinkConverterSettings.BlinkPath = path;
-
-            htmlConverter.ConverterSettings = blinkConverterSettings;
-
-            var pdfDocument = htmlConverter.Convert(html, string.Empty);
-
-            using (MemoryStream stream = new MemoryStream())
-            {
-                pdfDocument.Save(stream);
-                pdfDocument.Close(true);
-                var pdfBytes = stream.ToArray();
-                return new FileContent(pdfName, "application/pdf", pdfBytes);
-
-            }
         }
 
         private FileContent ExportByWebKit(string html, string pdfName)
