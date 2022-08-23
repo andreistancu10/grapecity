@@ -1,11 +1,8 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Poco;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Internal;
+using DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Poco;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
-using Syncfusion.Drawing;
-using Syncfusion.HtmlConverter;
-using Syncfusion.Pdf;
-using Syncfusion.Pdf.Graphics;
 using System.Reflection;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generators
@@ -54,7 +51,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generato
 
             try
             {
-                return CreatePdf(html, pdfName); 
+                _logger.LogDebug("Pdf Builtin Generator");
+                return BuildPdfContent(pdfName, html);
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, ex.Message);
+            }
+
+            try
+            {
+                _logger.LogDebug("Pdf Custom Generator");
+                return BuildCustomPdfContent(pdfName, html);
             }
             catch (Exception ex)
             {
@@ -64,38 +72,27 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generato
             return null;
         }
 
-        private FileContent CreatePdf(string html, string pdfName)
+        private FileContent BuildPdfContent(string pdfName, string html)
         {
-            PdfDocument document = new PdfDocument();
-            PdfPage page = document.Pages.Add();
-            PdfGraphics graphics = page.Graphics;
-            PdfFont font = new PdfStandardFont(PdfFontFamily.Helvetica, 20);
-            graphics.DrawString(html, font, PdfBrushes.Black, new PointF(0, 0));
-            using (MemoryStream stream = new MemoryStream())
-            {
-                document.Save(stream);
-                document.Close(true);
-                var pdfBytes = stream.ToArray();
-                return new FileContent(pdfName, "application/pdf", pdfBytes);
-
-            }
-        }
-
-        private FileContent ExportByWebKit(string html, string pdfName)
-        {
-            HtmlToPdfConverter htmlConverter = new HtmlToPdfConverter(HtmlRenderingEngine.WebKit);
+            var pdfContent = OpenHtmlToPdf.Pdf
+                .From(html)
+                .Content();
             
-            var pdfDocument = htmlConverter.Convert(html, string.Empty);
-
-            using (MemoryStream stream = new MemoryStream())
-            {
-                pdfDocument.Save(stream);
-                pdfDocument.Close(true);
-                var pdfBytes = stream.ToArray();
-                return new FileContent(pdfName, "application/pdf", pdfBytes);
-
-            }
+            return new FileContent(pdfName, "application/pdf", pdfContent);
         }
+
+        private FileContent BuildCustomPdfContent(string pdfName, string html)
+        {
+            var localDistPath = Path.Combine(Directory.GetCurrentDirectory(), "temp");
+
+            var pdfContent = CustomPdfDocument
+                .Containing(html)
+                .WithGlobalSetting("tempFolder", localDistPath)
+                .Content();
+
+            return new FileContent(pdfName, "application/pdf", pdfContent);
+        }
+
 
         private static string GetTemplateContent(string templateName)
         {
