@@ -40,14 +40,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generato
                 html = html.Replace(item.TokenName, item.TokenValue);
             }
             HtmlToPdfConverter htmlConverter = new HtmlToPdfConverter(HtmlRenderingEngine.Blink);
-            var pdfDocument = htmlConverter.Convert(html, "");
-            MemoryStream stream = new MemoryStream();
-            pdfDocument.Save(stream);
-            pdfDocument.Close(true);
-            var pdfBytes = stream.ToArray();
+            var pdfDocument = htmlConverter.Convert(html, string.Empty);
 
-            return new FileContent(pdfName, "application/pdf", pdfBytes);
+            using(MemoryStream stream = new MemoryStream())
+            {
+                pdfDocument.Save(stream);
+                pdfDocument.Close(true);
+                var pdfBytes = stream.ToArray();
+                return new FileContent(pdfName, "application/pdf", pdfBytes);
 
+            }
         }
 
         private static string GetTemplateContent(string templateName)
