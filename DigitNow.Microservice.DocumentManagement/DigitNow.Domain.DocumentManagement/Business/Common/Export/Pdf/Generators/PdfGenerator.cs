@@ -1,5 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Poco;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents;
+using Microsoft.AspNetCore.Hosting;
 using Syncfusion.HtmlConverter;
 using System.Reflection;
 
@@ -19,7 +20,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generato
         
         private readonly List<PdfToken> _tokens = new List<PdfToken>();
         private string _templateName;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
+        public PdfGenerator(IWebHostEnvironment hostingEnvironment)
+        {
+           _webHostEnvironment = hostingEnvironment;
+        }
         public IPdfGenerator SetTemplateName(string templateName)
         {
             _templateName = templateName;
@@ -39,7 +45,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generato
             {
                 html = html.Replace(item.TokenName, item.TokenValue);
             }
+
             HtmlToPdfConverter htmlConverter = new HtmlToPdfConverter(HtmlRenderingEngine.Blink);
+            BlinkConverterSettings blinkConverterSettings = new BlinkConverterSettings();
+
+            string contentRootPath = _webHostEnvironment.ContentRootPath;
+            string path = Path.Combine(contentRootPath, "BlinkBinariesWindows");
+            blinkConverterSettings.BlinkPath = path;
+
+            htmlConverter.ConverterSettings = blinkConverterSettings;
+
             var pdfDocument = htmlConverter.Convert(html, string.Empty);
 
             using(MemoryStream stream = new MemoryStream())
