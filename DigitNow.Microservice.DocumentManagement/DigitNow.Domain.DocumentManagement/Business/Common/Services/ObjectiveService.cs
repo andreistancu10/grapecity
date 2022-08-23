@@ -58,11 +58,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         private async Task SetGeneralObjectiveCodeAsync(Objective objective, CancellationToken token)
         {
-            var maxObjectiveCode = await _dbContext.Objectives
-                .Where(item => item.ObjectiveType == ObjectiveType.General && item.CreatedAt.Year == DateTime.UtcNow.Year)
-                .CountAsync(token);
+            var lastObjective = await _dbContext.GeneralObjectives
+                .Where(item => item.CreatedAt.Year == DateTime.UtcNow.Year)
+                .OrderByDescending(p => p.CreatedAt)
+                .FirstOrDefaultAsync(token);
 
-            objective.Code = $"OG{DateTime.Now.Year}_{++maxObjectiveCode}";
+            var order = lastObjective != null ? lastObjective.Id : 0;
+
+            objective.Code = $"OG{DateTime.Now.Year}_{++order}";
         }
 
         private async Task SetSpecificObjectiveCodeAsync(Objective objective, CancellationToken token)
