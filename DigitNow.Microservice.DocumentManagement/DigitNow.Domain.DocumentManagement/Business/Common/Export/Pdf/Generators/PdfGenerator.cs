@@ -2,7 +2,10 @@
 using DigitNow.Domain.DocumentManagement.Contracts.Documents;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Logging;
+using Syncfusion.Drawing;
 using Syncfusion.HtmlConverter;
+using Syncfusion.Pdf;
+using Syncfusion.Pdf.Graphics;
 using System.Reflection;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generators
@@ -51,7 +54,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generato
 
             try
             {
-                return ExportByWebKit(html, pdfName);
+                return CreatePdf(html, pdfName); 
             }
             catch (Exception ex)
             {
@@ -59,6 +62,23 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generato
             }
 
             return null;
+        }
+
+        private FileContent CreatePdf(string html, string pdfName)
+        {
+            PdfDocument document = new PdfDocument();
+            PdfPage page = document.Pages.Add();
+            PdfGraphics graphics = page.Graphics;
+            PdfFont font = new PdfStandardFont(PdfFontFamily.Helvetica, 20);
+            graphics.DrawString(html, font, PdfBrushes.Black, new PointF(0, 0));
+            using (MemoryStream stream = new MemoryStream())
+            {
+                document.Save(stream);
+                document.Close(true);
+                var pdfBytes = stream.ToArray();
+                return new FileContent(pdfName, "application/pdf", pdfBytes);
+
+            }
         }
 
         private FileContent ExportByWebKit(string html, string pdfName)
