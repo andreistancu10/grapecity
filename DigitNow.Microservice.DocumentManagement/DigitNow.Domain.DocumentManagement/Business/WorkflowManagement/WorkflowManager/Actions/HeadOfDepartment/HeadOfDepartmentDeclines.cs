@@ -86,7 +86,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                     Remarks = command.Remarks
                 };
 
-                await PassDocumentToResponsibleUserAsync(document, newWorkflowResponsible, command, token);
+                await SendOpinionBackToRequesterAsync(document, newWorkflowResponsible, command, token);
             }
             else
             {
