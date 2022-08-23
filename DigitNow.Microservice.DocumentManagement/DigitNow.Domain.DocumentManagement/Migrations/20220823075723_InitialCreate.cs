@@ -10,11 +10,11 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
-                name: "DocumentMangement");
+                name: "DocumentManagement");
 
             migrationBuilder.CreateTable(
                 name: "ContactDetail",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -43,7 +43,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             migrationBuilder.CreateTable(
                 name: "DeliveryDetails",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -63,7 +63,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             migrationBuilder.CreateTable(
                 name: "Document",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -77,6 +77,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     RegistrationDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     RecipientId = table.Column<long>(type: "bigint", nullable: true),
                     DestinationDepartmentId = table.Column<long>(type: "bigint", nullable: false),
+                    SourceDestinationDepartmentId = table.Column<long>(type: "bigint", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     StatusModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     StatusModifiedBy = table.Column<long>(type: "bigint", nullable: false),
@@ -89,7 +90,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             migrationBuilder.CreateTable(
                 name: "DocumentResolution",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -109,8 +110,31 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Objective",
+                schema: "DocumentManagement",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<long>(type: "bigint", nullable: false),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
+                    ObjectiveType = table.Column<int>(type: "int", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    State = table.Column<int>(type: "int", nullable: false),
+                    Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Details = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ModificationMotive = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Objective", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "SpecialRegister",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -130,7 +154,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             migrationBuilder.CreateTable(
                 name: "UploadedFile",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -153,7 +177,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             migrationBuilder.CreateTable(
                 name: "IncomingDocument",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -185,19 +209,19 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     table.ForeignKey(
                         name: "FK_IncomingDocument_ContactDetail_ContactDetailId",
                         column: x => x.ContactDetailId,
-                        principalSchema: "DocumentMangement",
+                        principalSchema: "DocumentManagement",
                         principalTable: "ContactDetail",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_IncomingDocument_DeliveryDetails_DeliveryDetailsId",
                         column: x => x.DeliveryDetailsId,
-                        principalSchema: "DocumentMangement",
+                        principalSchema: "DocumentManagement",
                         principalTable: "DeliveryDetails",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_IncomingDocument_Document_DocumentId",
                         column: x => x.DocumentId,
-                        principalSchema: "DocumentMangement",
+                        principalSchema: "DocumentManagement",
                         principalTable: "Document",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -205,7 +229,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             migrationBuilder.CreateTable(
                 name: "InternalDocument",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -228,7 +252,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     table.ForeignKey(
                         name: "FK_InternalDocument_Document_DocumentId",
                         column: x => x.DocumentId,
-                        principalSchema: "DocumentMangement",
+                        principalSchema: "DocumentManagement",
                         principalTable: "Document",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -236,7 +260,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             migrationBuilder.CreateTable(
                 name: "OutgoingDocument",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -261,20 +285,20 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     table.ForeignKey(
                         name: "FK_OutgoingDocument_ContactDetail_ContactDetailId",
                         column: x => x.ContactDetailId,
-                        principalSchema: "DocumentMangement",
+                        principalSchema: "DocumentManagement",
                         principalTable: "ContactDetail",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_OutgoingDocument_DeliveryDetails_DeliveryDetailsId",
                         column: x => x.DeliveryDetailsId,
-                        principalSchema: "DocumentMangement",
+                        principalSchema: "DocumentManagement",
                         principalTable: "DeliveryDetails",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_OutgoingDocument_Document_DocumentId",
                         column: x => x.DocumentId,
-                        principalSchema: "DocumentMangement",
+                        principalSchema: "DocumentManagement",
                         principalTable: "Document",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -282,7 +306,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             migrationBuilder.CreateTable(
                 name: "WorkflowHistoryLog",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -308,15 +332,41 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     table.ForeignKey(
                         name: "FK_WorkflowHistoryLog_Document_DocumentId",
                         column: x => x.DocumentId,
-                        principalSchema: "DocumentMangement",
+                        principalSchema: "DocumentManagement",
                         principalTable: "Document",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
+                name: "GeneralObjective",
+                schema: "DocumentManagement",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<long>(type: "bigint", nullable: false),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
+                    ObjectiveId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GeneralObjective", x => x.Id);
+                    table.UniqueConstraint("AK_GeneralObjective_ObjectiveId", x => x.ObjectiveId);
+                    table.ForeignKey(
+                        name: "FK_GeneralObjective_Objective_ObjectiveId",
+                        column: x => x.ObjectiveId,
+                        principalSchema: "DocumentManagement",
+                        principalTable: "Objective",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "SpecialRegisterMappings",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -326,7 +376,8 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
                     DocumentId = table.Column<long>(type: "bigint", nullable: false),
-                    SpecialRegisterId = table.Column<long>(type: "bigint", nullable: false)
+                    SpecialRegisterId = table.Column<long>(type: "bigint", nullable: false),
+                    OrderNumber = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -334,14 +385,14 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     table.ForeignKey(
                         name: "FK_SpecialRegisterMappings_Document_DocumentId",
                         column: x => x.DocumentId,
-                        principalSchema: "DocumentMangement",
+                        principalSchema: "DocumentManagement",
                         principalTable: "Document",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_SpecialRegisterMappings_SpecialRegister_SpecialRegisterId",
                         column: x => x.SpecialRegisterId,
-                        principalSchema: "DocumentMangement",
+                        principalSchema: "DocumentManagement",
                         principalTable: "SpecialRegister",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -349,7 +400,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             migrationBuilder.CreateTable(
                 name: "DocumentUploadedFile",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
@@ -367,14 +418,47 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     table.ForeignKey(
                         name: "FK_DocumentUploadedFile_Document_DocumentId",
                         column: x => x.DocumentId,
-                        principalSchema: "DocumentMangement",
+                        principalSchema: "DocumentManagement",
                         principalTable: "Document",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_DocumentUploadedFile_UploadedFile_UploadedFileId",
                         column: x => x.UploadedFileId,
-                        principalSchema: "DocumentMangement",
+                        principalSchema: "DocumentManagement",
+                        principalTable: "UploadedFile",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ObjectiveUploadedFile",
+                schema: "DocumentManagement",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<long>(type: "bigint", nullable: false),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
+                    ObjectiveId = table.Column<long>(type: "bigint", nullable: false),
+                    UploadedFileId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ObjectiveUploadedFile", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ObjectiveUploadedFile_Objective_ObjectiveId",
+                        column: x => x.ObjectiveId,
+                        principalSchema: "DocumentManagement",
+                        principalTable: "Objective",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ObjectiveUploadedFile_UploadedFile_UploadedFileId",
+                        column: x => x.UploadedFileId,
+                        principalSchema: "DocumentManagement",
                         principalTable: "UploadedFile",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
@@ -382,14 +466,12 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             migrationBuilder.CreateTable(
                 name: "ConnectedDocument",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 columns: table => new
                 {
                     Id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ChildDocumentId = table.Column<long>(type: "bigint", nullable: false),
-                    RegistrationNumber = table.Column<long>(type: "bigint", nullable: false),
-                    DocumentType = table.Column<int>(type: "int", nullable: false),
+                    DocumentId = table.Column<long>(type: "bigint", nullable: false),
                     IncomingDocumentId = table.Column<long>(type: "bigint", nullable: true),
                     OutgoingDocumentId = table.Column<long>(type: "bigint", nullable: true)
                 },
@@ -397,110 +479,208 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 {
                     table.PrimaryKey("PK_ConnectedDocument", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_ConnectedDocument_Document_DocumentId",
+                        column: x => x.DocumentId,
+                        principalSchema: "DocumentManagement",
+                        principalTable: "Document",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
                         name: "FK_ConnectedDocument_IncomingDocument_IncomingDocumentId",
                         column: x => x.IncomingDocumentId,
-                        principalSchema: "DocumentMangement",
+                        principalSchema: "DocumentManagement",
                         principalTable: "IncomingDocument",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ConnectedDocument_OutgoingDocument_OutgoingDocumentId",
                         column: x => x.OutgoingDocumentId,
-                        principalSchema: "DocumentMangement",
+                        principalSchema: "DocumentManagement",
                         principalTable: "OutgoingDocument",
                         principalColumn: "Id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "SpecificObjective",
+                schema: "DocumentManagement",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<long>(type: "bigint", nullable: false),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
+                    ObjectiveId = table.Column<long>(type: "bigint", nullable: false),
+                    DepartmentId = table.Column<long>(type: "bigint", nullable: false),
+                    GeneralObjectiveId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SpecificObjective", x => x.Id);
+                    table.UniqueConstraint("AK_SpecificObjective_ObjectiveId", x => x.ObjectiveId);
+                    table.ForeignKey(
+                        name: "FK_SpecificObjective_GeneralObjective_GeneralObjectiveId",
+                        column: x => x.GeneralObjectiveId,
+                        principalSchema: "DocumentManagement",
+                        principalTable: "GeneralObjective",
+                        principalColumn: "ObjectiveId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_SpecificObjective_Objective_ObjectiveId",
+                        column: x => x.ObjectiveId,
+                        principalSchema: "DocumentManagement",
+                        principalTable: "Objective",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "SpecificObjectiveFunctionary",
+                schema: "DocumentManagement",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedBy = table.Column<long>(type: "bigint", nullable: false),
+                    ModifiedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ModifiedBy = table.Column<long>(type: "bigint", nullable: false),
+                    SpecificObjectiveId = table.Column<long>(type: "bigint", nullable: false),
+                    FunctionaryId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SpecificObjectiveFunctionary", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_SpecificObjectiveFunctionary_SpecificObjective_SpecificObjectiveId",
+                        column: x => x.SpecificObjectiveId,
+                        principalSchema: "DocumentManagement",
+                        principalTable: "SpecificObjective",
+                        principalColumn: "ObjectiveId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ConnectedDocument_DocumentId",
+                schema: "DocumentManagement",
+                table: "ConnectedDocument",
+                column: "DocumentId");
+
             migrationBuilder.CreateIndex(
                 name: "IX_ConnectedDocument_IncomingDocumentId",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 table: "ConnectedDocument",
                 column: "IncomingDocumentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ConnectedDocument_OutgoingDocumentId",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 table: "ConnectedDocument",
                 column: "OutgoingDocumentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DocumentUploadedFile_DocumentId",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 table: "DocumentUploadedFile",
                 column: "DocumentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_DocumentUploadedFile_UploadedFileId",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 table: "DocumentUploadedFile",
                 column: "UploadedFileId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_IncomingDocument_ContactDetailId",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 table: "IncomingDocument",
                 column: "ContactDetailId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_IncomingDocument_DeliveryDetailsId",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 table: "IncomingDocument",
                 column: "DeliveryDetailsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_IncomingDocument_DocumentId",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 table: "IncomingDocument",
                 column: "DocumentId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_InternalDocument_DocumentId",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 table: "InternalDocument",
                 column: "DocumentId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_ObjectiveUploadedFile_ObjectiveId",
+                schema: "DocumentManagement",
+                table: "ObjectiveUploadedFile",
+                column: "ObjectiveId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ObjectiveUploadedFile_UploadedFileId",
+                schema: "DocumentManagement",
+                table: "ObjectiveUploadedFile",
+                column: "UploadedFileId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_OutgoingDocument_ContactDetailId",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 table: "OutgoingDocument",
                 column: "ContactDetailId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OutgoingDocument_DeliveryDetailsId",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 table: "OutgoingDocument",
                 column: "DeliveryDetailsId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_OutgoingDocument_DocumentId",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 table: "OutgoingDocument",
                 column: "DocumentId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_SpecialRegister_DocumentCategoryId",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 table: "SpecialRegister",
                 column: "DocumentCategoryId",
                 unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_SpecialRegisterMappings_DocumentId",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 table: "SpecialRegisterMappings",
                 column: "DocumentId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SpecialRegisterMappings_SpecialRegisterId",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 table: "SpecialRegisterMappings",
                 column: "SpecialRegisterId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_SpecificObjective_GeneralObjectiveId",
+                schema: "DocumentManagement",
+                table: "SpecificObjective",
+                column: "GeneralObjectiveId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_SpecificObjectiveFunctionary_SpecificObjectiveId",
+                schema: "DocumentManagement",
+                table: "SpecificObjectiveFunctionary",
+                column: "SpecificObjectiveId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_WorkflowHistoryLog_DocumentId",
-                schema: "DocumentMangement",
+                schema: "DocumentManagement",
                 table: "WorkflowHistoryLog",
                 column: "DocumentId");
         }
@@ -509,55 +689,75 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
         {
             migrationBuilder.DropTable(
                 name: "ConnectedDocument",
-                schema: "DocumentMangement");
+                schema: "DocumentManagement");
 
             migrationBuilder.DropTable(
                 name: "DocumentResolution",
-                schema: "DocumentMangement");
+                schema: "DocumentManagement");
 
             migrationBuilder.DropTable(
                 name: "DocumentUploadedFile",
-                schema: "DocumentMangement");
+                schema: "DocumentManagement");
 
             migrationBuilder.DropTable(
                 name: "InternalDocument",
-                schema: "DocumentMangement");
+                schema: "DocumentManagement");
+
+            migrationBuilder.DropTable(
+                name: "ObjectiveUploadedFile",
+                schema: "DocumentManagement");
 
             migrationBuilder.DropTable(
                 name: "SpecialRegisterMappings",
-                schema: "DocumentMangement");
+                schema: "DocumentManagement");
+
+            migrationBuilder.DropTable(
+                name: "SpecificObjectiveFunctionary",
+                schema: "DocumentManagement");
 
             migrationBuilder.DropTable(
                 name: "WorkflowHistoryLog",
-                schema: "DocumentMangement");
+                schema: "DocumentManagement");
 
             migrationBuilder.DropTable(
                 name: "IncomingDocument",
-                schema: "DocumentMangement");
+                schema: "DocumentManagement");
 
             migrationBuilder.DropTable(
                 name: "OutgoingDocument",
-                schema: "DocumentMangement");
+                schema: "DocumentManagement");
 
             migrationBuilder.DropTable(
                 name: "UploadedFile",
-                schema: "DocumentMangement");
+                schema: "DocumentManagement");
 
             migrationBuilder.DropTable(
                 name: "SpecialRegister",
-                schema: "DocumentMangement");
+                schema: "DocumentManagement");
+
+            migrationBuilder.DropTable(
+                name: "SpecificObjective",
+                schema: "DocumentManagement");
 
             migrationBuilder.DropTable(
                 name: "ContactDetail",
-                schema: "DocumentMangement");
+                schema: "DocumentManagement");
 
             migrationBuilder.DropTable(
                 name: "DeliveryDetails",
-                schema: "DocumentMangement");
+                schema: "DocumentManagement");
 
             migrationBuilder.DropTable(
                 name: "Document",
-                schema: "DocumentMangement");
+                schema: "DocumentManagement");
+
+            migrationBuilder.DropTable(
+                name: "GeneralObjective",
+                schema: "DocumentManagement");
+
+            migrationBuilder.DropTable(
+                name: "Objective",
+                schema: "DocumentManagement");
         }
     }
 }

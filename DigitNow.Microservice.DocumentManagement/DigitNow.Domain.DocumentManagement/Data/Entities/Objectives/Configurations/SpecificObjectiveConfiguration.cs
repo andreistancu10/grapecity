@@ -20,6 +20,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities.Objectives.Configurat
 
             builder.HasOne(item => item.AssociatedGeneralObjective)
                 .WithMany(item => item.SpecificObjectives)
+                .HasPrincipalKey(item => item.ObjectiveId)
                 .HasForeignKey(item => item.GeneralObjectiveId);
 
         }

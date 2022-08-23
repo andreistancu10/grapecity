@@ -39,7 +39,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
             if (request.UploadedFileIds.Any())
                 await _uploadedFileService.UpdateUploadedFilesWithTargetIdForObjectiveAsync(request.UploadedFileIds, specificObjective.Objective, cancellationToken);
 
-            return ResultObject.Created(specificObjective.Id);
+            return ResultObject.Created(specificObjective.ObjectiveId);
         }
     }
 }

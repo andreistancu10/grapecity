@@ -49,7 +49,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Internal
             {
                 var distPath = _globalSettings["tempFolder"];
                 if (!Directory.Exists(distPath)) Directory.CreateDirectory(distPath);
-                
+
                 temporaryPath = Path.Combine(_globalSettings["tempFolder"], TemporaryFilename());
 
                 _globalSettings.Remove("tempFolder");

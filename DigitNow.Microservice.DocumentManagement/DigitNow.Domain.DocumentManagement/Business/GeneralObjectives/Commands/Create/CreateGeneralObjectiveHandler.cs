@@ -44,7 +44,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
 
             await _dbContext.SaveChangesAsync(cancellationToken);
 
-            return ResultObject.Created(generalObjective.Id);
+            return ResultObject.Created(generalObjective.ObjectiveId);
         }
     }
 }
