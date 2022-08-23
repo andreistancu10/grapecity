@@ -45,6 +45,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             await PassDocumentToDepartment(document, command, token);
 
             ResetDateAsOpinionWasSent(document);
+            DeleteActionAfterBeingProcessed(document, UserActionsOnDocument.AsksForOpinion);
+
             await MailSenderService.SendMail_OpinionFunctionaryReply(document, token);
             return command;
         }

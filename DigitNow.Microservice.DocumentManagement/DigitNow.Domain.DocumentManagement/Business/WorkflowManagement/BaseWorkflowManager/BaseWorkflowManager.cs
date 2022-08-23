@@ -71,6 +71,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             }
             else
             {
+                var responsibleUser = await IdentityAdapterClient.GetUserByIdAsync(recipientId, token);
+                document.DestinationDepartmentId = responsibleUser.Departments.First();
                 document.RecipientId = recipientId;
             }
 
