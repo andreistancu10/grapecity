@@ -45,18 +45,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             await _dbContext.UploadedFiles.AddAsync(newUploadedFile, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
-            if (command.DocumentCategoryId != null)
-            {
-                var newDocumentFileMapping = new DocumentFileMapping
-                {
-                    DocumentCategoryId = (long)command.DocumentCategoryId,
-                    UploadedFileId = newUploadedFile.Id
-                };
-
-                await _dbContext.DocumentFileMappings.AddAsync(newDocumentFileMapping, cancellationToken);
-                await _dbContext.SaveChangesAsync(cancellationToken);
-            }
-
             var uploadedFileMapping = new UploadedFileMapping
             {
                 UploadedFileId = newUploadedFile.Id,
@@ -69,6 +57,21 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
 
             await _dbContext.UploadedFileMappings.AddAsync(uploadedFileMapping, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            newUploadedFile.UploadedFileMappingId = uploadedFileMapping.Id;
+
+            if (command.DocumentCategoryId != null)
+            {
+                var newDocumentFileMapping = new DocumentFileMapping
+                {
+                    DocumentCategoryId = (long)command.DocumentCategoryId,
+                    UploadedFileMappingId = uploadedFileMapping.Id
+                };
+
+                await _dbContext.DocumentFileMappings.AddAsync(newDocumentFileMapping, cancellationToken);
+            }
+
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return newUploadedFile;

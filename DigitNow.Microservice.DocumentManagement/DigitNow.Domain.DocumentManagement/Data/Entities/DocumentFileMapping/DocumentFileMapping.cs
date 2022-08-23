@@ -5,11 +5,11 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
     public class DocumentFileMapping : Entity
     {
         public long DocumentCategoryId { get; set; }
-        public long UploadedFileId { get; set; }
+        public long UploadedFileMappingId { get; set; }
 
         #region
 
-        public UploadedFile UploadedFile{ get; set; }
+        public UploadedFileMapping UploadedFileMapping { get; set; }
 
         #endregion
     }

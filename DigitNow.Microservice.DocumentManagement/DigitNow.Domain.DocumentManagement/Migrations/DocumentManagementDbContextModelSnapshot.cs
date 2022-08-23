@@ -242,12 +242,12 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<long>("DocumentCategoryId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("UploadedFileId")
+                    b.Property<long>("UploadedFileMappingId")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UploadedFileId");
+                    b.HasIndex("UploadedFileMappingId");
 
                     b.ToTable("DocumentFileMappings", "DocumentMangement");
                 });
@@ -1052,13 +1052,13 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.DocumentFileMapping", b =>
                 {
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.UploadedFile", "UploadedFile")
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.UploadedFileMapping", "UploadedFileMapping")
                         .WithMany()
-                        .HasForeignKey("UploadedFileId")
+                        .HasForeignKey("UploadedFileMappingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("UploadedFile");
+                    b.Navigation("UploadedFileMapping");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", b =>

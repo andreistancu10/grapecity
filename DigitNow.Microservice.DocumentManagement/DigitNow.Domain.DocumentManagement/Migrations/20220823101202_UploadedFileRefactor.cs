@@ -20,28 +20,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 newName: "UploadedFileMappingId");
 
             migrationBuilder.CreateTable(
-                name: "DocumentFileMappings",
-                schema: "DocumentMangement",
-                columns: table => new
-                {
-                    Id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    DocumentCategoryId = table.Column<long>(type: "bigint", nullable: false),
-                    UploadedFileId = table.Column<long>(type: "bigint", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_DocumentFileMappings", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_DocumentFileMappings_UploadedFile_UploadedFileId",
-                        column: x => x.UploadedFileId,
-                        principalSchema: "DocumentMangement",
-                        principalTable: "UploadedFile",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "UploadedFileMapping",
                 schema: "DocumentMangement",
                 columns: table => new
@@ -75,11 +53,33 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "DocumentFileMappings",
+                schema: "DocumentMangement",
+                columns: table => new
+                {
+                    Id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    DocumentCategoryId = table.Column<long>(type: "bigint", nullable: false),
+                    UploadedFileMappingId = table.Column<long>(type: "bigint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DocumentFileMappings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_DocumentFileMappings_UploadedFileMapping_UploadedFileMappingId",
+                        column: x => x.UploadedFileMappingId,
+                        principalSchema: "DocumentMangement",
+                        principalTable: "UploadedFileMapping",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
-                name: "IX_DocumentFileMappings_UploadedFileId",
+                name: "IX_DocumentFileMappings_UploadedFileMappingId",
                 schema: "DocumentMangement",
                 table: "DocumentFileMappings",
-                column: "UploadedFileId");
+                column: "UploadedFileMappingId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UploadedFileMapping_DocumentId",

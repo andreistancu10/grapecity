@@ -3,6 +3,6 @@
     public class DocumentFileMappingModel
     {
         public long DocumentCategoryId { get; set; }
-        public long UploadedFileId { get; set; }
+        public long UploadedFileMappingId { get; set; }
     }
 }

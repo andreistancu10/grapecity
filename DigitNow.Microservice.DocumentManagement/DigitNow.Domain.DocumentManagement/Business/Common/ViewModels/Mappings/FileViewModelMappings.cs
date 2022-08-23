@@ -35,7 +35,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             public BasicViewModel Resolve(VirtualFileAggregate source, DocumentFileViewModel destination, BasicViewModel destMember,
                 ResolutionContext context)
             {
-                var foundDocumentCategoryId = source.DocumentFileMappings?.FirstOrDefault(c => c.UploadedFileId == source.UploadedFile.Id)?.DocumentCategoryId;
+                var foundDocumentCategoryId = source.DocumentFileMappings?.FirstOrDefault(c => c.UploadedFileMappingId == source.UploadedFile.UploadedFileMappingId)?.DocumentCategoryId;
 
                 if (foundDocumentCategoryId == null)
                 {

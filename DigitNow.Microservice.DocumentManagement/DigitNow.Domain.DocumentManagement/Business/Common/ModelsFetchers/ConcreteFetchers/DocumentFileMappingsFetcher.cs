@@ -20,9 +20,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
 
         protected override async Task<List<DocumentFileMappingModel>> FetchInternalAsync(UploadedFilesFetcherContext context, CancellationToken cancellationToken)
         {
-            var uploadedFileIds = context.UploadedFiles.Select(c => c.Id);
+            var uploadedFileMappingIds = context.UploadedFiles.Select(c => c.UploadedFileMappingId);
             var documentFileMappings = await _dbContext.DocumentFileMappings
-                .Where(c => uploadedFileIds.Contains(c.UploadedFileId))
+                .Where(c => uploadedFileMappingIds.Contains(c.UploadedFileMappingId))
                 .ToListAsync(cancellationToken);
 
             return documentFileMappings.Select(c => _mapper.Map<DocumentFileMappingModel>(c)).ToList();
