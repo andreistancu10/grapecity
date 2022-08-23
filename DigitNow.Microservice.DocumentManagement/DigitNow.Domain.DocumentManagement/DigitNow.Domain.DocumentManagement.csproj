@@ -91,6 +91,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="Business\SpecificObjectives\Mappings\" />
 	  <Folder Include="Data\Entities\UploadedFileMappings\Entities\" />
 	  <Folder Include="Migrations\" />
 	  <Folder Include="Public\Common\" />

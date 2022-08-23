@@ -3,9 +3,9 @@ using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates
 {
-    public class VirtualObjectiveAggregate
+    public class GeneralObjectiveAggregate
     {
-        public VirtualObjective VirtualObjective { get; set; }
+        public GeneralObjective GeneralObjective { get; set; }
         public List<DocumentFileMappingModel> DocumentFileMappingModels { get; set; }
     }
 }

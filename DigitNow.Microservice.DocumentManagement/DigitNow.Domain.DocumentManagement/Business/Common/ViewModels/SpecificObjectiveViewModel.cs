@@ -1,4 +1,5 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Dtos;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
@@ -19,6 +20,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
         public long GeneralObjectiveId { get; set; }
         public GeneralObjectiveDto AssociatedGeneralObjective { get; set; }
         public List<long> FunctionaryId { get; set; }
-        public List<ObjectiveUploadedFileDto> ObjectiveUploadedFiles { get; set; }
+        public List<DocumentFileMappingModel> ObjectiveUploadedFiles { get; set; }
     }
 }

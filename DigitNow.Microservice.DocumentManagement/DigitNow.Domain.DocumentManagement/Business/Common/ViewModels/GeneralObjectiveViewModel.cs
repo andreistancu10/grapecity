@@ -1,9 +1,9 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Dtos;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 
-namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.GetById
+namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
 {
-    public class GetGeneralObjectiveByIdResponse
+    public class GeneralObjectiveViewModel
     {
         public long Id { get; set; }
         public DateTime CreatedAt { get; set; }
@@ -15,7 +15,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.
         public string Title { get; set; }
         public string Details { get; set; }
         public string ModificationMotive { get; set; }
-
-        public List<ObjectiveUploadedFileDto> ObjectiveUploadedFiles { get; set; }
+        public List<DocumentFileMappingModel> ObjectiveUploadedFiles { get; set; }
     }
 }

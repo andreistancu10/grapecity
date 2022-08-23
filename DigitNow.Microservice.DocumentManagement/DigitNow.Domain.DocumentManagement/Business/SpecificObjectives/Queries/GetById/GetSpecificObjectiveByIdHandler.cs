@@ -2,13 +2,15 @@
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Queries.GetById
 {
-    public class GetSpecificObjectiveByIdHandler : IQueryHandler<GetSpecificObjectiveByIdQuery, GetSpecificObjectiveByIdResponse>
+    public class GetSpecificObjectiveByIdHandler : IQueryHandler<GetSpecificObjectiveByIdQuery, SpecificObjectiveViewModel>
     {
         private readonly IMapper _mapper;
         private readonly ISpecificObjectiveService _specificObjectiveService;
@@ -23,7 +25,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Queries
             _uploadedFileService = uploadedFileService;
         }
 
-        public async Task<GetSpecificObjectiveByIdResponse> Handle(GetSpecificObjectiveByIdQuery request, CancellationToken cancellationToken)
+        public async Task<SpecificObjectiveViewModel> Handle(GetSpecificObjectiveByIdQuery request, CancellationToken cancellationToken)
         {
             var specificObjective = await _specificObjectiveService.FindQuery()
                 .Where(item => item.ObjectiveId == request.ObjectiveId)
@@ -41,14 +43,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Queries
                 {
                     specificObjective.Id
                 }, TargetEntity.Objective, cancellationToken);
-
-            var aggregate = new VirtualObjectiveAggregate
+            
+            var aggregate = new SpecificObjectiveAggregate
             {
-                DocumentFileMappingModels = files.Select(c => _mapper.Map<DocumentFileMappingModel>(c)).ToList(),
-                VirtualObjective = specificObjective
+                SpecificObjective = specificObjective,
+                DocumentFileMappingModels = files.Select(c => _mapper.Map<DocumentFileMappingModel>(c)).ToList()
             };
 
-            return _mapper.Map<GetSpecificObjectiveByIdResponse>(aggregate);
+            return _mapper.Map<SpecificObjectiveViewModel>(aggregate);
         }
     }
 }
