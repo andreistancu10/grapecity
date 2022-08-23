@@ -1,7 +1,6 @@
-﻿using DigitNow.Adapters.MS.Identity;
-using DigitNow.Adapters.MS.Identity.Poco;
-using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
@@ -14,27 +13,23 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
     public class UpdateDocumentUserRecipientHandler: ICommandHandler<UpdateDocumentUserRecipientCommand, ResultObject>
     {
         private readonly DocumentManagementDbContext _dbContext;
-        private readonly IIdentityAdapterClient _identityAdapterClient;
         private readonly IIdentityService _identityService;
         private readonly IMailSenderService _mailSenderService;
 
 
         public UpdateDocumentUserRecipientHandler(
             DocumentManagementDbContext dbContext,
-            IIdentityAdapterClient identityAdapterClient,
             IIdentityService identityService,
             IMailSenderService mailSenderService)
         {
             _dbContext = dbContext;
-            _identityAdapterClient = identityAdapterClient;
             _identityService = identityService;
             _mailSenderService = mailSenderService;
         }
         public async Task<ResultObject> Handle(UpdateDocumentUserRecipientCommand request, CancellationToken cancellationToken)
         {
-
-            var currentUser = await _identityAdapterClient.GetUserByIdAsync(_identityService.GetCurrentUserId(), cancellationToken);
-            var targetUser = await _identityAdapterClient.GetUserByIdAsync(request.UserId, cancellationToken);
+            var currentUser = await _identityService.GetUserByIdAsync(_identityService.GetCurrentUserId(), cancellationToken);
+            var targetUser = await _identityService.GetUserByIdAsync(request.UserId, cancellationToken);
 
             if (targetUser == null)
                 return ResultObject.Error(new ErrorMessage
@@ -60,7 +55,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
             return new ResultObject(ResultStatusCode.Ok);
         }
 
-        private async Task UpdateDocumentsAsync(List<long> documentIds, User targetUser, CancellationToken token)
+        private async Task UpdateDocumentsAsync(List<long> documentIds, UserModel targetUser, CancellationToken token)
         {
             var foundDocuments = await _dbContext.Documents
                 .Include(x => x.WorkflowHistories)
@@ -69,7 +64,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
 
             foreach (var foundDocument in foundDocuments)
             {
-                var isHeadOfDepartment = targetUser.Roles.Contains(RecipientType.HeadOfDepartment.Code);
+                var isHeadOfDepartment = targetUser.Roles.Select(x => x.Code).Contains(RecipientType.HeadOfDepartment.Code);
                 if (isHeadOfDepartment)
                 {
                     foundDocument.Status = foundDocument.DocumentType == DocumentType.Incoming ? DocumentStatus.InWorkDelegatedUnallocated : DocumentStatus.New;
@@ -79,7 +74,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
                     foundDocument.Status = foundDocument.DocumentType == DocumentType.Incoming ? DocumentStatus.InWorkDelegated : DocumentStatus.New;
                 }
 
-                foundDocument.DestinationDepartmentId = targetUser.Departments.FirstOrDefault();
+                foundDocument.DestinationDepartmentId = targetUser.Departments.First().Id;
                 foundDocument.RecipientId = targetUser.Id;
 
                 var recipientType = isHeadOfDepartment ? RecipientType.HeadOfDepartment : RecipientType.Functionary;

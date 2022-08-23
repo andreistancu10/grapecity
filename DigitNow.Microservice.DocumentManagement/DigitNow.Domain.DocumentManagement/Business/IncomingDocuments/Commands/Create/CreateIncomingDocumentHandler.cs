@@ -4,12 +4,14 @@ using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using HTSS.Platform.Core.Errors;
-using DigitNow.Adapters.MS.Identity;
-using DigitNow.Adapters.MS.Identity.Poco;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
+using DigitNow.Domain.Authentication.Client;
+using DigitNow.Domain.Authentication.Contracts.ContactDetails.Create;
+using DigitNow.Domain.Authentication.Contracts;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create
 {
@@ -17,7 +19,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IMapper _mapper;
-        private readonly IIdentityAdapterClient _identityAdapterClient;
+        private readonly IAuthenticationClient _authenticationClient;
+        private readonly IIdentityService _identityService;
         private readonly ISpecialRegisterMappingService _specialRegisterMappingService;
         private readonly IIncomingDocumentService _incomingDocumentService;
         private readonly IUploadedFileService _uploadedFileService;
@@ -25,7 +28,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
 
         public CreateIncomingDocumentHandler(DocumentManagementDbContext dbContext,
             IMapper mapper,
-            IIdentityAdapterClient identityAdapterClient,
+            IAuthenticationClient authenticationClient,
+            IIdentityService identityService,
             ISpecialRegisterMappingService specialRegisterMappingService,
             IUploadedFileService uploadedFileService,
             IIncomingDocumentService incomingDocumentService,
@@ -33,7 +37,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
         {
             _dbContext = dbContext;
             _mapper = mapper;
-            _identityAdapterClient = identityAdapterClient;
+            _authenticationClient = authenticationClient;
+            _identityService = identityService;
             _uploadedFileService = uploadedFileService;
             _specialRegisterMappingService = specialRegisterMappingService;
             _incomingDocumentService = incomingDocumentService;
@@ -45,7 +50,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
             if (!string.IsNullOrWhiteSpace(request.IdentificationNumber))
                 await CreateContactDetailsAsync(request, cancellationToken);
 
-            var headOfDepartment = await GetHeadOfDepartmentUserAsync(request.RecipientId, cancellationToken);
+            var headOfDepartment = await _identityService.GetHeadOfDepartmentUserAsync(request.RecipientId, cancellationToken);
             if (headOfDepartment == null)
                 return ResultObject.Error(new ErrorMessage
                 {
@@ -82,7 +87,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
                 if (request.ContactDetail?.Email != null)
                 {
                     await _mailSenderService.SendMail_CreateIncomingDocument(
-                        new User { FirstName = request.IssuerName, Email = request.ContactDetail.Email },
+                        new UserModel { FirstName = request.IssuerName, Email = request.ContactDetail.Email },
                         newIncomingDocument.Document.RegistrationNumber,
                         newIncomingDocument.Document.RegistrationDate,
                         cancellationToken
@@ -98,12 +103,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
             }
 
             return ResultObject.Created(newIncomingDocument.DocumentId);
-        }
-        private async Task<User> GetHeadOfDepartmentUserAsync(long departmentId, CancellationToken token)
-        {
-            var response = await _identityAdapterClient.GetUsersAsync(token);
-            var departmentUsers = response.Users.Where(x => x.Departments.Contains(departmentId));
-            return departmentUsers.FirstOrDefault(x => x.Roles.Contains(RecipientType.HeadOfDepartment.Code));
         }
 
         private async Task AttachConnectedDocumentsAsync(CreateIncomingDocumentCommand request, IncomingDocument incomingDocumentForCreation, CancellationToken cancellationToken)
@@ -128,8 +127,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
             contactDetails.IdentificationNumber = request.IdentificationNumber;
             contactDetails.IssuerName = request.IssuerName;
 
-            var contactDetailDto = _mapper.Map<IdentityContactDetail>(contactDetails);
-            await _identityAdapterClient.CreateContactDetailsAsync(contactDetailDto, cancellationToken);
+            await _authenticationClient.ContactDetails.CreateAsync(new CreateContactDetailRequest
+            {
+                ContactDetailModel = _mapper.Map<ContactDetailModel>(contactDetails)
+            }, cancellationToken);
         }
     }
 }

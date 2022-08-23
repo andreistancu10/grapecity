@@ -39,7 +39,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.
             }
 
             var documentType = await _catalogAdapterClient.GetDocumentTypeByIdAsync(result.DocumentTypeId, cancellationToken);
-            var fileContent = await _pdfDocumentGenerator.GeneratePdf((new DocumentPdfDetails
+            var fileContent = _pdfDocumentGenerator.GeneratePdf((new DocumentPdfDetails
             {
                 IssuerName = result.IssuerName,
                 RegistrationDate = result.Document.RegistrationDate,
@@ -48,7 +48,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.
                 DocumentType = documentType.Name,
                 CityHall = "Primaria Bucuresti",
                 InstitutionHeader = "Primaria Bucuresti"
-            }), "Business/Common/Export/Pdf/Templates/Html/registration_proof_template.html", "dovada_inregistrare_document_intrare.pdf");
+            }), "dovada_inregistrare_document_intrare.pdf");
 
 
             return _mapper.Map<FileContent, GetRegistrationProofResponse>(fileContent);

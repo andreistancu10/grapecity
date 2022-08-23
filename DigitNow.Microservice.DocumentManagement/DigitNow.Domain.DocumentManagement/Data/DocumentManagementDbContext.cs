@@ -14,7 +14,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
 {
     public class DocumentManagementDbContext : DbContext
     {
-        internal const string Schema = "DocumentMangement";
+        internal const string Schema = "DocumentManagement";
 
         private readonly IIdentityService _identityService;
 

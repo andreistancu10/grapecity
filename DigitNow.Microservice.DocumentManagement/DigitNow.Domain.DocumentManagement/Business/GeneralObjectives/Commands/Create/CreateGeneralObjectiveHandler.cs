@@ -39,7 +39,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
                 await _uploadedFileService.CreateObjectiveUploadedFilesAsync(request.UploadedFileIds, generalObjective.Objective, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
 
-            return ResultObject.Created(generalObjective.Id);
+            return ResultObject.Created(generalObjective.ObjectiveId);
         }
     }
 }

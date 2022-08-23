@@ -91,7 +91,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
         {
             if (HeadOfDepartmentPermissionsFilter != null)
             {
-                EntityPredicates.Add(x => x.DestinationDepartmentId == HeadOfDepartmentPermissionsFilter.DepartmentId
+                EntityPredicates.Add(x => HeadOfDepartmentPermissionsFilter.DepartmentIds.Contains(x.DestinationDepartmentId)
                 || x.CreatedBy == HeadOfDepartmentPermissionsFilter.UserId
                 || x.RecipientId == HeadOfDepartmentPermissionsFilter.UserId
                 || x.DocumentActions.Select(x => x.ResposibleId).Contains(HeadOfDepartmentPermissionsFilter.UserId));
@@ -108,7 +108,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
                     ||
                     x.DocumentActions.Select(x => x.ResposibleId).Contains(FunctionaryPermissionsFilter.UserId)
                     ||
-                    (x.DestinationDepartmentId == FunctionaryPermissionsFilter.DepartmentId)
+                    (FunctionaryPermissionsFilter.DepartmentIds.Contains(x.DestinationDepartmentId))
                     &&
                     (
                         (
