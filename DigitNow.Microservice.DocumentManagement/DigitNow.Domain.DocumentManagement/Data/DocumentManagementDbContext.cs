@@ -43,7 +43,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<Objective> Objectives { get; set; }
         public DbSet<GeneralObjective> GeneralObjectives { get; set; }
         public DbSet<SpecificObjective> SpecificObjectives { get; set; }
-        public DbSet<SpecificObjectiveFunctionary> SpecificObjectiveFunctionarys { get; set; } //TODO: Fix typo. Correct value SpecificObjectiveFunctionaries
+        public DbSet<SpecificObjectiveFunctionary> SpecificObjectiveFunctionaries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

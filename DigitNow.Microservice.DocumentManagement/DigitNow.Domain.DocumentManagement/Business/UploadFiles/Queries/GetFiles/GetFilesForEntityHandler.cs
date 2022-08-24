@@ -4,6 +4,7 @@ using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using HTSS.Platform.Core.CQRS;
@@ -13,16 +14,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetFil
     public class GetFilesForEntityHandler : IQueryHandler<GetFilesForEntityQuery, List<DocumentFileViewModel>>
     {
         private readonly IMapper _mapper;
-        private readonly IUploadedFileService _uploadedFileService;
+        private readonly IDocumentFileService _documentFileService;
+
         private readonly UploadedFileRelationsFetcher _uploadedFileRelationsFetcher;
 
         public GetFilesForEntityHandler(
             IMapper mapper,
             IServiceProvider serviceProvider,
-            IUploadedFileService uploadedFileService)
+            IDocumentFileService documentFileService)
         {
             _mapper = mapper;
-            _uploadedFileService = uploadedFileService;
+            _documentFileService = documentFileService;
             _uploadedFileRelationsFetcher = new UploadedFileRelationsFetcher(serviceProvider);
         }
 
@@ -30,7 +32,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetFil
         {
             var uploadedFiles = request.TargetEntity switch
             {
-                (int)TargetEntity.Document => await _uploadedFileService.FetchUploadedFilesForDocument(request.TargetId, cancellationToken),
+                (int)TargetEntity.Document => await _documentFileService.FetchUploadedFilesForDocument(request.TargetId, cancellationToken),
                 _ => throw new InvalidEnumArgumentException()
             };
 
@@ -39,14 +41,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetFil
                 .TriggerFetchersAsync(cancellationToken);
 
             return uploadedFiles.Select(file =>
-                new VirtualFileAggregate
+                new DocumentFileAggregate
                 {
                     UploadedFile = file,
                     Categories = _uploadedFileRelationsFetcher.UploadedFileCategoryModels,
                     Users = _uploadedFileRelationsFetcher.UploadedFileUsers,
                     DocumentFileMappings = _uploadedFileRelationsFetcher.DocumentFileMappings
                 })
-                .Select(aggregate => _mapper.Map<VirtualFileAggregate, DocumentFileViewModel>(aggregate))
+                .Select(aggregate => _mapper.Map<DocumentFileAggregate, DocumentFileViewModel>(aggregate))
                 .ToList();
         }
     }

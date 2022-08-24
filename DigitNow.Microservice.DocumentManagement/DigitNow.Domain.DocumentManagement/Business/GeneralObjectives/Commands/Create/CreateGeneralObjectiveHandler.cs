@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
 using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
@@ -12,15 +13,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IGeneralObjectiveService _generalObjectiveService;
-        private readonly IUploadedFileService _uploadedFileService;
+        private readonly IObjectiveFileService _objectiveFileService;
 
         public CreateGeneralObjectiveHandler(DocumentManagementDbContext dbContext,
             IGeneralObjectiveService generalObjectiveService,
-            IUploadedFileService uploadedFileService)
+            IObjectiveFileService objectiveFileService)
         {
             _dbContext = dbContext;
             _generalObjectiveService = generalObjectiveService;
-            _uploadedFileService = uploadedFileService;
+            _objectiveFileService = objectiveFileService;
         }
         public async Task<ResultObject> Handle(CreateGeneralObjectiveCommand request, CancellationToken cancellationToken)
         {
@@ -38,7 +39,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
             
             if (request.UploadedFileIds.Any())
             {
-                await _uploadedFileService.UpdateUploadedFilesWithTargetIdForObjectiveAsync(request.UploadedFileIds,
+                await _objectiveFileService.UpdateUploadedFilesWithTargetIdAsync(request.UploadedFileIds,
                     generalObjective.Objective, cancellationToken);
             }
 

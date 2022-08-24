@@ -10,8 +10,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Mappings
         public UploadFileMapping()
         {
             CreateMap<UploadFileCommand, UploadedFile>()
-                .ForMember(c => c.ContentType, opt => opt.MapFrom(src => src.File.ContentType))
-                ;
+                .ForMember(c => c.ContentType, opt => opt.MapFrom(src => src.File.ContentType));
+
             CreateMap<UploadedFile, UploadFileResponse>()
                 .ForMember(c => c.FileId, opt => opt.MapFrom(dest => dest.Id));
         }

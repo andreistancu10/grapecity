@@ -1,4 +1,5 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
 using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
@@ -9,13 +10,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
     public class UpdateGeneralObjectiveHandler : ICommandHandler<UpdateGeneralObjectiveCommand, ResultObject>
     {
         private readonly IGeneralObjectiveService _generalObjectiveService;
-        private readonly IUploadedFileService _uploadedFileService;
+        private readonly IObjectiveFileService _objectiveFileService;
 
-        public UpdateGeneralObjectiveHandler(IGeneralObjectiveService generalObjectiveService,
-            IUploadedFileService uploadedFileService)
+        public UpdateGeneralObjectiveHandler(
+            IGeneralObjectiveService generalObjectiveService,
+            IObjectiveFileService objectiveFileService)
         {
             _generalObjectiveService = generalObjectiveService;
-            _uploadedFileService = uploadedFileService;
+            _objectiveFileService = objectiveFileService;
         }
         public async Task<ResultObject> Handle(UpdateGeneralObjectiveCommand request, CancellationToken cancellationToken)
         {
@@ -32,10 +34,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
                     Parameters = new object[] { request.ObjectiveId }
                 });
 
-            var fileMappings =  await _uploadedFileService.GetUploadedFileMappingsAsync(new List<long>
+            var fileMappings = await _objectiveFileService.GetUploadedFileMappingsAsync(new List<long>
             {
                 initialGeneralObjective.Id
-            }, TargetEntity.Objective, cancellationToken);
+            }, cancellationToken);
 
             initialGeneralObjective.Objective.Title = request.Title;
             initialGeneralObjective.Objective.State = request.State;
@@ -48,7 +50,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
             {
                 var uploadedFileIds = fileMappings.Select(item => item.UploadedFileId);
 
-                await _uploadedFileService.UpdateUploadedFilesWithTargetIdForObjectiveAsync(request.UploadedFileIds.Except(uploadedFileIds), initialGeneralObjective.Objective, cancellationToken).ConfigureAwait(false);
+                await _objectiveFileService.UpdateUploadedFilesWithTargetIdAsync(request.UploadedFileIds.Except(uploadedFileIds), initialGeneralObjective.Objective, cancellationToken).ConfigureAwait(false);
             }
 
             return ResultObject.Ok(initialGeneralObjective.ObjectiveId);

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
@@ -7,7 +8,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
     {
         public FileViewModelMappings()
         {
-            CreateMap<VirtualFileAggregate, DocumentFileViewModel>()
+            CreateMap<VirtualFileAggregate, FileViewModel>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.UploadedFile.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.UploadedFile.Name))
+                .ForMember(dest => dest.UploadDate, opt => opt.MapFrom(src => src.UploadedFile.CreatedAt))
+                .ForMember(dest => dest.UploadedBy, opt => opt.MapFrom<MapUploadedBy>());
+
+            CreateMap<DocumentFileAggregate, DocumentFileViewModel>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.UploadedFile.Id))
                 .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.UploadedFile.Name))
                 .ForMember(dest => dest.UploadDate, opt => opt.MapFrom(src => src.UploadedFile.CreatedAt))
@@ -16,23 +23,33 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
         }
 
         private class MapUploadedBy :
-            IValueResolver<VirtualFileAggregate, DocumentFileViewModel, BasicViewModel>
+            IValueResolver<VirtualFileAggregate, FileViewModel, BasicViewModel>,
+            IValueResolver<DocumentFileAggregate, DocumentFileViewModel, BasicViewModel>
         {
-            public BasicViewModel Resolve(VirtualFileAggregate source, DocumentFileViewModel destination, BasicViewModel destMember,
+            public BasicViewModel Resolve(VirtualFileAggregate source, FileViewModel destination, BasicViewModel destMember,
                 ResolutionContext context)
             {
-                var foundUser = source.Users.FirstOrDefault(x => x.Id == source.UploadedFile.CreatedBy);
+                return FindUser(source.Users, source.UploadedFile.CreatedBy);
+            }
 
-                return foundUser != null ?
-                    new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}") :
-                    null;
+            public BasicViewModel Resolve(DocumentFileAggregate source, DocumentFileViewModel destination, BasicViewModel destMember,
+                ResolutionContext context)
+            {
+                return FindUser(source.Users, source.UploadedFile.CreatedBy);
+            }
+
+            private static BasicViewModel FindUser(IReadOnlyList<UserModel> users, long userId)
+            {
+                var foundUser = users.FirstOrDefault(x => x.Id == userId);
+
+                return foundUser != null ? new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}") : null;
             }
         }
 
         private class MapCategory :
-            IValueResolver<VirtualFileAggregate, DocumentFileViewModel, BasicViewModel>
+            IValueResolver<DocumentFileAggregate, DocumentFileViewModel, BasicViewModel>
         {
-            public BasicViewModel Resolve(VirtualFileAggregate source, DocumentFileViewModel destination, BasicViewModel destMember,
+            public BasicViewModel Resolve(DocumentFileAggregate source, DocumentFileViewModel destination, BasicViewModel destMember,
                 ResolutionContext context)
             {
                 var foundDocumentCategoryId = source.DocumentFileMappings?.FirstOrDefault(c => c.UploadedFileMappingId == source.UploadedFile.UploadedFileMappingId)?.DocumentCategoryId;

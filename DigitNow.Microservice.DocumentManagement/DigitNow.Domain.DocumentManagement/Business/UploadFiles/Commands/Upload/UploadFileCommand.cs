@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload
 {
-    public class UploadFileCommand : ICommand<DocumentFileViewModel>
+    public class UploadFileCommand : ICommand<FileViewModel>
     {
         public long? DocumentCategoryId { get; set; }
         public long? TargetId { get; set; }

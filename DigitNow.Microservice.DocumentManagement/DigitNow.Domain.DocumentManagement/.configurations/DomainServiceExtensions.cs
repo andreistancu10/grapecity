@@ -17,6 +17,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using DigitNow.Domain.DocumentManagement.Business.Common.Notifications.Mail;
 using DigitNow.Domain.Authentication.Client;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
 using Domain.Mail.Client;
 
 namespace DigitNow.Domain.DocumentManagement.configurations
@@ -91,7 +92,11 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<ISpecialRegisterMappingService, SpecialRegisterMappingService>();
             services.AddTransient<ISpecialRegisterService, SpecialRegisterService>();
             services.AddTransient<IFileService, FileService>(c => new FileService(true));
+            
             services.AddTransient<IUploadedFileService, UploadedFileService>();
+            services.AddTransient<IDocumentFileService, DocumentFileService>();
+            services.AddTransient<IObjectiveFileService, ObjectiveFileService>();
+
             services.AddTransient<IObjectiveService, ObjectiveService>();
             services.AddTransient<IGeneralObjectiveService, GeneralObjectiveService>();
             services.AddTransient<ISpecificObjectiveService, SpecificObjectiveService>();

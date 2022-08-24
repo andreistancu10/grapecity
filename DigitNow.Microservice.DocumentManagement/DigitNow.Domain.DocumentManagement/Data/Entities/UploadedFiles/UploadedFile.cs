@@ -10,7 +10,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public string ContentType { get; set; }
         public string RelativePath { get; set; }
         public string AbsolutePath { get; set; }
-        public Guid Guid { get; set; }
+        public Guid GeneratedName { get; set; }
 
         #region References
 

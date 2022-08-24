@@ -4,6 +4,7 @@ using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
 using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 
 namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Commands.Update
@@ -11,16 +12,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
     public class UpdateSpecificObjectiveHandler : ICommandHandler<UpdateSpecificObjectiveCommand, ResultObject>
     {
         private readonly ISpecificObjectiveService _specificObjectiveService;
-        private readonly IUploadedFileService _uploadedFileService;
         private readonly ISpecificObjectiveFunctionaryService _specificObjectiveFunctionaryService;
+        private readonly IObjectiveFileService _objectiveFileService;
 
-        public UpdateSpecificObjectiveHandler(ISpecificObjectiveService specificObjectiveService,
+        public UpdateSpecificObjectiveHandler(
+            ISpecificObjectiveService specificObjectiveService,
             ISpecificObjectiveFunctionaryService specificObjectiveFunctionaryService,
-            IUploadedFileService uploadedFileService)
+            IObjectiveFileService objectiveFileService)
         {
             _specificObjectiveService = specificObjectiveService;
             _specificObjectiveFunctionaryService = specificObjectiveFunctionaryService;
-            _uploadedFileService = uploadedFileService;
+            _objectiveFileService = objectiveFileService;
         }
         public async Task<ResultObject> Handle(UpdateSpecificObjectiveCommand request, CancellationToken cancellationToken)
         {
@@ -38,11 +40,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
                     Parameters = new object[] { request.ObjectiveId }
                 });
 
-            var uploadedFileMappings = await _uploadedFileService.GetUploadedFileMappingsAsync(
+            var uploadedFileMappings = await _objectiveFileService.GetUploadedFileMappingsAsync(
                  new List<long>
                  {
                     initialSpecificObjective.Id
-                 }, TargetEntity.Objective, cancellationToken);
+                 }, cancellationToken);
 
             initialSpecificObjective.Objective.Title = request.Title;
             initialSpecificObjective.Objective.Details = request.Details;
@@ -61,7 +63,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
             {
                 var uploadedFileIds = uploadedFileMappings.Select(item => item.UploadedFileId);
 
-                await _uploadedFileService.UpdateUploadedFilesWithTargetIdForObjectiveAsync(request.UploadedFileIds.Except(uploadedFileIds), initialSpecificObjective.Objective, cancellationToken).ConfigureAwait(false);
+                await _objectiveFileService.UpdateUploadedFilesWithTargetIdAsync(request.UploadedFileIds.Except(uploadedFileIds), initialSpecificObjective.Objective, cancellationToken).ConfigureAwait(false);
             }
 
             return ResultObject.Created(initialSpecificObjective.ObjectiveId);
