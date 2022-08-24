@@ -17,5 +17,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
         public bool IsDispatched { get; set; }
         public BasicViewModel User { get; set; }
         public string IdentificationNumber { get; set; }
+        public bool Editable { get; set; }
     }
 }

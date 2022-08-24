@@ -29,7 +29,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Queries.GetWorkf
             var userRole = await _identityService.GetCurrentUserFirstRoleAsync(cancellationToken);
 
             DateTime? opinionRequestedUntil = null;
-            if (document.Status == DocumentStatus.OpinionRequestedAllocated)
+            if (document.Status == DocumentStatus.OpinionRequestedAllocated || document.Status == DocumentStatus.OpinionRequestedUnallocated)
             {
                 opinionRequestedUntil = ExtractDeadline(document);
             }
