@@ -62,18 +62,8 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
                 }
                 else
                 {
-                    //(!) Rules applied
-                    // Incoming => Allow all
-                    // Internal => No not allow
-                    // Outgoing => Only with Status = Finalized
                     EntityPredicates.Add(x =>
-                        (x.DestinationDepartmentId == RegistryOfficeDepartmentRightsFilter.DepartmentId)
-                        &&
-                        (
-                            (x.DocumentType == DocumentType.Incoming || x.DocumentType == DocumentType.Internal)
-                            ||
-                            (x.DocumentType == DocumentType.Outgoing && x.Status == DocumentStatus.Finalized)
-                        )
+                        x.DestinationDepartmentId == RegistryOfficeDepartmentRightsFilter.DepartmentId
                     );
                 }
             }
@@ -92,8 +82,9 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
             if (HeadOfDepartmentPermissionsFilter != null)
             {
                 EntityPredicates.Add(x => HeadOfDepartmentPermissionsFilter.DepartmentIds.Contains(x.DestinationDepartmentId)
-                || x.CreatedBy == HeadOfDepartmentPermissionsFilter.UserId 
-                || x.RecipientId == HeadOfDepartmentPermissionsFilter.UserId);
+                || x.CreatedBy == HeadOfDepartmentPermissionsFilter.UserId
+                || x.RecipientId == HeadOfDepartmentPermissionsFilter.UserId
+                || x.DocumentActions.Select(x => x.ResposibleId).Contains(HeadOfDepartmentPermissionsFilter.UserId));
             }
         }
 
@@ -103,7 +94,9 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
             {
                 // Allow access to it's assigned documents
                 EntityPredicates.Add(x =>
-                    (x.RecipientId == FunctionaryPermissionsFilter.UserId || x.CreatedBy == FunctionaryPermissionsFilter.UserId)
+                    x.RecipientId == FunctionaryPermissionsFilter.UserId || x.CreatedBy == FunctionaryPermissionsFilter.UserId
+                    ||
+                    x.DocumentActions.Select(x => x.ResposibleId).Contains(FunctionaryPermissionsFilter.UserId)
                     ||
                     (FunctionaryPermissionsFilter.DepartmentIds.Contains(x.DestinationDepartmentId))
                     &&

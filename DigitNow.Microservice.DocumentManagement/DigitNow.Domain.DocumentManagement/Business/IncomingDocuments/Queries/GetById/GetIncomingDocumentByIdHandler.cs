@@ -23,6 +23,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.
             var getByIdQuery = await _documentService.GetByIdQueryAsync(request.Id, cancellationToken, applyPermissions: true);
                 
             var foundDocument = await getByIdQuery
+                .Include(x => x.DocumentActions)
                 .Include(x => x.WorkflowHistories)
                 .Include(x => x.IncomingDocument)
                 .Include(x => x.IncomingDocument.ContactDetail)
