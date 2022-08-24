@@ -62,18 +62,8 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
                 }
                 else
                 {
-                    //(!) Rules applied
-                    // Incoming => Allow all
-                    // Internal => No not allow
-                    // Outgoing => Only with Status = Finalized
                     EntityPredicates.Add(x =>
-                        (x.DestinationDepartmentId == RegistryOfficeDepartmentRightsFilter.DepartmentId)
-                        &&
-                        (
-                            (x.DocumentType == DocumentType.Incoming || x.DocumentType == DocumentType.Internal)
-                            ||
-                            (x.DocumentType == DocumentType.Outgoing && x.Status == DocumentStatus.Finalized)
-                        )
+                        x.DestinationDepartmentId == RegistryOfficeDepartmentRightsFilter.DepartmentId
                     );
                 }
             }
