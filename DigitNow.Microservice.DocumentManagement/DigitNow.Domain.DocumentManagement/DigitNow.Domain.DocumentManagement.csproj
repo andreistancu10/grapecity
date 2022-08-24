@@ -67,8 +67,8 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="OpenHtmlToPdf" Version="1.12.0" />
 		<PackageReference Include="ShiftIn.Utils" Version="6.0.7" />
+		<PackageReference Include="Syncfusion.HtmlToPdfConverter.QtWebKit.Net.Core" Version="20.2.0.44" />
 		<PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="6.13.15" />
 		<PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="6.13.15" />
 	</ItemGroup>

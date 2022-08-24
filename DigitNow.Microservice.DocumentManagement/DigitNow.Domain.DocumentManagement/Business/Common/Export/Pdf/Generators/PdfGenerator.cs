@@ -1,6 +1,8 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Internal;
-using DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Poco;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Poco;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents;
+using Syncfusion.Drawing;
+using Syncfusion.Pdf;
+using Syncfusion.Pdf.Graphics;
 using System.Reflection;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generators
@@ -40,15 +42,25 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Export.Pdf.Generato
                 html = html.Replace(item.TokenName, item.TokenValue);
             }
 
-            var localDistPath = Path.Combine(Directory.GetCurrentDirectory(), "temp");
-
-            var pdfContent = CustomPdfDocument
-                .Containing(html)
-                .WithGlobalSetting("tempFolder", localDistPath)
-                .Content();
-
-            return new FileContent(pdfName, "application/pdf", pdfContent);
+            return CreatePdf(html, pdfName);
         }
+
+        private FileContent CreatePdf(string html, string pdfName)
+        {
+            PdfDocument document = new PdfDocument();
+            PdfPage page = document.Pages.Add();
+            PdfGraphics graphics = page.Graphics;
+            PdfFont font = new PdfStandardFont(PdfFontFamily.TimesRoman, 14);
+            graphics.DrawString(html, font, PdfBrushes.Black, new PointF(0, 0));
+            using (MemoryStream stream = new MemoryStream())
+            {
+                document.Save(stream);
+                document.Close(true);
+                var pdfBytes = stream.ToArray();
+                return new FileContent(pdfName, "application/pdf", pdfBytes);
+            }
+        }
+
 
         private static string GetTemplateContent(string templateName)
         {

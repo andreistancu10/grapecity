@@ -77,7 +77,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
         public bool TryGetCurrentUserId(out int userId)
         {
-            var userIdClaim = _httpContextAccesor.HttpContext.User.FindFirstValue("htss_uid"); ;
+            var userIdClaim = _httpContextAccesor.HttpContext.User.FindFirstValue("htss_uid");
 
             return int.TryParse(userIdClaim, out userId);
         }

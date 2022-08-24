@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Commands.Update;
+using DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Queries.GetAll;
 using DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Queries.GetById;
 using DigitNow.Domain.DocumentManagement.Public.SpecialObjective.Models;
 using DigitNow.Domain.DocumentManagement.Public.SpecificObjectives.Models;
@@ -45,6 +46,17 @@ namespace DigitNow.Domain.DocumentManagement.Public.SpecialObjective
         public async Task<IActionResult> GetById([FromRoute] long id)
         {
             return await _mediator.Send(new GetSpecificObjectiveByIdQuery(id))
+                switch
+            {
+                null => NotFound(),
+                var result => Ok(result)
+            };
+        }
+
+        [HttpGet("getAllbyUserDepartment")]
+        public async Task<ActionResult<List<GetAllByUserDepartmentSpecificObjectiveResponse>>> GetAlByUserDepartment(CancellationToken cancellationToken)
+        {
+            return await _mediator.Send(new GetAllByUserDepartmentSpecificObjectiveQuery(), cancellationToken)
                 switch
             {
                 null => NotFound(),

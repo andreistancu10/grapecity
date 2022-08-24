@@ -23,7 +23,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
         Task<IQueryable<Document>> GetByIdQueryAsync(long documentId, CancellationToken token, bool applyPermissions = false);
         Task<IQueryable<Document>> FindByFilterQueryAsync(CancellationToken token, bool applyPermissions = false);
         Task<IQueryable<Document>> FindByRegistrationQueryAsync(long registrationNumber, int registrationYear, CancellationToken token, bool applyPermissions = false);
-        
+        Task<bool> CheckDocumentPermissionsAsync(long documentId, CancellationToken token);
+
         // Update
         Task SetResolutionAsync(IEnumerable<long> documentIds, DocumentResolutionType resolutionType, string remarks, CancellationToken cancellationToken);
 
@@ -60,6 +61,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             }
 
             return query.Where(x => x.Id == documentId);
+        }        
+        
+        public async Task<bool> CheckDocumentPermissionsAsync(long documentId, CancellationToken token)
+        {
+            var query = _dbContext.Documents.Where(x => x.Id == documentId).AsQueryable();
+
+            var dataPermissionsExpressions = await GetPermissionsDataExpressionsAsync(token);
+
+            query = query.WhereAll(dataPermissionsExpressions.ToPredicates());
+
+            return await query.AnyAsync(token);
         }
 
         public async Task<IQueryable<Document>> FindByFilterQueryAsync(CancellationToken token, bool applyPermissions = false)

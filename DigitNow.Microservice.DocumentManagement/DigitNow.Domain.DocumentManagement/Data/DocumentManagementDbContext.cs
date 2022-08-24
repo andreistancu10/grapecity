@@ -5,6 +5,7 @@
 
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentActions;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -13,7 +14,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
 {
     public class DocumentManagementDbContext : DbContext
     {
-        internal const string Schema = "DocumentMangement";
+        internal const string Schema = "DocumentManagement";
 
         private readonly IIdentityService _identityService;
 
@@ -44,6 +45,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<GeneralObjective> GeneralObjectives { get; set; }
         public DbSet<SpecificObjective> SpecificObjectives { get; set; }
         public DbSet<SpecificObjectiveFunctionary> SpecificObjectiveFunctionarys { get; set; }
+        public DbSet<DocumentAction> DocumentActions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

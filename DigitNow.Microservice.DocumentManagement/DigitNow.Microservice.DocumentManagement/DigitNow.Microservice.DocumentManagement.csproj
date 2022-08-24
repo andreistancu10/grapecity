@@ -18,6 +18,7 @@
 		<Compile Include=".configurations\Swagger\ConfigureSwaggerExtensions.cs" />
 		<Compile Include=".configurations\Swagger\SwaggerOptions.cs" />
 		<Compile Include=".configurations\Swagger\SwaggerSetup.cs" />
+		<Compile Include=".configurations\Syncfusion\ConfigureSyncfusionExtensions.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -32,13 +33,13 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="OpenHtmlToPdf" Version="1.12.0" />
 		<PackageReference Include="Serilog" Version="2.10.0" />
 		<PackageReference Include="Serilog.AspNetCore" Version="5.0.0" />
 		<PackageReference Include="Serilog.Exceptions" Version="8.1.0" />
 		<PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
 		<PackageReference Include="Serilog.Sinks.Elasticsearch" Version="8.4.1" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="5.5.1" />
+		<PackageReference Include="Syncfusion.HtmlToPdfConverter.Blink.Net.Core.Windows" Version="20.1.0.55" />
 	</ItemGroup>
 
 	<ItemGroup>
