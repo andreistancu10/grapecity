@@ -41,9 +41,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServic
                 };
 
                 await _dbContext.DocumentFileMappings.AddAsync(newDocumentFileMapping, cancellationToken);
+                await _dbContext.SaveChangesAsync(cancellationToken);
             }
-
-            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return uploadedFile;
         }
@@ -66,7 +65,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServic
 
             await UpdateUploadedFilesWithTargetIdAsync(idsToAdd, document, cancellationToken);
         }
-        
+
         public Task<List<UploadedFile>> FetchUploadedFilesForDocument(long documentId, CancellationToken cancellationToken)
         {
             return _dbContext.UploadedFileMappings
