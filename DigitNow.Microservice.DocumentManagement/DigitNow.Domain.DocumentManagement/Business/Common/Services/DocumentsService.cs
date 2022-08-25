@@ -176,17 +176,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
                         .SingleUpdateAsync(foundResolution, cancellationToken);
                 }
 
-
-                Department departmentToReceiveDocument = null;
-
-                if (dbDocument.DocumentType == Contracts.Documents.Enums.DocumentType.Incoming)
-                {
-                    departmentToReceiveDocument = await _catalogAdapterClient.GetDepartmentByCodeAsync(UserDepartment.Registry.Code, cancellationToken);
-                }
-                else
-                {
-                    departmentToReceiveDocument = await _catalogAdapterClient.GetDepartmentByIdAsync(dbDocument.SourceDestinationDepartmentId, cancellationToken);
-                }
+                var departmentToReceiveDocument = await _identityService.GetCurrentUserFirstDepartmentAsync(cancellationToken);
 
                 // TODO: Create Abstract factory
                 var newWorkflowResponsible = new WorkflowHistoryLog
