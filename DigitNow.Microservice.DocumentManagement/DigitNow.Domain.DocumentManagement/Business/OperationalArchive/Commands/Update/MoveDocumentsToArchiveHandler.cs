@@ -8,10 +8,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.OperationalArchive.Command
 {
     public class MoveDocumentsToArchiveHandler : ICommandHandler<MoveDocumentsToArchiveCommand, ResultObject>
     {
+        private const int ARCHIVE_DOCUMENTS_DAYS_COUNT = 180;
+
         private readonly DocumentManagementDbContext _dbContext;
         private readonly ILogger<MoveDocumentsToArchiveHandler> _logger;
-        //TODO: revert back to month interval
-        //private readonly int _archivingPeriod = 6;
 
         public MoveDocumentsToArchiveHandler(DocumentManagementDbContext dbContext, ILogger<MoveDocumentsToArchiveHandler> logger)
         {
@@ -20,19 +20,28 @@ namespace DigitNow.Domain.DocumentManagement.Business.OperationalArchive.Command
         }
         public async Task<ResultObject> Handle(MoveDocumentsToArchiveCommand request, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Handler called");
+            _logger.LogInformation("Archiving documents");
+            
             var documents = await _dbContext.Documents
                 .Where(x => !x.IsArchived)
-                //.Where(x => x.StatusModifiedAt.Date.AddMonths(_archivingPeriod) < System.DateTime.Now.Date)
+                .Where(x => x.StatusModifiedAt.Date.AddDays(ARCHIVE_DOCUMENTS_DAYS_COUNT) < DateTime.Now.Date)
                 .Where(x => x.Status == DocumentStatus.Finalized || (x.DocumentType == DocumentType.Internal && x.Status == DocumentStatus.InWorkMayorCountersignature))
                 .ToListAsync(cancellationToken);
-            _logger.LogInformation($"Docs to be moved to archive: { documents.Count }");
+            
+            if(!documents.Any())
+            {
+                _logger.LogInformation("No documents found to archive");
+                return ResultObject.Ok();
+            }
 
             foreach (var document in documents)
             {
                 document.IsArchived = true;
             }
             await _dbContext.SaveChangesAsync(cancellationToken);
+            
+            _logger.LogInformation($"Documents archived ({documents.Count}): {string.Join(',', documents.Select(x => x.Id))}");
+
             return ResultObject.Ok();
         }
     }
