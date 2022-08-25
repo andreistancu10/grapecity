@@ -1,6 +1,6 @@
 ﻿namespace DigitNow.Domain.DocumentManagement.utils
 {
-    public enum FieldType
+    public enum DynamicFieldType
     {
         Input,
         Number,

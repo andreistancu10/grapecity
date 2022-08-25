@@ -18,16 +18,13 @@ namespace DigitNow.Domain.DocumentManagement.Public.Forms
     {
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
-        private readonly ILocalizationManager _localizationManger;
 
         public FormsController(
             IMediator mediator,
-            IMapper mapper,
-            ILocalizationManager localizationManger)
+            IMapper mapper)
         {
             _mediator = mediator;
             _mapper = mapper;
-            _localizationManger = localizationManger;
         }
 
         [HttpGet("filter")]

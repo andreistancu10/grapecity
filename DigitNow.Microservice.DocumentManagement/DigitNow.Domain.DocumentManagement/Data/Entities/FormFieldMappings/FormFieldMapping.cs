@@ -12,14 +12,11 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public string InitialValue { get; set; }
         public long FormId { get; set; }
         public long FormFieldId { get; set; }
-        //public long FormValueId { get; set; }
 
         #region [ References ]
 
         public Form Form { get; set; }
         public FormField FormField { get; set; }
-
-        //public List<FormValue> FormValues { get; set; }
 
         #endregion
 

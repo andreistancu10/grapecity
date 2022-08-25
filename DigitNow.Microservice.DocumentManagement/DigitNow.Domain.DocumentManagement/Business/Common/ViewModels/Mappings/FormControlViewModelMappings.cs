@@ -22,7 +22,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
         {
             public int Resolve(FormControlAggregate source, FormControlViewModel destination, int destMember, ResolutionContext context)
             {
-                return (int)source.FormFields.First(c => c.Id == source.FormFieldMapping.FormFieldId).FieldType;
+                return (int)source.FormFields.First(c => c.Id == source.FormFieldMapping.FormFieldId).DynamicFieldType;
             }
         }
     }

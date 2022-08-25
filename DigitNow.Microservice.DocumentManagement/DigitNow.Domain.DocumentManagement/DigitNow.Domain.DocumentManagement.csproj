@@ -29,7 +29,7 @@
 		<Compile Include=".utils\CustomMappings.cs" />
 		<Compile Include=".utils\DevOnlyActionFilter.cs" />
 		<Compile Include=".utils\DocumentTypeTranslation.cs" />
-		<Compile Include=".utils\FieldType.cs" />
+		<Compile Include=".utils\DynamicFieldType.cs" />
 		<Compile Include=".utils\FilterDescriptor.cs" />
 		<Compile Include=".utils\LanguagesUtils.cs" />
 	</ItemGroup>

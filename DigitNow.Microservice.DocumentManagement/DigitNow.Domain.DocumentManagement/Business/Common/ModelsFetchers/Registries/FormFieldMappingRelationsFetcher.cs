@@ -6,8 +6,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
 {
     internal sealed class FormFieldMappingRelationsFetcher : BaseRelationsFetcher
     {
-        public List<FormFieldModel> FormFieldModels
-            => GetItems<FormFieldFetcher, FormFieldModel>();
+        public List<DynamicFormFieldModel> FormFieldModels
+            => GetItems<FormFieldFetcher, DynamicFormFieldModel>();
 
         public FormFieldMappingRelationsFetcher(IServiceProvider serviceProvider) : base(serviceProvider)
         {

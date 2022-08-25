@@ -47,7 +47,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Forms.Commands
                 await _dbContext.FormFieldValues.AddRangeAsync(formValues, cancellationToken);
                 await _dbContext.SaveChangesAsync(cancellationToken);
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return ResultObject.CreateError("Error Saving Form Data", "");
             }
