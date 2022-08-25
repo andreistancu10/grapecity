@@ -61,7 +61,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
 
         [Obsolete("Will be refactored with the use of the Catalog SDK")]
         private Task<Department> GetRegistryOfficeDepartmentAsync(CancellationToken token) =>        
-            _catalogAdapterClient.GetDepartmentByCodeAsync("registratura", token);
+            _catalogAdapterClient.GetDepartmentByCodeAsync(UserDepartment.Registry.Code, token);
 
         #endregion
     }

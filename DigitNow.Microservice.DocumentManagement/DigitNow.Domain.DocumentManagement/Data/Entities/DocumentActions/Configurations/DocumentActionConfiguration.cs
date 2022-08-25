@@ -13,7 +13,6 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities.DocumentActions.Confi
 
             builder.Property(p => p.DocumentId).IsRequired();
             builder.Property(p => p.Action).IsRequired();
-            builder.Property(p => p.ResposibleId).IsRequired();
 
             builder.HasOne(item => item.Document)
                 .WithMany(item => item.DocumentActions)
