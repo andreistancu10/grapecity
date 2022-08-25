@@ -48,10 +48,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
         private async Task CreateWorkflowForOutgoingAndInternalDocumentAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
         {
-            var departmentToReceiveDocument = document.WorkflowHistories
-                    .Where(x => x.RecipientType == RecipientType.Department.Id)
-                    .OrderBy(x => x.CreatedAt)
-                    .First().RecipientId;
+            var departmentToReceiveDocument = await IdentityService.GetCurrentUserFirstDepartmentIdAsync(token);
 
             document.DestinationDepartmentId = departmentToReceiveDocument;
             document.RecipientId = await IdentityService.GetHeadOfDepartmentUserIdAsync(departmentToReceiveDocument, token);

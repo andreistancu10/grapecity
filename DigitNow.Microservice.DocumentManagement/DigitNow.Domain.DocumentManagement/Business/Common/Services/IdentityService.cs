@@ -16,6 +16,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
         long GetCurrentUserId();
         bool TryGetCurrentUserId(out int userId);
         Task<RecipientType> GetCurrentUserFirstRoleAsync(CancellationToken token);
+        Task<long> GetCurrentUserFirstDepartmentIdAsync(CancellationToken token);
 
         Task<UserModel> GetUserByIdAsync(long userId, CancellationToken token);
 
@@ -172,6 +173,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             var department = await _catalogAdapterClient.GetDepartmentByCodeAsync(departmentCode, token);
 
             return await GetUsersWithinDepartmentAsync(department.Id, token);
+        }
+
+        public async Task<long> GetCurrentUserFirstDepartmentIdAsync(CancellationToken token)
+        {
+            var user = await GetUserByIdAsync(GetCurrentUserId(), token);
+            var department = user.Departments.First();
+
+            return department.Id;
         }
     }
 }

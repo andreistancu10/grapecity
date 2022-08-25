@@ -64,6 +64,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
                 {
                     EntityPredicates.Add(x =>
                         x.DestinationDepartmentId == RegistryOfficeDepartmentRightsFilter.DepartmentId
+                        || x.DocumentActions.Select(x => x.DepartmentId).Contains(RegistryOfficeDepartmentRightsFilter.DepartmentId)
                     );
                 }
             }
@@ -84,7 +85,8 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
                 EntityPredicates.Add(x => HeadOfDepartmentPermissionsFilter.DepartmentIds.Contains(x.DestinationDepartmentId)
                 || x.CreatedBy == HeadOfDepartmentPermissionsFilter.UserId
                 || x.RecipientId == HeadOfDepartmentPermissionsFilter.UserId
-                || x.DocumentActions.Select(x => x.ResposibleId).Contains(HeadOfDepartmentPermissionsFilter.UserId));
+                || x.DocumentActions.Select(x => x.ResposibleId).Contains(HeadOfDepartmentPermissionsFilter.UserId)
+                || x.DocumentActions.Where(x => x.DepartmentId.HasValue).Select(x => x.DepartmentId.Value).Contains(HeadOfDepartmentPermissionsFilter.DepartmentIds.First()));
             }
         }
 
@@ -97,6 +99,8 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
                     x.RecipientId == FunctionaryPermissionsFilter.UserId || x.CreatedBy == FunctionaryPermissionsFilter.UserId
                     ||
                     x.DocumentActions.Select(x => x.ResposibleId).Contains(FunctionaryPermissionsFilter.UserId)
+                    || 
+                    x.DocumentActions.Where(x => x.DepartmentId.HasValue).Select(x => x.DepartmentId.Value).Contains(FunctionaryPermissionsFilter.DepartmentIds.First())
                     ||
                     (FunctionaryPermissionsFilter.DepartmentIds.Contains(x.DestinationDepartmentId))
                     &&
