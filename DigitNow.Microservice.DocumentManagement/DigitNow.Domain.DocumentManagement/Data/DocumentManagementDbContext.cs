@@ -1,4 +1,4 @@
-﻿#undef MIGRATION_ONLY
+﻿#define MIGRATION_ONLY
 
 #if    MIGRATION_ONLY
 #endif
@@ -46,6 +46,10 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<SpecificObjective> SpecificObjectives { get; set; }
         public DbSet<SpecificObjectiveFunctionary> SpecificObjectiveFunctionarys { get; set; }
         public DbSet<DocumentAction> DocumentActions { get; set; }
+        public DbSet<Form> Forms { get; set; }
+        public DbSet<FormFieldMapping> FormFieldMappings { get; set; }
+        public DbSet<FormFieldValue> FormFieldValues { get; set; }
+        public DbSet<FormFillingLog> FormFillingLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

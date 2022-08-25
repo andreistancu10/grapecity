@@ -7,9 +7,9 @@ using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Adapters.MS.Catalog;
+using DigitNow.Domain.Authentication.Client;
 using DigitNow.Domain.Authentication.Contracts;
 using DigitNow.Domain.Authentication.Contracts.ContactDetails.Create;
-using DigitNow.Domain.Authentication.Client;
 
 namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Create
 {

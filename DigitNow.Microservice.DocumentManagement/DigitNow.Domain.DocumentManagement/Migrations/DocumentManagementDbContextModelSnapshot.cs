@@ -399,7 +399,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Form", "DocumentMangement");
+                    b.ToTable("Form", "DocumentManagement");
 
                     b.HasData(
                         new
@@ -431,7 +431,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<string>("Context")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("FieldType")
+                    b.Property<int>("DynamicFieldType")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -444,49 +444,49 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("FormField", "DocumentMangement");
+                    b.ToTable("FormField", "DocumentManagement");
 
                     b.HasData(
                         new
                         {
                             Id = 1L,
                             Context = "",
-                            FieldType = 0,
+                            DynamicFieldType = 0,
                             Name = "Input"
                         },
                         new
                         {
                             Id = 2L,
                             Context = "",
-                            FieldType = 1,
+                            DynamicFieldType = 1,
                             Name = "Number"
                         },
                         new
                         {
                             Id = 3L,
                             Context = "",
-                            FieldType = 2,
+                            DynamicFieldType = 2,
                             Name = "Date"
                         },
                         new
                         {
                             Id = 4L,
                             Context = "",
-                            FieldType = 3,
+                            DynamicFieldType = 5,
                             Name = "CountryDropdown"
                         },
                         new
                         {
                             Id = 5L,
                             Context = "",
-                            FieldType = 4,
+                            DynamicFieldType = 4,
                             Name = "DistrictDropdown"
                         },
                         new
                         {
                             Id = 6L,
                             Context = "",
-                            FieldType = 5,
+                            DynamicFieldType = 3,
                             Name = "CityDropdown"
                         });
                 });
@@ -529,7 +529,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.HasIndex("FormId");
 
-                    b.ToTable("FormFieldMapping", "DocumentMangement");
+                    b.ToTable("FormFieldMapping", "DocumentManagement");
 
                     b.HasData(
                         new
@@ -653,7 +653,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.HasIndex("FormFillingLogId");
 
-                    b.ToTable("FormFieldValue", "DocumentMangement");
+                    b.ToTable("FormFieldValue", "DocumentManagement");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.FormFillingLog", b =>
@@ -693,7 +693,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.HasIndex("FormId");
 
-                    b.ToTable("FormFillingLogs", "DocumentMangement");
+                    b.ToTable("FormFillingLogs", "DocumentManagement");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", b =>

@@ -10,8 +10,8 @@ using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.Authentication.Client;
-using DigitNow.Domain.Authentication.Contracts.ContactDetails.Create;
 using DigitNow.Domain.Authentication.Contracts;
+using DigitNow.Domain.Authentication.Contracts.ContactDetails.Create;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create
 {
