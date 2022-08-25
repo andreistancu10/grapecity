@@ -1,4 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
+using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 using HTSS.Platform.Core.CQRS;
 
@@ -7,10 +9,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
     public class CreateSpecificObjectiveHandler : ICommandHandler<CreateSpecificObjectiveCommand, ResultObject>
     {
         private readonly ISpecificObjectiveService _specificObjectiveService;
-        private readonly IUploadedFileService _uploadedFileService;
         private readonly ISpecificObjectiveFunctionaryService _specificObjectiveFunctionaryService;
+        private readonly IUploadedFileService _uploadedFileService;
 
-        public CreateSpecificObjectiveHandler(ISpecificObjectiveService specificObjectiveService,
+        public CreateSpecificObjectiveHandler(
+            ISpecificObjectiveService specificObjectiveService,
             ISpecificObjectiveFunctionaryService specificObjectiveFunctionaryService,
             IUploadedFileService uploadedFileService)
         {
@@ -24,7 +27,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
             {
                 DepartmentId = request.DepartmentId,
                 GeneralObjectiveId = request.GeneralObjectiveId,
-                Objective = new Objective()
+                Objective = new Objective
                 {
                     Title = request.Title,
                     Details = request.Details,
@@ -37,7 +40,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
                 await _specificObjectiveFunctionaryService.AddRangeAsync(specificObjective.ObjectiveId, request.SpecificObjectiveFunctionaryIds, cancellationToken);
 
             if (request.UploadedFileIds.Any())
-                await _uploadedFileService.CreateObjectiveUploadedFilesAsync(request.UploadedFileIds, specificObjective.Objective, cancellationToken);
+            {
+                await _uploadedFileService.UpdateUploadedFilesWithTargetIdAsync(request.UploadedFileIds, specificObjective.Objective.Id, TargetEntity.Objective, cancellationToken);
+            }
 
             return ResultObject.Created(specificObjective.ObjectiveId);
         }

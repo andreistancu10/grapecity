@@ -17,11 +17,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
 
         protected override async Task<List<UserModel>> FetchInternalAsync(UploadedFilesFetcherContext context, CancellationToken cancellationToken)
         {
-            var createdByUsers = context.UploadFiles
+            var createdByUsers = context.UploadedFiles
                 .Select(x => x.CreatedBy)
                 .ToList();
 
-            var usersResponse = await _authenticationClient.Users.GetUsersByFilterAsync(new GetUsersByFilterRequest(),cancellationToken);
+            var usersResponse = await _authenticationClient.Users.GetUsersByFilterAsync(new GetUsersByFilterRequest(), cancellationToken);
 
             var relatedUsers = usersResponse.Users
                 .Where(x => createdByUsers.Contains(x.Id))

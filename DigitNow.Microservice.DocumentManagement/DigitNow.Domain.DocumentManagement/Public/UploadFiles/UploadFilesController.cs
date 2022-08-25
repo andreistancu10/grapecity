@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.DownloadFile;
-using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetFiles;
+using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetUploadedFilesForDocumentId;
+using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetUploadedFilesForTargetId;
+using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using DigitNow.Domain.DocumentManagement.Public.UploadFiles.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
@@ -47,10 +50,22 @@ namespace DigitNow.Domain.DocumentManagement.Public.UploadFiles
             };
         }
 
-        [HttpGet("get-files/{documentId:int}")]
-        public async Task<IActionResult> GetFilesAsync([FromRoute] int documentId)
+        [HttpGet("get-files/{targetEntity}/{entityId:int}")]
+        public async Task<IActionResult> GetFilesAsync([FromRoute] TargetEntity targetEntity, [FromRoute] int entityId)
         {
-            var result = await _mediator.Send(new GetFilesQuery(documentId));
+
+            if (targetEntity == TargetEntity.Document)
+            {
+               var documentFileResult =await _mediator.Send(new GetUploadedFilesForDocumentIdQuery(entityId));
+                
+               return documentFileResult switch
+                {
+                    null => NotFound(),
+                    _ => Ok(documentFileResult)
+                }; 
+            }
+            
+            var result = await _mediator.Send(new GetUploadedFilesForTargetIdQuery(targetEntity, entityId));
 
             return result switch
             {

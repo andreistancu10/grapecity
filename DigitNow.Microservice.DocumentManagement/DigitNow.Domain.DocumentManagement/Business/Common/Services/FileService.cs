@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IFileService
     {
-        Task<Tuple<string, string>> UploadFileAsync(IFormFile formFileStream, string fileGuid);
+        Task<StoredFileModel> UploadFileAsync(FileModel fileModel, IFormFile contentFile);
         byte[] DownloadFileAsync(string path, string fileGuid);
     }
 
@@ -13,31 +15,39 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private readonly int _filesPerDirectory;
         private readonly string _rootPath;
         private readonly string _pathDirectorySeparator;
+        private readonly IMapper _mapper;
 
         public FileService(
-            bool isLinuxTypePath = false,
+            IMapper mapper, 
+            bool isLinuxTypePath = true,
             string rootDirectory = "DigitNow_Documents",
             int filesPerDirectory = 1000
-            //string partition = "/home",
             )
         {
+            _mapper = mapper;
             _filesPerDirectory = filesPerDirectory;
             var partition = isLinuxTypePath ? "/home" : "C:";
             _pathDirectorySeparator = isLinuxTypePath ? "/" : "\\";
             _rootPath = $"{partition}{_pathDirectorySeparator}{rootDirectory}";
         }
 
-        public async Task<Tuple<string, string>> UploadFileAsync(IFormFile formFileStream, string fileGuid)
+        public async Task<StoredFileModel> UploadFileAsync(FileModel fileModel, IFormFile contentFile)
         {
             var relativePath = GenerateRelativePath();
             relativePath = EnsureEligibilityOfPath(relativePath);
             var fullPath = GenerateFullPath(relativePath);
-            fileGuid = EnsureEligibilityOfFilename(fileGuid, fullPath);
+
+            var generatedName = Guid.NewGuid();
 
             CheckOrCreateDirectoryTree(fullPath);
-            await SaveFileOnDiskAsync(fullPath, fileGuid, formFileStream);
+            await SaveFileOnDiskAsync(fullPath, generatedName.ToString(), contentFile);
 
-            return new Tuple<string, string>(relativePath, fullPath);
+            var storedFileModel = _mapper.Map<StoredFileModel>(fileModel);
+            storedFileModel.RelativePath = relativePath;
+            storedFileModel.AbsolutePath = fullPath;
+            storedFileModel.GeneratedName = generatedName;
+
+            return storedFileModel;
         }
 
         public byte[] DownloadFileAsync(string path, string fileGuid)
@@ -49,28 +59,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             return File.ReadAllBytes($"{path}{_pathDirectorySeparator}{fileGuid}");
         }
-
-        private string EnsureEligibilityOfFilename(string fileGuid, string fullPath)
-        {
-            var isFilenameEligible = false;
-            var newFilename = fileGuid;
-
-            for (var i = 1; !isFilenameEligible; i++)
-            {
-                if (DoesFileExist(fullPath, newFilename))
-                {
-                    var bits = fileGuid.Split(".");
-                    newFilename = $"{bits[0]}_{i}.{bits[1]}";
-                }
-                else
-                {
-                    isFilenameEligible = true;
-                }
-            }
-
-            return newFilename;
-        }
-
+        
         private string EnsureEligibilityOfPath(string relativePath)
         {
             var isDirectoryEligible = false;

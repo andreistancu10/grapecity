@@ -1,53 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using AutoMapper;
+﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
-using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
-using DigitNow.Domain.DocumentManagement.Data;
 using HTSS.Platform.Core.CQRS;
-using Microsoft.EntityFrameworkCore;
 
-namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetFiles
+namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetUploadedFilesForTargetId
 {
-    public class GetFilesHandler : IQueryHandler<GetFilesQuery, List<FileViewModel>>
+    public class GetUploadedFilesForTargetIdHandler : IQueryHandler<GetUploadedFilesForTargetIdQuery, List<FileViewModel>>
     {
-        private readonly DocumentManagementDbContext _dbContext;
         private readonly IMapper _mapper;
         private readonly IUploadedFileService _uploadedFileService;
+
         private readonly UploadedFileRelationsFetcher _uploadedFileRelationsFetcher;
 
-        public GetFilesHandler(
-            DocumentManagementDbContext dbContext,
+        public GetUploadedFilesForTargetIdHandler(
             IMapper mapper,
             IServiceProvider serviceProvider,
             IUploadedFileService uploadedFileService)
         {
-            _dbContext = dbContext;
             _mapper = mapper;
             _uploadedFileService = uploadedFileService;
             _uploadedFileRelationsFetcher = new UploadedFileRelationsFetcher(serviceProvider);
         }
 
-        public async Task<List<FileViewModel>> Handle(GetFilesQuery query, CancellationToken cancellationToken)
+        public async Task<List<FileViewModel>> Handle(GetUploadedFilesForTargetIdQuery request, CancellationToken cancellationToken)
         {
-            var uploadedFiles = await _uploadedFileService.FetchUploadedFiles(query.DocumentId, cancellationToken);
+            var uploadedFiles =
+                await _uploadedFileService.FetchUploadedFiles(request.TargetEntity, request.TargetId,
+                    cancellationToken);
 
             await _uploadedFileRelationsFetcher
-                .UseUploadedFilesContext(new UploadedFilesFetcherContext { UploadFiles = uploadedFiles })
+                .UseUploadedFilesContext(new UploadedFilesFetcherContext(uploadedFiles))
                 .TriggerFetchersAsync(cancellationToken);
 
             return uploadedFiles.Select(file =>
                 new VirtualFileAggregate
                 {
                     UploadedFile = file,
-                    Categories = _uploadedFileRelationsFetcher.UploadedFileCategoryModels,
-                    Users = _uploadedFileRelationsFetcher.UploadedFileUsers
+                    Users = _uploadedFileRelationsFetcher.UploadedFileUsers,
                 })
                 .Select(aggregate => _mapper.Map<VirtualFileAggregate, FileViewModel>(aggregate))
                 .ToList();
