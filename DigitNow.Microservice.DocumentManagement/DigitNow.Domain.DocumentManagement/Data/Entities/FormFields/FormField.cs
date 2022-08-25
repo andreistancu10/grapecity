@@ -1,4 +1,5 @@
-﻿using DigitNow.Domain.DocumentManagement.utils;
+﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+using DigitNow.Domain.DocumentManagement.utils;
 using HTSS.Platform.Core.Domain;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities

@@ -1,4 +1,4 @@
-﻿namespace DigitNow.Domain.DocumentManagement.utils
+﻿namespace DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums
 {
     public enum DynamicFieldType
     {
