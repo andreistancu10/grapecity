@@ -72,7 +72,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 document.Status = DocumentStatus.InWorkMayorCountersignature;
 
                 await PassDocumentToDepartment(document, command, token);
-                await MailSenderService.SendMail_MayorApprovalDecision(document, oldWorkflowResponsible, token);
+
+                // ToDo: pass document.RecipientId as param to the send email function
+                //await MailSenderService.SendMail_MayorApprovalDecision(document, oldWorkflowResponsible, token);
             }
         }
 
@@ -114,7 +116,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         {
             var departmentToReceiveDocument = document.WorkflowHistories
                 .Where(x => x.RecipientType == RecipientType.Department.Id)
-                .OrderBy(x => x.CreatedAt)
+                .OrderByDescending(x => x.CreatedAt)
                 .First().RecipientId;
 
             document.Status = DocumentStatus.InWorkMayorDeclined;
@@ -123,8 +125,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             await PassDocumentToDepartment(document, command, token);
 
-            var oldWorkflowResponsible = GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.HeadOfDepartment.Id);
-            await MailSenderService.SendMail_MayorRejectionDecision(document, oldWorkflowResponsible, token);
+            //ToDo: pass document.RecipientId as param to the send email method
+            //await MailSenderService.SendMail_MayorRejectionDecision(document, oldWorkflowResponsible, token);
         }
 
         private async Task MayorDeclinedIncomingDocumentAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)

@@ -5,6 +5,7 @@ using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentActions;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
 
@@ -70,14 +71,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateD
 
             var departmentToReceiveDocument = await _catalogAdapterClient.GetDepartmentByCodeAsync(UserDepartment.Registry.Code, token);
 
-            document.DestinationDepartmentId = departmentToReceiveDocument.Id;
-            document.RecipientId = await _identityService.GetHeadOfDepartmentUserIdAsync(departmentToReceiveDocument.Id, token);
             document.Status = DocumentStatus.Finalized;
 
-            if (deliveryDetails.DeliveryMode == (int)TransmissionMode.DirectTransmission && document.DocumentType == DocumentType.Outgoing)
-            {
-                return;
-            }
+            //ToDo: clarification needed
+            //if (deliveryDetails.DeliveryMode == (int)TransmissionMode.DirectTransmission && document.DocumentType == DocumentType.Outgoing)
+            //{
+            //    return;
+            //}
 
             var newWorkflowResponsible = new WorkflowHistoryLog
             {
@@ -89,6 +89,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateD
             };
             
             await _dbContext.WorkflowHistoryLogs.AddAsync(newWorkflowResponsible, token);
+
+            //Make visible to registry after delivery
+            await _dbContext.DocumentActions.AddAsync(new DocumentAction
+            {
+                DocumentId = document.Id,
+                Action = UserActionsOnDocument.ShipsDocument,
+                DepartmentId = departmentToReceiveDocument.Id,
+                ResposibleId = default
+            }, token);
         }
     }
 }
