@@ -112,7 +112,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 
         public async Task<UserModel> GetMayorAsync(CancellationToken token)
         {
-            var mayorDepartment = _catalogAdapterClient.GetDepartmentByCodeAsync("cabinetPrimar", token);
+            var mayorDepartment = await _catalogAdapterClient.GetDepartmentByCodeAsync("cabinetPrimar", token);
 
             return await GetHeadOfDepartmentUserAsync(mayorDepartment.Id, token);
         }
