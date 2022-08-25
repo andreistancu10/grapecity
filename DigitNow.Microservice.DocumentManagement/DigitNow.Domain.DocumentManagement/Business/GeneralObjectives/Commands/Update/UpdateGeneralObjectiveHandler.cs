@@ -10,14 +10,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
     public class UpdateGeneralObjectiveHandler : ICommandHandler<UpdateGeneralObjectiveCommand, ResultObject>
     {
         private readonly IGeneralObjectiveService _generalObjectiveService;
-        private readonly IObjectiveFileService _objectiveFileService;
+        private readonly IUploadedFileService _uploadedFileService;
 
         public UpdateGeneralObjectiveHandler(
             IGeneralObjectiveService generalObjectiveService,
-            IObjectiveFileService objectiveFileService)
+            IUploadedFileService uploadedFileService)
         {
             _generalObjectiveService = generalObjectiveService;
-            _objectiveFileService = objectiveFileService;
+            _uploadedFileService = uploadedFileService;
         }
         public async Task<ResultObject> Handle(UpdateGeneralObjectiveCommand request, CancellationToken cancellationToken)
         {
@@ -34,10 +34,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
                     Parameters = new object[] { request.ObjectiveId }
                 });
 
-            var fileMappings = await _objectiveFileService.GetUploadedFileMappingsAsync(new List<long>
-            {
-                initialGeneralObjective.Id
-            }, cancellationToken);
+            var fileMappings = await _uploadedFileService.GetUploadedFileMappingsAsync(new List<long> { initialGeneralObjective.Id }, TargetEntity.Objective, cancellationToken);
 
             initialGeneralObjective.Objective.Title = request.Title;
             initialGeneralObjective.Objective.State = request.State;
@@ -50,7 +47,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
             {
                 var uploadedFileIds = fileMappings.Select(item => item.UploadedFileId);
 
-                await _objectiveFileService.UpdateUploadedFilesWithTargetIdAsync(request.UploadedFileIds.Except(uploadedFileIds), initialGeneralObjective.Objective, cancellationToken).ConfigureAwait(false);
+                await _uploadedFileService.UpdateUploadedFilesWithTargetIdAsync(request.UploadedFileIds.Except(uploadedFileIds), initialGeneralObjective.Objective.Id, TargetEntity.Objective, cancellationToken).ConfigureAwait(false);
             }
 
             return ResultObject.Ok(initialGeneralObjective.ObjectiveId);

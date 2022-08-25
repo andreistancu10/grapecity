@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
@@ -17,7 +18,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Uploa
         private readonly IFileService _fileService;
         private readonly IUploadedFileService _uploadedFileService;
         private readonly IDocumentFileService _documentFileService;
-        private readonly UploadedFileRelationsFetcher _uploadedFileRelationsFetcher;
+        private readonly IServiceProvider _serviceProvider;
 
         public UploadFileHandler(
             IMapper mapper,
@@ -29,66 +30,55 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Uploa
             _mapper = mapper;
             _fileService = fileService;
             _uploadedFileService = uploadedFileService;
+            _serviceProvider = serviceProvider;
             _documentFileService = documentFileService;
-            _uploadedFileRelationsFetcher = new UploadedFileRelationsFetcher(serviceProvider);
         }
 
         public async Task<FileViewModel> Handle(UploadFileCommand request, CancellationToken cancellationToken)
         {
-            var newGuid = Guid.NewGuid();
-            var (relativePath, absolutePath) = await _fileService.UploadFileAsync(request.File, newGuid.ToString());
+            var fileModel = _mapper.Map<FileModel>(request);
+            var storedFileModel = await _fileService.UploadFileAsync(fileModel, request.File);
             UploadedFile newUploadedFile;
 
             if (request.TargetEntity == TargetEntity.Document)
             {
-                newUploadedFile = await _documentFileService.CreateAsync(request, newGuid, relativePath, absolutePath, cancellationToken);
-            }
-            else
-            {
-                newUploadedFile = await _uploadedFileService.CreateAsync(request, newGuid, relativePath, absolutePath, cancellationToken);
-            }
+                var documentFileModel = _mapper.Map<DocumentFileModel>(storedFileModel);
+                documentFileModel = await _documentFileService.CreateAsync(documentFileModel, cancellationToken);
 
-            var uploadedFiles = new List<UploadedFile>
-            {
-                newUploadedFile
-            };
-
-            await _uploadedFileRelationsFetcher
-                .UseUploadedFilesContext(new UploadedFilesFetcherContext { UploadedFiles = uploadedFiles })
-                .TriggerFetchersAsync(cancellationToken);
-
-
-            if (request.TargetEntity == TargetEntity.Document)
-            {
-                return MapToDocumentFileViewModel(uploadedFiles);
+                return await MapToDocumentFileViewModelAsync(documentFileModel, cancellationToken);
             }
 
-            return MapToFileViewModel(uploadedFiles);
+            newUploadedFile = await _uploadedFileService.CreateAsync(storedFileModel, cancellationToken);
+            return await MapToFileViewModelAsync(newUploadedFile, cancellationToken);
         }
 
-        private DocumentFileViewModel MapToDocumentFileViewModel(List<UploadedFile> uploadedFiles)
+        private async Task<DocumentFileViewModel> MapToDocumentFileViewModelAsync(DocumentFileModel documentFileModel, CancellationToken cancellationToken)
         {
-            var file = uploadedFiles.FirstOrDefault();
+            var documentFileRelationsFetcher = new DocumentFileRelationsFetcher(_serviceProvider);
+            await documentFileRelationsFetcher
+                .UseDocumentFilesContext(new DocumentFilesFetcherContext(new List<DocumentFileModel> { documentFileModel }))
+                .TriggerFetchersAsync(cancellationToken);
 
             return _mapper.Map<DocumentFileAggregate, DocumentFileViewModel>(new DocumentFileAggregate
             {
-                UploadedFile = file,
-                Categories = _uploadedFileRelationsFetcher.UploadedFileCategoryModels,
-                Users = _uploadedFileRelationsFetcher.UploadedFileUsers,
-                DocumentFileMappings = _uploadedFileRelationsFetcher.DocumentFileMappings
+                DocumentFileModel = documentFileModel,
+                Categories = documentFileRelationsFetcher.UploadedFileCategoryModels,
+                Users = documentFileRelationsFetcher.UploadedFileUsers,
             });
         }
 
-        private FileViewModel MapToFileViewModel(List<UploadedFile> uploadedFiles)
+        private async Task<FileViewModel> MapToFileViewModelAsync(UploadedFile uploadedFile, CancellationToken cancellationToken)
         {
-            return uploadedFiles.Select(file =>
-                    new VirtualFileAggregate
-                    {
-                        UploadedFile = file,
-                        Users = _uploadedFileRelationsFetcher.UploadedFileUsers,
-                    })
-                .Select(aggregate => _mapper.Map<VirtualFileAggregate, FileViewModel>(aggregate))
-                .FirstOrDefault();
+            var uploadedFileRelationsFetcher = new UploadedFileRelationsFetcher(_serviceProvider);
+            await uploadedFileRelationsFetcher
+                .UseUploadedFilesContext(new UploadedFilesFetcherContext(new List<UploadedFile> { uploadedFile }))
+                .TriggerFetchersAsync(cancellationToken);
+
+            return _mapper.Map<VirtualFileAggregate, FileViewModel>(new VirtualFileAggregate
+            {
+                UploadedFile = uploadedFile,
+                Users = uploadedFileRelationsFetcher.UploadedFileUsers,
+            });
         }
     }
 }

@@ -15,9 +15,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(dest => dest.UploadedBy, opt => opt.MapFrom<MapUploadedBy>());
 
             CreateMap<DocumentFileAggregate, DocumentFileViewModel>()
-                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.UploadedFile.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.UploadedFile.Name))
-                .ForMember(dest => dest.UploadDate, opt => opt.MapFrom(src => src.UploadedFile.CreatedAt))
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.DocumentFileModel.Id))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.DocumentFileModel.Name))
+                .ForMember(dest => dest.UploadDate, opt => opt.MapFrom(src => src.DocumentFileModel.CreatedAt))
                 .ForMember(dest => dest.UploadedBy, opt => opt.MapFrom<MapUploadedBy>())
                 .ForMember(dest => dest.Category, opt => opt.MapFrom<MapCategory>());
         }
@@ -35,7 +35,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             public BasicViewModel Resolve(DocumentFileAggregate source, DocumentFileViewModel destination, BasicViewModel destMember,
                 ResolutionContext context)
             {
-                return FindUser(source.Users, source.UploadedFile.CreatedBy);
+                return FindUser(source.Users, source.DocumentFileModel.CreatedBy);
             }
 
             private static BasicViewModel FindUser(IReadOnlyList<UserModel> users, long userId)
@@ -52,14 +52,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             public BasicViewModel Resolve(DocumentFileAggregate source, DocumentFileViewModel destination, BasicViewModel destMember,
                 ResolutionContext context)
             {
-                var foundDocumentCategoryId = source.DocumentFileMappings?.FirstOrDefault(c => c.UploadedFileMappingId == source.UploadedFile.UploadedFileMappingId)?.DocumentCategoryId;
-
-                if (foundDocumentCategoryId == null)
-                {
-                    return null;
-                }
-
-                var foundCategory = source.Categories.FirstOrDefault(x => x.Id == foundDocumentCategoryId);
+               var foundCategory = source.Categories.FirstOrDefault(x => x.Id == source.DocumentFileModel.DocumentCategoryId);
 
                 return foundCategory != null ?
                     new BasicViewModel(foundCategory.Id, foundCategory.Name) :

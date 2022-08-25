@@ -2,6 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
 using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
+using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 using HTSS.Platform.Core.CQRS;
@@ -13,15 +14,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IGeneralObjectiveService _generalObjectiveService;
-        private readonly IObjectiveFileService _objectiveFileService;
+        private readonly IUploadedFileService _uploadedFileService;
 
-        public CreateGeneralObjectiveHandler(DocumentManagementDbContext dbContext,
+        public CreateGeneralObjectiveHandler(
+            DocumentManagementDbContext dbContext,
             IGeneralObjectiveService generalObjectiveService,
-            IObjectiveFileService objectiveFileService)
+            IUploadedFileService uploadedFileService)
         {
             _dbContext = dbContext;
             _generalObjectiveService = generalObjectiveService;
-            _objectiveFileService = objectiveFileService;
+            _uploadedFileService = uploadedFileService;
         }
         public async Task<ResultObject> Handle(CreateGeneralObjectiveCommand request, CancellationToken cancellationToken)
         {
@@ -36,11 +38,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
             };
 
             await _generalObjectiveService.AddAsync(generalObjective, cancellationToken);
-            
+
             if (request.UploadedFileIds.Any())
             {
-                await _objectiveFileService.UpdateUploadedFilesWithTargetIdAsync(request.UploadedFileIds,
-                    generalObjective.Objective, cancellationToken);
+                await _uploadedFileService.UpdateUploadedFilesWithTargetIdAsync(
+                    request.UploadedFileIds,
+                    generalObjective.Objective.Id,
+                    TargetEntity.Objective,
+                    cancellationToken);
             }
 
             await _dbContext.SaveChangesAsync(cancellationToken);

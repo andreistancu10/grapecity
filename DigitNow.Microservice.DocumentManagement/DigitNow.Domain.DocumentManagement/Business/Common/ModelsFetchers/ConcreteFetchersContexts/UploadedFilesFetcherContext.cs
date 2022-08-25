@@ -1,5 +1,4 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts
 {
@@ -9,6 +8,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
         {
             get => this[nameof(UploadedFiles)] as IList<UploadedFile>;
             set => this[nameof(UploadedFiles)] = value;
+        }
+
+        public UploadedFilesFetcherContext(IList<UploadedFile> uploadedFiles)
+        {
+            UploadedFiles = uploadedFiles;
         }
     }
 }

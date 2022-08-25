@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload;
 using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
@@ -8,11 +9,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServic
 {
     public interface IUploadedFileService
     {
-        Task<UploadedFile> CreateAsync(UploadFileCommand command, Guid newGuid, string relativeFilePath, string absoluteFilePath, CancellationToken cancellationToken);
+        Task<UploadedFile> CreateAsync(StoredFileModel storedFileModel, CancellationToken cancellationToken);
         Task UpdateUploadedFilesWithTargetIdAsync(IEnumerable<long> uploadedFileIds, long targetId, TargetEntity targetEntity, CancellationToken cancellationToken);
         Task<List<UploadedFileMapping>> GetUploadedFileMappingsAsync(IEnumerable<long> ids,
             TargetEntity targetEntity,
             CancellationToken cancellationToken);
+        Task<List<UploadedFile>> FetchUploadedFiles(TargetEntity targetEntity, long targetId, CancellationToken cancellationToken);
     }
 
     public class UploadedFileService : IUploadedFileService
@@ -26,17 +28,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServic
             _dbContext = dbContext;
         }
 
-        public async Task<UploadedFile> CreateAsync(
-            UploadFileCommand command,
-            Guid newGuid,
-            string relativeFilePath,
-            string absoluteFilePath,
-            CancellationToken cancellationToken)
+        public async Task<UploadedFile> CreateAsync(StoredFileModel storedFileModel, CancellationToken cancellationToken)
         {
-            var newUploadedFile = _mapper.Map<UploadedFile>(command);
-            newUploadedFile.GeneratedName = newGuid;
-            newUploadedFile.RelativePath = relativeFilePath;
-            newUploadedFile.AbsolutePath = absoluteFilePath;
+            var newUploadedFile = _mapper.Map<UploadedFile>(storedFileModel);
 
             await _dbContext.UploadedFiles.AddAsync(newUploadedFile, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
@@ -44,12 +38,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServic
             var uploadedFileMapping = new UploadedFileMapping
             {
                 UploadedFileId = newUploadedFile.Id,
-                TargetEntity = command.TargetEntity,
+                TargetEntity = storedFileModel.TargetEntity,
             };
 
-            if (command.TargetId != null)
+            if (storedFileModel.TargetId != null)
             {
-                uploadedFileMapping.TargetId = (long)command.TargetId;
+                uploadedFileMapping.TargetId = (long)storedFileModel.TargetId;
             }
 
             await _dbContext.UploadedFileMappings.AddAsync(uploadedFileMapping, cancellationToken);
@@ -74,6 +68,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServic
             return await _dbContext.UploadedFileMappings
                 .Include(c => c.UploadedFile)
                 .Where(c => ids.Contains(c.Id) && c.TargetEntity == targetEntity)
+                .ToListAsync(cancellationToken);
+        }
+
+
+        public Task<List<UploadedFile>> FetchUploadedFiles(TargetEntity targetEntity, long targetId, CancellationToken cancellationToken)
+        {
+            return _dbContext.UploadedFileMappings
+                .AsNoTracking()
+                .Include(c => c.UploadedFile)
+                .ThenInclude(c => c.UploadedFileMapping)
+                .Where(c => c.TargetId == targetId && c.TargetEntity == targetEntity)
+                .Select(c => c.UploadedFile)
                 .ToListAsync(cancellationToken);
         }
     }

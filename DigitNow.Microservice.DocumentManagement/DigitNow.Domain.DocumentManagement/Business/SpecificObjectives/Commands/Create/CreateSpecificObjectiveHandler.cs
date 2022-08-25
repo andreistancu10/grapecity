@@ -1,5 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
+using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 using HTSS.Platform.Core.CQRS;
 
@@ -9,16 +10,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
     {
         private readonly ISpecificObjectiveService _specificObjectiveService;
         private readonly ISpecificObjectiveFunctionaryService _specificObjectiveFunctionaryService;
-        private readonly IObjectiveFileService _objectiveFileService;
+        private readonly IUploadedFileService _uploadedFileService;
 
         public CreateSpecificObjectiveHandler(
             ISpecificObjectiveService specificObjectiveService,
             ISpecificObjectiveFunctionaryService specificObjectiveFunctionaryService,
-            IObjectiveFileService objectiveFileService)
+            IUploadedFileService uploadedFileService)
         {
             _specificObjectiveService = specificObjectiveService;
             _specificObjectiveFunctionaryService = specificObjectiveFunctionaryService;
-            _objectiveFileService = objectiveFileService;
+            _uploadedFileService = uploadedFileService;
         }
         public async Task<ResultObject> Handle(CreateSpecificObjectiveCommand request, CancellationToken cancellationToken)
         {
@@ -26,7 +27,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
             {
                 DepartmentId = request.DepartmentId,
                 GeneralObjectiveId = request.GeneralObjectiveId,
-                Objective = new Objective()
+                Objective = new Objective
                 {
                     Title = request.Title,
                     Details = request.Details,
@@ -40,8 +41,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
 
             if (request.UploadedFileIds.Any())
             {
-                await _objectiveFileService.UpdateUploadedFilesWithTargetIdAsync(request.UploadedFileIds,
-                    specificObjective.Objective, cancellationToken);
+                await _uploadedFileService.UpdateUploadedFilesWithTargetIdAsync(request.UploadedFileIds, specificObjective.Objective.Id, TargetEntity.Objective, cancellationToken);
             }
 
             return ResultObject.Created(specificObjective.ObjectiveId);
