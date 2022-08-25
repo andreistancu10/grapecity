@@ -262,6 +262,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             private static bool IsDocumentEditable<T>(VirtualDocumentAggregate<T> source)
                  where T : VirtualDocument
             {
+                if (source.VirtualDocument.Document.IsArchived) return false;
+
                 if (source.VirtualDocument.Document.RecipientId == source.CurrentUser.Id 
                     || source.CurrentUser.Departments.Select(x => x.Id).Contains(source.VirtualDocument.Document.DestinationDepartmentId))
                 {
