@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Adapters.MS.Catalog;
+using DigitNow.Adapters.MS.Catalog.Poco;
 using DigitNow.Domain.Authentication.Client;
 using DigitNow.Domain.Authentication.Contracts.Users.GetUserById;
 using DigitNow.Domain.Authentication.Contracts.Users.GetUsersByFilter;
@@ -16,7 +17,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
         long GetCurrentUserId();
         bool TryGetCurrentUserId(out int userId);
         Task<RecipientType> GetCurrentUserFirstRoleAsync(CancellationToken token);
-        Task<long> GetCurrentUserFirstDepartmentIdAsync(CancellationToken token);
+        Task<Department> GetCurrentUserFirstDepartmentAsync(CancellationToken token);
 
         Task<UserModel> GetUserByIdAsync(long userId, CancellationToken token);
 
@@ -175,12 +176,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
             return await GetUsersWithinDepartmentAsync(department.Id, token);
         }
 
-        public async Task<long> GetCurrentUserFirstDepartmentIdAsync(CancellationToken token)
+        public async Task<Department> GetCurrentUserFirstDepartmentAsync(CancellationToken token)
         {
             var user = await GetUserByIdAsync(GetCurrentUserId(), token);
-            var department = user.Departments.First();
+            var userFirstDepartment = user.Departments.First();
 
-            return department.Id;
+            var department = await _catalogAdapterClient.GetDepartmentByIdAsync(userFirstDepartment.Id, token);
+
+            return department;
         }
     }
 }
