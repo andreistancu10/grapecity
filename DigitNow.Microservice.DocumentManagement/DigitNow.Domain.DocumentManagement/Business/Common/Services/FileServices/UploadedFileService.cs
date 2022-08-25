@@ -59,15 +59,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServic
         {
             var uploadedFileMappings = await GetUploadedFileMappingsAsync(uploadedFileIds, targetEntity, cancellationToken);
             uploadedFileMappings.ForEach(c => c.TargetId = targetId);
-            await _dbContext.SaveChangesAsync(cancellationToken);
             _dbContext.UploadedFileMappings.UpdateRange(uploadedFileMappings);
+            await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
         public async Task<List<UploadedFileMapping>> GetUploadedFileMappingsAsync(IEnumerable<long> ids, TargetEntity targetEntity, CancellationToken cancellationToken)
         {
             return await _dbContext.UploadedFileMappings
                 .Include(c => c.UploadedFile)
-                .Where(c => ids.Contains(c.Id) && c.TargetEntity == targetEntity)
+                .Where(c => ids.Contains(c.UploadedFileId) && c.TargetEntity == targetEntity)
                 .ToListAsync(cancellationToken);
         }
 
