@@ -22,43 +22,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             if (!Validate(command, lastWorkflowRecord, document))
                 return command;
 
-            switch (document.DocumentType)
-            {
-                case DocumentType.Incoming:
-                     await CreateWorkflowForIncomingDocumentAsync(command, document, token);
-                    break;
-                case DocumentType.Internal:
-                case DocumentType.Outgoing:
-                    await CreateWorkflowForOutgoingAndInternalDocumentAsync(command, document, token);
-                    break;
-                default:
-                    return command;
-            }
+            var departmentToReceiveDocument = await IdentityService.GetCurrentUserFirstDepartmentAsync(token);
+
+            document.DestinationDepartmentId = departmentToReceiveDocument.Id;
+            document.RecipientId = await IdentityService.GetHeadOfDepartmentUserIdAsync(departmentToReceiveDocument.Id, token);
+            document.Status = DocumentStatus.Finalized;
+
+            await PassDocumentToDepartment(document, command, token);
 
             return command;
         }
 
         #endregion
-
-        private async Task CreateWorkflowForIncomingDocumentAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
-        {
-            document.Status = DocumentStatus.Finalized;
-            await PassDocumentToRegistry(document, command, token);
-        }
-
-        private async Task CreateWorkflowForOutgoingAndInternalDocumentAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
-        {
-            var departmentToReceiveDocument = document.WorkflowHistories
-                    .Where(x => x.RecipientType == RecipientType.Department.Id)
-                    .OrderBy(x => x.CreatedAt)
-                    .First().RecipientId;
-
-            document.DestinationDepartmentId = departmentToReceiveDocument;
-            document.RecipientId = await IdentityService.GetHeadOfDepartmentUserIdAsync(departmentToReceiveDocument, token);
-            document.Status = DocumentStatus.Finalized;
-
-            await PassDocumentToDepartment(document, command, token);
-        }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord, Document document)
         {

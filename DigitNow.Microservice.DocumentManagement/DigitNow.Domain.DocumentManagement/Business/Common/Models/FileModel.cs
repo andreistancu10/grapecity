@@ -9,5 +9,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Models
         public long? TargetId { get; set; }
         public TargetEntity TargetEntity { get; set; }
         public string Context { get; set; }
+        public string ContentType { get; set; }
     }
 }

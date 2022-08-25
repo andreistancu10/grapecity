@@ -15,19 +15,16 @@ namespace DigitNow.Domain.DocumentManagement.Public.OperationalArchive
     public class OperationalArchiveController : ApiController
     {
         private readonly IMediator _mediator;
-        private readonly ILogger<OperationalArchiveController> _logger;
 
-        public OperationalArchiveController(IMediator mediator, ILogger<OperationalArchiveController> logger)
+        public OperationalArchiveController(IMediator mediator)
         {
             _mediator = mediator;
-            _logger = logger;
         }
 
 
         [HttpPut]
         public async Task<IActionResult> MoveDocumentsToArchiveAsync()
         {
-            _logger.LogInformation("MS Doc Management - Move doc to archive called");
             return await _mediator.Send(new MoveDocumentsToArchiveCommand())
            switch
             {

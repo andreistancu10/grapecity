@@ -45,6 +45,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServic
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             documentFileModel.Id = uploadedFile.Id;
+            documentFileModel.CreatedAt = uploadedFile.CreatedAt;
+            documentFileModel.CreatedBy = uploadedFile.CreatedBy;
+            documentFileModel.UploadedFileMappingId = uploadedFile.UploadedFileMappingId;
 
             return documentFileModel;
         }

@@ -9,7 +9,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.UploadFiles.Validators
         {
             RuleFor(item => item.Name).NotNull().NotEmpty();
             RuleFor(item => item.File).NotNull().NotEmpty();
-            RuleFor(item => item.TargetEntity).NotNull().NotEmpty();
+            RuleFor(item => item.TargetEntity).NotNull();
         }
     }
 }
