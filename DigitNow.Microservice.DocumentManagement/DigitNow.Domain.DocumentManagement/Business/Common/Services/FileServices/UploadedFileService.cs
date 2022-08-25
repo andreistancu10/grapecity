@@ -67,7 +67,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServic
         {
             return await _dbContext.UploadedFileMappings
                 .Include(c => c.UploadedFile)
-                .Where(c => ids.Contains(c.Id) && c.TargetEntity == targetEntity)
+                .Where(c => ids.Contains(c.UploadedFileId) && c.TargetEntity == targetEntity)
                 .ToListAsync(cancellationToken);
         }
 
