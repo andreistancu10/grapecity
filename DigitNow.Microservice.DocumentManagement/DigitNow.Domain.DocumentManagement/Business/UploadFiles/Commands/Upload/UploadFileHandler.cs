@@ -16,13 +16,20 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Uploa
         private readonly IMapper _mapper;
         private readonly IFileService _fileService;
         private readonly IUploadedFileService _uploadedFileService;
+        private readonly IDocumentFileService _documentFileService;
         private readonly UploadedFileRelationsFetcher _uploadedFileRelationsFetcher;
 
-        public UploadFileHandler(IMapper mapper, IFileService fileService, IUploadedFileService uploadedFileService, IServiceProvider serviceProvider)
+        public UploadFileHandler(
+            IMapper mapper,
+            IFileService fileService,
+            IUploadedFileService uploadedFileService,
+            IServiceProvider serviceProvider,
+            IDocumentFileService documentFileService)
         {
             _mapper = mapper;
             _fileService = fileService;
             _uploadedFileService = uploadedFileService;
+            _documentFileService = documentFileService;
             _uploadedFileRelationsFetcher = new UploadedFileRelationsFetcher(serviceProvider);
         }
 
@@ -30,7 +37,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Uploa
         {
             var newGuid = Guid.NewGuid();
             var (relativePath, absolutePath) = await _fileService.UploadFileAsync(request.File, newGuid.ToString());
-            var newUploadedFile = await _uploadedFileService.CreateAsync(request, newGuid, relativePath, absolutePath, cancellationToken);
+            UploadedFile newUploadedFile;
+
+            if (request.TargetEntity == TargetEntity.Document)
+            {
+                newUploadedFile = await _documentFileService.CreateAsync(request, newGuid, relativePath, absolutePath, cancellationToken);
+            }
+            else
+            {
+                newUploadedFile = await _uploadedFileService.CreateAsync(request, newGuid, relativePath, absolutePath, cancellationToken);
+            }
 
             var uploadedFiles = new List<UploadedFile>
             {
