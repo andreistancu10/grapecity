@@ -96,6 +96,8 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<IGeneralObjectiveService, GeneralObjectiveService>();
             services.AddTransient<ISpecificObjectiveService, SpecificObjectiveService>();
             services.AddTransient<ISpecificObjectiveFunctionaryService, SpecificObjectiveFunctionaryService>();
+            services.AddTransient<IObjectiveDashboardService, ObjectiveDashboardService>();
+            services.AddTransient<IObjectiveMappingService, ObjectiveMappingService>();
 
             return services;
         }
