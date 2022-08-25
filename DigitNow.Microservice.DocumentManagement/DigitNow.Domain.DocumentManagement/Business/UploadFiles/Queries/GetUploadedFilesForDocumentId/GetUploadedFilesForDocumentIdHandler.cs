@@ -4,6 +4,7 @@ using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Concrete
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
+using DigitNow.Domain.DocumentManagement.Data;
 using HTSS.Platform.Core.CQRS;
 
 namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetUploadedFilesForDocumentId
@@ -32,6 +33,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetUpl
 
             await _documentFileRelationsFetcher
                 .UseDocumentFilesContext(new DocumentFilesFetcherContext(documentFileModels))
+                .UseUploadedFilesContext(new UploadedFilesFetcherContext(_mapper.Map<List<UploadedFile>>(documentFileModels)))
                 .TriggerFetchersAsync(cancellationToken);
 
             return documentFileModels.Select(file =>
@@ -39,7 +41,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetUpl
                 {
                     DocumentFileModel = file,
                     Users = _documentFileRelationsFetcher.UploadedFileUsers,
-                    DocumentFileMappings = _documentFileRelationsFetcher.DocumentFileMappingModels
+                    DocumentFileMappings = _documentFileRelationsFetcher.DocumentFileMappingModels,
+                    Categories = _documentFileRelationsFetcher.UploadedFileCategoryModels
                 })
                 .Select(aggregate => _mapper.Map<DocumentFileAggregate, DocumentFileViewModel>(aggregate))
                 .ToList();

@@ -8,7 +8,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.UploadFiles.Models
         public string Name { get; set; }
         public IFormFile File { get; set; }
         public long? TargetId { get; set; }
-        public TargetEntity TargetEntity { get; set; }
+        public long TargetEntity { get; set; }
         public string Context { get; set; }
     }
 }

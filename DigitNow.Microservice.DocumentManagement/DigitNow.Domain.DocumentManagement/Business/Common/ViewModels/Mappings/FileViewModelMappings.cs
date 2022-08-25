@@ -52,11 +52,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             public BasicViewModel Resolve(DocumentFileAggregate source, DocumentFileViewModel destination, BasicViewModel destMember,
                 ResolutionContext context)
             {
-               var foundCategory = source.Categories.FirstOrDefault(x => x.Id == source.DocumentFileModel.DocumentCategoryId);
+                var documentCategoryId = source.DocumentFileMappings
+                    .First(c => c.UploadedFileMappingId == source.DocumentFileModel.UploadedFileMappingId)
+                    .DocumentCategoryId;
 
-                return foundCategory != null ?
-                    new BasicViewModel(foundCategory.Id, foundCategory.Name) :
-                    null;
+               var foundCategory = source.Categories.First(x => x.Id == documentCategoryId);
+
+                return new BasicViewModel(foundCategory.Id, foundCategory.Name);
             }
         }
     }

@@ -57,6 +57,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Uploa
             var documentFileRelationsFetcher = new DocumentFileRelationsFetcher(_serviceProvider);
             await documentFileRelationsFetcher
                 .UseDocumentFilesContext(new DocumentFilesFetcherContext(new List<DocumentFileModel> { documentFileModel }))
+                .UseUploadedFilesContext(new UploadedFilesFetcherContext(new List<UploadedFile> { _mapper.Map<UploadedFile>(documentFileModel) }))
                 .TriggerFetchersAsync(cancellationToken);
 
             return _mapper.Map<DocumentFileAggregate, DocumentFileViewModel>(new DocumentFileAggregate
@@ -64,6 +65,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Uploa
                 DocumentFileModel = documentFileModel,
                 Categories = documentFileRelationsFetcher.UploadedFileCategoryModels,
                 Users = documentFileRelationsFetcher.UploadedFileUsers,
+                DocumentFileMappings = documentFileRelationsFetcher.DocumentFileMappingModels
             });
         }
 

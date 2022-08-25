@@ -41,7 +41,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings
                 .ForMember(dest => dest.DocumentCategoryId, opt => opt.MapFrom<MapFromContext>());
 
             CreateMap<FileModel, StoredFileModel>();
-            CreateMap<StoredFileModel, DocumentFileModel>();
+
+            CreateMap<StoredFileModel, DocumentFileModel>()
+                .ForMember(dest => dest.DocumentCategoryId, opt => opt.MapFrom<MapFromContext>());
+
+            CreateMap<UploadedFile, DocumentFileModel>();
+            CreateMap<DocumentFileModel, UploadedFile>();
             CreateMap<StoredFileModel, UploadedFile>();
         }
 
