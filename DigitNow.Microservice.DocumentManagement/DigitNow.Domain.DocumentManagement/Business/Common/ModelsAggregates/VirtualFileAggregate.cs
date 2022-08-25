@@ -1,5 +1,5 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Models;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates
 {
@@ -7,6 +7,5 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates
     {
         internal UploadedFile UploadedFile { get; set; }
         internal IReadOnlyList<UserModel> Users { get; set; }
-        internal IReadOnlyList<DocumentCategoryModel> Categories { get; set; }
     }
 }

@@ -12,6 +12,8 @@ using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.Authentication.Client;
 using DigitNow.Domain.Authentication.Contracts;
 using DigitNow.Domain.Authentication.Contracts.ContactDetails.Create;
+using DigitNow.Domain.Authentication.Contracts;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
 
 namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands.Create
 {
@@ -23,7 +25,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
         private readonly IIdentityService _identityService;
         private readonly ISpecialRegisterMappingService _specialRegisterMappingService;
         private readonly IIncomingDocumentService _incomingDocumentService;
-        private readonly IUploadedFileService _uploadedFileService;
+        private readonly IDocumentFileService _documentFileService;
         private readonly IMailSenderService _mailSenderService;
 
         public CreateIncomingDocumentHandler(DocumentManagementDbContext dbContext,
@@ -31,7 +33,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
             IAuthenticationClient authenticationClient,
             IIdentityService identityService,
             ISpecialRegisterMappingService specialRegisterMappingService,
-            IUploadedFileService uploadedFileService,
+            IDocumentFileService documentFileService,
             IIncomingDocumentService incomingDocumentService,
             IMailSenderService mailSenderService)
         {
@@ -39,7 +41,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
             _mapper = mapper;
             _authenticationClient = authenticationClient;
             _identityService = identityService;
-            _uploadedFileService = uploadedFileService;
+            _documentFileService = documentFileService;
             _specialRegisterMappingService = specialRegisterMappingService;
             _incomingDocumentService = incomingDocumentService;
             _mailSenderService = mailSenderService;
@@ -48,9 +50,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
         public async Task<ResultObject> Handle(CreateIncomingDocumentCommand request, CancellationToken cancellationToken)
         {
             if (!string.IsNullOrWhiteSpace(request.IdentificationNumber))
+            {
                 await CreateContactDetailsAsync(request, cancellationToken);
+            }
 
             var headOfDepartment = await _identityService.GetHeadOfDepartmentUserAsync(request.RecipientId, cancellationToken);
+
             if (headOfDepartment == null)
                 return ResultObject.Error(new ErrorMessage
                 {
@@ -58,7 +63,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
                     TranslationCode = "catalog.headOfdepartment.backend.update.validation.entityNotFound",
                     Parameters = new object[] { request.RecipientId }
                 });
-
 
             var newIncomingDocument = _mapper.Map<IncomingDocument>(request);
 
@@ -76,10 +80,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
                 };
             
                 await _incomingDocumentService.AddAsync(newIncomingDocument, cancellationToken);
-                await _uploadedFileService.CreateDocumentUploadedFilesAsync(request.UploadedFileIds, newIncomingDocument.Document, cancellationToken);
+                await _documentFileService.UpdateUploadedFilesWithTargetIdAsync(request.UploadedFileIds, newIncomingDocument.Document, cancellationToken);
 
-                var newWorkflowHistroryLog = WorkflowHistoryLogFactory.Create(newIncomingDocument.Document, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkUnallocated);
-                await _dbContext.WorkflowHistoryLogs.AddAsync(newWorkflowHistroryLog, cancellationToken);
+                var newWorkflowHistoryLog = WorkflowHistoryLogFactory.Create(newIncomingDocument.Document, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.InWorkUnallocated);
+                await _dbContext.WorkflowHistoryLogs.AddAsync(newWorkflowHistoryLog, cancellationToken);
 
                 await _dbContext.SaveChangesAsync(cancellationToken);
                 await _specialRegisterMappingService.MapDocumentAsync(newIncomingDocument, cancellationToken);

@@ -1,19 +1,20 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Services;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
+using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 
 namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Commands.Update
 {
     public class UpdateSpecificObjectiveHandler : ICommandHandler<UpdateSpecificObjectiveCommand, ResultObject>
     {
         private readonly ISpecificObjectiveService _specificObjectiveService;
-        private readonly IUploadedFileService _uploadedFileService;
         private readonly ISpecificObjectiveFunctionaryService _specificObjectiveFunctionaryService;
+        private readonly IUploadedFileService _uploadedFileService;
 
-        public UpdateSpecificObjectiveHandler(ISpecificObjectiveService specificObjectiveService,
+        public UpdateSpecificObjectiveHandler(
+            ISpecificObjectiveService specificObjectiveService,
             ISpecificObjectiveFunctionaryService specificObjectiveFunctionaryService,
             IUploadedFileService uploadedFileService)
         {
@@ -21,12 +22,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
             _specificObjectiveFunctionaryService = specificObjectiveFunctionaryService;
             _uploadedFileService = uploadedFileService;
         }
+
         public async Task<ResultObject> Handle(UpdateSpecificObjectiveCommand request, CancellationToken cancellationToken)
         {
             var initialSpecificObjective = await _specificObjectiveService.FindQuery()
                 .Where(item => item.ObjectiveId == request.ObjectiveId)
                 .Include(item => item.Objective)
-                .ThenInclude(item => item.ObjectiveUploadedFiles)
                 .Include(item => item.SpecificObjectiveFunctionarys)
                 .FirstOrDefaultAsync(cancellationToken);
 
@@ -38,6 +39,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
                     Parameters = new object[] { request.ObjectiveId }
                 });
 
+            var uploadedFileMappings = await _uploadedFileService.GetUploadedFileMappingsAsync(
+                 new List<long>
+                 {
+                    initialSpecificObjective.Id
+                 },
+                 TargetEntity.Objective,
+                 cancellationToken);
+
             initialSpecificObjective.Objective.Title = request.Title;
             initialSpecificObjective.Objective.Details = request.Details;
             initialSpecificObjective.Objective.ModificationMotive = request.ModificationMotive;
@@ -46,13 +55,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
             await _specificObjectiveService.UpdateAsync(initialSpecificObjective, cancellationToken);
 
             if (request.SpecificObjectiveFunctionaryIds != null)
-                await _specificObjectiveFunctionaryService.UpdateRangeAsync(initialSpecificObjective.ObjectiveId, request.SpecificObjectiveFunctionaryIds, cancellationToken);
+            {
+                await _specificObjectiveFunctionaryService.UpdateRangeAsync(initialSpecificObjective.ObjectiveId,
+                    request.SpecificObjectiveFunctionaryIds, cancellationToken);
+            }
 
             if (request.UploadedFileIds.Any())
             {
-                var uploadedFileIds = initialSpecificObjective.Objective.ObjectiveUploadedFiles.Select(item => item.UploadedFileId);
+                var uploadedFileIds = uploadedFileMappings.Select(item => item.UploadedFileId);
 
-                await _uploadedFileService.CreateObjectiveUploadedFilesAsync(request.UploadedFileIds.Except(uploadedFileIds), initialSpecificObjective.Objective, cancellationToken).ConfigureAwait(false);
+                await _uploadedFileService.UpdateUploadedFilesWithTargetIdAsync(request.UploadedFileIds.Except(uploadedFileIds), initialSpecificObjective.Objective.Id, TargetEntity.Objective, cancellationToken).ConfigureAwait(false);
             }
 
             return ResultObject.Created(initialSpecificObjective.ObjectiveId);

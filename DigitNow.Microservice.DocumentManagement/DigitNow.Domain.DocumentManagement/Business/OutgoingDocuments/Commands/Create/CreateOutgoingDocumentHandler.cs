@@ -10,6 +10,8 @@ using DigitNow.Adapters.MS.Catalog;
 using DigitNow.Domain.Authentication.Client;
 using DigitNow.Domain.Authentication.Contracts;
 using DigitNow.Domain.Authentication.Contracts.ContactDetails.Create;
+using DigitNow.Domain.Authentication.Client;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
 
 namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands.Create
 {
@@ -19,22 +21,22 @@ namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands
         private readonly IMapper _mapper;
         private readonly IOutgoingDocumentService _outgoingDocumentService;
         private readonly IAuthenticationClient _authenticationClient;
-        private readonly IUploadedFileService _uploadedFileService;
         private readonly ICatalogAdapterClient _catalogAdapterClient;
+        private readonly IDocumentFileService _documentFileService;
 
         public CreateOutgoingDocumentHandler(DocumentManagementDbContext dbContext,
             IMapper mapper,
             IOutgoingDocumentService outgoingDocumentService,
             IAuthenticationClient authenticationClient,
-            IUploadedFileService uploadedFileService,
-            ICatalogAdapterClient catalogAdapterClient)
+            ICatalogAdapterClient catalogAdapterClient,
+            IDocumentFileService documentFileService)
         {
             _dbContext = dbContext;
             _mapper = mapper;
             _outgoingDocumentService = outgoingDocumentService;
             _authenticationClient = authenticationClient;
-            _uploadedFileService = uploadedFileService;
             _catalogAdapterClient = catalogAdapterClient;
+            _documentFileService = documentFileService;
         }
 
         public async Task<ResultObject> Handle(CreateOutgoingDocumentCommand request, CancellationToken cancellationToken)
@@ -47,7 +49,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.OutgoingDocuments.Commands
             await _outgoingDocumentService.AddAsync(newOutgoingDocument, cancellationToken);
 
             await AttachConnectedDocumentsAsync(request, newOutgoingDocument, cancellationToken);
-            await _uploadedFileService.CreateDocumentUploadedFilesAsync(request.UploadedFileIds, newOutgoingDocument.Document, cancellationToken);
+            await _documentFileService.UpdateUploadedFilesWithTargetIdAsync(request.UploadedFileIds, newOutgoingDocument.Document, cancellationToken);
 
             var department = await _catalogAdapterClient.GetDepartmentByIdAsync(request.DestinationDepartmentId, cancellationToken);
 

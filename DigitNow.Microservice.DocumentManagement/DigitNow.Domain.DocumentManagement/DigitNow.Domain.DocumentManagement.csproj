@@ -99,6 +99,9 @@
 	<ItemGroup>
 	  <Folder Include="Business\Forms\Queries\Common\" />
 	  <Folder Include="Data\Entities\FormFillingLogs\Configuration\" />
+	  <Folder Include="Business\Common\FileUsageContexts\" />
+	  <Folder Include="Business\SpecificObjectives\Mappings\" />
+	  <Folder Include="Data\Entities\UploadedFileMappings\Entities\" />
 	  <Folder Include="Migrations\" />
 	  <Folder Include="Public\Common\" />
 	  <Folder Include="Public\Forms\Models\" />
