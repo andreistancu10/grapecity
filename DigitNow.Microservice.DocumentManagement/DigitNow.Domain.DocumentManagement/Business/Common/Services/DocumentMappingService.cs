@@ -4,6 +4,8 @@ using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
+using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -18,6 +20,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         #region [ Fields ]
 
         private readonly IMapper _mapper;
+        private readonly IIdentityService _identityService;
+
+        private UserModel _currentUser;
         private readonly DocumentRelationsFetcher _documentRelationsFetcher;
         private readonly DocumentReportRelationsFetcher _documentReportRelationsFetcher;
 
@@ -27,8 +32,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public DocumentMappingService(
             IServiceProvider serviceProvider,
+            IIdentityService identityService,
             IMapper mapper)
         {
+            _identityService = identityService;
             _mapper = mapper;
             _documentRelationsFetcher = new DocumentRelationsFetcher(serviceProvider);
             _documentReportRelationsFetcher = new DocumentReportRelationsFetcher(serviceProvider);
@@ -44,6 +51,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             {
                 return new List<DocumentViewModel>();
             }
+
+            _currentUser = await _identityService.GetCurrentUserAsync(cancellationToken);
 
             await _documentRelationsFetcher
                 .UseDocumentsContext(new DocumentsFetcherContext { Documents = virtualDocuments })
@@ -106,6 +115,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 var aggregate = new VirtualDocumentAggregate<T>
                 {
                     VirtualDocument = childDocument,
+                    CurrentUser = _currentUser,
                     Users = _documentRelationsFetcher.DocumentUsers,
                     Departments = _documentRelationsFetcher.DocumentDepartments,
                     Categories = _documentRelationsFetcher.DocumentCategories,

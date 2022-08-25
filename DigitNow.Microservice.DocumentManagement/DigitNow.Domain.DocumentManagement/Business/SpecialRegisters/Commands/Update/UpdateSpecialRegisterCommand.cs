@@ -7,5 +7,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Commands.
         public long Id { get; set; }
         public int DocumentCategoryId { get; set; }
         public string Observations { get; set; }
+        public string Name { get; set; }
     }
 }

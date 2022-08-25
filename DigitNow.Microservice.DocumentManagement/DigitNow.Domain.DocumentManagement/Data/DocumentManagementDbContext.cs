@@ -1,19 +1,20 @@
-﻿
-#define MIGRATION_ONLY
+﻿#undef MIGRATION_ONLY
 
 #if    MIGRATION_ONLY
 #endif
 
-using Microsoft.EntityFrameworkCore;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentActions;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
 namespace DigitNow.Domain.DocumentManagement.Data
 {
     public class DocumentManagementDbContext : DbContext
     {
-        internal const string Schema = "DocumentMangement";
+        internal const string Schema = "DocumentManagement";
 
         private readonly IIdentityService _identityService;
 
@@ -37,13 +38,14 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<SpecialRegisterMapping> SpecialRegisterMappings { get; set; }
         public DbSet<UploadedFile> UploadedFiles { get; set; }
         public DbSet<DocumentUploadedFile> DocumentUploadedFiles { get; set; }
+        public DbSet<ObjectiveUploadedFile> ObjectiveUploadedFiles { get; set; }
         public DbSet<DeliveryDetail> DeliveryDetails { get; set; }
         public DbSet<WorkflowHistoryLog> WorkflowHistoryLogs { get; set; }
-        public DbSet<Form> Forms { get; set; }
-        public DbSet<FormField> FormFields { get; set; }
-        public DbSet<FormFieldMapping> FormFieldMappings { get; set; }
-        public DbSet<FormFillingLog> FormFillingLogs { get; set; }
-        public DbSet<FormFieldValue> FormFieldValues { get; set; }
+        public DbSet<Objective> Objectives { get; set; }
+        public DbSet<GeneralObjective> GeneralObjectives { get; set; }
+        public DbSet<SpecificObjective> SpecificObjectives { get; set; }
+        public DbSet<SpecificObjectiveFunctionary> SpecificObjectiveFunctionarys { get; set; }
+        public DbSet<DocumentAction> DocumentActions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -58,6 +58,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 await PassDocumentToRegistry(document, command, token);
             }
 
+            DeleteActionAfterBeingProcessed(document, UserActionsOnDocument.AsksForOpinion);
             await SendFunctonaryDeclinesMail(document, lastWorkFlowRecord, token);
 
             return command;
@@ -78,9 +79,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 .FirstOrDefault();
 
             await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
-
             document.WorkflowHistories.Add(newWorkflowResponsible);
 
+            DeleteActionAfterBeingProcessed(document, UserActionsOnDocument.AsksForOpinion);
             await SendFunctonaryDeclinesMail(document, oldWorkflowResponsible, token);
 
             return command;

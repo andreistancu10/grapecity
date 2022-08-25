@@ -1,12 +1,13 @@
 ﻿using DigitNow.Adapters.MS.Catalog;
-using DigitNow.Adapters.MS.Identity;
-using DigitNow.Adapters.MS.Identity.Poco;
+using DigitNow.Domain.Authentication.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Interfaces.WorkflowManagement;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentActions;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
     public abstract class BaseWorkflowManager
     {
         protected readonly DocumentManagementDbContext DbContext;
-        protected readonly IIdentityAdapterClient IdentityAdapterClient;
+        protected readonly IAuthenticationClient AuthenticationClient;
         protected readonly IIdentityService IdentityService;
         protected readonly ICatalogAdapterClient CatalogAdapterClient;
         protected readonly IMailSenderService MailSenderService;
@@ -26,7 +27,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
         protected BaseWorkflowManager(IServiceProvider serviceProvider)
         {
             DbContext = serviceProvider.GetService<DocumentManagementDbContext>();
-            IdentityAdapterClient = serviceProvider.GetService<IIdentityAdapterClient>();
+            AuthenticationClient = serviceProvider.GetService<IAuthenticationClient>();
             IdentityService = serviceProvider.GetService<IIdentityService>();
             CatalogAdapterClient = serviceProvider.GetService<ICatalogAdapterClient>();
             MailSenderService = serviceProvider.GetService<IMailSenderService>();
@@ -39,21 +40,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
         {
             var document = await DbContext.Documents
                 .Include(x => x.WorkflowHistories)
+                .Include(x => x.DocumentActions)
                 .FirstAsync(x => x.Id == command.DocumentId, token);
-            var lastWorkFlowRecord = GetLastWorkflowRecord(document);
-            
+            var lastWorkFlowRecord = document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).FirstOrDefault();
+
             await CreateWorkflowRecordInternal(command, document, lastWorkFlowRecord, token);
             await DbContext.SaveChangesAsync(token);
 
             return command;
         }
 
-        public static WorkflowHistoryLog GetLastWorkflowRecord(Document document)
-        {
-            return document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).FirstOrDefault();
-        }
-
-        public static bool IsTransitionAllowed(WorkflowHistoryLog lastWorkFlowRecord, int[] allowedTransitionStatuses)
+        protected static bool IsTransitionAllowed(WorkflowHistoryLog lastWorkFlowRecord, int[] allowedTransitionStatuses)
         {
             if (lastWorkFlowRecord == null || !allowedTransitionStatuses.Contains((int)lastWorkFlowRecord.Document.Status))
             {
@@ -62,7 +59,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             return true;
         }
 
-        public async Task UpdateDocumentBasedOnWorkflowDecisionAsync(bool makeDocumentVisibleForDepartment, long documentId, long recipientId, DocumentStatus status, CancellationToken token)
+        protected async Task UpdateDocumentBasedOnWorkflowDecisionAsync(bool makeDocumentVisibleForDepartment, long documentId, long recipientId, DocumentStatus status, CancellationToken token)
         {
             var document = await DbContext.Documents.FirstAsync(x => x.Id == documentId, token);
 
@@ -74,6 +71,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             }
             else
             {
+                var responsibleUser = await IdentityService.GetUserByIdAsync(recipientId, token);
+                document.DestinationDepartmentId = responsibleUser.Departments.First().Id;
                 document.RecipientId = recipientId;
             }
 
@@ -104,7 +103,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             });
         }
 
-        protected virtual bool UserExists(User user, ICreateWorkflowHistoryCommand command)
+        protected virtual bool UserExists(UserModel user, ICreateWorkflowHistoryCommand command)
         {
             if (user == null)
             {
@@ -155,8 +154,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
 
         protected async Task PassDocumentToResponsibleUserAsync(Document document, WorkflowHistoryLog newWorkflowResponsible, ICreateWorkflowHistoryCommand command, CancellationToken token)
         {
-            var oldWorkflowResponsible = GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Functionary.Id 
-                    || (x.RecipientType == RecipientType.HeadOfDepartment.Id && x.DocumentStatus != DocumentStatus.OpinionRequestedUnallocated));
+            var oldWorkflowResponsible = GetOldWorkflowResponsibleAsync(document, x => x.RecipientType == RecipientType.Functionary.Id
+        || (x.RecipientType == RecipientType.HeadOfDepartment.Id && x.DocumentStatus != DocumentStatus.OpinionRequestedUnallocated));
 
             newWorkflowResponsible.DocumentStatus = oldWorkflowResponsible.RecipientType == RecipientType.HeadOfDepartment.Id 
                 ? DocumentStatus.InWorkUnallocated 
@@ -169,15 +168,28 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
 
         protected static WorkflowHistoryLog GetOldWorkflowResponsibleAsync(Document document, Expression<Func<WorkflowHistoryLog, bool>> predicate)
         {
-            return ExtractResponsible(document.WorkflowHistories, predicate);
+            return document.WorkflowHistories.AsQueryable()
+                                             .Where(predicate)
+                                             .OrderByDescending(x => x.CreatedAt)
+                                             .FirstOrDefault();
         }
 
-        private static WorkflowHistoryLog ExtractResponsible(List<WorkflowHistoryLog> history, Expression<Func<WorkflowHistoryLog, bool>> predicate)
+        protected async Task CreateActionOnDocument(Document document, UserActionsOnDocument action, bool makeDocumentVisibleForDepartment, CancellationToken token)
         {
-            return history.AsQueryable()
-                          .Where(predicate)
-                          .OrderByDescending(x => x.CreatedAt)
-                          .FirstOrDefault();
+            var currentUser = await IdentityService.GetCurrentUserAsync(token);
+
+            document.DocumentActions.Add(
+                new DocumentAction
+                {
+                    Action = action,
+                    ResposibleId = currentUser.Id,
+                    DepartmentId = makeDocumentVisibleForDepartment ? currentUser.Departments.First().Id : null
+                });
+        }
+
+        protected static void DeleteActionAfterBeingProcessed(Document document, UserActionsOnDocument action)
+        {
+            document.DocumentActions.RemoveAll(x => x.Action == action);
         }
     }
 }
