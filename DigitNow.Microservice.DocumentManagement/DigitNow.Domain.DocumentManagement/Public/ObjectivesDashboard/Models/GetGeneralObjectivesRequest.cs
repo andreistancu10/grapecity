@@ -11,26 +11,26 @@ namespace DigitNow.Domain.DocumentManagement.Public.ObjectivesDashboard.Models
 
     public class GeneralObjectiveFilterDto
     {
-        public ObjectiveCreationDateFilterDto CreationDateFilter { get; set; }
+        public ObjectiveRegistrationDateFilterDto ObjectiveRegistrationDateFilter { get; set; }
         public ObjectiveTitleFilterDto ObjectiveTitleFilter { get; set; }
         public ObjectiveCodeFilterDto ObjectiveCodeFilter { get; set; }
         public ObjectiveStateFilterDto ObjectiveStateFilter { get; set; }
     }
 
-    public class ObjectiveCreationDateFilterDto
+    public class ObjectiveRegistrationDateFilterDto
     {
-        public DateTime CreationDate { get; set; }
+        public DateTime ObjectiveRegistrationDate { get; set; }
     }
     public  class ObjectiveTitleFilterDto
     {
-        public string Title { get; set; }   
+        public string ObjectiveTitle { get; set; }   
     }
     public class ObjectiveCodeFilterDto
     {
-        public string Code { get; set; }    
+        public string ObjectiveCode { get; set; }    
     }
     public class ObjectiveStateFilterDto
     {
-        public ObjectiveState State { get; set; }
+        public ObjectiveState ObjectiveState { get; set; }
     }
 }

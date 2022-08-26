@@ -11,10 +11,14 @@ namespace DigitNow.Domain.DocumentManagement.Public.Common.Mappings
         {
             CreateMap<GeneralObjectiveFilterDto,ObjectiveFilter>();
             {
-                CreateMap<ObjectiveCreationDateFilterDto, ObjectiveCreationDateFilter>();
-                CreateMap<ObjectiveTitleFilterDto, ObjectiveTitleFilter>();
-                CreateMap<ObjectiveCodeFilterDto, ObjectiveCodeFilter>();
-                CreateMap<ObjectiveStateFilterDto, ObjectiveStateFilter>();
+                CreateMap<ObjectiveRegistrationDateFilterDto, ObjectiveCreationDateFilter>()
+                    .ForMember(m => m.CreationDate, opt => opt.MapFrom(src => src.ObjectiveRegistrationDate));
+                CreateMap<ObjectiveTitleFilterDto, ObjectiveTitleFilter>()
+                    .ForMember(m => m.Title, opt => opt.MapFrom(src => src.ObjectiveTitle));
+                CreateMap<ObjectiveCodeFilterDto, ObjectiveCodeFilter>()
+                    .ForMember(m => m.Code, opt => opt.MapFrom(src => src.ObjectiveCode));
+                CreateMap<ObjectiveStateFilterDto, ObjectiveStateFilter>()
+                    .ForMember(m => m.State, opt => opt.MapFrom(src => src.ObjectiveState));
             }
             CreateMap<GetGeneralObjectivesRequest, GetGeneralObjectivesQuery>()
                .ForMember(m => m.Filter, opt => opt.MapFrom(src => src.Filter ?? new GeneralObjectiveFilterDto()));
