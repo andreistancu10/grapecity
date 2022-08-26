@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.DownloadFile;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetUploadedFilesForDocumentId;
@@ -30,8 +29,18 @@ namespace DigitNow.Domain.DocumentManagement.Public.UploadFiles
         [HttpPost("upload")]
         public async Task<IActionResult> UploadAsync([FromForm] UploadFileRequest request)
         {
-            return await _mediator.Send(_mapper.Map<UploadFileCommand>(request))
+            if ((TargetEntity)request.TargetEntity == TargetEntity.Document)
+            {
+                return await _mediator.Send(_mapper.Map<UploadDocumentFileCommand>(request))
                 switch
+                {
+                    null => NotFound(),
+                    var result => Ok(result)
+                };
+            }
+
+            return await _mediator.Send(_mapper.Map<UploadFileCommand>(request))
+            switch
             {
                 null => NotFound(),
                 var result => Ok(result)
@@ -56,21 +65,19 @@ namespace DigitNow.Domain.DocumentManagement.Public.UploadFiles
 
             if (targetEntity == TargetEntity.Document)
             {
-               var documentFileResult =await _mediator.Send(new GetUploadedFilesForDocumentIdQuery(entityId));
-                
-               return documentFileResult switch
+                return await _mediator.Send(new GetUploadedFilesForDocumentIdQuery(entityId))
+                switch
                 {
                     null => NotFound(),
-                    _ => Ok(documentFileResult)
-                }; 
+                    var result => Ok(result)
+                };
             }
-            
-            var result = await _mediator.Send(new GetUploadedFilesForTargetIdQuery(targetEntity, entityId));
 
-            return result switch
+            return await _mediator.Send(new GetUploadedFilesForTargetIdQuery(targetEntity, entityId))
+            switch
             {
                 null => NotFound(),
-                _ => Ok(result)
+                var result => Ok(result)
             };
         }
     }
