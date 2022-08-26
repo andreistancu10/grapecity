@@ -36,7 +36,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Forms.Queries.GetFormById
             var formFieldMappings = await _formsService.GetFormFieldMappingsByFormIdAsync(request.Id, cancellationToken);
             var formFields = formFieldMappings.Select(c => c.FormField).ToList();
 
-            //TODO: determine whether to use Fetchers or leave it as it is. NOTE: Fetchers code already written.
             var formControlViewModels = new List<FormControlViewModel>();
 
             foreach (var mapping in formFieldMappings)
