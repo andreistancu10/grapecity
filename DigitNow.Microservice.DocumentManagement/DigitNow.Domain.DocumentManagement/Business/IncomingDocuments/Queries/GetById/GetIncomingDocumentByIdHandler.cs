@@ -29,6 +29,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Queries.
                 .Include(x => x.IncomingDocument.ContactDetail)
                 .Include(x => x.IncomingDocument.DeliveryDetails)
                 .Include(x => x.IncomingDocument.ConnectedDocuments)
+                    .ThenInclude(x => x.Document)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (foundDocument == null)
