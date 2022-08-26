@@ -73,8 +73,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
                 await PassDocumentToDepartment(document, command, token);
 
-                // ToDo: pass document.RecipientId as param to the send email function
-                //await MailSenderService.SendMail_MayorApprovalDecision(document, oldWorkflowResponsible, token);
+                await MailSenderService.SendMail_MayorApprovalDecision(document, (long)document.RecipientId, token);
             }
         }
 
@@ -93,7 +92,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             document.Status = DocumentStatus.InWorkMayorCountersignature;
             document.WorkflowHistories.Add(newWorkflowResponsible);
 
-            await MailSenderService.SendMail_MayorApprovalDecision(document, oldWorkflowResponsible, token);
+            await MailSenderService.SendMail_MayorApprovalDecision(document, oldWorkflowResponsible.RecipientId, token);
         }
 
         private async Task MayorDeclinedAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
@@ -125,8 +124,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             await PassDocumentToDepartment(document, command, token);
 
-            //ToDo: pass document.RecipientId as param to the send email method
-            //await MailSenderService.SendMail_MayorRejectionDecision(document, oldWorkflowResponsible, token);
+            await MailSenderService.SendMail_MayorRejectionDecision(document, (long)document.RecipientId, token);
         }
 
         private async Task MayorDeclinedIncomingDocumentAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
@@ -143,7 +141,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             document.Status = DocumentStatus.InWorkMayorDeclined;
             document.WorkflowHistories.Add(newWorkflowResponsible);
-            await MailSenderService.SendMail_MayorRejectionDecision(document, oldWorkflowResponsible, token);
+            await MailSenderService.SendMail_MayorRejectionDecision(document, oldWorkflowResponsible.RecipientId, token);
 
         }
 
