@@ -36,7 +36,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings
 
             CreateMap<DocumentFileMapping, DocumentFileMappingModel>();
 
-            CreateMap<UploadFileCommand, FileModel>();
+            CreateMap<UploadFileCommand, FileModel>()
+                .ForMember(c => c.ContentType, opt => opt.MapFrom(src => src.File.ContentType));
+
+            CreateMap<UploadDocumentFileCommand, FileModel>()
+                .ForMember(c => c.ContentType, opt => opt.MapFrom(src => src.File.ContentType));
+
             CreateMap<FileModel, DocumentFileModel>()
                 .ForMember(dest => dest.DocumentCategoryId, opt => opt.MapFrom<MapFromContext>());
 

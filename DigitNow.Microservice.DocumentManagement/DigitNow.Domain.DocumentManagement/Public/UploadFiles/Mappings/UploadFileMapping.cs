@@ -9,8 +9,11 @@ namespace DigitNow.Domain.DocumentManagement.Public.UploadFiles.Mappings
     {
         public UploadFileMapping()
         {
+            CreateMap<UploadFileRequest, UploadDocumentFileCommand>()
+                .ForMember(x => x.TargetEntity, opt => opt.MapFrom(src => (TargetEntity)src.TargetEntity));
+
             CreateMap<UploadFileRequest, UploadFileCommand>()
-                .ForMember(c => c.TargetEntity, opt => opt.MapFrom(src => (TargetEntity)src.TargetEntity));
+                .ForMember(x => x.TargetEntity, opt => opt.MapFrom(src => (TargetEntity)src.TargetEntity));
         }
     }
 }
