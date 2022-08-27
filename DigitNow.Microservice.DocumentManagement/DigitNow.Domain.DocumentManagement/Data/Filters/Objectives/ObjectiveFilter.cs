@@ -4,7 +4,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Objectives
 {
     public class ObjectiveFilter : DataFilter
     {
-        public ObjectiveCreationDateFilter ObjectiveCreationDateFilter { get; set; }
+        public ObjectiveCreationDateFilter ObjectiveRegistrationDateFilter { get; set; }
         public ObjectiveTitleFilter ObjectiveTitleFilter { get; set; }
         public ObjectiveCodeFilter ObjectiveCodeFilter { get; set; }
         public ObjectiveStateFilter ObjectiveStateFilter { get; set; }

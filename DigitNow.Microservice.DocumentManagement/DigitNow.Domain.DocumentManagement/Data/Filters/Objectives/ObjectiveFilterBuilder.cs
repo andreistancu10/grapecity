@@ -9,11 +9,11 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Objectives
 
         private void BuildFilterByCreationDate()
         {
-            var creationDateFilter = EntityFilter.ObjectiveCreationDateFilter;
+            var creationDateFilter = EntityFilter.ObjectiveRegistrationDateFilter;
             if (creationDateFilter != null)
             {
                 EntityPredicates.Add(objective =>
-                    objective.CreatedAt.Date == creationDateFilter.CreationDate
+                    objective.CreatedAt.Date == creationDateFilter.CreationDate.Date
                 );
             }
         }
