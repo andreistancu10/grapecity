@@ -5,8 +5,8 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
     public class DynamicFormFieldValue : Entity
     {
         public string Value { get; set; }
-        public long FormFillingLogId { get; set; }
-        public long FormFieldMappingId { get; set; }
+        public long DynamicFormFillingLogId { get; set; }
+        public long DynamicFormFieldMappingId { get; set; }
 
         #region [ References ]
 

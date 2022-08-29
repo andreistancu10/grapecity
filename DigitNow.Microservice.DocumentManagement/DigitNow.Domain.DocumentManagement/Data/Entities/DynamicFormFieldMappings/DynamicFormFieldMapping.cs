@@ -10,8 +10,8 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public int Order { get; set; }
         public bool Required { get; set; }
         public string InitialValue { get; set; }
-        public long FormId { get; set; }
-        public long FormFieldId { get; set; }
+        public long DynamicFormId { get; set; }
+        public long DynamicFormFieldId { get; set; }
 
         #region [ References ]
 

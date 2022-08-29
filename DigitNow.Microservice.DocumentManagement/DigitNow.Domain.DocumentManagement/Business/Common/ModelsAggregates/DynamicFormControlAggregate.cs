@@ -3,9 +3,9 @@ using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates
 {
-    public class FormControlAggregate
+    public class DynamicFormControlAggregate
     {
-        public List<DynamicFormField> FormFields { get; set; }
+        public List<DynamicFormField> DynamicFormFields { get; set; }
         public DynamicFormFieldMapping DynamicFormFieldMapping { get; set; }
     }
 }

@@ -2,7 +2,7 @@
 {
     public class DynamicFormFillingLog : ExtendedEntity
     {
-        public long FormId { get; set; }
+        public long DynamicFormId { get; set; }
 
         #region [ References ]
 

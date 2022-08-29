@@ -24,8 +24,8 @@
                 Order = order,
                 Required = required,
                 InitialValue = initialValue,
-                FormId = formId,
-                FormFieldId = formFieldId
+                DynamicFormId = formId,
+                DynamicFormFieldId = formFieldId
             };
     }
 }

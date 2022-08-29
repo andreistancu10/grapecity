@@ -11,6 +11,6 @@
         public string InitialValue { get; set; }
         public string CurrentValue { get; set; }
 
-        public DynamicFormFieldDto Field { get; set; }
+        public DynamicFormFieldDto DynamicField { get; set; }
     }
 }

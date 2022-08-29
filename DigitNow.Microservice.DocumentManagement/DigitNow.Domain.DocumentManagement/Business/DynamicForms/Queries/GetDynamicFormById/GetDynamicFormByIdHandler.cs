@@ -6,48 +6,19 @@ using HTSS.Platform.Core.CQRS;
 
 namespace DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.GetDynamicFormById
 {
-    public class GetDynamicFormByIdHandler : IQueryHandler<GetDynamicFormByIdQuery, GetDynamicFormByIdResponse>
+    public class GetDynamicFormByIdHandler : IQueryHandler<GetDynamicFormByIdQuery, DynamicFormViewModel>
     {
-        private readonly IMapper _mapper;
         private readonly IDynamicFormsServices _dynamicFormsService;
 
         public GetDynamicFormByIdHandler(
-            IMapper mapper,
             IDynamicFormsServices dynamicFormsService)
         {
-            _mapper = mapper;
             _dynamicFormsService = dynamicFormsService;
         }
 
-        public async Task<GetDynamicFormByIdResponse> Handle(GetDynamicFormByIdQuery request, CancellationToken cancellationToken)
+        public async Task<DynamicFormViewModel> Handle(GetDynamicFormByIdQuery request, CancellationToken cancellationToken)
         {
-            var form = _dynamicFormsService.GetDynamicFormAsync(request.Id, cancellationToken);
-
-            if (form == null)
-            {
-                return null;
-            }
-
-            var formFieldMappings = await _dynamicFormsService.GetDynamicFormFieldMappingsAsync(request.Id, cancellationToken);
-            var formFields = formFieldMappings.Select(c => c.DynamicFormField).ToList();
-
-            var formControlViewModels = new List<FormControlViewModel>();
-
-            foreach (var mapping in formFieldMappings)
-            {
-                var viewModel = _mapper.Map<FormControlViewModel>(new FormControlAggregate
-                {
-                    FormFields = formFields,
-                    DynamicFormFieldMapping = mapping
-                });
-
-                formControlViewModels.Add(viewModel);
-            }
-
-            var formResponse = _mapper.Map<GetDynamicFormByIdResponse>(form);
-            formResponse.FormControls = formControlViewModels;
-
-            return formResponse;
+            return await _dynamicFormsService.GetDynamicFormViewModelAsync(request.Id, cancellationToken);
         }
     }
 }

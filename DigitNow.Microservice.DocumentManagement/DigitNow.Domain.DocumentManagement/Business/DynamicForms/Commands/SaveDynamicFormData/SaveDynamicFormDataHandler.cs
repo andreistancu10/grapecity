@@ -17,14 +17,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.DynamicForms.Commands
 
         public async Task<ResultObject> Handle(SaveDynamicFormDataCommand request, CancellationToken cancellationToken)
         {
-            try
-            {
-                await _dynamicFormsService.SaveDataForDynamicFormAsync(request.FormId, request.Values, cancellationToken);
-            }
-            catch (Exception)
-            {
-                return ResultObject.CreateError("Error Saving Form Data", "");
-            }
+            await _dynamicFormsService.SaveDataForDynamicFormAsync(request.DynamicFormId, request.DynamicFormFillingValues, cancellationToken);
 
             return ResultObject.Ok();
         }

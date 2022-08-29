@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Business.DynamicForms.Dtos;
 using DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.Filter;
 using DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.GetDynamicFormById;
@@ -12,7 +13,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.DynamicForms.Mapping
         {
             CreateMap<DynamicForm, DynamicFormDto>();
             CreateMap<DynamicForm, DynamicFilterFormsResponse>();
-            CreateMap<DynamicForm, GetDynamicFormByIdResponse>();
         }
     }
 }

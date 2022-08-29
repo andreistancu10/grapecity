@@ -1,9 +1,9 @@
 ﻿namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
 {
-    public class FormControlViewModel
+    public class DynamicFormControlViewModel
     {
         public long Id { get; set; }
-        public long FormId { get; set; }
+        public long DynamicFormId { get; set; }
         public int OrderNumber { get; set; }
         public string Label { get; set; }
         public string Key { get; set; }

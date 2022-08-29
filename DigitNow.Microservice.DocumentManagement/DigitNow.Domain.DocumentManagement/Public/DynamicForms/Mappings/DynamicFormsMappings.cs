@@ -11,7 +11,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Forms.Mappings
         public DynamicFormsMappings()
         {
             CreateMap<FilterDynamicFormsRequest, DynamicFilterFormsQuery>();
-            CreateMap<GetFormByIdRequest, GetDynamicFormByIdQuery>();
+            CreateMap<GetDynamicFormByIdRequest, GetDynamicFormByIdQuery>();
             CreateMap<SaveDynamicFormDataRequest, SaveDynamicFormDataCommand>();
         }
     }
