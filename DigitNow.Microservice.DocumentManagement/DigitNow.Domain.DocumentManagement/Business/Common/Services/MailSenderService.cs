@@ -28,8 +28,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         Task SentMail_DepartmentSupervisorRejectionDecision(Document document, CancellationToken token);
         Task SendMail_SendingReply(Document document, CancellationToken token);
         Task SendMail_DeclineCompetence(Document document, WorkflowHistoryLog historyLog, CancellationToken token);
-        Task SendMail_MayorApprovalDecision(Document document, WorkflowHistoryLog historyLog, CancellationToken token);
-        Task SendMail_MayorRejectionDecision(Document document, WorkflowHistoryLog historyLog, CancellationToken token);
+        Task SendMail_MayorApprovalDecision(Document document, long recipientId, CancellationToken token);
+        Task SendMail_MayorRejectionDecision(Document document, long recipientId, CancellationToken token);
         Task SendMail_OpinionSupervisorToFunctionary(UserModel targetUser, Document document, CancellationToken token);
         Task SendMail_OpinionFunctionaryReply(Document document, CancellationToken token);
     }
@@ -249,16 +249,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
         }
 
-        public async Task SendMail_MayorApprovalDecision(Document document, WorkflowHistoryLog historyLog, CancellationToken token)
+        public async Task SendMail_MayorApprovalDecision(Document document, long recipientId, CancellationToken token)
         {
-            var recipient = await _identityService.GetUserByIdAsync(historyLog.RecipientId, token);
+            var recipient = await _identityService.GetUserByIdAsync(recipientId, token);
 
             await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.MayorApprovalDecisionTemplate, token);
         }
 
-        public async Task SendMail_MayorRejectionDecision(Document document, WorkflowHistoryLog historyLog, CancellationToken token)
+        public async Task SendMail_MayorRejectionDecision(Document document, long recipientId, CancellationToken token)
         {
-            var recipient = await _identityService.GetUserByIdAsync(historyLog.RecipientId, token);
+            var recipient = await _identityService.GetUserByIdAsync(recipientId, token);
 
             await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.MayorRejectionDecisionTemplate, token);
         }
