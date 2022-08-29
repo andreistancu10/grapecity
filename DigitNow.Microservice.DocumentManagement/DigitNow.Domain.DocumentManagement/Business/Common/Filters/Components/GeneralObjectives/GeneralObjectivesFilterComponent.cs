@@ -2,7 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Data.Filters;
 using DigitNow.Domain.DocumentManagement.Data.Filters.Objectives;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Objectives
+namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.GeneralObjectives
 {
     internal class GeneralObjectivesFilterComponent : DataExpressionFilterComponent<GeneralObjective, GeneralObjectivesFilterComponentContext>
     {
@@ -16,9 +16,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
         {
             var dataExpressions = new DataExpressions<GeneralObjective>();
 
-            if (!context.ObjectiveFilter.IsEmpty())
+            if (!context.GeneralObjectiveFilter.IsEmpty())
             {
-                var filterBuilder = new ObjectiveFilterBuilder(ServiceProvider, context.ObjectiveFilter);
+                var filterBuilder = new GeneralObjectiveFilterBuilder(ServiceProvider, context.GeneralObjectiveFilter);
                 dataExpressions.AddRange(filterBuilder.Build());
             }
 

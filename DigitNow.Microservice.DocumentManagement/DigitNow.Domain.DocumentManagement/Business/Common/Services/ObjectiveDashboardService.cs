@@ -1,4 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Objectives;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.GeneralObjectives;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
@@ -53,7 +53,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var filterComponent = new GeneralObjectivesFilterComponent(_serviceProvider);
             var filterComponentContext = new GeneralObjectivesFilterComponentContext
             {
-                ObjectiveFilter = filter
+                GeneralObjectiveFilter = filter
             };
 
             return filterComponent.ExtractDataExpressionsAsync(filterComponentContext, token);

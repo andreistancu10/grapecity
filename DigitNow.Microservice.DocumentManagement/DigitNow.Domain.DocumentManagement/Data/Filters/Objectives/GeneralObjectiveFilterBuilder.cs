@@ -2,9 +2,9 @@
 
 namespace DigitNow.Domain.DocumentManagement.Data.Filters.Objectives
 {
-    internal class ObjectiveFilterBuilder : DataExpressionFilterBuilder<GeneralObjective, GeneralObjectiveFilter>
+    internal class GeneralObjectiveFilterBuilder : DataExpressionFilterBuilder<GeneralObjective, GeneralObjectiveFilter>
     {
-        public ObjectiveFilterBuilder(IServiceProvider serviceProvider, GeneralObjectiveFilter filter)
+        public GeneralObjectiveFilterBuilder(IServiceProvider serviceProvider, GeneralObjectiveFilter filter)
            : base(serviceProvider, filter) { }
 
         private void BuildFilterByCreationDate()
