@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.ObjectivesDashboard.Queries.GetGeneralObjectives;
 using DigitNow.Domain.DocumentManagement.Data.Filters.Objectives;
-using DigitNow.Domain.DocumentManagement.Public.ObjectivesDashboard.Models;
+using DigitNow.Domain.DocumentManagement.Public.GeneralObjectives.Models;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Common.Mappings
 {

@@ -19,12 +19,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.ObjectivesDashboard.Querie
         {
             var totalItems = await _objectiveDashboardService.CountGeneralObjectivesAsync(request.Filter, cancellationToken);
 
-            var documents = await _objectiveDashboardService.GetGeneralObjectivesAsync(request.Filter,
+            var objectives = await _objectiveDashboardService.GetGeneralObjectivesAsync(request.Filter,
                 request.Page,
                 request.Count,
                 cancellationToken);
 
-            var viewModels = await _objectiveMappingService.MapToGeneralObjectiveViewModelAsync(documents, cancellationToken);
+            var viewModels = await _objectiveMappingService.MapToGeneralObjectiveViewModelAsync(objectives, cancellationToken);
 
             return BuildFirstPageDocumentResponse(request, totalItems, viewModels);
         }

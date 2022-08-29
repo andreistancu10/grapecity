@@ -2,7 +2,7 @@
 
 namespace DigitNow.Domain.DocumentManagement.Data.Filters.Objectives
 {
-    internal class ObjectiveFilterBuilder : DataExpressionFilterBuilder<Objective, ObjectiveFilter>
+    internal class ObjectiveFilterBuilder : DataExpressionFilterBuilder<GeneralObjective, ObjectiveFilter>
     {
         public ObjectiveFilterBuilder(IServiceProvider serviceProvider, ObjectiveFilter filter)
            : base(serviceProvider, filter) { }
@@ -24,7 +24,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Objectives
             if (titleFilter != null)
             {
                 EntityPredicates.Add(objective =>
-                    objective.Title.Equals(titleFilter.Title)
+                    objective.Objective.Title.Equals(titleFilter.Title)
                 );
             }
         }
@@ -34,7 +34,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Objectives
             if (codeFilter != null)
             {
                 EntityPredicates.Add(objective =>
-                    objective.Code.Equals(codeFilter.Code)
+                    objective.Objective.Code.Equals(codeFilter.Code)
                 );
             }
         }
@@ -44,7 +44,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Objectives
             if (stateFilter != null)
             {
                 EntityPredicates.Add(objective =>
-                    objective.State == stateFilter.State
+                    objective.Objective.State == stateFilter.State
                 );
             }
         }

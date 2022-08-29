@@ -3,6 +3,7 @@ using DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands.Cre
 using DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.GetAll;
 using DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.GetById;
+using DigitNow.Domain.DocumentManagement.Business.ObjectivesDashboard.Queries.GetGeneralObjectives;
 using DigitNow.Domain.DocumentManagement.Public.GeneralObjectives.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
@@ -61,6 +62,13 @@ namespace DigitNow.Domain.DocumentManagement.Public.GeneralObjectives
                 null => NotFound(),
                 var result => Ok(result)
             };
+        }
+
+        [HttpPost("getAll")]
+        public async Task<ActionResult<List<GetGeneralObjectivesResponse>>> GetGeneralObjectivesAsync([FromBody] GetGeneralObjectivesRequest request, CancellationToken cancellationToken)
+        {
+            var query = _mapper.Map<GetGeneralObjectivesQuery>(request);
+            return Ok(await _mediator.Send(query, cancellationToken));
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 
-namespace DigitNow.Domain.DocumentManagement.Public.ObjectivesDashboard.Models
+namespace DigitNow.Domain.DocumentManagement.Public.GeneralObjectives.Models
 {
     public class GetGeneralObjectivesRequest
     {
