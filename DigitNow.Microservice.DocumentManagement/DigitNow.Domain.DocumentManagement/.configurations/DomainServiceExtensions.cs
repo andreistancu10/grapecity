@@ -94,7 +94,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<IFileService, FileService>();
             
             services.AddTransient<IUploadedFileService, UploadedFileService>();
-            services.AddTransient<IFormsServices, FormsServices>();
+            services.AddTransient<IDynamicFormsServices, DynamicFormsServices>();
             
             services.AddTransient<IDocumentFileService, DocumentFileService>();
 

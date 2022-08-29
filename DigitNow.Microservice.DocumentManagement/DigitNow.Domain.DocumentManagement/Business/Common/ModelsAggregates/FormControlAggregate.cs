@@ -5,7 +5,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates
 {
     public class FormControlAggregate
     {
-        public List<FormField> FormFields { get; set; }
-        public FormFieldMapping FormFieldMapping { get; set; }
+        public List<DynamicFormField> FormFields { get; set; }
+        public DynamicFormFieldMapping DynamicFormFieldMapping { get; set; }
     }
 }

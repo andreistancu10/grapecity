@@ -4,9 +4,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
 {
     internal class FormFieldFetcherContext : ModelFetcherContext
     {
-        public IList<FormFieldMapping> FormFieldMappings
+        public IList<DynamicFormFieldMapping> FormFieldMappings
         {
-            get => this[nameof(FormFieldMappings)] as IList<FormFieldMapping>;
+            get => this[nameof(FormFieldMappings)] as IList<DynamicFormFieldMapping>;
             set => this[nameof(FormFieldMappings)] = value;
         }
     }

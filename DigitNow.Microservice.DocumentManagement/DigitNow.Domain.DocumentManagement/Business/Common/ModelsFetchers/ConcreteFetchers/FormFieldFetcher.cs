@@ -9,10 +9,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
         {
             var formFieldModels = context.FormFieldMappings.Select(c => new DynamicFormFieldModel
             {
-                Id = c.FormField.Id,
-                Name = c.FormField.Name,
-                Context = c.FormField.Context,
-                DynamicFieldType = c.FormField.DynamicFieldType
+                Id = c.DynamicFormField.Id,
+                Name = c.DynamicFormField.Name,
+                Context = c.DynamicFormField.Context,
+                DynamicFieldType = c.DynamicFormField.DynamicFieldType
             }).ToList();
 
             return Task.FromResult(formFieldModels);
