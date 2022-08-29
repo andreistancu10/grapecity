@@ -1,16 +1,14 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Models;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates
 {
-    public class VirtualDocumentAggregate<T>
-        where T : VirtualDocument
+    public class VirtualObjectiveAgregate<T>
+        where T : VirtualObjective
     {
-        public T VirtualDocument { get; set; }
+        public T VirtualObjective { get; set; }
         internal UserModel CurrentUser { get; set; }
         internal IReadOnlyList<UserModel> Users { get; set; }
         internal IReadOnlyList<DepartmentModel> Departments { get; set; }
-        internal IReadOnlyList<DocumentCategoryModel> Categories { get; set; }
-        internal IReadOnlyList<DocumentCategoryModel> InternalCategories { get; set; }
     }
 }

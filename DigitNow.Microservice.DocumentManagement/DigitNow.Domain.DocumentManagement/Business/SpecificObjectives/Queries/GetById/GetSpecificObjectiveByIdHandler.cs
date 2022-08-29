@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Queries.GetById
 {
-    public class GetSpecificObjectiveByIdHandler : IQueryHandler<GetSpecificObjectiveByIdQuery, SpecificObjectiveViewModel>
+    public class GetSpecificObjectiveByIdHandler : IQueryHandler<GetSpecificObjectiveByIdQuery, GetSpecificObjectiveViewModel>
     {
         private readonly IMapper _mapper;
         private readonly ISpecificObjectiveService _specificObjectiveService;
@@ -26,7 +26,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Queries
             _uploadedFileService = uploadedFileService;
         }
 
-        public async Task<SpecificObjectiveViewModel> Handle(GetSpecificObjectiveByIdQuery request, CancellationToken cancellationToken)
+        public async Task<GetSpecificObjectiveViewModel> Handle(GetSpecificObjectiveByIdQuery request, CancellationToken cancellationToken)
         {
             var specificObjective = await _specificObjectiveService.FindQuery()
                 .Where(item => item.ObjectiveId == request.ObjectiveId)
@@ -51,7 +51,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Queries
                 DocumentFileMappingModels = files.Select(c => _mapper.Map<DocumentFileMappingModel>(c)).ToList()
             };
 
-            return _mapper.Map<SpecificObjectiveViewModel>(aggregate);
+            return _mapper.Map<GetSpecificObjectiveViewModel>(aggregate);
         }
     }
 }

@@ -10,8 +10,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
         public IReadOnlyList<UserModel> DocumentUsers 
             => GetItems<DocumentsUsersFetcher, UserModel>();
 
-        public IReadOnlyList<DocumentDepartmentModel> DocumentDepartments 
-            => GetItems<GenericDocumentsDepartmentsFetcher, DocumentDepartmentModel>();
+        public IReadOnlyList<DepartmentModel> DocumentDepartments 
+            => GetItems<GenericDepartmentsFetcher, DepartmentModel>();
 
         public IReadOnlyList<DocumentCategoryModel> DocumentCategories 
             => GetItems<GenericDocumentsCategoriesFetcher, DocumentCategoryModel>();
@@ -25,7 +25,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
             Aggregator
                 .UseGenericRemoteFetcher<GenericDocumentsCategoriesFetcher>()
                 .UseGenericRemoteFetcher<GenericDocumentsInternalCategoriesFetcher>()
-                .UseGenericRemoteFetcher<GenericDocumentsDepartmentsFetcher>();         
+                .UseGenericRemoteFetcher<GenericDepartmentsFetcher>();         
         }
 
         public DocumentRelationsFetcher UseDocumentsContext(DocumentsFetcherContext context)

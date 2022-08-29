@@ -24,8 +24,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings
                 .ForMember(x => x.Departments, opt => opt.MapFrom(o => o.UserDepartments))
                 .ForMember(x => x.Roles, opt => opt.MapFrom(o => o.UserRoles));
 
-            CreateMap<DepartmentDto, DocumentDepartmentModel>();
-            CreateMap<IDepartmentResponse, DocumentDepartmentModel>();
+            CreateMap<DepartmentDto, DepartmentModel>();
+            CreateMap<IDepartmentResponse, DepartmentModel>();
             CreateMap<IDocumentTypeResponse, DocumentCategoryModel>();
             CreateMap<IInternalDocumentTypeResponse, InternalDocumentCategoryModel>();
             CreateMap<IInternalDocumentTypeResponse, DocumentCategoryModel>();

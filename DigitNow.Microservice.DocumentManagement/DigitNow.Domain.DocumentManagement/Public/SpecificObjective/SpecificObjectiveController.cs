@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Commands.Update;
+using DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Queries.Get;
 using DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Queries.GetAll;
 using DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Queries.GetById;
 using DigitNow.Domain.DocumentManagement.Public.SpecialObjective.Models;
+using DigitNow.Domain.DocumentManagement.Public.SpecificObjective.Models;
 using DigitNow.Domain.DocumentManagement.Public.SpecificObjectives.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
@@ -63,5 +65,13 @@ namespace DigitNow.Domain.DocumentManagement.Public.SpecialObjective
                 var result => Ok(result)
             };
         }
+
+        [HttpPost("getSpecificObjectives")]
+        public async Task<ActionResult<List<GetSpecificObjectiveResponse>>> GetDocumentsAsync([FromBody] GetSpecificObjectiveRequest request, CancellationToken cancellationToken)
+        {
+            var query = _mapper.Map<GetSpecificObjectiveQuery>(request);
+            return Ok(await _mediator.Send(query, cancellationToken));
+        }
+
     }
 }
