@@ -7,7 +7,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.ObjectivesDashboard.Querie
     {
         public int Page { get; set; } = 1;
         public int Count { get; set; } = 10;
-        public ObjectiveFilter Filter { get; set; }
+        public GeneralObjectiveFilter Filter { get; set; }
 
     }
 }

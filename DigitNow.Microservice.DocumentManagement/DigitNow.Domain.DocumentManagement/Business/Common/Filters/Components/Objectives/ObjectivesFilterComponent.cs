@@ -4,15 +4,15 @@ using DigitNow.Domain.DocumentManagement.Data.Filters.Objectives;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Objectives
 {
-    internal class ObjectivesFilterComponent : DataExpressionFilterComponent<GeneralObjective, ObjectivesFilterComponentContext>
+    internal class GeneralObjectivesFilterComponent : DataExpressionFilterComponent<GeneralObjective, GeneralObjectivesFilterComponentContext>
     {
         #region [ Construction ]
-        public ObjectivesFilterComponent(IServiceProvider serviceProvider)
+        public GeneralObjectivesFilterComponent(IServiceProvider serviceProvider)
             : base(serviceProvider) { }
 
         #endregion
 
-        protected override Task<DataExpressions<GeneralObjective>> SetCustomDataExpressionsAsync(ObjectivesFilterComponentContext context, CancellationToken token)
+        protected override Task<DataExpressions<GeneralObjective>> SetCustomDataExpressionsAsync(GeneralObjectivesFilterComponentContext context, CancellationToken token)
         {
             var dataExpressions = new DataExpressions<GeneralObjective>();
 

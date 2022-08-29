@@ -2,32 +2,32 @@
 
 namespace DigitNow.Domain.DocumentManagement.Data.Filters.Objectives
 {
-    public class ObjectiveFilter : DataFilter
+    public class GeneralObjectiveFilter : DataFilter
     {
-        public ObjectiveCreationDateFilter ObjectiveRegistrationDateFilter { get; set; }
-        public ObjectiveTitleFilter ObjectiveTitleFilter { get; set; }
-        public ObjectiveCodeFilter ObjectiveCodeFilter { get; set; }
-        public ObjectiveStateFilter ObjectiveStateFilter { get; set; }
+        public GeneralObjectiveCreationDateFilter GeneralObjectiveRegistrationDateFilter { get; set; }
+        public GeneralObjectiveTitleFilter GeneralObjectiveTitleFilter { get; set; }
+        public GeneralObjectiveCodeFilter GeneralObjectiveCodeFilter { get; set; }
+        public GeneralObjectiveStateFilter GeneralObjectiveStateFilter { get; set; }
 
-        public static ObjectiveFilter Empty => new ObjectiveFilter();
+        public static GeneralObjectiveFilter Empty => new GeneralObjectiveFilter();
     }
 
-    public class ObjectiveCreationDateFilter
+    public class GeneralObjectiveCreationDateFilter
     {
         public DateTime CreationDate { get; set; }
     }
 
-    public class ObjectiveTitleFilter
+    public class GeneralObjectiveTitleFilter
     {
         public string Title { get; set; }
     }
 
-    public class ObjectiveCodeFilter
+    public class GeneralObjectiveCodeFilter
     {
         public string Code { get; set; }
     }
 
-    public class ObjectiveStateFilter
+    public class GeneralObjectiveStateFilter
     {
         public ObjectiveState State { get; set; }
     }

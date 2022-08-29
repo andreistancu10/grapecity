@@ -3,8 +3,8 @@ using DigitNow.Domain.DocumentManagement.Data.Filters.Objectives;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Objectives
 {
-    internal class ObjectivesFilterComponentContext: DataExpressionFilterComponentContext
+    internal class GeneralObjectivesFilterComponentContext : DataExpressionFilterComponentContext
     {
-        public ObjectiveFilter ObjectiveFilter { get; set; }
+        public GeneralObjectiveFilter ObjectiveFilter { get; set; }
     }
 }

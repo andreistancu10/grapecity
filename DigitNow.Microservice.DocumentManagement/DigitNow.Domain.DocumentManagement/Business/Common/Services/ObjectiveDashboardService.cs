@@ -10,8 +10,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IObjectiveDashboardService
     {
-        Task<long> CountGeneralObjectivesAsync(ObjectiveFilter filter, CancellationToken token);
-        Task<List<GeneralObjective>> GetGeneralObjectivesAsync(ObjectiveFilter filter, int page, int count, CancellationToken token);
+        Task<long> CountGeneralObjectivesAsync(GeneralObjectiveFilter filter, CancellationToken token);
+        Task<List<GeneralObjective>> GetGeneralObjectivesAsync(GeneralObjectiveFilter filter, int page, int count, CancellationToken token);
     }
 
     public class ObjectiveDashboardService : IObjectiveDashboardService
@@ -27,7 +27,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             _serviceProvider = serviceProvider;
         }
 
-        public async Task<long> CountGeneralObjectivesAsync(ObjectiveFilter filter, CancellationToken token)
+        public async Task<long> CountGeneralObjectivesAsync(GeneralObjectiveFilter filter, CancellationToken token)
         {
             return await _dbContext.GeneralObjectives
                 .WhereAll((await GetObjectivesExpressionsAsync(filter, token)).ToPredicates())
@@ -35,7 +35,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .CountAsync(token);
         }
 
-        public async Task<List<GeneralObjective>> GetGeneralObjectivesAsync(ObjectiveFilter filter, int page, int count, CancellationToken token)
+        public async Task<List<GeneralObjective>> GetGeneralObjectivesAsync(GeneralObjectiveFilter filter, int page, int count, CancellationToken token)
         {
             var objectives = await _dbContext.GeneralObjectives
                 .Include(x => x.Objective)
@@ -48,10 +48,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return objectives;
         }
 
-        private Task<DataExpressions<GeneralObjective>> GetObjectivesExpressionsAsync(ObjectiveFilter filter, CancellationToken token)
+        private Task<DataExpressions<GeneralObjective>> GetObjectivesExpressionsAsync(GeneralObjectiveFilter filter, CancellationToken token)
         {
-            var filterComponent = new ObjectivesFilterComponent(_serviceProvider);
-            var filterComponentContext = new ObjectivesFilterComponentContext
+            var filterComponent = new GeneralObjectivesFilterComponent(_serviceProvider);
+            var filterComponentContext = new GeneralObjectivesFilterComponentContext
             {
                 ObjectiveFilter = filter
             };

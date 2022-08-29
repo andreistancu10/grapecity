@@ -2,14 +2,14 @@
 
 namespace DigitNow.Domain.DocumentManagement.Data.Filters.Objectives
 {
-    internal class ObjectiveFilterBuilder : DataExpressionFilterBuilder<GeneralObjective, ObjectiveFilter>
+    internal class ObjectiveFilterBuilder : DataExpressionFilterBuilder<GeneralObjective, GeneralObjectiveFilter>
     {
-        public ObjectiveFilterBuilder(IServiceProvider serviceProvider, ObjectiveFilter filter)
+        public ObjectiveFilterBuilder(IServiceProvider serviceProvider, GeneralObjectiveFilter filter)
            : base(serviceProvider, filter) { }
 
         private void BuildFilterByCreationDate()
         {
-            var creationDateFilter = EntityFilter.ObjectiveRegistrationDateFilter;
+            var creationDateFilter = EntityFilter.GeneralObjectiveRegistrationDateFilter;
             if (creationDateFilter != null)
             {
                 EntityPredicates.Add(objective =>
@@ -20,7 +20,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Objectives
 
         private void BuildFilterByTitle()
         {
-            var titleFilter = EntityFilter.ObjectiveTitleFilter;
+            var titleFilter = EntityFilter.GeneralObjectiveTitleFilter;
             if (titleFilter != null)
             {
                 EntityPredicates.Add(objective =>
@@ -30,7 +30,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Objectives
         }
         private void BuildFilterByCode()
         {
-            var codeFilter = EntityFilter.ObjectiveCodeFilter;
+            var codeFilter = EntityFilter.GeneralObjectiveCodeFilter;
             if (codeFilter != null)
             {
                 EntityPredicates.Add(objective =>
@@ -40,7 +40,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Objectives
         }
         private void BuildFilterByState()
         {
-            var stateFilter = EntityFilter.ObjectiveStateFilter;
+            var stateFilter = EntityFilter.GeneralObjectiveStateFilter;
             if (stateFilter != null)
             {
                 EntityPredicates.Add(objective =>
