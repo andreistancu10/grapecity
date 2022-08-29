@@ -39,7 +39,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public IQueryable<SpecificObjectiveFunctionary> FindQuery()
         {
-            return _dbContext.SpecificObjectiveFunctionarys.AsQueryable();
+            return _dbContext.SpecificObjectiveFunctionaries.AsQueryable();
         }
 
         public async Task UpdateRangeAsync(long objectiveId, List<long> functionaryIds, CancellationToken cancellationToken)
@@ -56,7 +56,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 if (functionaryIdsToRemove.Any())
                 {
                     var itemsToDelete = initialSpecificObjectiveFunctionary.Where(x => functionaryIdsToRemove.Any(y => y == x.FunctionaryId)).ToArray();
-                    _dbContext.SpecificObjectiveFunctionarys.RemoveRange(itemsToDelete);
+                    _dbContext.SpecificObjectiveFunctionaries.RemoveRange(itemsToDelete);
                 }
                 functionaryIds = functionaryIds.Except(initialFunctionaryIds).ToList();
             }

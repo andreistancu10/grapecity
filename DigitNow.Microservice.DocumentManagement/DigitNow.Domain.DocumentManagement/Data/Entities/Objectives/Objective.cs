@@ -13,10 +13,10 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities.Objectives
         public string ModificationMotive { get; set; }
 
         #region [ Children ]
+
         public GeneralObjective GeneralObjective { get; set; }
         public SpecificObjective SpecificObjective { get; set; }
-        #endregion
 
-        public List<ObjectiveUploadedFile> ObjectiveUploadedFiles { get; set; }
+        #endregion
     }
 }

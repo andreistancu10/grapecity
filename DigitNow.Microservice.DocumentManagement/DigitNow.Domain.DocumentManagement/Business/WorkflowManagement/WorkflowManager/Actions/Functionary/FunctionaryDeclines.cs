@@ -50,7 +50,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                     Remarks = command.Remarks
                 };
 
-                await PassDocumentToResponsibleUserAsync(document, newWorkflowResponsible, command, token);
+                await SendOpinionBackToRequesterAsync(document, newWorkflowResponsible, command, token);
             }
             else
             {
@@ -58,6 +58,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 await PassDocumentToRegistry(document, command, token);
             }
 
+            DeleteActionAfterBeingProcessed(document, UserActionsOnDocument.AsksForOpinion);
             await SendFunctonaryDeclinesMail(document, lastWorkFlowRecord, token);
 
             return command;
@@ -80,8 +81,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
             document.WorkflowHistories.Add(newWorkflowResponsible);
 
-            document.WorkflowHistories.Add(newWorkflowResponsible);
-
+            DeleteActionAfterBeingProcessed(document, UserActionsOnDocument.AsksForOpinion);
             await SendFunctonaryDeclinesMail(document, oldWorkflowResponsible, token);
 
             return command;

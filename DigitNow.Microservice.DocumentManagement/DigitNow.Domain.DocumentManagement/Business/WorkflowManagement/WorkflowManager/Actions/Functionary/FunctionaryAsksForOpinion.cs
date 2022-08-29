@@ -34,6 +34,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             document.WorkflowHistories.Add(WorkflowHistoryLogFactory
                 .Create(document, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.OpinionRequestedUnallocated, string.Empty, command.Remarks, command.OpinionRequestedUntil));
 
+            await CreateActionOnDocument(document, UserActionsOnDocument.AsksForOpinion, makeDocumentVisibleForDepartment: false, token);
             await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: false, command.DocumentId, headOfDepartment.Id, DocumentStatus.OpinionRequestedUnallocated, token);
             
             return command;

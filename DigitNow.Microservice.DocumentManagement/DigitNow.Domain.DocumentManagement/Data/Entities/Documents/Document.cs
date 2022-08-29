@@ -1,4 +1,5 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentActions;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
@@ -31,8 +32,9 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         #region [ References ]
 
         public List<SpecialRegisterMapping> SpecialRegisterMappings { get; set; }
-        public List<DocumentUploadedFile> DocumentUploadedFiles { get; set; }
+        public List<UploadedFileMapping> DocumentUploadedFiles { get; set; }
         public List<WorkflowHistoryLog> WorkflowHistories { get; set; }
+        public List<DocumentAction> DocumentActions { get; set; }
 
         #endregion
     }

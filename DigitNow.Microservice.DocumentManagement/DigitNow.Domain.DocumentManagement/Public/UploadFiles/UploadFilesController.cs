@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.DownloadFile;
-using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetFiles;
+using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetUploadedFilesForDocumentId;
+using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.GetUploadedFilesForTargetId;
+using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using DigitNow.Domain.DocumentManagement.Public.UploadFiles.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
@@ -27,8 +29,18 @@ namespace DigitNow.Domain.DocumentManagement.Public.UploadFiles
         [HttpPost("upload")]
         public async Task<IActionResult> UploadAsync([FromForm] UploadFileRequest request)
         {
-            return await _mediator.Send(_mapper.Map<UploadFileCommand>(request))
+            if ((TargetEntity)request.TargetEntity == TargetEntity.Document)
+            {
+                return await _mediator.Send(_mapper.Map<UploadDocumentFileCommand>(request))
                 switch
+                {
+                    null => NotFound(),
+                    var result => Ok(result)
+                };
+            }
+
+            return await _mediator.Send(_mapper.Map<UploadFileCommand>(request))
+            switch
             {
                 null => NotFound(),
                 var result => Ok(result)
@@ -47,15 +59,25 @@ namespace DigitNow.Domain.DocumentManagement.Public.UploadFiles
             };
         }
 
-        [HttpGet("get-files/{documentId:int}")]
-        public async Task<IActionResult> GetFilesAsync([FromRoute] int documentId)
+        [HttpGet("get-files/{targetEntity}/{entityId:int}")]
+        public async Task<IActionResult> GetFilesAsync([FromRoute] TargetEntity targetEntity, [FromRoute] int entityId)
         {
-            var result = await _mediator.Send(new GetFilesQuery(documentId));
 
-            return result switch
+            if (targetEntity == TargetEntity.Document)
+            {
+                return await _mediator.Send(new GetUploadedFilesForDocumentIdQuery(entityId))
+                switch
+                {
+                    null => NotFound(),
+                    var result => Ok(result)
+                };
+            }
+
+            return await _mediator.Send(new GetUploadedFilesForTargetIdQuery(targetEntity, entityId))
+            switch
             {
                 null => NotFound(),
-                _ => Ok(result)
+                var result => Ok(result)
             };
         }
     }

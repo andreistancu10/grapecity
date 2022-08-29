@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
 using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
+using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 using HTSS.Platform.Core.CQRS;
@@ -14,7 +16,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
         private readonly IGeneralObjectiveService _generalObjectiveService;
         private readonly IUploadedFileService _uploadedFileService;
 
-        public CreateGeneralObjectiveHandler(DocumentManagementDbContext dbContext,
+        public CreateGeneralObjectiveHandler(
+            DocumentManagementDbContext dbContext,
             IGeneralObjectiveService generalObjectiveService,
             IUploadedFileService uploadedFileService)
         {
@@ -27,7 +30,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
 
             var generalObjective = new GeneralObjective
             {
-                Objective = new Objective()
+                Objective = new Objective
                 {
                     Title = request.Title,
                     Details = request.Details,
@@ -35,8 +38,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
             };
 
             await _generalObjectiveService.AddAsync(generalObjective, cancellationToken);
+
             if (request.UploadedFileIds.Any())
-                await _uploadedFileService.CreateObjectiveUploadedFilesAsync(request.UploadedFileIds, generalObjective.Objective, cancellationToken);
+            {
+                await _uploadedFileService.UpdateUploadedFilesWithTargetIdAsync(
+                    request.UploadedFileIds,
+                    generalObjective.Objective.Id,
+                    TargetEntity.Objective,
+                    cancellationToken);
+            }
+
             await _dbContext.SaveChangesAsync(cancellationToken);
 
             return ResultObject.Created(generalObjective.ObjectiveId);

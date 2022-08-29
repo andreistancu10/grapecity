@@ -199,7 +199,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task SendMail_SendingReply(Document document, CancellationToken token)
         {
-            var department = await _catalogAdapterClient.GetDepartmentByCodeAsync("registratura", token);
+            var department = await _catalogAdapterClient.GetDepartmentByCodeAsync(UserDepartment.Registry.Code, token);
             if (department == null) return;
 
             var departmentUsers = await _identityService.GetUsersWithinDepartmentAsync(department.Id, token);

@@ -6,6 +6,15 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Business\Common\FileUsageContexts\**" />
+	  <Compile Remove="Data\Entities\UploadedFileMappings\Entities\**" />
+	  <EmbeddedResource Remove="Business\Common\FileUsageContexts\**" />
+	  <EmbeddedResource Remove="Data\Entities\UploadedFileMappings\Entities\**" />
+	  <None Remove="Business\Common\FileUsageContexts\**" />
+	  <None Remove="Data\Entities\UploadedFileMappings\Entities\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <None Remove="Business\Common\Export\Pdf\Templates\Html\registration_proof_template.html" />
 	</ItemGroup>
 
@@ -91,6 +100,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="Business\SpecificObjectives\Mappings\" />
 	  <Folder Include="Migrations\" />
 	  <Folder Include="Public\Common\" />
 	</ItemGroup>

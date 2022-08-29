@@ -46,8 +46,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             document.DestinationDepartmentId = oldWorkflowResponsible.RecipientId;
 
             await PassDocumentToDepartment(document, command, token);
+            DeleteActionAfterBeingProcessed(document, UserActionsOnDocument.AsksForOpinion);
+
             await SendHeadOfDepartmentDeclinesMail(document, lastWorkFlowRecord, token);
-          
+
             return command;
         }
 
@@ -58,8 +60,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 : DocumentStatus.NewDeclinedCompetence;
 
             await SetResponsibleBasedOnStatus(command, document, newDocumentStatus, token);
+            DeleteActionAfterBeingProcessed(document, UserActionsOnDocument.AsksForOpinion);
+
             await SendHeadOfDepartmentDeclinesMail(document, lastWorkFlowRecord, token);
-           
+
             return command;
         }
 
@@ -86,7 +90,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                     Remarks = command.Remarks
                 };
 
-                await PassDocumentToResponsibleUserAsync(document, newWorkflowResponsible, command, token);
+                await SendOpinionBackToRequesterAsync(document, newWorkflowResponsible, command, token);
             }
             else
             {

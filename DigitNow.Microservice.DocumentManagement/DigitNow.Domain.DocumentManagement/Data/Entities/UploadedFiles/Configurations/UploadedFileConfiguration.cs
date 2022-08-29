@@ -9,6 +9,11 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         {
             builder.ToTable(nameof(UploadedFile), DocumentManagementDbContext.Schema);
             builder.HasKey(p => p.Id);
+
+            builder
+                .HasOne(c => c.UploadedFileMapping)
+                .WithOne(c => c.UploadedFile)
+                .HasForeignKey<UploadedFileMapping>();
         }
     }
 }

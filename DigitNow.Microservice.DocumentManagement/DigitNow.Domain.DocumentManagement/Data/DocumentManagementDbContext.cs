@@ -1,10 +1,11 @@
-﻿#undef MIGRATION_ONLY
+﻿#define MIGRATION_ONLY
 
 #if    MIGRATION_ONLY
 #endif
 
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentActions;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -36,14 +37,15 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<SpecialRegister> SpecialRegisters { get; set; }
         public DbSet<SpecialRegisterMapping> SpecialRegisterMappings { get; set; }
         public DbSet<UploadedFile> UploadedFiles { get; set; }
-        public DbSet<DocumentUploadedFile> DocumentUploadedFiles { get; set; }
-        public DbSet<ObjectiveUploadedFile> ObjectiveUploadedFiles { get; set; }
+        public DbSet<UploadedFileMapping> UploadedFileMappings { get; set; }
+        public DbSet<DocumentFileMapping> DocumentFileMappings { get; set; }
         public DbSet<DeliveryDetail> DeliveryDetails { get; set; }
         public DbSet<WorkflowHistoryLog> WorkflowHistoryLogs { get; set; }
         public DbSet<Objective> Objectives { get; set; }
         public DbSet<GeneralObjective> GeneralObjectives { get; set; }
         public DbSet<SpecificObjective> SpecificObjectives { get; set; }
-        public DbSet<SpecificObjectiveFunctionary> SpecificObjectiveFunctionarys { get; set; }
+        public DbSet<SpecificObjectiveFunctionary> SpecificObjectiveFunctionaries { get; set; }
+        public DbSet<DocumentAction> DocumentActions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
