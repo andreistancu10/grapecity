@@ -9,12 +9,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.ObjectivesDashboard.Querie
     {
         private readonly IObjectiveDashboardService _objectiveDashboardService;
         private readonly IObjectiveMappingService _objectiveMappingService;
-        private readonly IMapper _mapper;
-        public GetGeneralObjectivesHandler(IObjectiveDashboardService objectiveDashboardService, IMapper mapper, IObjectiveMappingService objectiveMappingService)
+        public GetGeneralObjectivesHandler(IObjectiveDashboardService objectiveDashboardService, IObjectiveMappingService objectiveMappingService)
         {
             _objectiveDashboardService = objectiveDashboardService;
             _objectiveMappingService = objectiveMappingService;
-            _mapper = mapper;
         }
 
         public async Task<GetGeneralObjectivesResponse> Handle(GetGeneralObjectivesQuery request, CancellationToken cancellationToken)
@@ -31,7 +29,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.ObjectivesDashboard.Querie
             return BuildFirstPageDocumentResponse(request, totalItems, viewModels);
         }
 
-        private static GetGeneralObjectivesResponse BuildFirstPageDocumentResponse(GetGeneralObjectivesQuery query, long totalItems, IList<GeneralObjectiveViewModel> items)
+        private static GetGeneralObjectivesResponse BuildFirstPageDocumentResponse(GetGeneralObjectivesQuery query, long totalItems, IList<BasicGeneralObjectiveViewModel> items)
         {
             var pageCount = totalItems / query.Count;
 
