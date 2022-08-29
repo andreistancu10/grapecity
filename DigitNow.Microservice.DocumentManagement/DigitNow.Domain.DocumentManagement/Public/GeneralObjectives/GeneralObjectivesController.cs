@@ -54,7 +54,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.GeneralObjectives
         }
 
         [HttpGet("getAllActive")]
-        public async Task<ActionResult<List<GetAllGeneralActiveObjectiveResponse>>> GetAllActiveObjective(CancellationToken cancellationToken)
+        public async Task<IActionResult> GetAllActiveObjective(CancellationToken cancellationToken)
         {
             return await _mediator.Send(new GetAllGeneralActiveObjectiveQuery(), cancellationToken)
                 switch
@@ -65,7 +65,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.GeneralObjectives
         }
 
         [HttpPost("getAll")]
-        public async Task<ActionResult<List<GetGeneralObjectivesResponse>>> GetGeneralObjectivesAsync([FromBody] GetGeneralObjectivesRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetGeneralObjectivesAsync([FromBody] GetGeneralObjectivesRequest request, CancellationToken cancellationToken)
         {
             var query = _mapper.Map<GetGeneralObjectivesQuery>(request);
             return Ok(await _mediator.Send(query, cancellationToken));

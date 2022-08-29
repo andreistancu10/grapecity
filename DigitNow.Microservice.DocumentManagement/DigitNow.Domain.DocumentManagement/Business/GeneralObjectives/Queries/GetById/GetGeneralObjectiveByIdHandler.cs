@@ -9,6 +9,8 @@ using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
+using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
+using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 
 namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.GetById
 {
@@ -17,14 +19,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.
         private readonly IMapper _mapper;
         private readonly IGeneralObjectiveService _generalObjectiveService;
         private readonly IUploadedFileService _uploadedFileService;
+        private readonly GeneralObjectiveRelationsFetcher _generalObjectiveRelationsFetcher;
+
 
         public GetGeneralObjectiveByIdHandler(IMapper mapper,
             IGeneralObjectiveService generalObjectiveService,
-            IUploadedFileService uploadedFileService)
+            IUploadedFileService uploadedFileService,
+            IServiceProvider serviceProvider)
         {
             _mapper = mapper;
             _generalObjectiveService = generalObjectiveService;
             _uploadedFileService = uploadedFileService;
+            _generalObjectiveRelationsFetcher = new GeneralObjectiveRelationsFetcher(serviceProvider);
         }
 
         public async Task<GeneralObjectiveViewModel> Handle(GetGeneralObjectiveByIdQuery request, CancellationToken cancellationToken)
@@ -33,6 +39,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.
                 .Where(item => item.ObjectiveId == request.ObjectiveId)
                 .Include(item => item.Objective)
                 .FirstOrDefaultAsync(cancellationToken);
+
+            await _generalObjectiveRelationsFetcher
+                .UseGeneralObjectivesContext(new GeneralObjectivesFetcherContext { GeneralObjectives = new List<GeneralObjective>() { generalObjective } })
+                .TriggerFetchersAsync(cancellationToken);
 
             if (generalObjective == null)
             {
@@ -48,7 +58,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.
             var aggregate = new GeneralObjectiveAggregate()
             {
                 GeneralObjective = generalObjective,
-                DocumentFileMappingModels = files.Select(c => _mapper.Map<DocumentFileMappingModel>(c)).ToList()
+                DocumentFileMappingModels = files.Select(c => _mapper.Map<DocumentFileMappingModel>(c)).ToList(),
+                Users = _generalObjectiveRelationsFetcher.GeneralObjectiveUsers
             };
 
             return _mapper.Map<GeneralObjectiveViewModel>(aggregate);

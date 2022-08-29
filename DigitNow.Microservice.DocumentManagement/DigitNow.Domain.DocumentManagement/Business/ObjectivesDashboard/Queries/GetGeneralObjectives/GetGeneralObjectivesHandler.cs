@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using HTSS.Platform.Core.CQRS;
 
@@ -29,7 +28,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.ObjectivesDashboard.Querie
             return BuildFirstPageDocumentResponse(request, totalItems, viewModels);
         }
 
-        private static GetGeneralObjectivesResponse BuildFirstPageDocumentResponse(GetGeneralObjectivesQuery query, long totalItems, IList<BasicGeneralObjectiveViewModel> items)
+        private static GetGeneralObjectivesResponse BuildFirstPageDocumentResponse(GetGeneralObjectivesQuery query, long totalItems, IList<GeneralObjectiveViewModel> items)
         {
             var pageCount = totalItems / query.Count;
 
