@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries
+namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.GetDocumentsReports
 {
-    public class GetReportResponse
+    public class GetDocumentsExcelReportsResponse
     {
         public long Id { get; set; }
         public int RegistrationNumber { get; set; }

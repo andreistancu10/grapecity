@@ -57,33 +57,60 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
         }
 
         private class MapDocumentType :
-            IValueResolver<VirtualDocumentAggregate<IncomingDocument>, DocumentViewModel, int>,
-            IValueResolver<VirtualDocumentAggregate<OutgoingDocument>, DocumentViewModel, int>,
-            IValueResolver<VirtualDocumentAggregate<InternalDocument>, DocumentViewModel, int>
+            IValueResolver<VirtualDocumentAggregate<IncomingDocument>, DocumentViewModel, DocumentTypeViewModel>,
+            IValueResolver<VirtualDocumentAggregate<OutgoingDocument>, DocumentViewModel, DocumentTypeViewModel>,
+            IValueResolver<VirtualDocumentAggregate<InternalDocument>, DocumentViewModel, DocumentTypeViewModel>
         {
-            public int Resolve(VirtualDocumentAggregate<IncomingDocument> source, DocumentViewModel destination, int destMember, ResolutionContext context) =>
-                (int)DocumentType.Incoming;
+            public DocumentTypeViewModel Resolve(VirtualDocumentAggregate<IncomingDocument> source, DocumentViewModel destination, DocumentTypeViewModel destMember, ResolutionContext context) =>
+                Resolve(source);
 
-            public int Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, int destMember, ResolutionContext context) =>
-                (int)DocumentType.Outgoing;
+            public DocumentTypeViewModel Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, DocumentTypeViewModel destMember, ResolutionContext context) =>
+                Resolve(source);
 
-            public int Resolve(VirtualDocumentAggregate<InternalDocument> source, DocumentViewModel destination, int destMember, ResolutionContext context) =>
-                (int)DocumentType.Internal;
+            public DocumentTypeViewModel Resolve(VirtualDocumentAggregate<InternalDocument> source, DocumentViewModel destination, DocumentTypeViewModel destMember, ResolutionContext context) =>
+                Resolve(source);
+
+            private DocumentTypeViewModel Resolve<T>(VirtualDocumentAggregate<T> source) where T : VirtualDocument
+            {
+                var viewModel = new DocumentTypeViewModel { Id = source.VirtualDocument.Document.DocumentType };
+
+                var foundTranslation = source.DocumentTypeTranslations.FirstOrDefault(x => x.DocumentType == viewModel.Id);
+                if (foundTranslation != null)
+                {
+                    viewModel.Label = foundTranslation.Translation;
+                }
+
+                return viewModel;
+            }
         }
 
         private class MapDocumentStatus :
-            IValueResolver<VirtualDocumentAggregate<IncomingDocument>, DocumentViewModel, int>,
-            IValueResolver<VirtualDocumentAggregate<OutgoingDocument>, DocumentViewModel, int>,
-            IValueResolver<VirtualDocumentAggregate<InternalDocument>, DocumentViewModel, int>
+            IValueResolver<VirtualDocumentAggregate<IncomingDocument>, DocumentViewModel, DocumentStatusViewModel>,
+            IValueResolver<VirtualDocumentAggregate<OutgoingDocument>, DocumentViewModel, DocumentStatusViewModel>,
+            IValueResolver<VirtualDocumentAggregate<InternalDocument>, DocumentViewModel, DocumentStatusViewModel>
         {
-            public int Resolve(VirtualDocumentAggregate<IncomingDocument> source, DocumentViewModel destination, int destMember, ResolutionContext context) =>
-                (int)source.VirtualDocument.Document.Status;
+            public DocumentStatusViewModel Resolve(VirtualDocumentAggregate<IncomingDocument> source, DocumentViewModel destination, DocumentStatusViewModel destMember, ResolutionContext context) =>
+                Resolve(source);
 
-            public int Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, int destMember, ResolutionContext context) =>
-                (int)source.VirtualDocument.Document.Status;
+            public DocumentStatusViewModel Resolve(VirtualDocumentAggregate<OutgoingDocument> source, DocumentViewModel destination, DocumentStatusViewModel destMember, ResolutionContext context) =>
+                Resolve(source);
 
-            public int Resolve(VirtualDocumentAggregate<InternalDocument> source, DocumentViewModel destination, int destMember, ResolutionContext context) =>
-                (int)source.VirtualDocument.Document.Status;
+            public DocumentStatusViewModel Resolve(VirtualDocumentAggregate<InternalDocument> source, DocumentViewModel destination, DocumentStatusViewModel destMember, ResolutionContext context) =>
+                Resolve(source);
+
+            private DocumentStatusViewModel Resolve<T>(VirtualDocumentAggregate<T> source)
+                where T : VirtualDocument
+            {
+                var viewModel = new DocumentStatusViewModel { Status = source.VirtualDocument.Document.Status };
+
+                var foundTranslation = source.DocumentStatusTranslations.FirstOrDefault(x => x.Status == source.VirtualDocument.Document.Status);
+                if (foundTranslation != null)
+                {
+                    viewModel.Label = foundTranslation.Translation;
+                }
+
+                return viewModel;
+            }
         }
 
         private class MapDocumentRecipient :
@@ -264,7 +291,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             {
                 if (source.VirtualDocument.Document.IsArchived) return false;
 
-                if (source.VirtualDocument.Document.RecipientId == source.CurrentUser.Id 
+                if (source.VirtualDocument.Document.RecipientId == source.CurrentUser.Id
                     || source.CurrentUser.Departments.Select(x => x.Id).Contains(source.VirtualDocument.Document.DestinationDepartmentId))
                 {
                     return true;

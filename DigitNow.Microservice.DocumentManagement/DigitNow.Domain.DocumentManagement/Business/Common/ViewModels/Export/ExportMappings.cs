@@ -1,9 +1,4 @@
 ﻿using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Export
 {
@@ -11,10 +6,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Export
     {
         public ExportMappings()
         {
-            CreateMap<DocumentViewModel, ExportDocumentViewModel>()
+            CreateMap<DocumentViewModel, ExportDocumentViewModel>()                
+                .ForMember(dest => dest.DocumentType, opt => opt.MapFrom(src => src.DocumentType.Label))
                 .ForMember(dest => dest.Issuer, opt => opt.MapFrom(src => src.Issuer.Name))
                 .ForMember(dest => dest.Recipient, opt => opt.MapFrom(src => src.Recipient.Name))
                 .ForMember(dest => dest.DocumentCategory, opt => opt.MapFrom(src => src.DocumentCategory.Name))
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.Label))
                 .ForMember(dest => dest.User, opt => opt.MapFrom(src => src.User.Name));
         }
     }

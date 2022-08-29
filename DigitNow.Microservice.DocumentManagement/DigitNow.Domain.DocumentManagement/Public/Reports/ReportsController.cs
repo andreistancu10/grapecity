@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Export;
-using DigitNow.Domain.DocumentManagement.Business.Reports.Queries;
+using DigitNow.Domain.DocumentManagement.Business.Reports.Queries.GetDocumentsReports;
 using DigitNow.Domain.DocumentManagement.Public.Reports.Models;
 using DigitNow.Domain.DocumentManagement.utils;
 using Domain.Localization.Client;
@@ -39,7 +39,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Reports
         [HttpPost("expired")]
         public async Task<IActionResult> GetExpiredDocumentsReportAsync([FromBody] GetExpiredReportRequest request, CancellationToken cancellationToken)
         {
-            var getReportQuery = _mapper.Map<GetReportQuery>(request);
+            var getReportQuery = _mapper.Map<GetDocumentsExcelReportsQuery>(request);
             var reportResult = await _mediator.Send(getReportQuery, cancellationToken);
             if (reportResult == null) return NotFound();
 
@@ -54,7 +54,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Reports
         [HttpPost("to-expire")]
         public async Task<IActionResult> GetAboutToExpireDocumentsReportAsync([FromBody] GetToExpireReportRequest request, CancellationToken cancellationToken)
         {
-            var getReportQuery = _mapper.Map<GetReportQuery>(request);
+            var getReportQuery = _mapper.Map<GetDocumentsExcelReportsQuery>(request);
             var reportResult = await _mediator.Send(getReportQuery, cancellationToken);
             if (reportResult == null) return NotFound();
 
