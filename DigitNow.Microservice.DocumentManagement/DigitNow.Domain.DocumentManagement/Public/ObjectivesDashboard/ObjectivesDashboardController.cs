@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace DigitNow.Domain.DocumentManagement.Public.ObjectivesDashboard
 {
     [ApiController]
-    //[Authorize]
+    [Authorize]
     [Route("api/objectives-dashboard")]
     public class ObjectivesDashboardController: ApiController
     {
