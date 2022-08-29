@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
+using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 
@@ -26,20 +27,26 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     public class ObjectiveMappingService : IObjectiveMappingService
     {
         private readonly IMapper _mapper;
-        private readonly IIdentityService _identityService;
-        public ObjectiveMappingService(IMapper mapper, IIdentityService identityService)
+
+        private readonly GeneralObjectiveRelationsFetcher _generalObjectiveRelationsFetcher;
+        public ObjectiveMappingService(IMapper mapper, IServiceProvider serviceProvider)
         {
             _mapper = mapper;
-            _identityService = identityService;
+            _generalObjectiveRelationsFetcher = new GeneralObjectiveRelationsFetcher(serviceProvider);
         }
         public async Task<List<BasicGeneralObjectiveViewModel>> MapToGeneralObjectiveViewModelAsync(IList<GeneralObjective> objectives, CancellationToken cancellationToken)
         {
+            await _generalObjectiveRelationsFetcher
+                .UseGeneralObjectivesContext(new GeneralObjectivesFetcherContext { GeneralObjectives = objectives })
+                .TriggerFetchersAsync(cancellationToken);
+
             var result = new List<BasicGeneralObjectiveViewModel>();
 
             foreach (var objective in objectives)
             {
                 var generalObjectiveViewModel = _mapper.Map<GeneralObjective, BasicGeneralObjectiveViewModel>(objective);
-                var createdByUser = await _identityService.GetUserByIdAsync(objective.CreatedBy, cancellationToken);
+                
+                var createdByUser = _generalObjectiveRelationsFetcher.GeneralObjectiveUsers.FirstOrDefault(x => x.Id == objective.CreatedBy);
 
                 if (createdByUser != null)
                 {
