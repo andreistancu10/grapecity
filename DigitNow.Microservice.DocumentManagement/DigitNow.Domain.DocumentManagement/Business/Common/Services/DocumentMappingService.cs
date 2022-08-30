@@ -11,8 +11,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IDocumentMappingService
     {
-        Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken);
-        Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken);
+        Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(int languageId, IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken);
+        Task<List<ReportViewModel>> MapToReportViewModelAsync(int languageId, IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken);
     }
 
     public class DocumentMappingService : IDocumentMappingService
@@ -45,7 +45,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         #region [ IDocumentMappingService ]
 
-        public async Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
+        public async Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(int languageId, IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
         {
             if (!virtualDocuments.Any())
             {
@@ -56,6 +56,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             await _documentRelationsFetcher
                 .UseDocumentsContext(new DocumentsFetcherContext { Documents = virtualDocuments })
+                .UseTranslationsContext(new LanguageFetcherContext { LanguageId = languageId })
                 .TriggerFetchersAsync(cancellationToken);
 
             return MapDocuments(virtualDocuments)
@@ -63,12 +64,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .ToList();
         }
 
-        public async Task<List<ReportViewModel>> MapToReportViewModelAsync(IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
+        public async Task<List<ReportViewModel>> MapToReportViewModelAsync(int languageId, IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
         {
             if (!virtualDocuments.Any()) return new List<ReportViewModel>();
 
             await _documentReportRelationsFetcher
                 .UseDocumentsContext(new DocumentsFetcherContext { Documents = virtualDocuments })
+                .UseTranslationsContext(new LanguageFetcherContext { LanguageId = languageId })
                 .TriggerFetchersAsync(cancellationToken);
 
             return MapDocumentsReports(virtualDocuments)
@@ -119,7 +121,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                     Users = _documentRelationsFetcher.DocumentUsers,
                     Departments = _documentRelationsFetcher.DocumentDepartments,
                     Categories = _documentRelationsFetcher.DocumentCategories,
-                    InternalCategories = _documentRelationsFetcher.DocumentInternalCategories
+                    InternalCategories = _documentRelationsFetcher.DocumentInternalCategories,
+                    DocumentStatusTranslations = _documentRelationsFetcher.DocumentStatusTranslations,
+                    DocumentTypeTranslations = _documentRelationsFetcher.DocumentTypesTranslations
                 };
 
                 result.Add(_mapper.Map<VirtualDocumentAggregate<T>, DocumentViewModel>(aggregate));
@@ -171,6 +175,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                     Categories = _documentReportRelationsFetcher.DocumentCategories,
                     InternalCategories = _documentReportRelationsFetcher.DocumentInternalCategories,
                     Departments = _documentReportRelationsFetcher.DocumentDepartments,
+                    DocumentStatusTranslations = _documentReportRelationsFetcher.DocumentStatusTranslations,
+                    DocumentTypeTranslations = _documentReportRelationsFetcher.DocumentTypesTranslationModels
                 };
 
                 result.Add(_mapper.Map<VirtualReportAggregate<T>, ReportViewModel>(aggregate));

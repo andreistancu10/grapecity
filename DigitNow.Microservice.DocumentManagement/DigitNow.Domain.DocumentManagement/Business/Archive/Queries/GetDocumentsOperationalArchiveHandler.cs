@@ -27,7 +27,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Archive.Queries
                 request.Count,
                 cancellationToken);
 
-            var viewModels = await _documentMappingService.MapToDocumentViewModelAsync(documents, cancellationToken);
+            var viewModels = await _documentMappingService.MapToDocumentViewModelAsync(request.LanguageId, documents, cancellationToken);
 
             return BuildFirstPageDocumentResponse(request, totalItems, viewModels);
         }

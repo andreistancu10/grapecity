@@ -2,6 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Export;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
+using DigitNow.Domain.DocumentManagement.Data.Filters.Documents;
 using HTSS.Platform.Core.CQRS;
 
 namespace DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Queries.Exports
@@ -24,15 +25,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Queries.E
 
         public async Task<List<ExportDocumentViewModel>> Handle(DocumentsExportQuery request, CancellationToken cancellationToken)
         {
+            var activeDocumentsCount = await _dashboardService.CountActiveDocumentsAsync(DocumentFilter.Empty, cancellationToken);
+
             var handler = new GetDocumentsHandler(_dashboardService, _documentMappingService);
-            var result = await handler.Handle(new GetDocumentsQuery
+            var documentsResponse = await handler.Handle(new GetDocumentsQuery
             {
-                Count = request.Count,
+                Count = (int)activeDocumentsCount,
                 Filter = request.Filter,
-                Page = request.Page
+                Page = 1
             }, cancellationToken);
 
-            return _mapper.Map<List<ExportDocumentViewModel>>(result.Items);
+            return _mapper.Map<List<ExportDocumentViewModel>>(documentsResponse.Items);
         }
     }
 }
