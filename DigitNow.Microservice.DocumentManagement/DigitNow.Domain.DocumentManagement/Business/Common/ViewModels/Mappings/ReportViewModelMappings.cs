@@ -182,7 +182,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             public DocumentTypeViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, DocumentTypeViewModel destMember, ResolutionContext context) =>
                 Resolve(source);
 
-            private DocumentTypeViewModel Resolve<T>(VirtualReportAggregate<T> source) where T : VirtualDocument
+            private static DocumentTypeViewModel Resolve<T>(VirtualReportAggregate<T> source) where T : VirtualDocument
             {
                 var viewModel = new DocumentTypeViewModel { Id = source.VirtualDocument.Document.DocumentType };
 
@@ -206,7 +206,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             public DocumentStatusViewModel Resolve(VirtualReportAggregate<InternalDocument> source, ReportViewModel destination, DocumentStatusViewModel destMember, ResolutionContext context) =>
                 Resolve(source);
 
-            private DocumentStatusViewModel Resolve<T>(VirtualReportAggregate<T> source)
+            private static DocumentStatusViewModel Resolve<T>(VirtualReportAggregate<T> source)
                 where T: VirtualDocument
             {
                 var viewModel = new DocumentStatusViewModel { Status = source.VirtualDocument.Document.Status };
