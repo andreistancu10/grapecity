@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using DigitNow.Adapters.MS.Catalog;
+﻿using DigitNow.Adapters.MS.Catalog;
 using DigitNow.Domain.Authentication.Client;
 using DigitNow.Domain.Authentication.Contracts.ContactDetails.GetLegalEntity;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
@@ -117,7 +116,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                     Address = legalEntity.Name,
                     Name = $"{sender.FirstName} {sender.LastName}",
                     RegistryNumber = registrationId.ToString(),
-                    Date = date.ToShortDateString(),
+                    Date = date.ToString("d", new CultureInfo("es-ES"))
                 }, token);
         }
 
@@ -168,7 +167,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                    {
                        Structure = senderDepartment.Name,
                        RegistryNumber = document.RegistrationNumber,
-                       Date = document.RegistrationDate.ToShortDateString()
+                       Date = document.RegistrationDate.ToString("d", new CultureInfo("es-ES"))
                    }, token);
             }
         }
@@ -191,6 +190,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             if (previousResponsible != null)
             {
                 var recipient = await _identityService.GetUserByIdAsync(previousResponsible.CreatedBy, token);
+                if (recipient == null)
+                {
+                    throw new ArgumentException("Recipient cannot be null", nameof(document));
+                }
+
                 await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.DepartmentSupervisorApprovalDecisionTemplate, token);
             }
         }
@@ -201,6 +205,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             if (previousResponsible != null)
             {
                 var recipient = await _identityService.GetUserByIdAsync(previousResponsible.CreatedBy, token);
+                if (recipient == null)
+                {
+                    throw new ArgumentException("Recipient cannot be null", nameof(document));
+                }
                 await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.DepartmentSupervisorRejectionDecisionTemplate, token);
             }
         }
@@ -226,12 +234,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             new
             {
                 RegistryNumber = document.RegistrationNumber,
-                Date = document.RegistrationDate.ToShortDateString()
+                Date = document.RegistrationDate.ToString("d", new CultureInfo("es-ES"))
             },
             new
             {
                 RegistryNumber = document.RegistrationNumber,
-                Date = document.RegistrationDate.ToShortDateString()
+                Date = document.RegistrationDate.ToString("d", new CultureInfo("es-ES"))
             }, token);
         }
 
@@ -243,6 +251,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             if (userWhoRegistered != null)
             {
                 var department = await _catalogAdapterClient.GetDepartmentByIdAsync(historyLog.DestinationDepartmentId, token);
+
+                if (department == null)
+                {
+                    throw new ArgumentException("Department cannot be null", nameof(document));
+                }
+
                 await _mailSender.SendMail(MailTemplateEnum.DeclineCompetenceTemplate, userWhoRegistered.Email,
                 new
                 {
@@ -252,7 +266,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 {
                     Structure = department.Name,
                     RegistryNumber = document.RegistrationNumber,
-                    Date = document.RegistrationDate.ToShortDateString()
+                    Date = document.RegistrationDate.ToString("d", new CultureInfo("es-ES"))
                 }, token);
             }
         }
@@ -263,6 +277,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             if(inWorkMayorReviewWorkflow != null)
             {
                 var recipient = await _identityService.GetUserByIdAsync(inWorkMayorReviewWorkflow.CreatedBy, token);
+                if (recipient == null)
+                {
+                    throw new ArgumentException("Recipient cannot be null", nameof(document));
+                }
+
                 await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.MayorApprovalDecisionTemplate, token);
             }
         }
@@ -287,21 +306,29 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             if(opinionRequestedAllocatedFlow != null && opinionRequestedUnallocatedFlow != null)
             {
                 var supervisorWhoSentForOpinion = await _identityService.GetUserByIdAsync(opinionRequestedAllocatedFlow.CreatedBy, token);
-                var department = await _catalogAdapterClient.GetDepartmentByIdAsync(supervisorWhoSentForOpinion.Departments.First().Id, token);
+                if(supervisorWhoSentForOpinion == null)
+                {
+                    throw new ArgumentException("Supervisor who asked for opinion cannot be null", nameof(document));
+                }
 
+                var department = await _catalogAdapterClient.GetDepartmentByIdAsync(supervisorWhoSentForOpinion.Departments.First().Id, token);
                 var recipient = await _identityService.GetUserByIdAsync(opinionRequestedUnallocatedFlow.CreatedBy, token);
+                if(department == null || recipient == null)
+                {
+                    throw new ArgumentException("Department and recipient cannot be null", nameof(document));
+                }
 
                 await _mailSender.SendMail(MailTemplateEnum.OpinionFunctionaryReplyTemplate, recipient.Email,
                 new
                 {
                     RegistryNumber = document.RegistrationNumber,
-                    Date = document.RegistrationDate.ToShortDateString()
+                    Date = document.RegistrationDate.ToString("d", new CultureInfo("es-ES"))
                 },
                 new
                 {
                     Structure = department.Name,
                     RegistryNumber = document.RegistrationNumber,
-                    Date = document.RegistrationDate.ToShortDateString(),
+                    Date = document.RegistrationDate.ToString("d", new CultureInfo("es-ES"))
 
                 }, token);
             }
