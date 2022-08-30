@@ -13,7 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         IIncludableQueryable<DynamicFormFieldMapping, DynamicFormField> GetDynamicFormFieldMappingsQueryable(long dynamicFormId);
         Task<DynamicFormViewModel> GetDynamicFormViewModelAsync(long dynamicFormId, CancellationToken cancellationToken);
-        IQueryable<DynamicForm> GetDynamicFormsAsync();
+        IQueryable<DynamicForm> GetDynamicFormsQueryAsync();
         Task SaveDataForDynamicFormAsync(long dynamicFormId, List<KeyValueRequestModel> values, CancellationToken cancellationToken);
     }
 
@@ -59,7 +59,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return dynamicFormViewModel;
         }
 
-        public IQueryable<DynamicForm> GetDynamicFormsAsync()
+        public IQueryable<DynamicForm> GetDynamicFormsQueryAsync()
         {
             return _dbContext.DynamicForms.AsNoTracking();
         }
