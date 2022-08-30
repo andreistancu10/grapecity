@@ -46,6 +46,10 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<SpecificObjective> SpecificObjectives { get; set; }
         public DbSet<SpecificObjectiveFunctionary> SpecificObjectiveFunctionaries { get; set; }
         public DbSet<DocumentAction> DocumentActions { get; set; }
+        public DbSet<DynamicForm> DynamicForms { get; set; }
+        public DbSet<DynamicFormFieldMapping> DynamicFormFieldMappings { get; set; }
+        public DbSet<DynamicFormFieldValue> DynamicFormFieldValues { get; set; }
+        public DbSet<DynamicFormFillingLog> DynamicFormFillingLogs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -53,7 +57,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(DocumentManagementDbContext).Assembly);
         }
 
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new())
         {
             foreach (var entry in ChangeTracker.Entries<IExtendedEntity>())
             {

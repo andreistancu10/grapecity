@@ -2,12 +2,12 @@
 using DigitNow.Adapters.MS.Catalog;
 using DigitNow.Adapters.MS.Catalog.Poco;
 using DigitNow.Domain.Authentication.Client;
-using DigitNow.Domain.Authentication.Contracts.Users.GetUserById;
-using DigitNow.Domain.Authentication.Contracts.Users.GetUsersByFilter;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
+using DigitNow.Domain.Authentication.Contracts.Users.GetUserById;
+using DigitNow.Domain.Authentication.Contracts.Users.GetUsersByFilter;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services
 {
