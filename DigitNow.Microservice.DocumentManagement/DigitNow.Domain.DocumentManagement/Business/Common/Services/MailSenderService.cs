@@ -281,23 +281,31 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task SendMail_OpinionFunctionaryReply(Document document, CancellationToken token)
         {
-            var historyLog = document.WorkflowHistories.FirstOrDefault(x => x.DocumentStatus == DocumentStatus.OpinionRequestedAllocated);
+            var opinionRequestedAllocatedFlow = document.WorkflowHistories.FirstOrDefault(x => x.DocumentStatus == DocumentStatus.OpinionRequestedAllocated);
+            var opinionRequestedUnallocatedFlow = document.WorkflowHistories.FirstOrDefault(x => x.DocumentStatus == DocumentStatus.OpinionRequestedUnallocated);
 
-            var supervisorWhoSentForOpinion = await _identityService.GetUserByIdAsync(historyLog.CreatedBy, token);
-            var department = await _catalogAdapterClient.GetDepartmentByIdAsync(supervisorWhoSentForOpinion.Departments.First().Id, token);
-            await _mailSender.SendMail(MailTemplateEnum.OpinionFunctionaryReplyTemplate, supervisorWhoSentForOpinion.Email,
-            new
+            if(opinionRequestedAllocatedFlow != null && opinionRequestedUnallocatedFlow != null)
             {
-                RegistryNumber = document.RegistrationNumber,
-                Date = document.RegistrationDate.ToShortDateString()
-            },
-            new
-            {
-                Structure = department.Name,
-                RegistryNumber = document.RegistrationNumber,
-                Date = document.RegistrationDate.ToShortDateString(),
-               
-            }, token);
+                var supervisorWhoSentForOpinion = await _identityService.GetUserByIdAsync(opinionRequestedAllocatedFlow.CreatedBy, token);
+                var department = await _catalogAdapterClient.GetDepartmentByIdAsync(supervisorWhoSentForOpinion.Departments.First().Id, token);
+
+                var recipient = await _identityService.GetUserByIdAsync(opinionRequestedUnallocatedFlow.CreatedBy, token);
+
+                await _mailSender.SendMail(MailTemplateEnum.OpinionFunctionaryReplyTemplate, recipient.Email,
+                new
+                {
+                    RegistryNumber = document.RegistrationNumber,
+                    Date = document.RegistrationDate.ToShortDateString()
+                },
+                new
+                {
+                    Structure = department.Name,
+                    RegistryNumber = document.RegistrationNumber,
+                    Date = document.RegistrationDate.ToShortDateString(),
+
+                }, token);
+            }
+            
         }
     }
 }
