@@ -31,12 +31,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             if (!UserExists(headOfDepartment, command))
                 return command;
 
+            var currentDestinationDepartment = document.DestinationDepartmentId;
+
             document.WorkflowHistories.Add(WorkflowHistoryLogFactory
                 .Create(document, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.OpinionRequestedUnallocated, string.Empty, command.Remarks, command.OpinionRequestedUntil));
 
             await CreateActionOnDocument(document, UserActionsOnDocument.AsksForOpinion, makeDocumentVisibleForDepartment: false, token);
             await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: false, command.DocumentId, headOfDepartment.Id, DocumentStatus.OpinionRequestedUnallocated, token);
-            
+
+            await MailSenderService.SendMail_OpinionRequestedByAnotherDepartment(headOfDepartment, currentDestinationDepartment, document, token);
             return command;
         }
         #endregion
