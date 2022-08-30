@@ -240,9 +240,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var userWhoRegisteredId = document.CreatedBy;
 
             var userWhoRegistered = await _identityService.GetUserByIdAsync(userWhoRegisteredId, token);
-            if (userWhoRegistered != null && userWhoRegistered.Departments.Any())
+            if (userWhoRegistered != null)
             {
-                var department = await _catalogAdapterClient.GetDepartmentByIdAsync(userWhoRegistered.Departments.First().Id, token);
+                var department = await _catalogAdapterClient.GetDepartmentByIdAsync(historyLog.DestinationDepartmentId, token);
                 await _mailSender.SendMail(MailTemplateEnum.DeclineCompetenceTemplate, userWhoRegistered.Email,
                 new
                 {
