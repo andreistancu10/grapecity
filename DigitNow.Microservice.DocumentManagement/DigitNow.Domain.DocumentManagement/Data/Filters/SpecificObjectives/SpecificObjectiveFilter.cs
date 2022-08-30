@@ -4,36 +4,42 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.SpecificObjectives
 {
     public class SpecificObjectiveFilter : DataFilter
     {
-        public SpecialObjectiveCodeFilter CodeFilter { get; set; }
-        public SpecialObjectiveTitleFilter TitleFilter { get; set; }
-        public SpecialObjectiveDepartmentFilter DepartmentFilter { get; set; }
-        public SpecialObjectiveFunctionaryFilter FunctionaryFilter { get; set; }
-        public SpecialObjectiveStateFilter StateFilter { get; set; }
+        public SpecificObjectiveGeneralObjectiveIdFilter GeneralObjectiveIdFilter { get; set; }
+        public SpecificObjectiveCodeFilter CodeFilter { get; set; }
+        public SpecificObjectiveTitleFilter TitleFilter { get; set; }
+        public SpecificObjectiveDepartmentFilter DepartmentFilter { get; set; }
+        public SpecificObjectiveFunctionaryFilter FunctionaryFilter { get; set; }
+        public SpecificObjectiveStateFilter StateFilter { get; set; }
 
         public static SpecificObjectiveFilter Empty => new SpecificObjectiveFilter();
     }
 
-    public class SpecialObjectiveCodeFilter
+    public class SpecificObjectiveGeneralObjectiveIdFilter
+    {
+        public long ObjectiveId { get; set; }
+    }
+
+    public class SpecificObjectiveCodeFilter
     {
         public string Code { get; set; }
     }
 
-    public class SpecialObjectiveTitleFilter
+    public class SpecificObjectiveTitleFilter
     {
         public string Title { get; set; }
     }
 
-    public class SpecialObjectiveDepartmentFilter
+    public class SpecificObjectiveDepartmentFilter
     {
         public long DepartmentId { get; set; }
     }
 
-    public class SpecialObjectiveFunctionaryFilter
+    public class SpecificObjectiveFunctionaryFilter
     {
         public long FunctionaryId { get; set; }
     }
 
-    public class SpecialObjectiveStateFilter
+    public class SpecificObjectiveStateFilter
     {
         public ObjectiveState StateId { get; set; }
     }

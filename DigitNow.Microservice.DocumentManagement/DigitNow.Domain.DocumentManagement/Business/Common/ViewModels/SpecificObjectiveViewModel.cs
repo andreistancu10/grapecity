@@ -4,6 +4,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
 {
     public class SpecificObjectiveViewModel
     {
+        public long Id { get; set; }
         public string Code { get; set; }
         public BasicViewModel Department { get; set; }
         public BasicViewModel Functionary { get; set; }

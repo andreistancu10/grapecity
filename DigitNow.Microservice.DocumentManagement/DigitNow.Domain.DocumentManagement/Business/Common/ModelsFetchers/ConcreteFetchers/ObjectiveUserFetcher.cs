@@ -17,22 +17,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
 
         protected override async Task<List<UserModel>> FetchInternalAsync(ObjectivesFetcherContext context, CancellationToken cancellationToken)
         {
-            var createdByUsers = context.Objectives
-                .Select(x => x.CreatedBy)
-                .ToList();
-            var modifiedByUsers = context.Objectives
-                .Select(x => x.ModifiedBy)
-                .ToList();
-
-            var targetUsers = new List<long>();
-            targetUsers.AddRange(createdByUsers);
-            targetUsers.AddRange(modifiedByUsers);
-            targetUsers = targetUsers.Distinct().ToList();
-
             var usersList = await _authenticationClient.Users.GetUsersByFilterAsync(new GetUsersByFilterRequest(), cancellationToken);
 
             var relatedUsers = usersList.Users
-                .Where(x => targetUsers.Contains(x.Id))
                 .Select(x => new UserModel
                 {
                     Id = x.Id,

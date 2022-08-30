@@ -20,21 +20,24 @@ namespace DigitNow.Domain.DocumentManagement.Public.SpecialObjective.Mappings
                 .ForMember(m => m.Filter, opt => opt.MapFrom(src => src.Filter ?? new SpecificObjectiveFilterDto()));
 
             CreateMap<SpecificObjectiveFilterDto, SpecificObjectiveFilter>()
+                .ForMember(m => m.GeneralObjectiveIdFilter, opt => opt.MapFrom(src => src.GeneralObjectiveIdFilter))
                 .ForMember(m => m.CodeFilter, opt => opt.MapFrom(src => src.CodeFilter))
                 .ForMember(m => m.TitleFilter, opt => opt.MapFrom(src => src.TitleFilter))
                 .ForMember(m => m.DepartmentFilter, opt => opt.MapFrom(src => src.DepartmentFilter))
                 .ForMember(m => m.FunctionaryFilter, opt => opt.MapFrom(src => src.FunctionaryFilter))
                 .ForMember(m => m.StateFilter, opt => opt.MapFrom(src => src.StateFilter));
                 {
-                CreateMap<SpecialObjectiveCodeFilterDto, SpecialObjectiveCodeFilter>()
+                CreateMap<SpecificObjectiveGeneralObjectiveIdFilterDto, SpecificObjectiveGeneralObjectiveIdFilter>()
+                    .ForMember(m => m.ObjectiveId, opt => opt.MapFrom(src => src.ObjectiveId));
+                CreateMap<SpecificObjectiveCodeFilterDto, SpecificObjectiveCodeFilter>()
                     .ForMember(m => m.Code, opt => opt.MapFrom(src => src.Code));
-                CreateMap<SpecialObjectiveTitleFilterDto, SpecialObjectiveTitleFilter>()
+                CreateMap<SpecificObjectiveTitleFilterDto, SpecificObjectiveTitleFilter>()
                     .ForMember(m => m.Title, opt => opt.MapFrom(src => src.Title));
-                CreateMap<SpecialObjectiveDepartmentFilterDto, SpecialObjectiveDepartmentFilter>()
+                CreateMap<SpecificObjectiveDepartmentFilterDto, SpecificObjectiveDepartmentFilter>()
                     .ForMember(m => m.DepartmentId, opt => opt.MapFrom(src => src.DepartmentId));
-                CreateMap<SpecialObjectiveFunctionaryFilterDto, SpecialObjectiveFunctionaryFilter>()
+                CreateMap<SpecificObjectiveFunctionaryFilterDto, SpecificObjectiveFunctionaryFilter>()
                     .ForMember(m => m.FunctionaryId, opt => opt.MapFrom(src => src.FunctionaryId));
-                CreateMap<SpecialObjectiveStateFilterDto, SpecialObjectiveStateFilter>()
+                CreateMap<SpecificObjectiveStateFilterDto, SpecificObjectiveStateFilter>()
                     .ForMember(m => m.StateId, opt => opt.MapFrom(src => src.StateId));
                 }
         }

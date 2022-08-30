@@ -11,7 +11,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
         {
         }
 
-        protected override async Task<DataExpressions<SpecificObjective>> SetCustomDataExpressionsAsync(SpecificObjectivesPermissionsFilterComponentContext context, CancellationToken token)
+        protected override Task<DataExpressions<SpecificObjective>> SetCustomDataExpressionsAsync(SpecificObjectivesPermissionsFilterComponentContext context, CancellationToken token)
         {
             var currentUser = context.CurrentUser;
 
@@ -24,8 +24,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
                 }
             };
 
-            return new SpecificObjectivePermissionsFilterBuilder(ServiceProvider, filter)
-                .Build();
+            return Task.FromResult(new SpecificObjectivePermissionsFilterBuilder(ServiceProvider, filter)
+                .Build());
         }
     }
 }

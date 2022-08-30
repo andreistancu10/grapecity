@@ -8,7 +8,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
     {
         public ObjectiveViewModelMappings()
         {
-            _ = CreateMap<VirtualObjectiveAgregate<SpecificObjective>, SpecificObjectiveViewModel>()
+            CreateMap<VirtualObjectiveAgregate<SpecificObjective>, SpecificObjectiveViewModel>()
+                .ForMember(c => c.Id, opt => opt.MapFrom(src => src.VirtualObjective.ObjectiveId))
                 .ForMember(c => c.Code, opt => opt.MapFrom(src => src.VirtualObjective.Objective.Code))
                 .ForMember(c => c.Title, opt => opt.MapFrom(src => src.VirtualObjective.Objective.Title))
                 .ForMember(c => c.CreatedAt, opt => opt.MapFrom(src => src.VirtualObjective.CreatedAt))

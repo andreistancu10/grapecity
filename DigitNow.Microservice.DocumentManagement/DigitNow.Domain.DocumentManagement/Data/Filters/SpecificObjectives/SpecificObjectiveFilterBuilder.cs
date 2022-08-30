@@ -11,6 +11,8 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.SpecificObjectives
 
         protected override void InternalBuild()
         {
+            BuildGeneralObjectiveIdFilter();
+
             if (EntityFilter.CodeFilter != null)
             {
                 BuildCodeFilter();
@@ -22,6 +24,12 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.SpecificObjectives
                 BuildFunctionaryFilter();
                 BuildStateFilter();
             }
+        }
+
+        private void BuildGeneralObjectiveIdFilter()
+        {
+            if(EntityFilter.GeneralObjectiveIdFilter != null)
+                EntityPredicates.Add(x => x.GeneralObjectiveId == EntityFilter.GeneralObjectiveIdFilter.ObjectiveId);
         }
 
         private void BuildCodeFilter()
@@ -49,7 +57,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.SpecificObjectives
         {
             if (EntityFilter.FunctionaryFilter != null)
             {
-                EntityPredicates.Add(x => x.SpecificObjectiveFunctionarys.Where(x => x.FunctionaryId == EntityFilter.FunctionaryFilter.FunctionaryId).Any());
+                EntityPredicates.Add(x => x.SpecificObjectiveFunctionarys.Any(x => x.FunctionaryId == EntityFilter.FunctionaryFilter.FunctionaryId));
             }
         }
 
@@ -57,7 +65,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.SpecificObjectives
         {
             if (EntityFilter.StateFilter != null)
             {
-                EntityPredicates.Add(x => x.Objective.Code == EntityFilter.CodeFilter.Code);
+                EntityPredicates.Add(x => x.Objective.State == EntityFilter.StateFilter.StateId);
             }
         }
     }

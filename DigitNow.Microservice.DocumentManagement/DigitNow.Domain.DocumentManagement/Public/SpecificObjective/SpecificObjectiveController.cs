@@ -66,12 +66,11 @@ namespace DigitNow.Domain.DocumentManagement.Public.SpecialObjective
             };
         }
 
-        [HttpPost("getSpecificObjectives")]
-        public async Task<ActionResult<List<GetSpecificObjectiveResponse>>> GetDocumentsAsync([FromBody] GetSpecificObjectiveRequest request, CancellationToken cancellationToken)
+        [HttpPost("get-all")]
+        public async Task<IActionResult> GetDocumentsAsync([FromBody] GetSpecificObjectiveRequest request, CancellationToken cancellationToken)
         {
             var query = _mapper.Map<GetSpecificObjectiveQuery>(request);
             return Ok(await _mediator.Send(query, cancellationToken));
         }
-
     }
 }
