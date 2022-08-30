@@ -2,6 +2,7 @@
 using DigitNow.Domain.Authentication.Contracts.Users.GetUsersByFilter;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchers

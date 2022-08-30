@@ -6,6 +6,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Models
     {
         public long Id { get; set; }
         public string Name { get; set; }
+        public string OriginalFileName { get; set; }
         public long? TargetId { get; set; }
         public TargetEntity TargetEntity { get; set; }
         public string Context { get; set; }

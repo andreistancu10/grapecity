@@ -348,6 +348,330 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("DocumentResolution", "DocumentManagement");
                 });
 
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicForm", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<string>("Context")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Label")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("DynamicForm", "DocumentManagement");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Context = "",
+                            Description = "description1",
+                            Label = "label1",
+                            Name = "Formular 1"
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Context = "",
+                            Description = "description2",
+                            Label = "label2",
+                            Name = "Formular 2"
+                        });
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicFormField", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<string>("Context")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DynamicFieldType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("DynamicFormField", "DocumentManagement");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Context = "",
+                            DynamicFieldType = 0,
+                            Name = "Input"
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Context = "",
+                            DynamicFieldType = 1,
+                            Name = "Number"
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            Context = "",
+                            DynamicFieldType = 2,
+                            Name = "Date"
+                        },
+                        new
+                        {
+                            Id = 4L,
+                            Context = "",
+                            DynamicFieldType = 5,
+                            Name = "CountryDropdown"
+                        },
+                        new
+                        {
+                            Id = 5L,
+                            Context = "",
+                            DynamicFieldType = 4,
+                            Name = "DistrictDropdown"
+                        },
+                        new
+                        {
+                            Id = 6L,
+                            Context = "",
+                            DynamicFieldType = 3,
+                            Name = "CityDropdown"
+                        });
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicFormFieldMapping", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<string>("Context")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("DynamicFormFieldId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("DynamicFormId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("InitialValue")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Key")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Label")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Required")
+                        .HasColumnType("bit");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DynamicFormFieldId");
+
+                    b.HasIndex("DynamicFormId");
+
+                    b.ToTable("DynamicFormFieldMapping", "DocumentManagement");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1L,
+                            Context = "",
+                            DynamicFormFieldId = 1L,
+                            DynamicFormId = 1L,
+                            InitialValue = "",
+                            Key = "lastName",
+                            Label = "Nume",
+                            Order = 1,
+                            Required = true
+                        },
+                        new
+                        {
+                            Id = 2L,
+                            Context = "",
+                            DynamicFormFieldId = 1L,
+                            DynamicFormId = 1L,
+                            InitialValue = "",
+                            Key = "firstName",
+                            Label = "Prenume",
+                            Order = 2,
+                            Required = true
+                        },
+                        new
+                        {
+                            Id = 3L,
+                            Context = "",
+                            DynamicFormFieldId = 2L,
+                            DynamicFormId = 1L,
+                            InitialValue = "7",
+                            Key = "resolutionPeriod",
+                            Label = "Termen Solutionare",
+                            Order = 3,
+                            Required = false
+                        },
+                        new
+                        {
+                            Id = 4L,
+                            Context = "",
+                            DynamicFormFieldId = 3L,
+                            DynamicFormId = 1L,
+                            InitialValue = "",
+                            Key = "createdDate",
+                            Label = "Data Creare",
+                            Order = 4,
+                            Required = true
+                        },
+                        new
+                        {
+                            Id = 5L,
+                            Context = "",
+                            DynamicFormFieldId = 1L,
+                            DynamicFormId = 2L,
+                            InitialValue = "",
+                            Key = "observations",
+                            Label = "Observatii",
+                            Order = 1,
+                            Required = true
+                        },
+                        new
+                        {
+                            Id = 6L,
+                            Context = "",
+                            DynamicFormFieldId = 4L,
+                            DynamicFormId = 2L,
+                            InitialValue = "161",
+                            Key = "countryId",
+                            Label = "Tara",
+                            Order = 2,
+                            Required = false
+                        },
+                        new
+                        {
+                            Id = 7L,
+                            Context = "",
+                            DynamicFormFieldId = 6L,
+                            DynamicFormId = 2L,
+                            InitialValue = "",
+                            Key = "cityId",
+                            Label = "Oras",
+                            Order = 3,
+                            Required = false
+                        },
+                        new
+                        {
+                            Id = 8L,
+                            Context = "",
+                            DynamicFormFieldId = 5L,
+                            DynamicFormId = 2L,
+                            InitialValue = "",
+                            Key = "districtId",
+                            Label = "Judet",
+                            Order = 4,
+                            Required = true
+                        });
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicFormFieldValue", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<long>("DynamicFormFieldMappingId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("DynamicFormFillingLogId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DynamicFormFieldMappingId");
+
+                    b.HasIndex("DynamicFormFillingLogId");
+
+                    b.ToTable("DynamicFormFieldValue", "DocumentManagement");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicFormFillingLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("Id")
+                        .HasColumnOrder(1);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedAt")
+                        .HasColumnOrder(2);
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("CreatedBy")
+                        .HasColumnOrder(3);
+
+                    b.Property<long>("DynamicFormId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("ModifiedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("ModifiedAt")
+                        .HasColumnOrder(4);
+
+                    b.Property<long>("ModifiedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("ModifiedBy")
+                        .HasColumnOrder(5);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DynamicFormId");
+
+                    b.ToTable("DynamicFormFillingLogs", "DocumentManagement");
+                });
+
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", b =>
                 {
                     b.Property<long>("Id")
@@ -969,6 +1293,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("OriginalFileName")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("RelativePath")
                         .HasColumnType("nvarchar(max)");
 
@@ -1071,6 +1398,55 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .IsRequired();
 
                     b.Navigation("UploadedFileMapping");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicFormFieldMapping", b =>
+                {
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicFormField", "DynamicFormField")
+                        .WithMany()
+                        .HasForeignKey("DynamicFormFieldId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicForm", "DynamicForm")
+                        .WithMany()
+                        .HasForeignKey("DynamicFormId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DynamicForm");
+
+                    b.Navigation("DynamicFormField");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicFormFieldValue", b =>
+                {
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicFormFieldMapping", "DynamicFormFieldMapping")
+                        .WithMany()
+                        .HasForeignKey("DynamicFormFieldMappingId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicFormFillingLog", "DynamicFormFillingLog")
+                        .WithMany()
+                        .HasForeignKey("DynamicFormFillingLogId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("DynamicFormFieldMapping");
+
+                    b.Navigation("DynamicFormFillingLog");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicFormFillingLog", b =>
+                {
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicForm", "DynamicForm")
+                        .WithMany()
+                        .HasForeignKey("DynamicFormId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("DynamicForm");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.IncomingDocument", b =>

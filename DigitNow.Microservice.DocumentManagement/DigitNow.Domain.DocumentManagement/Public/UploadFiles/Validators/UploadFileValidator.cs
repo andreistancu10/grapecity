@@ -7,7 +7,6 @@ namespace DigitNow.Domain.DocumentManagement.Public.UploadFiles.Validators
     {
         public UploadFileValidator()
         {
-            RuleFor(item => item.Name).NotNull().NotEmpty();
             RuleFor(item => item.File).NotNull().NotEmpty();
             RuleFor(item => item.TargetEntity).NotNull();
         }
