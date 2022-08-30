@@ -10,6 +10,7 @@ using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Domain.Mail.Contracts.MailTemplates;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -127,7 +128,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task SendMail_OpinionRequestedByAnotherDepartment(UserModel targetUser, long departmentId, Document document, CancellationToken token)
         {
-            var department = await _catalogAdapterClient.GetDepartmentByIdAsync(document.DestinationDepartmentId, token);
+            var department = await _catalogAdapterClient.GetDepartmentByIdAsync(departmentId, token);
 
             await _mailSender.SendMail(MailTemplateEnum.OpinionRequestedByAnotherDepartmentTemplate, targetUser.Email,
                 new
@@ -138,7 +139,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 {
                     Structure = department.Name,
                     RegistryNumber = document.RegistrationNumber,
-                    Date = document.RegistrationDate.ToShortDateString()
+                    Date = document.RegistrationDate.ToString("d", new CultureInfo("es-ES"))
                 }, token);
         }
 
