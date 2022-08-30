@@ -29,7 +29,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         Task SentMail_DepartmentSupervisorRejectionDecision(Document document, CancellationToken token);
         Task SendMail_SendingReply(Document document, CancellationToken token);
         Task SendMail_DeclineCompetence(Document document, WorkflowHistoryLog historyLog, CancellationToken token);
-        Task SendMail_MayorApprovalDecision(Document document, long recipientId, CancellationToken token);
+        Task SendMail_MayorApprovalDecision(Document document, CancellationToken token);
         Task SendMail_MayorRejectionDecision(Document document, long recipientId, CancellationToken token);
         Task SendMail_OpinionSupervisorToFunctionary(UserModel targetUser, Document document, CancellationToken token);
         Task SendMail_OpinionFunctionaryReply(Document document, CancellationToken token);
@@ -187,20 +187,20 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task SentMail_DepartmentSupervisorApprovalDecision(Document document, CancellationToken token)
         {
-            var previousResponsible = document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).Skip(1).FirstOrDefault();
+            var previousResponsible = document.WorkflowHistories.FirstOrDefault(x => x.DocumentStatus == DocumentStatus.InWorkApprovalRequested);
             if (previousResponsible != null)
             {
-                var recipient = await _identityService.GetUserByIdAsync(previousResponsible.RecipientId, token);
+                var recipient = await _identityService.GetUserByIdAsync(previousResponsible.CreatedBy, token);
                 await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.DepartmentSupervisorApprovalDecisionTemplate, token);
             }
         }
 
         public async Task SentMail_DepartmentSupervisorRejectionDecision(Document document, CancellationToken token)
         {
-            var previousResponsible = document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).Skip(1).FirstOrDefault();
+            var previousResponsible = document.WorkflowHistories.FirstOrDefault(x => x.DocumentStatus == DocumentStatus.InWorkApprovalRequested);
             if (previousResponsible != null)
             {
-                var recipient = await _identityService.GetUserByIdAsync(previousResponsible.RecipientId, token);
+                var recipient = await _identityService.GetUserByIdAsync(previousResponsible.CreatedBy, token);
                 await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.DepartmentSupervisorRejectionDecisionTemplate, token);
             }
         }
@@ -257,11 +257,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
         }
 
-        public async Task SendMail_MayorApprovalDecision(Document document, long recipientId, CancellationToken token)
+        public async Task SendMail_MayorApprovalDecision(Document document, CancellationToken token)
         {
-            var recipient = await _identityService.GetUserByIdAsync(recipientId, token);
-
-            await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.MayorApprovalDecisionTemplate, token);
+            var inWorkMayorReviewWorkflow = document.WorkflowHistories.FirstOrDefault(x => x.DocumentStatus == DocumentStatus.InWorkMayorReview);
+            if(inWorkMayorReviewWorkflow != null)
+            {
+                var recipient = await _identityService.GetUserByIdAsync(inWorkMayorReviewWorkflow.CreatedBy, token);
+                await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.MayorApprovalDecisionTemplate, token);
+            }
         }
 
         public async Task SendMail_MayorRejectionDecision(Document document, long recipientId, CancellationToken token)
