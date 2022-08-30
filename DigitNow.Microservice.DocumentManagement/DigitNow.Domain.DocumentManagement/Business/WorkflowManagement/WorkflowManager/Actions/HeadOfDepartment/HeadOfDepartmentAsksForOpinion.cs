@@ -30,6 +30,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 return command;
 
             var currentDestinationDepartment = document.DestinationDepartmentId;
+            document.DestinationDepartmentId = command.RecipientId.Value;
 
             document.WorkflowHistories.Add(WorkflowHistoryLogFactory
                 .Create(document, RecipientType.HeadOfDepartment, headOfDepartment, DocumentStatus.OpinionRequestedUnallocated, string.Empty, command.Remarks, command.OpinionRequestedUntil));

@@ -81,8 +81,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
             document.WorkflowHistories.Add(newWorkflowResponsible);
 
+            var opinionAllocatedFlow = document.WorkflowHistories
+                .Where(x => x.DocumentStatus == DocumentStatus.OpinionRequestedAllocated)
+                .OrderByDescending(x => x.CreatedAt)
+                .FirstOrDefault();
+
             DeleteActionAfterBeingProcessed(document, UserActionsOnDocument.AsksForOpinion);
-            await SendFunctonaryDeclinesMail(document, oldWorkflowResponsible, token);
+            await SendFunctonaryDeclinesMail(document, opinionAllocatedFlow, token);
 
             return command;
         }
@@ -91,7 +96,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         {
             if (historyLog.DocumentStatus == DocumentStatus.OpinionRequestedAllocated)
             {
-                await MailSenderService.SendMail_DeclineCompetenceOpinion(document, historyLog, token);
+                await MailSenderService.SendMail_DeclineCompetenceOpinion(document, historyLog.DestinationDepartmentId, token);
             }
             else
             {

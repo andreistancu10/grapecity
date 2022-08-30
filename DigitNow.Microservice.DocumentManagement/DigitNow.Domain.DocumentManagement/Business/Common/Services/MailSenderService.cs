@@ -22,7 +22,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         Task SendMail_CreateIncomingDocument(UserModel sender, long registrationId, DateTime date, CancellationToken token);
         Task SendMail_DistributeIncomingDocToFunctionary(UserModel targetUser, Document document, CancellationToken token);
         Task SendMail_OpinionRequestedByAnotherDepartment(UserModel targetUser, long departmentId, Document document, CancellationToken token);
-        Task SendMail_DeclineCompetenceOpinion(Document document, WorkflowHistoryLog historyLog, CancellationToken token);
+        Task SendMail_DeclineCompetenceOpinion(Document document, long senderDepartmentId, CancellationToken token);
         Task SendMail_ApprovalRequestedByFunctionary(long recipientId, Document document, CancellationToken token);
         Task SendMail_ApprovalRequestedByFunctionary(UserModel recipient, Document document, CancellationToken token);
         Task SentMail_DepartmentSupervisorApprovalDecision(Document document, CancellationToken token);
@@ -143,23 +143,30 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 }, token);
         }
 
-        public async Task SendMail_DeclineCompetenceOpinion(Document document, WorkflowHistoryLog historyLog, CancellationToken token)
+        public async Task SendMail_DeclineCompetenceOpinion(Document document, long senderDepartmentId, CancellationToken token)
         {
-            var recipientUserHistoryLog = await _identityService.GetUserByIdAsync(historyLog.RecipientId, token);
-            if(recipientUserHistoryLog != null && recipientUserHistoryLog.Departments.Any())
+            
+            var opinionReguestedUnallocatedFlow = document.WorkflowHistories.FirstOrDefault(x => x.DocumentStatus == DocumentStatus.OpinionRequestedUnallocated);
+            if (opinionReguestedUnallocatedFlow != null)
             {
-                var department = await _catalogAdapterClient.GetDepartmentByIdAsync(recipientUserHistoryLog.Departments.First().Id, token);
-                var userWhoAdskedForOpinion = historyLog.CreatedBy;
-                var recipient = await _identityService.GetUserByIdAsync(userWhoAdskedForOpinion, token);
+                var whoAskedForOpinion = opinionReguestedUnallocatedFlow.CreatedBy;
+                var senderDepartment = await _catalogAdapterClient.GetDepartmentByIdAsync(senderDepartmentId, token);
+
+                var recipient = await _identityService.GetUserByIdAsync(whoAskedForOpinion, token);
+
+                if(recipient == null || senderDepartment == null)
+                {
+                    throw new ArgumentException("Recipient and sender cannot be null", nameof(document));
+                }
 
                 await _mailSender.SendMail(MailTemplateEnum.DeclineCompetenceOpinionTemplate, recipient.Email,
                    new
                    {
-                       Structure = department.Name
+                       Structure = senderDepartment.Name
                    },
                    new
                    {
-                       Structure = department.Name,
+                       Structure = senderDepartment.Name,
                        RegistryNumber = document.RegistrationNumber,
                        Date = document.RegistrationDate.ToShortDateString()
                    }, token);

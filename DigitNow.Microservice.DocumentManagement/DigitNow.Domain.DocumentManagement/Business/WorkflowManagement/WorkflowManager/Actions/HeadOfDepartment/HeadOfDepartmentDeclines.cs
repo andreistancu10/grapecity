@@ -71,7 +71,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         {
             if (historyLog.DocumentStatus == DocumentStatus.OpinionRequestedUnallocated)
             {
-                await MailSenderService.SendMail_DeclineCompetenceOpinion(document, historyLog, token);
+                await MailSenderService.SendMail_DeclineCompetenceOpinion(document, historyLog.DestinationDepartmentId, token);
             }
             else
             {
