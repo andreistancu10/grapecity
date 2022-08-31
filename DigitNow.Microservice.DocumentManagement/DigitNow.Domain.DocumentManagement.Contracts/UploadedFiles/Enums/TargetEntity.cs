@@ -3,6 +3,9 @@
     public enum TargetEntity
     {
         Document,
-        Objective
+        GeneralObjective,
+        SpecificObjective,
+        ScimActivity,
+        ScimAction
     }
 }

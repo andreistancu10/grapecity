@@ -43,7 +43,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Queries
                 new List<long>
                 {
                     specificObjective.Id
-                }, TargetEntity.Objective, cancellationToken);
+                }, TargetEntity.GeneralObjective, cancellationToken);
             
             var aggregate = new SpecificObjectiveAggregate
             {
