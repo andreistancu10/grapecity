@@ -39,7 +39,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             await CreateActionOnDocument(document, UserActionsOnDocument.AsksForOpinion, makeDocumentVisibleForDepartment: false, token);
             await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: false, command.DocumentId, headOfDepartment.Id, DocumentStatus.OpinionRequestedUnallocated, token);
 
-            await MailSenderService.SendMail_OpinionRequestedByAnotherDepartment(headOfDepartment, currentDestinationDepartment, document, token);
+            await MailSenderService.SendMail_OnOpinionRequestedByAnotherDepartment(headOfDepartment, currentDestinationDepartment, document, token);
             return command;
         }
         #endregion

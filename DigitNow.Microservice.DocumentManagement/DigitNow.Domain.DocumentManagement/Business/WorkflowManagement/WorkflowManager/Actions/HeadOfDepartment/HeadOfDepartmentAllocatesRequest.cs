@@ -39,11 +39,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             
             if(lastWorkflowRecord.DocumentStatus == DocumentStatus.OpinionRequestedUnallocated && newDocumentStatus == DocumentStatus.OpinionRequestedAllocated)
             {
-                await MailSenderService.SendMail_OpinionSupervisorToFunctionary(user, document, token);
+                await MailSenderService.SendMail_OnSupervisorAssignedOpinionRequestToFunctionary(user, document, token);
             }
             if(document.DocumentType == DocumentType.Incoming && newDocumentStatus == DocumentStatus.InWorkAllocated) 
             {
-                await MailSenderService.SendMail_DistributeIncomingDocToFunctionary(user, document, token);
+                await MailSenderService.SendMail_OnIncomingDocDictributedToFunctionary(user, document, token);
             }
 
             return command;

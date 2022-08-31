@@ -55,7 +55,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: false, command.DocumentId, userResponse.Id, DocumentStatus.InWorkMayorReview, token);
             
-            await MailSenderService.SentMail_DepartmentSupervisorApprovalDecision(document, token);
+            await MailSenderService.SendMail_OnDepartmentSupervisorApprovedDecision(document, token);
 
             return command;
         }
@@ -76,7 +76,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
             document.WorkflowHistories.Add(newWorkflowResponsible);
 
-            await MailSenderService.SentMail_DepartmentSupervisorRejectionDecision(document, token);
+            await MailSenderService.SendMail_OnDepartmentSupervisorRejectedDecision(document, token);
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord)
