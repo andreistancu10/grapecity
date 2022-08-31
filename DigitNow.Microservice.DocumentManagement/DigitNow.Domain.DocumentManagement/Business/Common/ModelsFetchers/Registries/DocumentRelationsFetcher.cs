@@ -31,7 +31,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
             Aggregator
                 .UseGenericRemoteFetcher<GenericDocumentsCategoriesFetcher>()
                 .UseGenericRemoteFetcher<GenericDocumentsInternalCategoriesFetcher>()
-                .UseGenericRemoteFetcher<GenericDocumentsDepartmentsFetcher>();                
+                .UseGenericRemoteFetcher<GenericDepartmentsFetcher>();                
         }
 
         public DocumentRelationsFetcher UseDocumentsContext(DocumentsFetcherContext context)
