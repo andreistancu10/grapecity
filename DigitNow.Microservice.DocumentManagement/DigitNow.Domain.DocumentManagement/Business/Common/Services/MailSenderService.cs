@@ -41,7 +41,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private readonly ICatalogAdapterClient _catalogAdapterClient;
         private readonly IAuthenticationClient _authenticationClient;
         private readonly IIdentityService _identityService;
-        private readonly IConfiguration _configuration;
         private readonly string _dateFormat;
 
 
@@ -58,9 +57,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             _catalogAdapterClient = catalogAdapterClient;
             _authenticationClient = authenticationClient;
             _identityService = identityService;
-            _configuration = configuration;
 
-            _dateFormat = _configuration.GetValue<string>("Date:Format");
+            _dateFormat = configuration.GetValue<string>("Date:Format");
         }
 
         public async Task SendMail_OnSendBulkDocuments(UserModel headOfDepartmentUser, IList<long> documentIds, CancellationToken token)
