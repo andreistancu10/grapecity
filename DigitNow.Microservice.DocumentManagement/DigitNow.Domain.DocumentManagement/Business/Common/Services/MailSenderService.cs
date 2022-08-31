@@ -15,23 +15,23 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IMailSenderService
     {
-        Task SendMail_SendBulkDocumentsTemplate(UserModel headOfDepartmentUser, IList<long> documentIds, CancellationToken token);
-        Task SendMail_DelegateDocumentToFunctionary(UserModel currentUser, UserModel delegatedUser, IList<long> documentIds, CancellationToken token);
-        Task SendMail_DelegateDocumentToFunctionarySupervisor(UserModel currentUser, UserModel delegatedUser, IList<long> documentIds, CancellationToken token);
-        Task SendMail_CreateIncomingDocument(UserModel sender, long registrationId, DateTime date, CancellationToken token);
+        Task SendMail_OnSendBulkDocuments(UserModel headOfDepartmentUser, IList<long> documentIds, CancellationToken token);
+        Task SendMail_OnDelegateDocumentToFunctionary(UserModel currentUser, UserModel delegatedUser, IList<long> documentIds, CancellationToken token);
+        Task SendMail_OnDelegateDocumentToFunctionarySupervisor(UserModel currentUser, UserModel delegatedUser, IList<long> documentIds, CancellationToken token);
+        Task SendMail_AfterIncomingDocumentCreated(UserModel sender, long registrationId, DateTime date, CancellationToken token);
         Task SendMail_DistributeIncomingDocToFunctionary(UserModel targetUser, Document document, CancellationToken token);
-        Task SendMail_OpinionRequestedByAnotherDepartment(UserModel targetUser, long departmentId, Document document, CancellationToken token);
-        Task SendMail_DeclineCompetenceOpinion(Document document, long senderDepartmentId, CancellationToken token);
-        Task SendMail_ApprovalRequestedByFunctionary(long recipientId, Document document, CancellationToken token);
-        Task SendMail_ApprovalRequestedByFunctionary(UserModel recipient, Document document, CancellationToken token);
-        Task SentMail_DepartmentSupervisorApprovalDecision(Document document, CancellationToken token);
-        Task SentMail_DepartmentSupervisorRejectionDecision(Document document, CancellationToken token);
-        Task SendMail_SendingReply(Document document, CancellationToken token);
-        Task SendMail_DeclineCompetence(Document document, WorkflowHistoryLog historyLog, CancellationToken token);
-        Task SendMail_MayorApprovalDecision(Document document, CancellationToken token);
-        Task SendMail_MayorRejectionDecision(Document document, long recipientId, CancellationToken token);
-        Task SendMail_OpinionSupervisorToFunctionary(UserModel targetUser, Document document, CancellationToken token);
-        Task SendMail_OpinionFunctionaryReply(Document document, CancellationToken token);
+        Task SendMail_OnOpinionRequestedByAnotherDepartment(UserModel targetUser, long departmentId, Document document, CancellationToken token);
+        Task SendMail_OnCompetenceDeclinedOnOpinionRequested(Document document, long senderDepartmentId, CancellationToken token);
+        Task SendMail_OnApprovalRequestedByFunctionary(long recipientId, Document document, CancellationToken token);
+        Task SendMail_OnApprovalRequestedByFunctionary(UserModel recipient, Document document, CancellationToken token);
+        Task SendMail_OnDepartmentSupervisorApprovedDecision(Document document, CancellationToken token);
+        Task SendMail_OnDepartmentSupervisorRejectedDecision(Document document, CancellationToken token);
+        Task SendMail_OnReplySent(Document document, CancellationToken token);
+        Task SendMail_OnCompetenceDeclined(Document document, WorkflowHistoryLog historyLog, CancellationToken token);
+        Task SendMail_OnMayorApprovedDecision(Document document, CancellationToken token);
+        Task SendMail_OnMayorRejectedDecision(Document document, long recipientId, CancellationToken token);
+        Task SendMail_OnSupervisorAssignedOpinionRequestToFunctionary(UserModel targetUser, Document document, CancellationToken token);
+        Task SendMail_OnOpinionFunctionaryReplied(Document document, CancellationToken token);
     }
 
     public class MailSenderService : IMailSenderService
@@ -56,7 +56,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             _identityService = identityService;
         }
 
-        public async Task SendMail_SendBulkDocumentsTemplate(UserModel headOfDepartmentUser, IList<long> documentIds, CancellationToken token)
+        public async Task SendMail_OnSendBulkDocuments(UserModel headOfDepartmentUser, IList<long> documentIds, CancellationToken token)
         {
             var registryNumbers = await _dbContext.Documents
                 .Where(x => documentIds.Contains(x.Id))
@@ -69,7 +69,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }, token);
         }
 
-        public async Task SendMail_DelegateDocumentToFunctionary(UserModel currentUser, UserModel delegatedUser, IList<long> documentIds, CancellationToken token)
+        public async Task SendMail_OnDelegateDocumentToFunctionary(UserModel currentUser, UserModel delegatedUser, IList<long> documentIds, CancellationToken token)
         {
             var registryNumbers = await _dbContext.Documents
                 .Where(x => documentIds.Contains(x.Id))
@@ -83,7 +83,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }, token);
         }
 
-        public async Task SendMail_DelegateDocumentToFunctionarySupervisor(UserModel currentUser, UserModel delegatedUser, IList<long> documentIds, CancellationToken token)
+        public async Task SendMail_OnDelegateDocumentToFunctionarySupervisor(UserModel currentUser, UserModel delegatedUser, IList<long> documentIds, CancellationToken token)
         {
             var headOfDepartmentUser = await _identityService.GetHeadOfDepartmentUserAsync(delegatedUser.Departments.First().Id, token);
 
@@ -100,7 +100,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }, token);            
         }
 
-        public async Task SendMail_CreateIncomingDocument(UserModel sender, long registrationId, DateTime date, CancellationToken token)
+        public async Task SendMail_AfterIncomingDocumentCreated(UserModel sender, long registrationId, DateTime date, CancellationToken token)
         {
             var legalEntityResponse = await _authenticationClient.ContactDetails.GetLegalEntityAsync(new GetLegalEntityRequest(), token);
 
@@ -125,7 +125,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return SendMail_WithRegistrationAndDateAsync(targetUser.Email, document, MailTemplateEnum.DistributionOfIncomingDocumentToFunctionaryTemplate, token);
         }
 
-        public async Task SendMail_OpinionRequestedByAnotherDepartment(UserModel targetUser, long departmentId, Document document, CancellationToken token)
+        public async Task SendMail_OnOpinionRequestedByAnotherDepartment(UserModel targetUser, long departmentId, Document document, CancellationToken token)
         {
             var department = await _catalogAdapterClient.GetDepartmentByIdAsync(departmentId, token);
 
@@ -142,7 +142,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 }, token);
         }
 
-        public async Task SendMail_DeclineCompetenceOpinion(Document document, long senderDepartmentId, CancellationToken token)
+        public async Task SendMail_OnCompetenceDeclinedOnOpinionRequested(Document document, long senderDepartmentId, CancellationToken token)
         {
             
             var opinionReguestedUnallocatedFlow = document.WorkflowHistories.FirstOrDefault(x => x.DocumentStatus == DocumentStatus.OpinionRequestedUnallocated);
@@ -172,19 +172,19 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
         }
 
-        public async Task SendMail_ApprovalRequestedByFunctionary(long recipientId, Document document, CancellationToken token)
+        public async Task SendMail_OnApprovalRequestedByFunctionary(long recipientId, Document document, CancellationToken token)
         {
             var recipient = await _identityService.GetUserByIdAsync(recipientId, token);
 
             await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.ApprovalRequestByFunctionaryTemplate, token);
         }
 
-        public Task SendMail_ApprovalRequestedByFunctionary(UserModel recipient, Document document, CancellationToken token)
+        public Task SendMail_OnApprovalRequestedByFunctionary(UserModel recipient, Document document, CancellationToken token)
         {
             return SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.ApprovalRequestByFunctionaryTemplate, token);
         }
 
-        public async Task SentMail_DepartmentSupervisorApprovalDecision(Document document, CancellationToken token)
+        public async Task SendMail_OnDepartmentSupervisorApprovedDecision(Document document, CancellationToken token)
         {
             var previousResponsible = document.WorkflowHistories.FirstOrDefault(x => x.DocumentStatus == DocumentStatus.InWorkApprovalRequested);
             if (previousResponsible != null)
@@ -199,7 +199,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
         }
 
-        public async Task SentMail_DepartmentSupervisorRejectionDecision(Document document, CancellationToken token)
+        public async Task SendMail_OnDepartmentSupervisorRejectedDecision(Document document, CancellationToken token)
         {
             var previousResponsible = document.WorkflowHistories.FirstOrDefault(x => x.DocumentStatus == DocumentStatus.InWorkApprovalRequested);
             if (previousResponsible != null)
@@ -213,7 +213,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
         }
 
-        public async Task SendMail_SendingReply(Document document, CancellationToken token)
+        public async Task SendMail_OnReplySent(Document document, CancellationToken token)
         {
             var department = await _catalogAdapterClient.GetDepartmentByCodeAsync(UserDepartment.Registry.Code, token);
             if (department == null) return;
@@ -243,7 +243,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }, token);
         }
 
-        public async Task SendMail_DeclineCompetence(Document document, WorkflowHistoryLog historyLog, CancellationToken token)
+        public async Task SendMail_OnCompetenceDeclined(Document document, WorkflowHistoryLog historyLog, CancellationToken token)
         {
             var userWhoRegisteredId = document.CreatedBy;
 
@@ -271,7 +271,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
         }
 
-        public async Task SendMail_MayorApprovalDecision(Document document, CancellationToken token)
+        public async Task SendMail_OnMayorApprovedDecision(Document document, CancellationToken token)
         {
             var inWorkMayorReviewWorkflow = document.WorkflowHistories.FirstOrDefault(x => x.DocumentStatus == DocumentStatus.InWorkMayorReview);
             if(inWorkMayorReviewWorkflow != null)
@@ -286,19 +286,19 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
         }
 
-        public async Task SendMail_MayorRejectionDecision(Document document, long recipientId, CancellationToken token)
+        public async Task SendMail_OnMayorRejectedDecision(Document document, long recipientId, CancellationToken token)
         {
             var recipient = await _identityService.GetUserByIdAsync(recipientId, token);
 
             await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.MayorRejectionDecisionTemplate, token);
         }
 
-        public Task SendMail_OpinionSupervisorToFunctionary(UserModel targetUser, Document document, CancellationToken token)
+        public Task SendMail_OnSupervisorAssignedOpinionRequestToFunctionary(UserModel targetUser, Document document, CancellationToken token)
         {
             return SendMail_WithRegistrationAndDateAsync(targetUser.Email, document, MailTemplateEnum.OpinionSupervisorToFunctionaryTemplate, token);
         }
 
-        public async Task SendMail_OpinionFunctionaryReply(Document document, CancellationToken token)
+        public async Task SendMail_OnOpinionFunctionaryReplied(Document document, CancellationToken token)
         {
             var opinionRequestedAllocatedFlow = document.WorkflowHistories.FirstOrDefault(x => x.DocumentStatus == DocumentStatus.OpinionRequestedAllocated);
             var opinionRequestedUnallocatedFlow = document.WorkflowHistories.FirstOrDefault(x => x.DocumentStatus == DocumentStatus.OpinionRequestedUnallocated);

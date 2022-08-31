@@ -124,7 +124,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             await PassDocumentToDepartment(document, command, token);
 
-            await MailSenderService.SendMail_MayorRejectionDecision(document, (long)document.RecipientId, token);
+            await MailSenderService.SendMail_OnMayorRejectedDecision(document, (long)document.RecipientId, token);
         }
 
         private async Task MayorDeclinedIncomingDocumentAsync(ICreateWorkflowHistoryCommand command, Document document, CancellationToken token)
@@ -141,7 +141,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
 
             document.Status = DocumentStatus.InWorkMayorDeclined;
             document.WorkflowHistories.Add(newWorkflowResponsible);
-            await MailSenderService.SendMail_MayorRejectionDecision(document, oldWorkflowResponsible.RecipientId, token);
+            await MailSenderService.SendMail_OnMayorRejectedDecision(document, oldWorkflowResponsible.RecipientId, token);
 
         }
 

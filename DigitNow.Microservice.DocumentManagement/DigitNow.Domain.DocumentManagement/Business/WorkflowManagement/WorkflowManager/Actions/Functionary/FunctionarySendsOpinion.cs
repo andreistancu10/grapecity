@@ -47,7 +47,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             ResetDateAsOpinionWasSent(document);
             DeleteActionAfterBeingProcessed(document, UserActionsOnDocument.AsksForOpinion);
 
-            await MailSenderService.SendMail_OpinionFunctionaryReply(document, token);
+            await MailSenderService.SendMail_OnOpinionFunctionaryReplied(document, token);
             return command;
         }
 
@@ -79,7 +79,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             ResetDateAsOpinionWasSent(document);
             DeleteActionAfterBeingProcessed(document, UserActionsOnDocument.AsksForOpinion);
 
-            await MailSenderService.SendMail_OpinionFunctionaryReply(document, token);
+            await MailSenderService.SendMail_OnOpinionFunctionaryReplied(document, token);
 
             return command;
         }
