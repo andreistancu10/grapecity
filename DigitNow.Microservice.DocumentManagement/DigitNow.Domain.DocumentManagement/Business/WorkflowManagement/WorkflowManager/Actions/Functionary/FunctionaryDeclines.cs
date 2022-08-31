@@ -95,11 +95,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
         {
             if (historyLog.DocumentStatus == DocumentStatus.OpinionRequestedAllocated)
             {
-                await MailSenderService.SendMail_OnCompetenceDeclinedOnOpinionRequested(document, historyLog.DestinationDepartmentId, token);
+                var opinionReguestedUnallocatedFlow = document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).FirstOrDefault(x => x.DocumentStatus == DocumentStatus.OpinionRequestedUnallocated);
+                if(opinionReguestedUnallocatedFlow != null)
+                {
+                    await MailSenderService.SendMail_OnCompetenceDeclinedOnOpinionRequested(document, historyLog.DestinationDepartmentId, opinionReguestedUnallocatedFlow, token);
+                }
             }
             else
             {
-                await MailSenderService.SendMail_OnCompetenceDeclined(document, historyLog, token);
+                await MailSenderService.SendMail_OnCompetenceDeclined(document, historyLog.DestinationDepartmentId, token);
             }
         }
 
