@@ -21,17 +21,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         Task SendMail_AfterIncomingDocumentCreated(UserModel sender, long registrationId, DateTime date, CancellationToken token);
         Task SendMail_OnIncomingDocDictributedToFunctionary(UserModel targetUser, Document document, CancellationToken token);
         Task SendMail_OnOpinionRequestedByAnotherDepartment(UserModel targetUser, long departmentId, Document document, CancellationToken token);
-        Task SendMail_OnCompetenceDeclinedOnOpinionRequested(Document document, long senderDepartmentId, CancellationToken token);
+        Task SendMail_OnCompetenceDeclinedOnOpinionRequested(Document document, long senderDepartmentId, WorkflowHistoryLog historyLog, CancellationToken token);
         Task SendMail_OnApprovalRequestedByFunctionary(long recipientId, Document document, CancellationToken token);
         Task SendMail_OnApprovalRequestedByFunctionary(UserModel recipient, Document document, CancellationToken token);
-        Task SendMail_OnDepartmentSupervisorApprovedDecision(Document document, CancellationToken token);
-        Task SendMail_OnDepartmentSupervisorRejectedDecision(Document document, CancellationToken token);
+        Task SendMail_OnDepartmentSupervisorApprovedDecision(Document document, long recipientId, CancellationToken token);
+        Task SendMail_OnDepartmentSupervisorRejectedDecision(Document document, long recipientId, CancellationToken token);
         Task SendMail_OnReplySent(Document document, CancellationToken token);
-        Task SendMail_OnCompetenceDeclined(Document document, WorkflowHistoryLog historyLog, CancellationToken token);
-        Task SendMail_OnMayorApprovedDecision(Document document, CancellationToken token);
+        Task SendMail_OnCompetenceDeclined(Document document, int destinationDepartmentId, CancellationToken token);
+        Task SendMail_OnMayorApprovedDecision(Document document, long recipientId, CancellationToken token);
         Task SendMail_OnMayorRejectedDecision(Document document, long recipientId, CancellationToken token);
         Task SendMail_OnSupervisorAssignedOpinionRequestToFunctionary(UserModel targetUser, Document document, CancellationToken token);
-        Task SendMail_OnOpinionFunctionaryReplied(Document document, CancellationToken token);
+        Task SendMail_OnOpinionFunctionaryReplied(Document document, long supervisorId, long recipientId, CancellationToken token);
     }
 
     public class MailSenderService : IMailSenderService
@@ -149,34 +149,30 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 }, token);
         }
 
-        public async Task SendMail_OnCompetenceDeclinedOnOpinionRequested(Document document, long senderDepartmentId, CancellationToken token)
+        public async Task SendMail_OnCompetenceDeclinedOnOpinionRequested(Document document, long senderDepartmentId, WorkflowHistoryLog historyLog, CancellationToken token)
         {
-            
-            var opinionReguestedUnallocatedFlow = document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).FirstOrDefault(x => x.DocumentStatus == DocumentStatus.OpinionRequestedUnallocated);
-            if (opinionReguestedUnallocatedFlow != null)
+
+            var whoAskedForOpinion = historyLog.CreatedBy;
+            var senderDepartment = await _catalogAdapterClient.GetDepartmentByIdAsync(senderDepartmentId, token);
+
+            var recipient = await _identityService.GetUserByIdAsync(whoAskedForOpinion, token);
+
+            if(recipient == null || senderDepartment == null)
             {
-                var whoAskedForOpinion = opinionReguestedUnallocatedFlow.CreatedBy;
-                var senderDepartment = await _catalogAdapterClient.GetDepartmentByIdAsync(senderDepartmentId, token);
-
-                var recipient = await _identityService.GetUserByIdAsync(whoAskedForOpinion, token);
-
-                if(recipient == null || senderDepartment == null)
-                {
-                    throw new ArgumentException("Recipient and sender cannot be found", nameof(document));
-                }
-
-                await _mailSender.SendMail(MailTemplateEnum.DeclineCompetenceOpinionTemplate, recipient.Email,
-                   new
-                   {
-                       Structure = senderDepartment.Name
-                   },
-                   new
-                   {
-                       Structure = senderDepartment.Name,
-                       RegistryNumber = document.RegistrationNumber,
-                       Date = document.RegistrationDate.ToString(_dateFormat)
-                   }, token);
+                throw new ArgumentException("Recipient and sender cannot be found", nameof(document));
             }
+
+            await _mailSender.SendMail(MailTemplateEnum.DeclineCompetenceOpinionTemplate, recipient.Email,
+               new
+               {
+                   Structure = senderDepartment.Name
+               },
+               new
+               {
+                   Structure = senderDepartment.Name,
+                   RegistryNumber = document.RegistrationNumber,
+                   Date = document.RegistrationDate.ToString(_dateFormat)
+               }, token);
         }
 
         public async Task SendMail_OnApprovalRequestedByFunctionary(long recipientId, Document document, CancellationToken token)
@@ -191,33 +187,28 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.ApprovalRequestByFunctionaryTemplate, token);
         }
 
-        public async Task SendMail_OnDepartmentSupervisorApprovedDecision(Document document, CancellationToken token)
+        public async Task SendMail_OnDepartmentSupervisorApprovedDecision(Document document, long recipientId, CancellationToken token)
         {
-            var previousResponsible = document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).FirstOrDefault(x => x.DocumentStatus == DocumentStatus.InWorkApprovalRequested);
-            if (previousResponsible != null)
+            
+            var recipient = await _identityService.GetUserByIdAsync(recipientId, token);
+            if (recipient == null)
             {
-                var recipient = await _identityService.GetUserByIdAsync(previousResponsible.CreatedBy, token);
-                if (recipient == null)
-                {
-                    throw new ArgumentException("Recipient cannot be found", nameof(document));
-                }
-
-                await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.DepartmentSupervisorApprovalDecisionTemplate, token);
+                throw new ArgumentException("Recipient cannot be found", nameof(document));
             }
+            await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.DepartmentSupervisorApprovalDecisionTemplate, token);
+            
         }
 
-        public async Task SendMail_OnDepartmentSupervisorRejectedDecision(Document document, CancellationToken token)
+        public async Task SendMail_OnDepartmentSupervisorRejectedDecision(Document document, long recipientId, CancellationToken token)
         {
-            var previousResponsible = document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).FirstOrDefault(x => x.DocumentStatus == DocumentStatus.InWorkApprovalRequested);
-            if (previousResponsible != null)
+
+            var recipient = await _identityService.GetUserByIdAsync(recipientId, token);
+            if (recipient == null)
             {
-                var recipient = await _identityService.GetUserByIdAsync(previousResponsible.CreatedBy, token);
-                if (recipient == null)
-                {
-                    throw new ArgumentException("Recipient cannot be found", nameof(document));
-                }
-                await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.DepartmentSupervisorRejectionDecisionTemplate, token);
+                throw new ArgumentException("Recipient cannot be found", nameof(document));
             }
+            await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.DepartmentSupervisorRejectionDecisionTemplate, token);
+            
         }
 
         public async Task SendMail_OnReplySent(Document document, CancellationToken token)
@@ -250,13 +241,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }, token);
         }
 
-        public async Task SendMail_OnCompetenceDeclined(Document document, WorkflowHistoryLog historyLog, CancellationToken token)
+        public async Task SendMail_OnCompetenceDeclined(Document document, int destinationDepartmentId, CancellationToken token)
         {
 
             var userWhoRegisteredTheDocument = await _identityService.GetUserByIdAsync(document.CreatedBy, token);
             if (userWhoRegisteredTheDocument != null)
             {
-                var department = await _catalogAdapterClient.GetDepartmentByIdAsync(historyLog.DestinationDepartmentId, token);
+                var department = await _catalogAdapterClient.GetDepartmentByIdAsync(destinationDepartmentId, token);
 
                 if (department == null)
                 {
@@ -277,19 +268,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
         }
 
-        public async Task SendMail_OnMayorApprovedDecision(Document document, CancellationToken token)
+        public async Task SendMail_OnMayorApprovedDecision(Document document, long recipientId, CancellationToken token)
         {
-            var inWorkMayorReviewWorkflow = document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).FirstOrDefault(x => x.DocumentStatus == DocumentStatus.InWorkMayorReview);
-            if(inWorkMayorReviewWorkflow != null)
+            var recipient = await _identityService.GetUserByIdAsync(recipientId, token);
+            if (recipient == null)
             {
-                var recipient = await _identityService.GetUserByIdAsync(inWorkMayorReviewWorkflow.CreatedBy, token);
-                if (recipient == null)
-                {
-                    throw new ArgumentException("Recipient cannot be found", nameof(document));
-                }
-
-                await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.MayorApprovalDecisionTemplate, token);
+                throw new ArgumentException("Recipient cannot be found", nameof(document));
             }
+
+            await SendMail_WithRegistrationAndDateAsync(recipient.Email, document, MailTemplateEnum.MayorApprovalDecisionTemplate, token);
+            
         }
 
         public async Task SendMail_OnMayorRejectedDecision(Document document, long recipientId, CancellationToken token)
@@ -304,27 +292,22 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return SendMail_WithRegistrationAndDateAsync(targetUser.Email, document, MailTemplateEnum.OpinionSupervisorToFunctionaryTemplate, token);
         }
 
-        public async Task SendMail_OnOpinionFunctionaryReplied(Document document, CancellationToken token)
+        public async Task SendMail_OnOpinionFunctionaryReplied(Document document, long supervisorId, long recipientId,  CancellationToken token)
         {
-            var opinionRequestedAllocatedFlow = document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).FirstOrDefault(x => x.DocumentStatus == DocumentStatus.OpinionRequestedAllocated);
-            var opinionRequestedUnallocatedFlow = document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).FirstOrDefault(x => x.DocumentStatus == DocumentStatus.OpinionRequestedUnallocated);
-
-            if(opinionRequestedAllocatedFlow != null && opinionRequestedUnallocatedFlow != null)
+            var supervisorWhoSentForOpinion = await _identityService.GetUserByIdAsync(supervisorId, token);
+            if(supervisorWhoSentForOpinion == null)
             {
-                var supervisorWhoSentForOpinion = await _identityService.GetUserByIdAsync(opinionRequestedAllocatedFlow.CreatedBy, token);
-                if(supervisorWhoSentForOpinion == null)
-                {
-                    throw new ArgumentException("Supervisor who asked for opinion cannot be found", nameof(document));
-                }
+                throw new ArgumentException("Supervisor who asked for opinion cannot be found", nameof(document));
+            }
 
-                var department = await _catalogAdapterClient.GetDepartmentByIdAsync(supervisorWhoSentForOpinion.Departments.First().Id, token);
-                var recipient = await _identityService.GetUserByIdAsync(opinionRequestedUnallocatedFlow.CreatedBy, token);
-                if(department == null || recipient == null)
-                {
-                    throw new ArgumentException("Department and recipient cannot be found", nameof(document));
-                }
-
-                await _mailSender.SendMail(MailTemplateEnum.OpinionFunctionaryReplyTemplate, recipient.Email,
+            var department = await _catalogAdapterClient.GetDepartmentByIdAsync(supervisorWhoSentForOpinion.Departments.First().Id, token);
+            var recipient = await _identityService.GetUserByIdAsync(recipientId, token);
+            if(department == null || recipient == null)
+            {
+                throw new ArgumentException("Department and recipient cannot be found", nameof(document));
+            }
+            
+            await _mailSender.SendMail(MailTemplateEnum.OpinionFunctionaryReplyTemplate, recipient.Email,
                 new
                 {
                     RegistryNumber = document.RegistrationNumber,
@@ -337,8 +320,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                     Date = document.RegistrationDate.ToString(_dateFormat)
 
                 }, token);
-            }
-            
         }
     }
 }

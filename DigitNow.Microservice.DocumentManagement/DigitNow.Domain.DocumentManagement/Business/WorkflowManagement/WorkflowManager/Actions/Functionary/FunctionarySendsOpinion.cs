@@ -47,7 +47,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             ResetDateAsOpinionWasSent(document);
             DeleteActionAfterBeingProcessed(document, UserActionsOnDocument.AsksForOpinion);
 
-            await MailSenderService.SendMail_OnOpinionFunctionaryReplied(document, token);
+            var opinionRequestedAllocatedFlow = document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).FirstOrDefault(x => x.DocumentStatus == DocumentStatus.OpinionRequestedAllocated);
+            var opinionRequestedUnallocatedFlow = document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).FirstOrDefault(x => x.DocumentStatus == DocumentStatus.OpinionRequestedUnallocated);
+            if(opinionRequestedAllocatedFlow != null && opinionRequestedUnallocatedFlow != null)
+            {
+                await MailSenderService.SendMail_OnOpinionFunctionaryReplied(document, opinionRequestedAllocatedFlow.CreatedBy, opinionRequestedUnallocatedFlow.CreatedBy, token);
+            }
+
             return command;
         }
 
@@ -79,7 +85,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             ResetDateAsOpinionWasSent(document);
             DeleteActionAfterBeingProcessed(document, UserActionsOnDocument.AsksForOpinion);
 
-            await MailSenderService.SendMail_OnOpinionFunctionaryReplied(document, token);
+            var opinionRequestedAllocatedFlow = document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).FirstOrDefault(x => x.DocumentStatus == DocumentStatus.OpinionRequestedAllocated);
+            var opinionRequestedUnallocatedFlow = document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).FirstOrDefault(x => x.DocumentStatus == DocumentStatus.OpinionRequestedUnallocated);
+            if (opinionRequestedAllocatedFlow != null && opinionRequestedUnallocatedFlow != null)
+            {
+                await MailSenderService.SendMail_OnOpinionFunctionaryReplied(document, opinionRequestedAllocatedFlow.CreatedBy, opinionRequestedUnallocatedFlow.CreatedBy, token);
+            }
 
             return command;
         }
