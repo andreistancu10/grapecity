@@ -9,7 +9,7 @@ using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Domain.Mail.Contracts.MailTemplates;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
+using Microsoft.Extensions.Configuration;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -41,19 +41,26 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private readonly ICatalogAdapterClient _catalogAdapterClient;
         private readonly IAuthenticationClient _authenticationClient;
         private readonly IIdentityService _identityService;
+        private readonly IConfiguration _configuration;
+        private readonly string _dateFormat;
+
 
         public MailSenderService(
             DocumentManagementDbContext dbContext, 
             IMailSender mailSender,
             ICatalogAdapterClient catalogAdapterClient,
             IAuthenticationClient authenticationClient,
-            IIdentityService identityService)
+            IIdentityService identityService,
+            IConfiguration configuration)
         {
             _dbContext = dbContext;
             _mailSender = mailSender;
             _catalogAdapterClient = catalogAdapterClient;
             _authenticationClient = authenticationClient;
             _identityService = identityService;
+            _configuration = configuration;
+
+            _dateFormat = _configuration.GetValue<string>("Date:Format");
         }
 
         public async Task SendMail_OnSendBulkDocuments(UserModel headOfDepartmentUser, IList<long> documentIds, CancellationToken token)
@@ -116,7 +123,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                     Address = legalEntity.Name,
                     Name = $"{sender.FirstName} {sender.LastName}",
                     RegistryNumber = registrationId.ToString(),
-                    Date = date.ToString("d", new CultureInfo("es-ES"))
+                    Date = date.ToString(_dateFormat)
                 }, token);
         }
 
@@ -138,7 +145,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 {
                     Structure = department.Name,
                     RegistryNumber = document.RegistrationNumber,
-                    Date = document.RegistrationDate.ToString("d", new CultureInfo("es-ES"))
+                    Date = document.RegistrationDate.ToString("dd/MM/YYYY")
                 }, token);
         }
 
@@ -167,7 +174,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                    {
                        Structure = senderDepartment.Name,
                        RegistryNumber = document.RegistrationNumber,
-                       Date = document.RegistrationDate.ToString("d", new CultureInfo("es-ES"))
+                       Date = document.RegistrationDate.ToString(_dateFormat)
                    }, token);
             }
         }
@@ -234,12 +241,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             new
             {
                 RegistryNumber = document.RegistrationNumber,
-                Date = document.RegistrationDate.ToString("d", new CultureInfo("es-ES"))
+                Date = document.RegistrationDate.ToString(_dateFormat)
             },
             new
             {
                 RegistryNumber = document.RegistrationNumber,
-                Date = document.RegistrationDate.ToString("d", new CultureInfo("es-ES"))
+                Date = document.RegistrationDate.ToString(_dateFormat)
             }, token);
         }
 
@@ -265,7 +272,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 {
                     Structure = department.Name,
                     RegistryNumber = document.RegistrationNumber,
-                    Date = document.RegistrationDate.ToString("d", new CultureInfo("es-ES"))
+                    Date = document.RegistrationDate.ToString(_dateFormat)
                 }, token);
             }
         }
@@ -321,13 +328,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 new
                 {
                     RegistryNumber = document.RegistrationNumber,
-                    Date = document.RegistrationDate.ToString("d", new CultureInfo("es-ES"))
+                    Date = document.RegistrationDate.ToString(_dateFormat)
                 },
                 new
                 {
                     Structure = department.Name,
                     RegistryNumber = document.RegistrationNumber,
-                    Date = document.RegistrationDate.ToString("d", new CultureInfo("es-ES"))
+                    Date = document.RegistrationDate.ToString(_dateFormat)
 
                 }, token);
             }
