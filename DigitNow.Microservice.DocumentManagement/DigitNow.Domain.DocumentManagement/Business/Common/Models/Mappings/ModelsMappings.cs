@@ -109,6 +109,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings
 
             private static string ExtractFromContext(string context)
             {
+                if (string.IsNullOrWhiteSpace(context))
+                {
+                    return null;
+                }
+
                 var result = JsonConvert.DeserializeObject<IDictionary<string, object>>(context);
                 const string nameKey = "name";
 

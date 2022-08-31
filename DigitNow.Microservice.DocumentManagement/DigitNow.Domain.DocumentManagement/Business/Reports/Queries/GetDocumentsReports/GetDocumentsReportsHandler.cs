@@ -1,36 +1,36 @@
-﻿using DigitNow.Domain.Catalog.Client;
-using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors
+namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.GetDocumentsReports
 {
-    internal class ReportRelatedProcessor
-    {
+    public class GetDocumentsReportsHandler : IQueryHandler<GetDocumentsReportsQuery, List<ReportViewModel>>
+    {        
+        private readonly DocumentManagementDbContext _dbContext;
         private readonly IVirtualDocumentService _virtualDocumentService;
         private readonly IDocumentMappingService _documentMappingService;
-        private readonly ICatalogClient _catalogClient;
-        private readonly DocumentManagementDbContext _dbContext;
 
-        public ReportRelatedProcessor(IServiceProvider serviceProvider)
+        public GetDocumentsReportsHandler(
+            DocumentManagementDbContext dbContext,
+            IVirtualDocumentService virtualDocumentService,
+            IDocumentMappingService documentMappingService)
         {
-            _virtualDocumentService = serviceProvider.GetService<IVirtualDocumentService>();
-            _documentMappingService = serviceProvider.GetService<IDocumentMappingService>();
-            _catalogClient = serviceProvider.GetService<ICatalogClient>();
-            _dbContext = serviceProvider.GetService<DocumentManagementDbContext>();
+            _dbContext = dbContext;
+            _virtualDocumentService = virtualDocumentService;
+            _documentMappingService = documentMappingService;
         }
 
-        public async Task<List<ReportViewModel>> ProcessDocumentsAsync(DateTime fromDate, DateTime toDate, CancellationToken cancellationToken)
+        public async Task<List<ReportViewModel>> Handle(GetDocumentsReportsQuery request, CancellationToken cancellationToken)
         {
             var documents = new List<Document>();
 
-            documents.AddRange(await GetEligibleIncomingDocumentsAsync(fromDate, toDate, cancellationToken));
-            documents.AddRange(await GetEligibleInternalDocumentsAsync(fromDate, toDate, cancellationToken));
-            
+            documents.AddRange(await GetEligibleIncomingDocumentsAsync(request.FromDate, request.ToDate, cancellationToken));
+            documents.AddRange(await GetEligibleInternalDocumentsAsync(request.FromDate, request.ToDate, cancellationToken));
+
             if (!documents.Any())
             {
                 return new List<ReportViewModel>();
@@ -38,7 +38,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors
 
             var virtualDocuments = _virtualDocumentService.ConvertDocumentsToVirtualDocuments(documents);
 
-            return await _documentMappingService.MapToReportViewModelAsync(virtualDocuments, cancellationToken);
+            return await _documentMappingService.MapToReportViewModelAsync(request.LanguageId, virtualDocuments, cancellationToken);
         }
 
         private async Task<IEnumerable<Document>> GetEligibleIncomingDocumentsAsync(DateTime fromDate, DateTime toDate, CancellationToken cancellationToken)
@@ -51,7 +51,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Reports.Queries.Processors
                         .ThenInclude(x => x.SpecialRegister)
                     .Include(c => c.WorkflowHistories)
                     .Where(c => c.DocumentType == DocumentType.Incoming && c.Status != DocumentStatus.Finalized)
-                    .Where(x => 
+                    .Where(x =>
                         (x.RegistrationDate.AddDays(x.IncomingDocument.ResolutionPeriod) > fromDate)
                         &&
                         (x.RegistrationDate.AddDays(x.IncomingDocument.ResolutionPeriod) < toDate)

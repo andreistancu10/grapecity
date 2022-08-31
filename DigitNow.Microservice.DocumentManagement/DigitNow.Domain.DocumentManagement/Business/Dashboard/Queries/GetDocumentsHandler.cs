@@ -26,7 +26,7 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, GetDocuments
             request.Count, 
             cancellationToken);
 
-        var viewModels = await _documentMappingService.MapToDocumentViewModelAsync(documents, cancellationToken);
+        var viewModels = await _documentMappingService.MapToDocumentViewModelAsync(request.LanguageId, documents, cancellationToken);
 
         return BuildFirstPageDocumentResponse(request, totalItems, viewModels);
     }

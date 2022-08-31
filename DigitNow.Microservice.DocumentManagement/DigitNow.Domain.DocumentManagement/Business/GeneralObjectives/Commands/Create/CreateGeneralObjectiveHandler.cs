@@ -44,7 +44,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
                 await _uploadedFileService.UpdateUploadedFilesWithTargetIdAsync(
                     request.UploadedFileIds,
                     generalObjective.Objective.Id,
-                    TargetEntity.Objective,
+                    TargetEntity.GeneralObjective,
                     cancellationToken);
             }
 
