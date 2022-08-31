@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands.Update;
-using DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.GetAll;
 using DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.GetById;
 using DigitNow.Domain.DocumentManagement.Business.ObjectivesDashboard.Queries.GetGeneralObjectives;
 using DigitNow.Domain.DocumentManagement.Public.GeneralObjectives.Models;
@@ -46,17 +45,6 @@ namespace DigitNow.Domain.DocumentManagement.Public.GeneralObjectives
         public async Task<IActionResult> GetById([FromRoute] long id)
         {
             return await _mediator.Send(new GetGeneralObjectiveByIdQuery(id))
-                switch
-            {
-                null => NotFound(),
-                var result => Ok(result)
-            };
-        }
-
-        [HttpGet("getAllActive")]
-        public async Task<IActionResult> GetAllActiveObjective(CancellationToken cancellationToken)
-        {
-            return await _mediator.Send(new GetAllGeneralActiveObjectiveQuery(), cancellationToken)
                 switch
             {
                 null => NotFound(),
