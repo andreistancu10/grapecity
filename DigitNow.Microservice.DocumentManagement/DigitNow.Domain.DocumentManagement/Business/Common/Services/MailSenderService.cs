@@ -10,6 +10,7 @@ using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Domain.Mail.Contracts.MailTemplates;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System.Globalization;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -18,7 +19,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         Task SendMail_OnSendBulkDocuments(UserModel headOfDepartmentUser, IList<long> documentIds, CancellationToken token);
         Task SendMail_OnDelegateDocumentToFunctionary(UserModel currentUser, UserModel delegatedUser, IList<long> documentIds, CancellationToken token);
         Task SendMail_OnDelegateDocumentToFunctionarySupervisor(UserModel currentUser, UserModel delegatedUser, IList<long> documentIds, CancellationToken token);
-        Task SendMail_AfterIncomingDocumentCreated(UserModel sender, long registrationId, DateTime date, CancellationToken token);
+        Task SendMail_OnIncomingDocumentCreated(UserModel sender, long registrationId, DateTime date, CancellationToken token);
         Task SendMail_OnIncomingDocDictributedToFunctionary(UserModel targetUser, Document document, CancellationToken token);
         Task SendMail_OnOpinionRequestedByAnotherDepartment(UserModel targetUser, long departmentId, Document document, CancellationToken token);
         Task SendMail_OnCompetenceDeclinedOnOpinionRequested(Document document, long senderDepartmentId, WorkflowHistoryLog historyLog, CancellationToken token);
@@ -105,7 +106,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }, token);            
         }
 
-        public async Task SendMail_AfterIncomingDocumentCreated(UserModel sender, long registrationId, DateTime date, CancellationToken token)
+        public async Task SendMail_OnIncomingDocumentCreated(UserModel sender, long registrationId, DateTime date, CancellationToken token)
         {
             var legalEntityResponse = await _authenticationClient.ContactDetails.GetLegalEntityAsync(new GetLegalEntityRequest(), token);
 
@@ -121,7 +122,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                     Address = legalEntity.Name,
                     Name = $"{sender.FirstName} {sender.LastName}",
                     RegistryNumber = registrationId.ToString(),
-                    Date = date.ToString(_dateFormat)
+                    Date = date.ToString(_dateFormat, CultureInfo.InvariantCulture)
                 }, token);
         }
 
@@ -143,7 +144,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 {
                     Structure = department.Name,
                     RegistryNumber = document.RegistrationNumber,
-                    Date = document.RegistrationDate.ToString("dd/MM/YYYY")
+                    Date = document.RegistrationDate.ToString(_dateFormat, CultureInfo.InvariantCulture)
                 }, token);
         }
 
@@ -169,7 +170,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                {
                    Structure = senderDepartment.Name,
                    RegistryNumber = document.RegistrationNumber,
-                   Date = document.RegistrationDate.ToString(_dateFormat)
+                   Date = document.RegistrationDate.ToString(_dateFormat, CultureInfo.InvariantCulture)
                }, token);
         }
 
@@ -230,12 +231,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             new
             {
                 RegistryNumber = document.RegistrationNumber,
-                Date = document.RegistrationDate.ToString(_dateFormat)
+                Date = document.RegistrationDate.ToString(_dateFormat, CultureInfo.InvariantCulture)
             },
             new
             {
                 RegistryNumber = document.RegistrationNumber,
-                Date = document.RegistrationDate.ToString(_dateFormat)
+                Date = document.RegistrationDate.ToString(_dateFormat, CultureInfo.InvariantCulture)
             }, token);
         }
 
@@ -261,7 +262,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 {
                     Structure = department.Name,
                     RegistryNumber = document.RegistrationNumber,
-                    Date = document.RegistrationDate.ToString(_dateFormat)
+                    Date = document.RegistrationDate.ToString(_dateFormat, CultureInfo.InvariantCulture)
                 }, token);
             }
         }
@@ -309,13 +310,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 new
                 {
                     RegistryNumber = document.RegistrationNumber,
-                    Date = document.RegistrationDate.ToString(_dateFormat)
+                    Date = document.RegistrationDate.ToString(_dateFormat, CultureInfo.InvariantCulture)
                 },
                 new
                 {
                     Structure = department.Name,
                     RegistryNumber = document.RegistrationNumber,
-                    Date = document.RegistrationDate.ToString(_dateFormat)
+                    Date = document.RegistrationDate.ToString(_dateFormat, CultureInfo.InvariantCulture)
 
                 }, token);
         }

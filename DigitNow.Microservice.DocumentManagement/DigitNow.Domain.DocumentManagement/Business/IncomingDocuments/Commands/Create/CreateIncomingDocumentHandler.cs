@@ -89,7 +89,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
 
                 if (request.ContactDetail?.Email != null)
                 {
-                    await _mailSenderService.SendMail_AfterIncomingDocumentCreated(
+                    await _mailSenderService.SendMail_OnIncomingDocumentCreated(
                         new UserModel { FirstName = request.IssuerName, Email = request.ContactDetail.Email },
                         newIncomingDocument.Document.RegistrationNumber,
                         newIncomingDocument.Document.RegistrationDate,
