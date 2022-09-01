@@ -14,6 +14,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServic
         Task<List<UploadedFileMapping>> GetUploadedFileMappingsAsync(IEnumerable<long> ids,
             TargetEntity targetEntity,
             CancellationToken cancellationToken);
+        Task<List<UploadedFileMapping>> GetUploadedFileMappingsByTargetIdAsync(long targetId, TargetEntity targetEntity, CancellationToken cancellationToken);
         Task<List<UploadedFile>> FetchUploadedFiles(TargetEntity targetEntity, long targetId, CancellationToken cancellationToken);
     }
 
@@ -68,6 +69,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServic
             return await _dbContext.UploadedFileMappings
                 .Include(c => c.UploadedFile)
                 .Where(c => ids.Contains(c.UploadedFileId) && c.TargetEntity == targetEntity)
+                .ToListAsync(cancellationToken);
+        }
+        public async Task<List<UploadedFileMapping>> GetUploadedFileMappingsByTargetIdAsync(long targetId, TargetEntity targetEntity, CancellationToken cancellationToken)
+        {
+            return await _dbContext.UploadedFileMappings
+                .Include(c => c.UploadedFile)
+                .Where(c => c.TargetId == targetId && c.TargetEntity == targetEntity)
                 .ToListAsync(cancellationToken);
         }
 
