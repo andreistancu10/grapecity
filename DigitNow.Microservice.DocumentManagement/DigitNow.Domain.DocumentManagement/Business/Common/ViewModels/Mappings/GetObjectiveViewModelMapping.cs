@@ -3,11 +3,11 @@ using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
 {
-    public class ObjectiveViewModelMapping : Profile
+    public class GetObjectiveViewModelMapping : Profile
     {
-        public ObjectiveViewModelMapping()
+        public GetObjectiveViewModelMapping()
         {
-            CreateMap<SpecificObjectiveAggregate, SpecificObjectiveViewModel>()
+            CreateMap<SpecificObjectiveAggregate, GetSpecificObjectiveViewModel>()
                 .ForMember(c => c.Id, opt => opt.MapFrom(src => src.SpecificObjective.ObjectiveId))
                 .ForMember(c => c.Code, opt => opt.MapFrom(src => src.SpecificObjective.Objective.Code))
                 .ForMember(c => c.State, opt => opt.MapFrom(src => src.SpecificObjective.Objective.State))

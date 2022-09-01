@@ -1,9 +1,10 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Commands.Update;
-using DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Queries.GetAll;
+using DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Queries.Get;
 using DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Queries.GetById;
 using DigitNow.Domain.DocumentManagement.Public.SpecialObjective.Models;
+using DigitNow.Domain.DocumentManagement.Public.SpecificObjective.Models;
 using DigitNow.Domain.DocumentManagement.Public.SpecificObjectives.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
@@ -53,15 +54,11 @@ namespace DigitNow.Domain.DocumentManagement.Public.SpecialObjective
             };
         }
 
-        [HttpGet("getAllbyUserDepartment")]
-        public async Task<ActionResult<List<GetAllByUserDepartmentSpecificObjectiveResponse>>> GetAlByUserDepartment(CancellationToken cancellationToken)
+        [HttpPost("get-all")]
+        public async Task<IActionResult> GetDocumentsAsync([FromBody] GetSpecificObjectiveRequest request, CancellationToken cancellationToken)
         {
-            return await _mediator.Send(new GetAllByUserDepartmentSpecificObjectiveQuery(), cancellationToken)
-                switch
-            {
-                null => NotFound(),
-                var result => Ok(result)
-            };
+            var query = _mapper.Map<GetSpecificObjectiveQuery>(request);
+            return Ok(await _mediator.Send(query, cancellationToken));
         }
     }
 }
