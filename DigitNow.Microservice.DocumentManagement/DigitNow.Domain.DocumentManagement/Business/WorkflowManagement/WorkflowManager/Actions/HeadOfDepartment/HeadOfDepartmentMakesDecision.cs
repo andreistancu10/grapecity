@@ -54,8 +54,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 .Create(document, RecipientType.Mayor, userResponse, DocumentStatus.InWorkMayorReview, command.DeclineReason, command.Remarks, command.OpinionRequestedUntil, command.Resolution));
 
             await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: false, command.DocumentId, userResponse.Id, DocumentStatus.InWorkMayorReview, token);
-            
-            await MailSenderService.SentMail_DepartmentSupervisorApprovalDecision(document, token);
+
+            var previousWorkflow = document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).FirstOrDefault(x => x.DocumentStatus == DocumentStatus.InWorkApprovalRequested);
+            if(previousWorkflow != null)
+            {
+                await MailSenderService.SendMail_OnDepartmentSupervisorApprovedDecision(document, previousWorkflow.CreatedBy, token);
+            }
 
             return command;
         }
@@ -76,7 +80,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
             document.WorkflowHistories.Add(newWorkflowResponsible);
 
-            await MailSenderService.SentMail_DepartmentSupervisorRejectionDecision(document, token);
+            var previousWorkflow = document.WorkflowHistories.OrderByDescending(x => x.CreatedAt).FirstOrDefault(x => x.DocumentStatus == DocumentStatus.InWorkApprovalRequested);
+            if(previousWorkflow != null)
+            {
+                await MailSenderService.SendMail_OnDepartmentSupervisorRejectedDecision(document, previousWorkflow.CreatedBy, token);
+            }
         }
 
         private bool Validate(ICreateWorkflowHistoryCommand command, WorkflowHistoryLog lastWorkFlowRecord)
