@@ -21,7 +21,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.
         public async Task<List<GetAllGeneralActiveObjectiveResponse>> Handle(GetAllGeneralActiveObjectiveQuery request, CancellationToken cancellationToken)
         {
             var generalObjectives = await _generalObjectiveService.FindQuery()
-                .Where(item => item.Objective.State != ObjectiveState.Inactive)
+                .Where(item => item.Objective.State != ScimState.Inactive)
                 .Include(item => item.Objective)
                 .ToListAsync(cancellationToken);
 
