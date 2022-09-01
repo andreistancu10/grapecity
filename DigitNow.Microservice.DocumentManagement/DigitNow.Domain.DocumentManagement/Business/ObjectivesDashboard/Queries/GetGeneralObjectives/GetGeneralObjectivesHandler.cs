@@ -17,6 +17,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.ObjectivesDashboard.Querie
         public async Task<GetGeneralObjectivesResponse> Handle(GetGeneralObjectivesQuery request, CancellationToken cancellationToken)
         {
             var totalItems = await _objectiveDashboardService.CountGeneralObjectivesAsync(request.Filter, cancellationToken);
+            if (totalItems == 0)
+                return new GetGeneralObjectivesResponse() { Items = new List<GeneralObjectiveViewModel>() };
 
             var objectives = await _objectiveDashboardService.GetGeneralObjectivesAsync(request.Filter,
                 request.Page,

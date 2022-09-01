@@ -20,6 +20,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Queries
         public async Task<GetSpecificObjectiveResponse> Handle(GetSpecificObjectiveQuery request, CancellationToken cancellationToken)
         {
             var totalItems = await _specificObjectiveDashboardService.CountSpecificObjectivesAsync(request.Filter, cancellationToken);
+            if(totalItems == 0)
+                return new GetSpecificObjectiveResponse() { Items = new List<SpecificObjectiveViewModel>() };
 
             var objectives = await _specificObjectiveDashboardService.GetSpecificObjectivesAsync(request.Filter,
                 request.Page,
