@@ -2,8 +2,9 @@
 using DigitNow.Domain.DocumentManagement.Business.DynamicForms.Commands;
 using DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.Filter;
 using DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.GetDynamicFormById;
+using DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.GetDynamicForms;
+using DigitNow.Domain.DocumentManagement.Public.DynamicForms.Models;
 using DigitNow.Domain.DocumentManagement.Public.Forms.Models;
-using Domain.Localization.Client;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -61,6 +62,13 @@ namespace DigitNow.Domain.DocumentManagement.Public.Forms
                 null => NotFound(),
                 var result => Ok(result)
             };
+        }
+
+        [HttpPost("list")]
+        public async Task<IActionResult> GetDynamicFormFillingLogsAsync([FromBody] GetDynamicFormFillingLogsRequest request, CancellationToken cancellationToken)
+        {
+            var query = _mapper.Map<GetDynamicFormFillingLogsQuery>(request);
+            return Ok(await _mediator.Send(query, cancellationToken));
         }
     }
 }
