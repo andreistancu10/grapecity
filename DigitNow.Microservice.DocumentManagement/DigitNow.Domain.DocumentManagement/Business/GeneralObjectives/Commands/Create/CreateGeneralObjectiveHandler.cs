@@ -1,12 +1,9 @@
-﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
-using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 using HTSS.Platform.Core.CQRS;
-using HTSS.Platform.Core.Errors;
 
 namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands.Create
 {
@@ -43,7 +40,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
             {
                 await _uploadedFileService.UpdateUploadedFilesWithTargetIdAsync(
                     request.UploadedFileIds,
-                    generalObjective.Objective.Id,
+                    generalObjective.ObjectiveId,
                     TargetEntity.GeneralObjective,
                     cancellationToken);
             }
