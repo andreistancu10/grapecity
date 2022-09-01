@@ -20,8 +20,6 @@ public class GetDocumentsHandler : IQueryHandler<GetDocumentsQuery, GetDocuments
     public async Task<GetDocumentsResponse> Handle(GetDocumentsQuery request, CancellationToken cancellationToken)
     {
         var totalItems = await _dashboardService.CountActiveDocumentsAsync(request.Filter, cancellationToken);
-        if (totalItems == 0)
-            return new GetDocumentsResponse() { Items = new List<DocumentViewModel>() };
 
         var documents = await _dashboardService.GetActiveDocumentsAsync(request.Filter,
             request.Page, 
