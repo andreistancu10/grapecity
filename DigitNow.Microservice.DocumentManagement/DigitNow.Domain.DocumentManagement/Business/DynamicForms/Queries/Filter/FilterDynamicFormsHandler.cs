@@ -11,7 +11,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.Filte
         private readonly IMapper _mapper;
         private readonly IDynamicFormsService _dynamicFormsService;
 
-
         public FilterDynamicFormsHandler(
             IMapper mapper,
             IDynamicFormsService dynamicFormsService)

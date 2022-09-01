@@ -53,7 +53,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Documents.Commands.CreateD
 
             if(deliveryDetails.DeliveryMode == (int)TransmissionMode.Post || deliveryDetails.DeliveryMode == (int)TransmissionMode.Widnow)
             {
-                await _mailSenderService.SendMail_SendingReply(document, cancellationToken);
+                await _mailSenderService.SendMail_OnReplySent(document, cancellationToken);
             }
 
             return new ResultObject(ResultStatusCode.Ok);

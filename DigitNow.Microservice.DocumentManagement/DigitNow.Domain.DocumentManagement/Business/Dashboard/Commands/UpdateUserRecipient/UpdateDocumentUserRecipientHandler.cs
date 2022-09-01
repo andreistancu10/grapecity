@@ -49,8 +49,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateU
 
             await UpdateDocumentsAsync(request.DocumentIds, targetUser, cancellationToken);
   
-            await _mailSenderService.SendMail_DelegateDocumentToFunctionary(currentUser, targetUser, request.DocumentIds, cancellationToken);
-            await _mailSenderService.SendMail_DelegateDocumentToFunctionarySupervisor(currentUser, targetUser, request.DocumentIds, cancellationToken);
+            await _mailSenderService.SendMail_OnDelegateDocumentToFunctionary(currentUser, targetUser, request.DocumentIds, cancellationToken);
+            await _mailSenderService.SendMail_OnDelegateDocumentToFunctionarySupervisor(currentUser, targetUser, request.DocumentIds, cancellationToken);
 
             return new ResultObject(ResultStatusCode.Ok);
         }

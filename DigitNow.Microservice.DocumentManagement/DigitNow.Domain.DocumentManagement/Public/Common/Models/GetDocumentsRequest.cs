@@ -1,11 +1,11 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using System;
-using System.Collections.Generic;
+using DigitNow.Domain.DocumentManagement.utils;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Dashboard.Models
 {
     public class GetDocumentsRequest
     {
+        public int LanguageId { get; set; } = LanguagesUtils.RomanianLanguageId;
         public int Page { get; set; } = 1;
         public int Count { get; set; } = 10;
         public DocumentFilterDto Filter { get; set; }

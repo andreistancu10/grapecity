@@ -34,9 +34,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.UploadFiles.Queries.Downlo
             }
 
             var fileBytes = _fileService.DownloadFileAsync(uploadedFile.AbsolutePath, uploadedFile.GeneratedName.ToString());
+            var fileName = string.IsNullOrWhiteSpace(uploadedFile.Name)
+                ? uploadedFile.OriginalFileName
+                : uploadedFile.Name;
 
             return
-                new DownloadFileResponse(new FileContent(uploadedFile.Name, uploadedFile.ContentType, fileBytes));
+                new DownloadFileResponse(new FileContent(fileName, uploadedFile.ContentType, fileBytes));
         }
     }
 }

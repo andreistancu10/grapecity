@@ -42,7 +42,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update
             await UpdateDocuments(request, headOfDepartment, cancellationToken);
 
             var documentIds = request.DocumentInfo.Select(x => x.DocumentId).ToList();
-            await _mailSenderService.SendMail_SendBulkDocumentsTemplate(headOfDepartment, documentIds, cancellationToken);
+            await _mailSenderService.SendMail_OnSendBulkDocuments(headOfDepartment, documentIds, cancellationToken);
 
             return new ResultObject(ResultStatusCode.Ok);
         }

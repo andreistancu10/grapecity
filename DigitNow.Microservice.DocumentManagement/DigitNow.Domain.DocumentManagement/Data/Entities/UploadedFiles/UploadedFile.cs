@@ -7,6 +7,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
     {
         public long UploadedFileMappingId { get; set; }
         public string Name { get; set; }
+        public string OriginalFileName { get; set; }
         public string ContentType { get; set; }
         public string RelativePath { get; set; }
         public string AbsolutePath { get; set; }

@@ -19,6 +19,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
         public IReadOnlyList<DocumentDepartmentModel> DocumentDepartments 
             => GetItems<GenericDocumentsDepartmentsFetcher, DocumentDepartmentModel>();
 
+        public IReadOnlyList<DocumentStatusTranslationModel> DocumentStatusTranslations
+            => GetItems<DocumentStatusTranslationsFetcher, DocumentStatusTranslationModel>();
+
+        public IReadOnlyList<DocumentTypeTranslationModel> DocumentTypesTranslationModels
+            => GetItems<DocumentTypeTranslationsFetcher, DocumentTypeTranslationModel>();
+
         public DocumentReportRelationsFetcher(IServiceProvider serviceProvider)
             : base(serviceProvider)
         {
@@ -32,6 +38,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
         {
             Aggregator
                 .UseRemoteFetcher<DocumentsUsersFetcher>(context);
+
+            return this;
+        }
+
+        public DocumentReportRelationsFetcher UseTranslationsContext(LanguageFetcherContext context)
+        {
+            Aggregator
+                .UseRemoteFetcher<DocumentStatusTranslationsFetcher>(context)
+                .UseRemoteFetcher<DocumentTypeTranslationsFetcher>(context);
 
             return this;
         }
