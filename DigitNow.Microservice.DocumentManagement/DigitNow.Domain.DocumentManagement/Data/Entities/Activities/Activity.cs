@@ -1,6 +1,7 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 
+
 namespace DigitNow.Domain.DocumentManagement.Data.Entities.Activities
 {
     public class Activity : ExtendedEntity
@@ -18,6 +19,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities.Activities
         public GeneralObjective AssociatedGeneralObjective { get; set; }
         public SpecificObjective AssociatedSpecificObjective { get; set; }
         public List<ActivityFunctionary> ActivityFunctionarys { get; set; }
+        public List<Actions.Action> Actions { get; set; }
         #endregion
     }
 }
