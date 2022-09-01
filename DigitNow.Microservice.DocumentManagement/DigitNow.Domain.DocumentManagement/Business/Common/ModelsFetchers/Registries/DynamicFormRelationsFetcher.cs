@@ -10,8 +10,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
         public IReadOnlyList<UserModel> DynamicFormUsers
             => GetItems<DynamicFormsUsersFetcher, UserModel>();
 
-        public IReadOnlyList<DocumentDepartmentModel> Departments
-            => GetItems<GenericDocumentsDepartmentsFetcher, DocumentDepartmentModel>();
+        public IReadOnlyList<DepartmentModel> Departments
+            => GetItems<GenericDepartmentsFetcher, DepartmentModel>();
 
         public DynamicFormRelationsFetcher(IServiceProvider serviceProvider) : base(serviceProvider)
         { }
@@ -20,7 +20,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
         {
             Aggregator
                .UseRemoteFetcher<DynamicFormsUsersFetcher>(context)
-               .UseRemoteFetcher<GenericDocumentsDepartmentsFetcher>(context);
+               .UseRemoteFetcher<GenericDepartmentsFetcher>(context);
                
             return this;
         }

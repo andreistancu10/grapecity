@@ -7,6 +7,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates
     {
         public DynamicFormFillingLog DynamicFormFillingLog { get; set; }
         public IReadOnlyList<UserModel> Users { get; set; }
-        public IReadOnlyList<DocumentDepartmentModel> Departments { get; set; }
+        public IReadOnlyList<DepartmentModel> Departments { get; set; }
     }
 }
