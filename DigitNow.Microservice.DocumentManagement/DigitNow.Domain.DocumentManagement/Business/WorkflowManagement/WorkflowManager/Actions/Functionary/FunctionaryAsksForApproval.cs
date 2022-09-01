@@ -57,7 +57,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
             document.WorkflowHistories.Add(newWorkflowResponsible);
             
-            await MailSenderService.SendMail_ApprovalRequestedByFunctionary(newWorkflowResponsible.RecipientId, document, token);
+            await MailSenderService.SendMail_OnApprovalRequestedByFunctionary(newWorkflowResponsible.RecipientId, document, token);
 
             return command;
         }
@@ -83,7 +83,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             document.Status = DocumentStatus.InWorkApprovalRequested;
             document.RecipientId = headOfDepartment.Id;
 
-            await MailSenderService.SendMail_ApprovalRequestedByFunctionary(headOfDepartment, document, token);
+            await MailSenderService.SendMail_OnApprovalRequestedByFunctionary(headOfDepartment, document, token);
             return command;
         }
 
