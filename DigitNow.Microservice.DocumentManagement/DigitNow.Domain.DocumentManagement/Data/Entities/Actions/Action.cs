@@ -1,6 +1,5 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Activities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities.Actions
 {
