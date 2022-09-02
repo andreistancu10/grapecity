@@ -2,7 +2,7 @@
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos
 {
-    public class GeneralObjectiveDto
+    public class SpecificObjectiveDto
     {
         public long ObjectiveId { get; set; }
         public string Code { get; set; }
