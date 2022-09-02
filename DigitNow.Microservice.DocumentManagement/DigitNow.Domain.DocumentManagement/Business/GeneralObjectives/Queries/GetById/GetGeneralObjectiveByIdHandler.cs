@@ -49,16 +49,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.
                 return null;
             }
 
-            var files = await _uploadedFileService.GetUploadedFileMappingsAsync(
-                new List<long>
-                {
-                    generalObjective.Id
-                }, TargetEntity.GeneralObjective, cancellationToken);
-
             var aggregate = new GeneralObjectiveAggregate()
             {
                 GeneralObjective = generalObjective,
-                DocumentFileMappingModels = files.Select(c => _mapper.Map<DocumentFileMappingModel>(c)).ToList(),
                 Users = _generalObjectiveRelationsFetcher.GeneralObjectiveUsers
             };
 

@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
-using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using HTSS.Platform.Core.CQRS;
 
@@ -8,10 +6,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.GetDy
 {
     public class GetDynamicFormByIdHandler : IQueryHandler<GetDynamicFormByIdQuery, DynamicFormViewModel>
     {
-        private readonly IDynamicFormsServices _dynamicFormsService;
+        private readonly IDynamicFormsService _dynamicFormsService;
 
         public GetDynamicFormByIdHandler(
-            IDynamicFormsServices dynamicFormsService)
+            IDynamicFormsService dynamicFormsService)
         {
             _dynamicFormsService = dynamicFormsService;
         }

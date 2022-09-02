@@ -109,6 +109,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
 
             await using Stream fileStream = new FileStream($"{fullPath}{_pathDirectorySeparator}{fileGuid}", FileMode.Create, FileAccess.Write);
+
             await formFileStream.CopyToAsync(fileStream);
         }
 

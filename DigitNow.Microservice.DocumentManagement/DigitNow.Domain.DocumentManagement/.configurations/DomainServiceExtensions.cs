@@ -96,7 +96,9 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<IActionFunctionaryService, ActionFunctionaryService>();
 
             services.AddTransient<IUploadedFileService, UploadedFileService>();
-            services.AddTransient<IDynamicFormsServices, DynamicFormsServices>();
+
+            services.AddTransient<IDynamicFormsService, DynamicFormsService>();
+            services.AddTransient<IDynamicFormsMappingService, DynamicFormsMappingService>();
             
             services.AddTransient<IDocumentFileService, DocumentFileService>();
 
@@ -106,6 +108,8 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<ISpecificObjectiveFunctionaryService, SpecificObjectiveFunctionaryService>();
             services.AddTransient<IObjectiveDashboardService, ObjectiveDashboardService>();
             services.AddTransient<IObjectiveMappingService, ObjectiveMappingService>();
+            services.AddTransient<ISpecificObjectiveMappingService, SpecificObjectiveMappingService>();
+            services.AddTransient<ISpecificObjectivesDashboardServices, SpecificObjectivesDashboardServices>();
 
             return services;
         }

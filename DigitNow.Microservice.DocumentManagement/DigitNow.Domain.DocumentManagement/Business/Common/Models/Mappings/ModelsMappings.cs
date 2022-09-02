@@ -23,8 +23,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings
                 .ForMember(x => x.Departments, opt => opt.MapFrom(o => o.UserDepartments))
                 .ForMember(x => x.Roles, opt => opt.MapFrom(o => o.UserRoles));
 
-            CreateMap<DepartmentDto, DocumentDepartmentModel>();
-            CreateMap<IDepartmentResponse, DocumentDepartmentModel>();
+            CreateMap<DepartmentDto, DepartmentModel>();
+            CreateMap<IDepartmentResponse, DepartmentModel>();
             CreateMap<IDocumentTypeResponse, DocumentCategoryModel>();
             CreateMap<IInternalDocumentTypeResponse, InternalDocumentCategoryModel>();
             CreateMap<IInternalDocumentTypeResponse, DocumentCategoryModel>();
@@ -37,11 +37,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings
 
             CreateMap<UploadFileCommand, FileModel>()
                 .ForMember(c => c.ContentType, opt => opt.MapFrom(src => src.File.ContentType))
-                .ForMember(c => c.OriginalFileName, opt => opt.MapFrom(src => src.File.FileName));
+                .ForMember(c => c.OriginalFileName, opt => opt.MapFrom<MapOriginalFileName>());
 
             CreateMap<UploadDocumentFileCommand, FileModel>()
                 .ForMember(c => c.ContentType, opt => opt.MapFrom(src => src.File.ContentType))
-                .ForMember(c => c.OriginalFileName, opt => opt.MapFrom(src => src.File.FileName));
+                .ForMember(c => c.OriginalFileName, opt => opt.MapFrom<MapOriginalFileName>());
 
             CreateMap<FileModel, DocumentFileModel>()
                 .ForMember(dest => dest.DocumentCategoryId, opt => opt.MapFrom<MapDocumentCategoryId>())
@@ -59,7 +59,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings
             CreateMap<StoredFileModel, UploadedFile>();
         }
 
-        public class MapDocumentCategoryId :
+        private class MapDocumentCategoryId :
             IValueResolver<FileModel, DocumentFileModel, long>,
             IValueResolver<StoredFileModel, DocumentFileModel, long>
         {
@@ -87,7 +87,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings
             }
         }
 
-        public class MapName :
+        private class MapName :
             IValueResolver<FileModel, DocumentFileModel, string>,
             IValueResolver<StoredFileModel, DocumentFileModel, string>,
             IValueResolver<FileModel, StoredFileModel, string>
@@ -125,5 +125,31 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings
                 throw new InvalidOperationException("Invalid Context");
             }
         }
+
+        private class MapOriginalFileName :
+            IValueResolver<UploadDocumentFileCommand, FileModel, string>,
+            IValueResolver<UploadFileCommand, FileModel, string>
+        {
+            public string Resolve(UploadDocumentFileCommand source, FileModel destination, string destMember, ResolutionContext context)
+            {
+                return RemoveExtensionFromFileName(source.File.FileName);
+            }
+
+            public string Resolve(UploadFileCommand source, FileModel destination, string destMember, ResolutionContext context)
+            {
+                return RemoveExtensionFromFileName(source.File.FileName);
+            }
+
+            private string RemoveExtensionFromFileName(string fileName)
+            {
+                if (!fileName.Contains('.'))
+                {
+                    return fileName;
+                }
+
+                return fileName.Substring(0, fileName.IndexOf('.'));
+            }
+        }
     }
+
 }

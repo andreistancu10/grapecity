@@ -5,23 +5,23 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.GenericFetchers
 {
-    internal sealed class GenericDocumentsDepartmentsFetcher : ModelFetcher<DocumentDepartmentModel, ModelFetcherContext>        
+    internal sealed class GenericDepartmentsFetcher : ModelFetcher<DepartmentModel, ModelFetcherContext>        
     {
         private readonly ICatalogClient _catalogClient;
         private readonly IMapper _mapper;
 
-        public GenericDocumentsDepartmentsFetcher(IServiceProvider serviceProvider)
+        public GenericDepartmentsFetcher(IServiceProvider serviceProvider)
         {
             _catalogClient = serviceProvider.GetService<ICatalogClient>();
             _mapper = serviceProvider.GetService<IMapper>();
         }
 
-        protected override async Task<List<DocumentDepartmentModel>> FetchInternalAsync(ModelFetcherContext context, CancellationToken cancellationToken)
+        protected override async Task<List<DepartmentModel>> FetchInternalAsync(ModelFetcherContext context, CancellationToken cancellationToken)
         {
             var departmentsResponse = await _catalogClient.Departments.GetDepartmentsAsync(cancellationToken);
 
             var documentDepartmentModels = departmentsResponse.Departments
-                .Select(x => _mapper.Map<DocumentDepartmentModel>(x))
+                .Select(x => _mapper.Map<DepartmentModel>(x))
                 .ToList();
 
             return documentDepartmentModels;

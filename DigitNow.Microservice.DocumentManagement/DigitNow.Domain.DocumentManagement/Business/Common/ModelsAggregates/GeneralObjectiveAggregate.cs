@@ -6,7 +6,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates
     public class GeneralObjectiveAggregate
     {
         public GeneralObjective GeneralObjective { get; set; }
-        public List<DocumentFileMappingModel> DocumentFileMappingModels { get; set; }
         public IReadOnlyList<UserModel> Users { get; set; }
     }
 }

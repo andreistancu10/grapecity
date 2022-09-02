@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
+using Newtonsoft.Json;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
 {
@@ -10,13 +11,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
         {
             CreateMap<VirtualFileAggregate, FileViewModel>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.UploadedFile.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.UploadedFile.Name))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom<MapViewModelName>())
                 .ForMember(dest => dest.UploadDate, opt => opt.MapFrom(src => src.UploadedFile.CreatedAt))
                 .ForMember(dest => dest.UploadedBy, opt => opt.MapFrom<MapUploadedBy>());
 
             CreateMap<DocumentFileAggregate, DocumentFileViewModel>()
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.DocumentFileModel.Id))
-                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.DocumentFileModel.Name))
+                .ForMember(dest => dest.Name, opt => opt.MapFrom<MapViewModelName>())
                 .ForMember(dest => dest.UploadDate, opt => opt.MapFrom(src => src.DocumentFileModel.CreatedAt))
                 .ForMember(dest => dest.UploadedBy, opt => opt.MapFrom<MapUploadedBy>())
                 .ForMember(dest => dest.Category, opt => opt.MapFrom<MapCategory>());
@@ -56,9 +57,30 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                     .First(c => c.UploadedFileMappingId == source.DocumentFileModel.UploadedFileMappingId)
                     .DocumentCategoryId;
 
-               var foundCategory = source.Categories.First(x => x.Id == documentCategoryId);
+                var foundCategory = source.Categories.First(x => x.Id == documentCategoryId);
 
                 return new BasicViewModel(foundCategory.Id, foundCategory.Name);
+            }
+        }
+
+        private class MapViewModelName :
+            IValueResolver<VirtualFileAggregate, FileViewModel, string>,
+            IValueResolver<DocumentFileAggregate, DocumentFileViewModel, string>
+        {
+            public string Resolve(VirtualFileAggregate source, FileViewModel destination, string destMember,
+                ResolutionContext context)
+            {
+                return string.IsNullOrWhiteSpace(source.UploadedFile.Name)
+                    ? source.UploadedFile.OriginalFileName
+                    : source.UploadedFile.Name;
+            }
+
+            public string Resolve(DocumentFileAggregate source, DocumentFileViewModel destination, string destMember,
+                ResolutionContext context)
+            {
+                return string.IsNullOrWhiteSpace(source.DocumentFileModel.Name)
+                    ? source.DocumentFileModel.OriginalFileName
+                    : source.DocumentFileModel.Name;
             }
         }
     }
