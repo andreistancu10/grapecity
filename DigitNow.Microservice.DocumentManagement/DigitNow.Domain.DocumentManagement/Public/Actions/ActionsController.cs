@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Actions.Commands;
+using DigitNow.Domain.DocumentManagement.Business.Actions.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Public.Actions.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
@@ -8,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Actions
 {
-    [Authorize]
+    [AllowAnonymous]
     [ApiController]
     [Route("api/actions")]
     public class ActionsController: ApiController
@@ -30,6 +31,14 @@ namespace DigitNow.Domain.DocumentManagement.Public.Actions
                 null => NotFound(),
                 var result => Ok(result)
             };
+        }
+
+        [HttpPut()]
+        public async Task<IActionResult> UpdateActionAsync([FromBody] UpdateActionRequest request)
+        {
+            var command = _mapper.Map<UpdateActionCommand>(request);
+
+            return CreateResponse(await _mediator.Send(command));
         }
     }
 }

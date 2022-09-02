@@ -11,6 +11,8 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities.Actions
         public string Title { get; set; }
         public ScimState State { get; set; }
         public string Details { get; set; }
+        public string ModificationMotive { get; set; }
+
 
         #region [ References ]
         public Activity AssociatedActivity { get; set; }

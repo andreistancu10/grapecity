@@ -33,7 +33,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Commands
             var newAction = _mapper.Map<Data.Entities.Actions.Action>(request);
             await _actionService.CreateAsync(newAction, cancellationToken);
 
-            if (request.ActionFunctionariesIds != null)
+            if (request.ActionFunctionariesIds.Any())
                 await _actionFunctionaryService.AddRangeAsync(newAction.Id, request.ActionFunctionariesIds, cancellationToken);
 
             if (request.UploadedFileIds.Any())
