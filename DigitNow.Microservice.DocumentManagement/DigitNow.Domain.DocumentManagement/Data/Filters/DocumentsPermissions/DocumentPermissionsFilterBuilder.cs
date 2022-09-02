@@ -65,6 +65,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
                     EntityPredicates.Add(x =>
                         x.DestinationDepartmentId == RegistryOfficeDepartmentRightsFilter.DepartmentId
                         || x.DocumentActions.Select(x => x.DepartmentId).Contains(RegistryOfficeDepartmentRightsFilter.DepartmentId)
+                        || x.CreatedBy == RegistryOfficeDepartmentRightsFilter.UserId
                     );
                 }
             }

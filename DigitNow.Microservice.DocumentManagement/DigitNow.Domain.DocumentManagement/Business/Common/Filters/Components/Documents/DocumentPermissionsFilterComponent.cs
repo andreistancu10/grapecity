@@ -36,7 +36,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
             var filter = new DocumentPermissionsFilter
             {
                 UserContextFilter = new DocumentUserContextFilter { DepartmentId = currentUser.Departments.First().Id },
-                DepartmentsPermissionsFilter = await BuildDepartmentsPermissionsFilterAsync(token),
+                DepartmentsPermissionsFilter = await BuildDepartmentsPermissionsFilterAsync(context, token),
                 UserPermissionsFilter = context.UserPermissionsFilter
             };
 
@@ -48,13 +48,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
 
         #region [ Helpers ]
 
-        private async Task<DocumentDepartmentPermissionsFilters> BuildDepartmentsPermissionsFilterAsync(CancellationToken token)
+        private async Task<DocumentDepartmentPermissionsFilters> BuildDepartmentsPermissionsFilterAsync(DocumentPermissionsFilterComponentContext context, CancellationToken token)
         {
             return new DocumentDepartmentPermissionsFilters
             {
                 RegistryOfficeRightsFilter = new DocumentRegistryOfficeDepartmentRightsFilter
                 {
-                    DepartmentId = (await GetRegistryOfficeDepartmentAsync(token)).Id
+                    DepartmentId = (await GetRegistryOfficeDepartmentAsync(token)).Id,
+                    UserId = context.CurrentUser.Id
                 }
             };
         }
