@@ -7,10 +7,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.DynamicForms.Commands
 {
     public class SaveDynamicFormDataHandler : ICommandHandler<SaveDynamicFormDataCommand, ResultObject>
     {
-        private readonly IDynamicFormsServices _dynamicFormsService;
+        private readonly IDynamicFormsService _dynamicFormsService;
 
         public SaveDynamicFormDataHandler(
-            IDynamicFormsServices dynamicFormsService)
+            IDynamicFormsService dynamicFormsService)
         {
             _dynamicFormsService = dynamicFormsService;
         }
