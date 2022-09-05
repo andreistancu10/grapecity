@@ -1,28 +1,34 @@
-version: "3.3"
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS base
+WORKDIR /app
+EXPOSE 80
 
-networks:
- localhost:
-  driver: "bridge"
-  name: "localhost"
- local_network:
-  driver: bridge
-  name: local_network
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 
-services:
- documentmanagement:
-  build:
-   context: ./
-   dockerfile: ./local.Dockerfile
-  container_name: documentmanagement
-  image: documentmanagement-digitnow
-  restart: unless-stopped
-  networks:
-   - localhost
-   - local_network
-  ports: 
-   - 7003:7003
-  environment:
-   ASPNETCORE_URLS: "http://0.0.0.0:7003"
-   ASPNETCORE_ENVIRONMENT: "Development"
-   MIGRATE_DATABASE: "true"
-   ENABLE_AUTO_SERVICE_DISCOVERY: "false"
+WORKDIR /src
+COPY DigitNow.Microservice.DocumentManagement/nuget.config ./
+COPY DigitNow.Microservice.DocumentManagement.sln ./ 
+COPY DigitNow.Domain.DocumentManagement/*.csproj ./DigitNow.Domain.DocumentManagement/
+COPY DigitNow.Adapters.MS.Catalog/*.csproj ./DigitNow.Adapters.MS.Catalog/
+COPY DigitNow.Domain.DocumentManagement.Client/*.csproj ./DigitNow.Domain.DocumentManagement.Client/
+COPY DigitNow.Domain.DocumentManagement.Client.IntegrationTests/*.csproj ./DigitNow.Domain.DocumentManagement.Client.IntegrationTests/
+COPY DigitNow.Domain.DocumentManagement.Contracts/*.csproj ./DigitNow.Domain.DocumentManagement.Contracts/
+COPY DigitNow.Domain.DocumentManagement.Tests/*.csproj ./DigitNow.Domain.DocumentManagement.Tests/
+COPY DigitNow.Microservice.DocumentManagement/*.csproj ./DigitNow.Microservice.DocumentManagement/
+
+ 
+RUN dotnet restore
+
+COPY . .
+WORKDIR /src/DigitNow.Domain.DocumentManagement
+RUN dotnet build -c Release -o /app
+
+WORKDIR /src/DigitNow.Microservice.DocumentManagement
+RUN dotnet build -c Release -o /app
+
+FROM build AS publish
+RUN dotnet publish -c Release -o /app
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app . 
+ENTRYPOINT ["dotnet", "DigitNow.Microservice.DocumentManagement.dll"]
