@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Reflection.Metadata.Ecma335;
+using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterActivities;
 using DigitNow.Domain.DocumentManagement.Business.ObjectivesDashboard.Queries.GetGeneralObjectives;
 using DigitNow.Domain.DocumentManagement.Public.Activities.Models;
@@ -22,12 +23,17 @@ namespace DigitNow.Domain.DocumentManagement.Public.Activities
             _mediator = mediator;
             _mapper = mapper;
         }
-        
+
         [HttpPost("filter")]
         public async Task<IActionResult> GetGeneralObjectivesAsync([FromBody] FilterActivitiesRequest request, CancellationToken cancellationToken)
         {
             var query = _mapper.Map<FilterActivitiesQuery>(request);
-            return Ok(await _mediator.Send(query, cancellationToken));
+
+            return await _mediator.Send(query, cancellationToken) switch
+            {
+                null => BadRequest(),
+                var result => Ok(result)
+            };
         }
     }
 }
