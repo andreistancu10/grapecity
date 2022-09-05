@@ -34,7 +34,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
                     Parameters = new object[] { request.ObjectiveId }
                 });
 
-            var fileMappings = await _uploadedFileService.GetUploadedFileMappingsAsync(new List<long> { initialGeneralObjective.Id }, TargetEntity.GeneralObjective, cancellationToken);
+            var fileMappings = await _uploadedFileService.GetUploadedFileMappingsByTargetIdAsync(initialGeneralObjective.ObjectiveId, TargetEntity.GeneralObjective, cancellationToken);
 
             initialGeneralObjective.Objective.Title = request.Title;
             initialGeneralObjective.Objective.State = request.State;
@@ -47,7 +47,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
             {
                 var uploadedFileIds = fileMappings.Select(item => item.UploadedFileId);
 
-                await _uploadedFileService.UpdateUploadedFilesWithTargetIdAsync(request.UploadedFileIds.Except(uploadedFileIds), initialGeneralObjective.Objective.Id, TargetEntity.GeneralObjective, cancellationToken).ConfigureAwait(false);
+                await _uploadedFileService.UpdateUploadedFilesWithTargetIdAsync(request.UploadedFileIds.Except(uploadedFileIds), initialGeneralObjective.ObjectiveId, TargetEntity.GeneralObjective, cancellationToken).ConfigureAwait(false);
             }
 
             return ResultObject.Ok(initialGeneralObjective.ObjectiveId);

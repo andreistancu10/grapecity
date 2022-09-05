@@ -108,7 +108,6 @@
 	  <Folder Include="Data\Entities\Activities\Configurations\" />
 	  <Folder Include="Data\Entities\DynamicFormFillingLogs\Configuration\" />
 	  <Folder Include="Business\Common\FileUsageContexts\" />
-	  <Folder Include="Business\SpecificObjectives\Mappings\" />
 	  <Folder Include="Migrations\" />
 	  <Folder Include="Public\Activities\Validators\" />
 	</ItemGroup>

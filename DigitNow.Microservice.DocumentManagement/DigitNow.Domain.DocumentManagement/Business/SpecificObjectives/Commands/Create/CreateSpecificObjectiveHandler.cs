@@ -41,7 +41,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
 
             if (request.UploadedFileIds.Any())
             {
-                await _uploadedFileService.UpdateUploadedFilesWithTargetIdAsync(request.UploadedFileIds, specificObjective.Objective.Id, TargetEntity.GeneralObjective, cancellationToken);
+                await _uploadedFileService.UpdateUploadedFilesWithTargetIdAsync(request.UploadedFileIds, specificObjective.ObjectiveId, TargetEntity.SpecificObjective, cancellationToken);
             }
 
             return ResultObject.Created(specificObjective.ObjectiveId);

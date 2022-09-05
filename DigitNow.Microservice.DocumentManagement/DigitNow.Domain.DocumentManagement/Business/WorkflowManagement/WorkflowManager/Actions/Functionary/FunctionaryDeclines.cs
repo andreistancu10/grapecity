@@ -78,7 +78,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 .OrderByDescending(x => x.CreatedAt)
                 .FirstOrDefault();
 
-            await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token);
+            await TransferUserResponsibilityAsync(oldWorkflowResponsible, newWorkflowResponsible, command, token, makeDocumentVisibleForDepartment: true);
             document.WorkflowHistories.Add(newWorkflowResponsible);
 
             var opinionAllocatedFlow = document.WorkflowHistories

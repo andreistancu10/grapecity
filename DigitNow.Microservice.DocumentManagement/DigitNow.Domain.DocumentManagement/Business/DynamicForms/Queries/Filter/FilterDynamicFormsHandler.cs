@@ -9,11 +9,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.Filte
     public class FilterDynamicFormsHandler : IQueryHandler<DynamicFilterFormsQuery, IEnumerable<DynamicFilterFormsResponse>>
     {
         private readonly IMapper _mapper;
-        private readonly IDynamicFormsServices _dynamicFormsService;
+        private readonly IDynamicFormsService _dynamicFormsService;
 
         public FilterDynamicFormsHandler(
             IMapper mapper,
-            IDynamicFormsServices dynamicFormsService)
+            IDynamicFormsService dynamicFormsService)
         {
             _mapper = mapper;
             _dynamicFormsService = dynamicFormsService;
