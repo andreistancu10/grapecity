@@ -50,6 +50,8 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<DynamicFormFieldMapping> DynamicFormFieldMappings { get; set; }
         public DbSet<DynamicFormFieldValue> DynamicFormFieldValues { get; set; }
         public DbSet<DynamicFormFillingLog> DynamicFormFillingLogs { get; set; }
+        public DbSet<Activity> Activities { get; set; }
+        public DbSet<ActivityAction> ActivityActions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
