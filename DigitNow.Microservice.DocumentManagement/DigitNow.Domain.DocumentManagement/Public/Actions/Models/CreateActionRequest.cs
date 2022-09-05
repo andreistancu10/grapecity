@@ -1,6 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
-
-namespace DigitNow.Domain.DocumentManagement.Public.Actions.Models
+﻿namespace DigitNow.Domain.DocumentManagement.Public.Actions.Models
 {
     public class CreateActionRequest
     {

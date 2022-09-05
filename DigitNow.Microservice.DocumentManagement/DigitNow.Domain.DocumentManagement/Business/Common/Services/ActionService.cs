@@ -8,6 +8,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         Task<Data.Entities.Actions.Action> CreateAsync(Data.Entities.Actions.Action action, CancellationToken cancellationToken);
         Task UpdateAsync(Data.Entities.Actions.Action action, CancellationToken cancellationToken);
+        IQueryable<Data.Entities.Actions.Action> FindQuery();
     }
     public class ActionService : IActionService
     {
@@ -32,6 +33,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             await _dbContext.SingleUpdateAsync(action, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
+
+        public IQueryable<Data.Entities.Actions.Action> FindQuery()
+        {
+            return _dbContext.Actions.AsQueryable();
+        }
+
 
         private async Task SetActionCodeAsync(Data.Entities.Actions.Action action, CancellationToken token)
         {

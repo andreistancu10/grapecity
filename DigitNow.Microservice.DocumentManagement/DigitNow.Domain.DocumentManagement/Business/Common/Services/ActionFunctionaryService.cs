@@ -39,7 +39,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             if (!functionaryIds.Any()) return;
 
-            var initialActionFunctionary = await FindQuery().Where(item => item.Id == actionId).ToListAsync(cancellationToken);
+            var initialActionFunctionary = await FindQuery().Where(item => item.ActionId == actionId).ToListAsync(cancellationToken);
 
             if (initialActionFunctionary.Count != 0)
             {
