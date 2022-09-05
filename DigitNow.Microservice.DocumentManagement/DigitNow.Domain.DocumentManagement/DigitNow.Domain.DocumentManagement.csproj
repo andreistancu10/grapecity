@@ -103,8 +103,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Data\Entities\DynamicFormFillingLogs\Configuration\" />
-	  <Folder Include="Business\Common\FileUsageContexts\" />
 	  <Folder Include="Migrations\" />
 	</ItemGroup>
 

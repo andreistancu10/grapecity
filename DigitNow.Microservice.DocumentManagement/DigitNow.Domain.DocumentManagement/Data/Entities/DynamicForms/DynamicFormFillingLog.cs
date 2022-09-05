@@ -1,4 +1,6 @@
-﻿namespace DigitNow.Domain.DocumentManagement.Data.Entities
+﻿using System;
+
+namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
     public class DynamicFormFillingLog : ExtendedEntity
     {

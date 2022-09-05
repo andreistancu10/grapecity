@@ -7,21 +7,20 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
     {
         public DynamicFormFillingLogModelMapping()
         {
-            CreateMap<DynamicFormAggregate, DynamicFormFillingLogViewModel>()
-                .ForMember(x => x.Id, opt => opt.MapFrom(src => src.DynamicFormFillingLog.Id))
-                .ForMember(c => c.FormCreator, opt => opt.MapFrom<MapDynamicFormCreator>())
-                .ForMember(c => c.Department, opt => opt.MapFrom<MapDynamicFormUserDepartment>())
-                .ForMember(c => c.Category, opt => opt.MapFrom(src => src.DynamicFormFillingLog.DynamicForm.Name))
-                .ForMember(c => c.CreatedAt, opt => opt.MapFrom(src => src.DynamicFormFillingLog.CreatedAt));
+            CreateMap<DynamicFormAggregate, HistoricalArchiveDocumentsViewModel>()
+                .ForMember(x => x.Id, opt => opt.MapFrom(src => src.DynamicFormValues.Id))
+                .ForMember(c => c.Category, opt => opt.MapFrom(src => src.DynamicFormValues.DynamicForm.Name))
+                .ForMember(c => c.RegistrationAt, opt => opt.MapFrom(src => src.DynamicFormValues.CreatedAt))
+                .ForMember(c => c.RegistrationBy, opt => opt.MapFrom<MapRegistrationBy>())
+                .ForMember(c => c.Recipient, opt => opt.MapFrom<MapRecipient>());                
         }
 
-        private class MapDynamicFormCreator :
-             IValueResolver<DynamicFormAggregate, DynamicFormFillingLogViewModel, BasicViewModel>
+        private class MapRegistrationBy :
+             IValueResolver<DynamicFormAggregate, HistoricalArchiveDocumentsViewModel, BasicViewModel>
         {
-            public BasicViewModel Resolve(DynamicFormAggregate source, DynamicFormFillingLogViewModel destination, BasicViewModel destMember, ResolutionContext context)
+            public BasicViewModel Resolve(DynamicFormAggregate source, HistoricalArchiveDocumentsViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
-                var foundUser = source.Users.FirstOrDefault(x => x.Id == source.DynamicFormFillingLog.CreatedBy);
-
+                var foundUser = source.Users.FirstOrDefault(x => x.Id == source.DynamicFormValues.CreatedBy);
                 if (foundUser != null)
                 {
                     return new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
@@ -30,13 +29,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             }
         }
 
-        private class MapDynamicFormUserDepartment :
-                IValueResolver<DynamicFormAggregate, DynamicFormFillingLogViewModel, BasicViewModel>
+        private class MapRecipient :
+                IValueResolver<DynamicFormAggregate, HistoricalArchiveDocumentsViewModel, BasicViewModel>
         {
-            public BasicViewModel Resolve(DynamicFormAggregate source, DynamicFormFillingLogViewModel destination, BasicViewModel destMember, ResolutionContext context)
+            public BasicViewModel Resolve(DynamicFormAggregate source, HistoricalArchiveDocumentsViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
+                //TODO: Review this
                 var userDepartment = source.Departments.FirstOrDefault();
-
                 if (userDepartment != null)
                 {
                     return new BasicViewModel(userDepartment.Id, userDepartment.Name);

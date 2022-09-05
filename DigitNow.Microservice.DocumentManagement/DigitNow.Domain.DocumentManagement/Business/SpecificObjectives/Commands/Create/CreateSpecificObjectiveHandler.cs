@@ -1,7 +1,7 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
 using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 
 namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Commands.Create

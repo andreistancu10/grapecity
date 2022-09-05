@@ -20,10 +20,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
 
         #endregion
 
-        public DynamicFormFieldMapping()
-        {
-        }
-
+        public DynamicFormFieldMapping() { }
         public DynamicFormFieldMapping(long id)
         {
             Id = id;

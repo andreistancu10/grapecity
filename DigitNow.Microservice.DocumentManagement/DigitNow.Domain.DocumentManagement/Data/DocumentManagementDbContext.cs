@@ -5,8 +5,6 @@
 
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentActions;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 

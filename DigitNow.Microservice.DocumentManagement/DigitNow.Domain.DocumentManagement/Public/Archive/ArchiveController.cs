@@ -2,8 +2,10 @@
 using DigitNow.Domain.DocumentManagement.Business.Archive.Commands;
 using DigitNow.Domain.DocumentManagement.Business.Archive.Queries;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
+using DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.GetDynamicForms;
 using DigitNow.Domain.DocumentManagement.Public.Archive.Models;
 using DigitNow.Domain.DocumentManagement.Public.Dashboard.Models;
+using DigitNow.Domain.DocumentManagement.Public.DynamicForms.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -28,7 +30,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Archive
         }
 
         [HttpPost("operational/get-documents")]
-        public async Task<ActionResult<List<GetDocumentsResponse>>> GetDocumentsAsync([FromBody] GetDocumentsRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetOperationalArchiveDocumentsAsync([FromBody] GetDocumentsRequest request, CancellationToken cancellationToken)
         {
             var query = _mapper.Map<GetDocumentsOperationalArchiveQuery>(request);
             return Ok(await _mediator.Send(query, cancellationToken));
@@ -40,6 +42,13 @@ namespace DigitNow.Domain.DocumentManagement.Public.Archive
             var deleteDocumentCommand = _mapper.Map<DeleteDocumentCommand>(request);
 
             return CreateResponse(await _mediator.Send(deleteDocumentCommand, cancellationToken));
+        }
+
+        [HttpPost("historical/get-documents")]
+        public async Task<IActionResult> GetHistoricalArchiveDocumentsAsync([FromBody] GetHistoricalArchiveDocumentsRequest request, CancellationToken cancellationToken)
+        {
+            var query = _mapper.Map<GetHistoricalArchiveDocumentsQuery>(request);
+            return Ok(await _mediator.Send(query, cancellationToken));
         }
     }
 }

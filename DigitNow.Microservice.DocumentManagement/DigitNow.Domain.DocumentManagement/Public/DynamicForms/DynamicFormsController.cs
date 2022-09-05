@@ -63,12 +63,5 @@ namespace DigitNow.Domain.DocumentManagement.Public.Forms
                 var result => Ok(result)
             };
         }
-
-        [HttpPost("list")]
-        public async Task<IActionResult> GetDynamicFormFillingLogsAsync([FromBody] GetDynamicFormFillingLogsRequest request, CancellationToken cancellationToken)
-        {
-            var query = _mapper.Map<GetDynamicFormFillingLogsQuery>(request);
-            return Ok(await _mediator.Send(query, cancellationToken));
-        }
     }
 }

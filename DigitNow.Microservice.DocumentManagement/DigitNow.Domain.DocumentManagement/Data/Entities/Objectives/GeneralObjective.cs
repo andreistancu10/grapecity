@@ -1,4 +1,4 @@
-﻿namespace DigitNow.Domain.DocumentManagement.Data.Entities.Objectives
+﻿namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
     public class GeneralObjective: VirtualObjective
     {

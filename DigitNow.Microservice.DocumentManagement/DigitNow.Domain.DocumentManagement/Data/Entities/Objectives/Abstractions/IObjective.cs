@@ -1,6 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities.Objectives.Abstractions
+namespace DigitNow.Domain.DocumentManagement.Data.Entities.Abstractions
 {
     public interface IObjective
     {
