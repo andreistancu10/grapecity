@@ -5,6 +5,8 @@
 
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Actions;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Activities;
 using DigitNow.Domain.DocumentManagement.Data.Entities.DocumentActions;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 using Microsoft.EntityFrameworkCore;
@@ -51,7 +53,9 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<DynamicFormFieldValue> DynamicFormFieldValues { get; set; }
         public DbSet<DynamicFormFillingLog> DynamicFormFillingLogs { get; set; }
         public DbSet<Activity> Activities { get; set; }
-        public DbSet<ActivityAction> ActivityActions { get; set; }
+        public DbSet<ActivityFunctionary> ActivityFunctionaries { get; set; }
+        public DbSet<Entities.Actions.Action> Actions { get; set; }
+        public DbSet<ActionFunctionary> ActionFunctionaries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

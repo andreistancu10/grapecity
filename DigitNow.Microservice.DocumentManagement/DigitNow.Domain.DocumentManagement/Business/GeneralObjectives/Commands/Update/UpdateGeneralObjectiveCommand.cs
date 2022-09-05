@@ -6,7 +6,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
     public class UpdateGeneralObjectiveCommand : ICommand<ResultObject>
     {
         public long ObjectiveId { get; set; }
-        public ObjectiveState State { get; set; }
+        public ScimState State { get; set; }
         public string Title { get; set; }
         public string Details { get; set; }
         public string ModificationMotive { get; set; }

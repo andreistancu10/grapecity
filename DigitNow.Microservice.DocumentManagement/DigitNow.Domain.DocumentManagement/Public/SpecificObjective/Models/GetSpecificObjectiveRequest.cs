@@ -46,6 +46,6 @@ namespace DigitNow.Domain.DocumentManagement.Public.SpecificObjective.Models
 
     public class SpecificObjectiveStateFilterDto
     {
-        public ObjectiveState StateId { get; set; }
+        public ScimState StateId { get; set; }
     }
 }

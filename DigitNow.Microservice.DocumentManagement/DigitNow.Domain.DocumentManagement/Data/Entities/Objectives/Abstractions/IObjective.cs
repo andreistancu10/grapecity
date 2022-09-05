@@ -5,7 +5,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities.Objectives.Abstractio
     public interface IObjective
     {
         public string Code { get; set; }
-        public ObjectiveState State { get; set; }
+        public ScimState State { get; set; }
         public string Title { get; set; }
         public string Details { get; set; }
         public string ModificationMotive { get; set; }
