@@ -23,6 +23,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.GetById
             var activity = await _activityService.FindQuery()
                 .Where(item => item.Id == request.Id)
                 .Include(item => item.AssociatedGeneralObjective)
+                .Include(item => item.AssociatedGeneralObjective.Objective)
+                .Include(item => item.AssociatedSpecificObjective)
                 .Include(item => item.AssociatedSpecificObjective.Objective)
                 .Include(item => item.ActivityFunctionarys).FirstOrDefaultAsync(cancellationToken);
 
