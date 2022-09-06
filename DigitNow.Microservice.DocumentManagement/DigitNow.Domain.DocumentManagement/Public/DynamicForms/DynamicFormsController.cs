@@ -37,13 +37,22 @@ namespace DigitNow.Domain.DocumentManagement.Public.Forms
             return Ok(result);
         }
 
-        [HttpGet("{id:long}")]
-        public async Task<IActionResult> GetByIdAsync([FromRoute] long id, CancellationToken cancellationToken)
+        [HttpGet("{formId:long}")]
+        public async Task<IActionResult> GetByIdAsync([FromRoute] long formId, CancellationToken cancellationToken)
         {
-            var query = new GetDynamicFormByIdQuery
+            var query = new GetDynamicFormByIdQuery { FormId = formId };
+
+            return await _mediator.Send(query, cancellationToken) switch
             {
-                Id = id
+                null => NotFound(),
+                var result => Ok(result)
             };
+        }
+
+        [HttpGet("{formId:long}/{formFillingLogId:long}")]
+        public async Task<IActionResult> GetByIdAsync([FromRoute] long formId, [FromRoute] long formFillingLogId, CancellationToken cancellationToken)
+        {
+            var query = new GetDynamicFormByIdQuery { FormId = formId, FormFillingId = formFillingLogId };
 
             return await _mediator.Send(query, cancellationToken) switch
             {

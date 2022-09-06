@@ -10,11 +10,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
         public IReadOnlyList<UserModel> DynamicFormUsers
             => GetItems<DynamicFormsUsersFetcher, UserModel>();
 
+        public IReadOnlyList<ArchivedDocumentCategoryModel> Categories
+            => GetItems<GenericArchivedDocumentsCategoriesFetcher, ArchivedDocumentCategoryModel>();
+
         public IReadOnlyList<DepartmentModel> Departments
             => GetItems<GenericDepartmentsFetcher, DepartmentModel>();
 
         public DynamicFormRelationsFetcher(IServiceProvider serviceProvider) : base(serviceProvider)
-        { }
+        {
+            Aggregator
+                .UseGenericRemoteFetcher<GenericArchivedDocumentsCategoriesFetcher>();
+        }
 
         public DynamicFormRelationsFetcher UseDynamicFormsContext(DynamicFormsFetcherContext context)
         {

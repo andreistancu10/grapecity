@@ -4,7 +4,7 @@ using HTSS.Platform.Core.CQRS;
 
 namespace DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.GetDynamicForms
 {
-    public class GetHistoricalArchiveDocumentsHandler : IQueryHandler<GetHistoricalArchiveDocumentsQuery, GetHistoricalArchiveDocumentsResponse>
+    public class GetHistoricalArchiveDocumentsHandler : IQueryHandler<GetHistoricalArchiveDocumentsQuery, ResultObject>
     {
         private readonly IDynamicFormsService _dynamicFormsService;
         private readonly IDocumentMappingService _documentMappingService;
@@ -15,19 +15,20 @@ namespace DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.GetDy
             _documentMappingService = documentMappingService;
         }
 
-        public async Task<GetHistoricalArchiveDocumentsResponse> Handle(GetHistoricalArchiveDocumentsQuery request, CancellationToken cancellationToken)
+        public async Task<ResultObject> Handle(GetHistoricalArchiveDocumentsQuery request, CancellationToken cancellationToken)
         {
             var totalItems = await _dynamicFormsService.CountDynamicFilledFormsAsync(request.Filter, cancellationToken);
-            if (totalItems == 0) return GetEmptyPageDocumentResponse(request);
+            if (totalItems == 0) return ResultObject.Ok(GetEmptyPageDocumentResponse(request));
 
-            var dynamicForms = await _dynamicFormsService.GetDynamicFilledFormsAsync(request.Filter,
+            var dynamicFormFillingLogs = await _dynamicFormsService.GetDynamicFilledFormsAsync(
+                request.Filter,
                 request.Page,
                 request.Count,
                 cancellationToken);
 
-            var viewModels = await _documentMappingService.MapToHistoricalArchiveDocumentsViewModelAsync(dynamicForms, cancellationToken);
+            var viewModels = await _documentMappingService.MapToHistoricalArchiveDocumentsViewModelAsync(dynamicFormFillingLogs, cancellationToken);
 
-            return BuildFirstPageDocumentResponse(request, totalItems, viewModels);
+            return ResultObject.Ok(BuildFirstPageDocumentResponse(request, totalItems, viewModels));
         }
 
         private static GetHistoricalArchiveDocumentsResponse BuildFirstPageDocumentResponse(GetHistoricalArchiveDocumentsQuery query, long totalItems, IList<HistoricalArchiveDocumentsViewModel> items)

@@ -13,7 +13,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Archive
 {
-
     [Authorize]
     [ApiController]
     [Route("api/archive")]
@@ -21,7 +20,6 @@ namespace DigitNow.Domain.DocumentManagement.Public.Archive
     {
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
-
 
         public ArchiveController(IMediator mediator, IMapper mapper)
         {
@@ -40,7 +38,6 @@ namespace DigitNow.Domain.DocumentManagement.Public.Archive
         public async Task<IActionResult> DeleteDocument([FromBody] DeleteDocumentRequest request, CancellationToken cancellationToken)
         {
             var deleteDocumentCommand = _mapper.Map<DeleteDocumentCommand>(request);
-
             return CreateResponse(await _mediator.Send(deleteDocumentCommand, cancellationToken));
         }
 
@@ -48,16 +45,13 @@ namespace DigitNow.Domain.DocumentManagement.Public.Archive
         public async Task<IActionResult> GetHistoricalArchiveDocumentsAsync([FromBody] GetHistoricalArchiveDocumentsRequest request, CancellationToken cancellationToken)
         {
             var query = _mapper.Map<GetHistoricalArchiveDocumentsQuery>(request);
-            return Ok(await _mediator.Send(query, cancellationToken));
+            return CreateResponse(await _mediator.Send(query, cancellationToken));
         }
 
         [HttpDelete("historical/delete/{id}")]
         public async Task<IActionResult> DeleteHistoricalArchiveDocumentAsync([FromRoute] long id, CancellationToken cancellationToken)
         {
-            var request = new DeleteHistoricalArchiveDocumentCommand
-            {
-                Id = id
-            };
+            var request = new DeleteHistoricalArchiveDocumentCommand { Id = id };
 
             var deleteDocumentCommand = _mapper.Map<DeleteHistoricalArchiveDocumentCommand>(request);
 

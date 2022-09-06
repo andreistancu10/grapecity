@@ -2,10 +2,11 @@
 {
     public class HistoricalArchiveDocumentsViewModel
     {
-        public long Id { get; set; }
-        public string Category { get; set; }
+        public long FormId { get; set; }
+        public long FormFillingLogId { get; set; }
+        public BasicViewModel Category { get; set; }
         public DateTime RegistrationAt { get; set; }
-        public BasicViewModel RegistrationBy { get; set; }        
+        public BasicViewModel RegistrationBy { get; set; }
         public BasicViewModel Recipient { get; set; }
     }
 }

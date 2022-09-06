@@ -49,44 +49,44 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         #region [ IDocumentMappingService ]
 
-        public async Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(int languageId, IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
+        public async Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(int languageId, IList<VirtualDocument> virtualDocuments, CancellationToken token)
         {
             if (!virtualDocuments.Any())
             {
                 return new List<DocumentViewModel>();
             }
 
-            _currentUser = await _identityService.GetCurrentUserAsync(cancellationToken);
+            _currentUser = await _identityService.GetCurrentUserAsync(token);
 
             await _documentRelationsFetcher
                 .UseDocumentsContext(new DocumentsFetcherContext { Documents = virtualDocuments })
                 .UseTranslationsContext(new LanguageFetcherContext { LanguageId = languageId })
-                .TriggerFetchersAsync(cancellationToken);
+                .TriggerFetchersAsync(token);
 
             return MapDocuments(virtualDocuments)
                 .OrderByDescending(x => x.RegistrationDate)
                 .ToList();
         }
 
-        public async Task<List<ReportViewModel>> MapToReportViewModelAsync(int languageId, IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
+        public async Task<List<ReportViewModel>> MapToReportViewModelAsync(int languageId, IList<VirtualDocument> virtualDocuments, CancellationToken token)
         {
             if (!virtualDocuments.Any()) return new List<ReportViewModel>();
 
             await _documentReportRelationsFetcher
                 .UseDocumentsContext(new DocumentsFetcherContext { Documents = virtualDocuments })
                 .UseTranslationsContext(new LanguageFetcherContext { LanguageId = languageId })
-                .TriggerFetchersAsync(cancellationToken);
+                .TriggerFetchersAsync(token);
 
             return MapDocumentsReports(virtualDocuments)
                 .OrderByDescending(x => x.RegistrationDate)
                 .ToList();
         }
 
-        public async Task<List<HistoricalArchiveDocumentsViewModel>> MapToHistoricalArchiveDocumentsViewModelAsync(IList<DynamicFormFillingLog> dynamicFormValues, CancellationToken cancellationToken)
+        public async Task<List<HistoricalArchiveDocumentsViewModel>> MapToHistoricalArchiveDocumentsViewModelAsync(IList<DynamicFormFillingLog> dynamicFormValues, CancellationToken token)
         {
             await _dynamicFormRelationsFetcher
                 .UseDynamicFormsContext(new DynamicFormsFetcherContext { DynamicFormValues = dynamicFormValues })
-                .TriggerFetchersAsync(cancellationToken);
+                .TriggerFetchersAsync(token);
 
             return MapHistoricalArchiveDocuments(dynamicFormValues)
                 .ToList();
@@ -210,7 +210,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             {
                 var aggregate = new DynamicFormAggregate
                 {
-                    DynamicFormValues = dynamicFormValue,
+                    FormValues = dynamicFormValue,
+                    Categories = _dynamicFormRelationsFetcher.Categories,
                     Users = _dynamicFormRelationsFetcher.DynamicFormUsers,
                     Departments = _dynamicFormRelationsFetcher.Departments
                 };
