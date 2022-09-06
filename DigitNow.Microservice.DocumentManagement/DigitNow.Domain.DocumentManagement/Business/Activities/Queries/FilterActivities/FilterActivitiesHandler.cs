@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
@@ -11,21 +12,27 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterA
     public class FilterActivitiesHandler : IQueryHandler<FilterActivitiesQuery, ResultPagedList<ActivityViewModel>>
     {
         private readonly IActivityService _activityService;
+        private readonly IIdentityService _identityService;
         private readonly IMapper _mapper;
         private readonly ActivityRelationsFetcher _activityRelationsFetcher;
 
         public FilterActivitiesHandler(
             IActivityService activityService,
             IMapper mapper,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            IIdentityService identityService)
         {
             _activityService = activityService;
             _mapper = mapper;
+            _identityService = identityService;
             _activityRelationsFetcher = new ActivityRelationsFetcher(serviceProvider);
         }
 
         public async Task<ResultPagedList<ActivityViewModel>> Handle(FilterActivitiesQuery request, CancellationToken cancellationToken)
         {
+            var currentUser = await _identityService.GetCurrentUserAsync(cancellationToken);
+            request.DepartmentIds = currentUser.Departments.Select(c => c.Id);
+
             var totalItems = await _activityService.CountActivitiesAsync(request, cancellationToken);
 
             if (totalItems == 0)
@@ -36,7 +43,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterA
             var activitiesPagedList = await _activityService.GetActivitiesAsync(request, cancellationToken);
             await _activityRelationsFetcher.TriggerFetchersAsync(cancellationToken);
 
-            var activityViewModels = activitiesPagedList.List.Select(c => 
+            var activityViewModels = activitiesPagedList.List.Select(c =>
                 _mapper.Map<ActivityAggregate, ActivityViewModel>(new ActivityAggregate
                 {
                     Activity = c,

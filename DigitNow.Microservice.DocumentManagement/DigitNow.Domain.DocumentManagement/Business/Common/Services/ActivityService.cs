@@ -13,7 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     public interface IActivityService
     {
         Task<PagedList<Activity>> GetActivitiesAsync(FilterActivitiesQuery request, CancellationToken cancellationToken);
-        Task<long> CountActivitiesAsync(FilterActivitiesQuery requestFilter, CancellationToken cancellationToken);
+        Task<long> CountActivitiesAsync(FilterActivitiesQuery query, CancellationToken cancellationToken);
         Task<Activity> AddAsync(Activity activity, CancellationToken cancellationToken);
         Task UpdateAsync(Activity activity, CancellationToken cancellationToken);
         IQueryable<Activity> FindQuery();
@@ -31,17 +31,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         public async Task<PagedList<Activity>> GetActivitiesAsync(FilterActivitiesQuery request,
             CancellationToken cancellationToken)
         {
-            var descriptor = new FilterDescriptor<Activity>(_dbContext.Activities.AsNoTracking(), request.SortField, request.SortOrder);
+            var descriptor = new FilterDescriptor<Activity>(_dbContext.Activities.Where(c => request.DepartmentIds.Contains(c.DepartmentId)).AsNoTracking(), request.SortField, request.SortOrder);
             descriptor.Query(p => p.Id, request.Id, () => request.GetFilterMode(p => p.Id));
             var pagedResult = await descriptor.PaginateAsync(request.PageNumber, request.PageSize, cancellationToken);
 
             return pagedResult;
         }
 
-        public async Task<long> CountActivitiesAsync(FilterActivitiesQuery requestFilter,
+        public async Task<long> CountActivitiesAsync(FilterActivitiesQuery query,
             CancellationToken cancellationToken)
         {
-            return await _dbContext.Activities.CountAsync(cancellationToken);
+            return await _dbContext.Activities.CountAsync(c => query.DepartmentIds.Contains(c.DepartmentId), cancellationToken);
         }
 
         public async Task<Activity> AddAsync(Activity activity, CancellationToken token)
