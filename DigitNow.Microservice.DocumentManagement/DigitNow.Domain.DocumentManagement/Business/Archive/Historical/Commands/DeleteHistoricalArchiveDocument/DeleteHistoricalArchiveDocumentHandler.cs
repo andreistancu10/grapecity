@@ -25,10 +25,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Archive.Historical.Command
                     Parameters = new object[] { request.Id }
                 });
 
-            var dynamicFormFieldValue = await _dbContext.DynamicFormFieldValues.Where(x => x.DynamicFormFillingLogId == request.Id).ToArrayAsync();
+            var dynamicFormFieldValue = await _dbContext.DynamicFormFieldValues.Where(x => x.DynamicFormFillingLogId == request.Id).ToArrayAsync(cancellationToken);
             _dbContext.RemoveRange(dynamicFormFieldValue);
             _dbContext.DynamicFormFillingLogs.Remove(document);
-            await _dbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync(cancellationToken);
             return ResultObject.Ok();
         }
     }
