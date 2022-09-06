@@ -7,6 +7,7 @@ using System.Text;
 using DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterActivities;
 using HTSS.Platform.Infrastructure.Data.Abstractions;
 using HTSS.Platform.Infrastructure.Data.EntityFramework;
+using Nest;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -31,8 +32,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         public async Task<PagedList<Activity>> GetActivitiesAsync(FilterActivitiesQuery request,
             CancellationToken cancellationToken)
         {
-            var descriptor = new FilterDescriptor<Activity>(_dbContext.Activities.Where(c => request.DepartmentIds.Contains(c.DepartmentId)).AsNoTracking(), request.SortField, request.SortOrder);
+            var descriptor = new FilterDescriptor<Activity>(_dbContext.Activities.AsNoTracking(), request.SortField, request.SortOrder);
             descriptor.Query(p => p.Id, request.Id, () => request.GetFilterMode(p => p.Id));
+            descriptor.Query(p=>request.DepartmentIds.Contains(p.DepartmentId));
             var pagedResult = await descriptor.PaginateAsync(request.PageNumber, request.PageSize, cancellationToken);
 
             return pagedResult;

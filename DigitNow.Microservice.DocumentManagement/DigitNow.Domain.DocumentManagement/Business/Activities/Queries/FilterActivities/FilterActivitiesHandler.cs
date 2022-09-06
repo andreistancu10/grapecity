@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
+using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
@@ -41,7 +42,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterA
             }
 
             var activitiesPagedList = await _activityService.GetActivitiesAsync(request, cancellationToken);
-            await _activityRelationsFetcher.TriggerFetchersAsync(cancellationToken);
+            await _activityRelationsFetcher.UseActivityFetcherContext(
+                    new ActivitiesFetcherContext
+                    {
+                        Activities = activitiesPagedList.List
+                    })
+                .TriggerFetchersAsync(cancellationToken);
 
             var activityViewModels = activitiesPagedList.List.Select(c =>
                 _mapper.Map<ActivityAggregate, ActivityViewModel>(new ActivityAggregate
