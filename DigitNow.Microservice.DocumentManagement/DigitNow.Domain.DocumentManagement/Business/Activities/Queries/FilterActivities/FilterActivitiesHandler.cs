@@ -26,27 +26,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterA
 
         public async Task<ResultPagedList<ActivityViewModel>> Handle(FilterActivitiesQuery request, CancellationToken cancellationToken)
         {
-            var totalItems = await _activityService.CountActivitiesAsync(request.Filter, cancellationToken);
-
-            var pagingHeader = new PagingHeader(
-                (int)totalItems,
-                request.Page,
-                request.Count,
-                (int)Math.Ceiling((decimal)totalItems / request.Count));
+            var totalItems = await _activityService.CountActivitiesAsync(request, cancellationToken);
 
             if (totalItems == 0)
             {
-                return new ResultPagedList<ActivityViewModel>(pagingHeader, null);
+                return new ResultPagedList<ActivityViewModel>(new PagingHeader(0, 0, 0, 0), null);
             }
 
-            var activities = await _activityService.GetActivitiesAsync(request.Filter,
-                request.Page,
-                request.Count,
-                cancellationToken);
-
+            var activitiesPagedList = await _activityService.GetActivitiesAsync(request, cancellationToken);
             await _activityRelationsFetcher.TriggerFetchersAsync(cancellationToken);
 
-            var result = activities.Select(c =>
+            var activityViewModels = activitiesPagedList.List.Select(c => 
                 _mapper.Map<ActivityAggregate, ActivityViewModel>(new ActivityAggregate
                 {
                     Activity = c,
@@ -55,9 +45,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterA
                 }))
                 .ToList();
 
-            var resultPage = new ResultPagedList<ActivityViewModel>(pagingHeader, result);
+            var resultPagedList = new ResultPagedList<ActivityViewModel>(activitiesPagedList.GetHeader(), activityViewModels);
 
-            return resultPage;
+            return resultPagedList;
         }
     }
 }

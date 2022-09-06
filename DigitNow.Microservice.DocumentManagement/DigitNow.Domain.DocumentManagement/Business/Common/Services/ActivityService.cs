@@ -4,14 +4,16 @@ using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Text;
-using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities;
+using DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterActivities;
+using HTSS.Platform.Infrastructure.Data.Abstractions;
+using HTSS.Platform.Infrastructure.Data.EntityFramework;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IActivityService
     {
-        Task<List<Activity>> GetActivitiesAsync(ActivityFilter requestFilter, int requestPage, int requestCount, CancellationToken cancellationToken);
-        Task<long> CountActivitiesAsync(ActivityFilter requestFilter, CancellationToken cancellationToken);
+        Task<PagedList<Activity>> GetActivitiesAsync(FilterActivitiesQuery request, CancellationToken cancellationToken);
+        Task<long> CountActivitiesAsync(FilterActivitiesQuery requestFilter, CancellationToken cancellationToken);
         Task<Activity> AddAsync(Activity activity, CancellationToken cancellationToken);
         Task UpdateAsync(Activity activity, CancellationToken cancellationToken);
         IQueryable<Activity> FindQuery();
@@ -26,13 +28,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             _dbContext = dbContext;
         }
 
-        public async Task<List<Activity>> GetActivitiesAsync(ActivityFilter requestFilter, int requestPage, int requestCount,
+        public async Task<PagedList<Activity>> GetActivitiesAsync(FilterActivitiesQuery request,
             CancellationToken cancellationToken)
         {
-            return await _dbContext.Activities.ToListAsync(cancellationToken);
+            var descriptor = new FilterDescriptor<Activity>(_dbContext.Activities.AsNoTracking(), request.SortField, request.SortOrder);
+            descriptor.Query(p => p.Id, request.Id, () => request.GetFilterMode(p => p.Id));
+            var pagedResult = await descriptor.PaginateAsync(request.PageNumber, request.PageSize, cancellationToken);
+
+            return pagedResult;
         }
 
-        public async Task<long> CountActivitiesAsync(ActivityFilter requestFilter, CancellationToken cancellationToken)
+        public async Task<long> CountActivitiesAsync(FilterActivitiesQuery requestFilter,
+            CancellationToken cancellationToken)
         {
             return await _dbContext.Activities.CountAsync(cancellationToken);
         }
