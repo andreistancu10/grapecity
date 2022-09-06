@@ -12,7 +12,9 @@ namespace DigitNow.Domain.DocumentManagement.Public.Common.Mappings
             CreateMap<GetHistoricalArchiveDocumentsRequest, GetHistoricalArchiveDocumentsQuery>()
                 .ForMember(x => x.Filter, opt => opt.MapFrom(src => src.Filter ?? new HistoricalArchiveDocumentsFilterDto()));
 
-            CreateMap<HistoricalArchiveDocumentsFilterDto, DynamicFormsFilter>();
+            CreateMap<HistoricalArchiveDocumentsFilterDto, DynamicFormsFilter>()
+                .ForMember(x => x.DynamicFormCategoryFilter, opt => opt.MapFrom(src => src.CategoryFilter))
+                .ForMember(x => x.DynamicFormsRegistrationDateFilter, opt => opt.MapFrom(src => src.RegistrationDateFilter));
             {
                 CreateMap<HistoricalArchiveDocumentsRegistrationDateFilterDto, DynamicFormsRegistrationDateFilter>()
                     .ForMember(m => m.From, opt => opt.MapFrom(src => src.From))
