@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
+using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Infrastructure.Data.Abstractions;
 
@@ -11,13 +12,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterA
     {
         private readonly IActivityService _activityService;
         private readonly IMapper _mapper;
+        private readonly ActivityRelationsFetcher _activityRelationsFetcher;
 
         public FilterActivitiesHandler(
             IActivityService activityService,
-            IMapper mapper)
+            IMapper mapper,
+            IServiceProvider serviceProvider)
         {
             _activityService = activityService;
             _mapper = mapper;
+            _activityRelationsFetcher = new ActivityRelationsFetcher(serviceProvider);
         }
 
         public async Task<ResultPagedList<ActivityViewModel>> Handle(FilterActivitiesQuery request, CancellationToken cancellationToken)
@@ -40,8 +44,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterA
                 request.Count,
                 cancellationToken);
 
-            var viewModels = _mapper.Map<List<Activity>, List<ActivityViewModel>>(activities);
-            var resultPage = new ResultPagedList<ActivityViewModel>(pagingHeader, viewModels);
+            await _activityRelationsFetcher.TriggerFetchersAsync(cancellationToken);
+
+            var result = activities.Select(c =>
+                _mapper.Map<ActivityAggregate, ActivityViewModel>(new ActivityAggregate
+                {
+                    Activity = c,
+                    Departments = _activityRelationsFetcher.Departments,
+                    Users = _activityRelationsFetcher.Users
+                }))
+                .ToList();
+
+            var resultPage = new ResultPagedList<ActivityViewModel>(pagingHeader, result);
 
             return resultPage;
         }

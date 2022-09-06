@@ -1,9 +1,10 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Activities;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Text;
+using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -18,12 +19,24 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
     public class ActivityService : IActivityService
     {
-        protected readonly DocumentManagementDbContext _dbContext;
+        private readonly DocumentManagementDbContext _dbContext;
 
         public ActivityService(DocumentManagementDbContext dbContext)
         {
             _dbContext = dbContext;
         }
+
+        public async Task<List<Activity>> GetActivitiesAsync(ActivityFilter requestFilter, int requestPage, int requestCount,
+            CancellationToken cancellationToken)
+        {
+            return await _dbContext.Activities.ToListAsync(cancellationToken);
+        }
+
+        public async Task<long> CountActivitiesAsync(ActivityFilter requestFilter, CancellationToken cancellationToken)
+        {
+            return await _dbContext.Activities.CountAsync(cancellationToken);
+        }
+
         public async Task<Activity> AddAsync(Activity activity, CancellationToken token)
         {
             activity.State = ScimState.Active;
