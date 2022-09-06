@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Archive.Commands;
+using DigitNow.Domain.DocumentManagement.Business.Archive.Historical.Commands.DeleteHistoricalArchiveDocument;
 using DigitNow.Domain.DocumentManagement.Business.Archive.Queries;
-using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
 using DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.GetDynamicForms;
 using DigitNow.Domain.DocumentManagement.Public.Archive.Models;
 using DigitNow.Domain.DocumentManagement.Public.Dashboard.Models;
@@ -49,6 +49,19 @@ namespace DigitNow.Domain.DocumentManagement.Public.Archive
         {
             var query = _mapper.Map<GetHistoricalArchiveDocumentsQuery>(request);
             return Ok(await _mediator.Send(query, cancellationToken));
+        }
+
+        [HttpDelete("historical/delete/{id}")]
+        public async Task<IActionResult> DeleteHistoricalArchiveDocumentAsync([FromRoute] long id, CancellationToken cancellationToken)
+        {
+            var request = new DeleteHistoricalArchiveDocumentCommand
+            {
+                Id = id
+            };
+
+            var deleteDocumentCommand = _mapper.Map<DeleteHistoricalArchiveDocumentCommand>(request);
+
+            return CreateResponse(await _mediator.Send(deleteDocumentCommand, cancellationToken));
         }
     }
 }
