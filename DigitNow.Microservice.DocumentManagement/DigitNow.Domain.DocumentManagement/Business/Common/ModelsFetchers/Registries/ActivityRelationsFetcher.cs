@@ -9,16 +9,20 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
     {
         public IReadOnlyList<UserModel> Users => GetItems<ActivityUsersFetcher, UserModel>();
         public IReadOnlyList<DepartmentModel> Departments => GetItems<GenericDepartmentsFetcher, DepartmentModel>();
+        public IReadOnlyList<ObjectiveModel> SpecificObjective => GetItems<ActivitySpecificObjectiveFetcher, ObjectiveModel>();
+        public IReadOnlyList<ObjectiveModel> GeneralObjective => GetItems<ActivityGeneralObjectiveFetcher, ObjectiveModel>();
 
         public ActivityRelationsFetcher(IServiceProvider serviceProvider) : base(serviceProvider)
         {
         }
-        
+
         public ActivityRelationsFetcher UseActivityFetcherContext(ActivitiesFetcherContext context)
         {
             Aggregator
                 .UseRemoteFetcher<ActivityUsersFetcher>(context)
-                .UseGenericRemoteFetcher<GenericDepartmentsFetcher>();
+                .UseGenericRemoteFetcher<GenericDepartmentsFetcher>()
+                .UseInternalFetcher<ActivitySpecificObjectiveFetcher>(context)
+                .UseInternalFetcher<ActivityGeneralObjectiveFetcher>(context);
 
             return this;
         }

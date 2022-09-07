@@ -5,8 +5,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
     public class ActivityViewModel
     {
         public long Id { get; set; }
-        public long GeneralObjectiveId { get; set; }
-        public long SpecificObjectiveId { get; set; }
+        public BasicViewModel GeneralObjective { get; set; }
+        public BasicViewModel SpecificObjective { get; set; }
         public BasicViewModel Department { get; set; }
         public string Code { get; set; }
         public string Title { get; set; }

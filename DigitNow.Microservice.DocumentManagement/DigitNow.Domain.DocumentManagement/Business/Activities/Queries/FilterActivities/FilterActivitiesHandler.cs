@@ -54,7 +54,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterA
                 {
                     Activity = c,
                     Departments = _activityRelationsFetcher.Departments,
-                    Users = _activityRelationsFetcher.Users
+                    Users = _activityRelationsFetcher.Users,
+                    GeneralObjectives = _activityRelationsFetcher.GeneralObjective,
+                    SpecificObjectives = _activityRelationsFetcher.SpecificObjective
                 }))
                 .ToList();
 
