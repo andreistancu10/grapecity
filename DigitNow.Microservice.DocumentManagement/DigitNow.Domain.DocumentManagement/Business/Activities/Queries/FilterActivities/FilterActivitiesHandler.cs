@@ -33,15 +33,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterA
         {
             var currentUser = await _identityService.GetCurrentUserAsync(cancellationToken);
             request.DepartmentIds = currentUser.Departments.Select(c => c.Id);
+            var activitiesPagedList = await _activityService.GetActivitiesAsync(request, cancellationToken);
 
-            var totalItems = await _activityService.CountActivitiesAsync(request, cancellationToken);
-
-            if (totalItems == 0)
+            if (activitiesPagedList.List.Count == 0)
             {
                 return new ResultPagedList<ActivityViewModel>(new PagingHeader(0, 0, 0, 0), null);
             }
 
-            var activitiesPagedList = await _activityService.GetActivitiesAsync(request, cancellationToken);
             await _activityRelationsFetcher.UseActivityFetcherContext(
                     new ActivitiesFetcherContext
                     {
