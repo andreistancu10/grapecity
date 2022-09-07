@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Archive.Commands;
-using DigitNow.Domain.DocumentManagement.Business.Archive.Historical.Commands.DeleteHistoricalArchiveDocument;
+using DigitNow.Domain.DocumentManagement.Business.Archive.Historical.Commands.RemoveHistoricalArchiveDocument;
 using DigitNow.Domain.DocumentManagement.Business.Archive.Queries;
 using DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.GetDynamicForms;
 using DigitNow.Domain.DocumentManagement.Public.Archive.Models;
@@ -35,9 +35,9 @@ namespace DigitNow.Domain.DocumentManagement.Public.Archive
         }
 
         [HttpPut("operational/delete")]
-        public async Task<IActionResult> DeleteDocument([FromBody] DeleteDocumentRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> RemoveDocument([FromBody] RemoveDocumentRequest request, CancellationToken cancellationToken)
         {
-            var deleteDocumentCommand = _mapper.Map<DeleteDocumentCommand>(request);
+            var deleteDocumentCommand = _mapper.Map<RemoveDocumentCommand>(request);
             return CreateResponse(await _mediator.Send(deleteDocumentCommand, cancellationToken));
         }
 
@@ -49,11 +49,11 @@ namespace DigitNow.Domain.DocumentManagement.Public.Archive
         }
 
         [HttpDelete("historical/delete/{id}")]
-        public async Task<IActionResult> DeleteHistoricalArchiveDocumentAsync([FromRoute] long id, CancellationToken cancellationToken)
+        public async Task<IActionResult> RemoveHistoricalArchiveDocumentAsync([FromRoute] long id, CancellationToken cancellationToken)
         {
-            var request = new DeleteHistoricalArchiveDocumentCommand { Id = id };
+            var request = new RemoveHistoricalArchiveDocumentCommand { Id = id };
 
-            var deleteDocumentCommand = _mapper.Map<DeleteHistoricalArchiveDocumentCommand>(request);
+            var deleteDocumentCommand = _mapper.Map<RemoveHistoricalArchiveDocumentCommand>(request);
 
             return CreateResponse(await _mediator.Send(deleteDocumentCommand, cancellationToken));
         }

@@ -1,6 +1,6 @@
 ﻿namespace DigitNow.Domain.DocumentManagement.Public.Archive.Models
 {
-    public class DeleteHistoricalArchiveDocumentRequest
+    public class RemoveHistoricalArchiveDocumentRequest
     {
         public long Id { get; set; }
     }
