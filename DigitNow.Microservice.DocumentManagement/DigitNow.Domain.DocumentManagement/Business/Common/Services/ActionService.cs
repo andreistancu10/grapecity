@@ -1,15 +1,21 @@
-﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
+﻿using DigitNow.Domain.DocumentManagement.Business.Actions.Queries.FilterActions;
+using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Data;
+using HTSS.Platform.Infrastructure.Data.Abstractions;
+using HTSS.Platform.Infrastructure.Data.EntityFramework;
 using Microsoft.EntityFrameworkCore;
+using Action = DigitNow.Domain.DocumentManagement.Data.Entities.Action;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IActionService
     {
-        Task<Data.Entities.Actions.Action> CreateAsync(Data.Entities.Actions.Action action, CancellationToken cancellationToken);
-        Task UpdateAsync(Data.Entities.Actions.Action action, CancellationToken cancellationToken);
-        IQueryable<Data.Entities.Actions.Action> FindQuery();
+        Task<PagedList<Action>> GetActionsAsync(FilterActionsQuery request, CancellationToken cancellationToken);
+        Task<Action> CreateAsync(Action action, CancellationToken cancellationToken);
+        Task UpdateAsync(Action action, CancellationToken cancellationToken);
+        IQueryable<Action> FindQuery();
     }
+
     public class ActionService : IActionService
     {
         private readonly DocumentManagementDbContext _dbContext;
@@ -18,7 +24,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             _dbContext = dbContext;
         }
-        public async Task<Data.Entities.Actions.Action> CreateAsync(Data.Entities.Actions.Action action, CancellationToken cancellationToken)
+
+        public async Task<PagedList<Action>> GetActionsAsync(FilterActionsQuery request, CancellationToken cancellationToken)
+        {
+            var descriptor = new FilterDescriptor<Action>(_dbContext.Actions.AsNoTracking(), request.SortField, request.SortOrder);
+            descriptor.Query(p => request.DepartmentIds.Contains(p.DepartmentId));
+            descriptor.Query(p => p.ActivityId == request.ActivityId);
+            var pagedResult = await descriptor.PaginateAsync(request.PageNumber, request.PageSize, cancellationToken);
+
+            return pagedResult;
+        }
+
+        public async Task<Action> CreateAsync(Action action, CancellationToken cancellationToken)
         {
             action.State = ScimState.Active;
             await SetActionCodeAsync(action, cancellationToken);
@@ -28,28 +45,27 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return action;
         }
 
-        public async Task UpdateAsync(Data.Entities.Actions.Action action, CancellationToken cancellationToken)
+        public async Task UpdateAsync(Action action, CancellationToken cancellationToken)
         {
             await _dbContext.SingleUpdateAsync(action, cancellationToken);
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public IQueryable<Data.Entities.Actions.Action> FindQuery()
+        public IQueryable<Action> FindQuery()
         {
             return _dbContext.Actions.AsQueryable();
         }
 
-
-        private async Task SetActionCodeAsync(Data.Entities.Actions.Action action, CancellationToken token)
+        private async Task SetActionCodeAsync(Action action, CancellationToken token)
         {
             var lastAction = await _dbContext.Actions
                 .Where(item => item.CreatedAt.Year == DateTime.UtcNow.Year && item.ActivityId == action.ActivityId)
                 .OrderByDescending(p => p.CreatedAt)
                 .FirstOrDefaultAsync(token);
 
-            var order = lastAction != null ? lastAction.Id : 0;
+            var order = lastAction?.Id ?? 0;
             var activity = await _dbContext.Activities
-                .FirstOrDefaultAsync(x => x.Id == action.ActivityId);
+                .FirstOrDefaultAsync(x => x.Id == action.ActivityId, token);
 
             if (activity != null)
             {

@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Actions.Commands;
 using DigitNow.Domain.DocumentManagement.Business.Actions.Commands.Update;
+using DigitNow.Domain.DocumentManagement.Business.Actions.Queries.FilterActions;
 using DigitNow.Domain.DocumentManagement.Business.Actions.Queries.GetById;
+using DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterActivities;
 using DigitNow.Domain.DocumentManagement.Public.Actions.Models;
+using DigitNow.Domain.DocumentManagement.Public.Activities.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -21,6 +24,18 @@ namespace DigitNow.Domain.DocumentManagement.Public.Actions
         {
             _mediator = mediator;
             _mapper = mapper;
+        }
+
+        [HttpPost("filter")]
+        public async Task<IActionResult> GetActionsAsync([FromBody] FilterActionsRequest request, CancellationToken cancellationToken)
+        {
+            var query = _mapper.Map<FilterActionsQuery>(request);
+
+            return await _mediator.Send(query, cancellationToken) switch
+            {
+                null => BadRequest(),
+                var result => Ok(result)
+            };
         }
 
         [HttpPost]

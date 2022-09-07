@@ -30,7 +30,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Commands
         }
         public async Task<ResultObject> Handle(CreateActionCommand request, CancellationToken cancellationToken)
         {
-            var newAction = _mapper.Map<Data.Entities.Actions.Action>(request);
+            var newAction = _mapper.Map<Data.Entities.Action>(request);
             await _actionService.CreateAsync(newAction, cancellationToken);
 
             if (request.ActionFunctionariesIds.Any())

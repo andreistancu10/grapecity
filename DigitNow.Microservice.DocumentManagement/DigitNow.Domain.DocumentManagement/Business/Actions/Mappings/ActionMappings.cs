@@ -9,8 +9,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Mappings
     {
         public ActionMappings()
         {
-            CreateMap<CreateActionCommand, Data.Entities.Actions.Action>();
-            CreateMap<Data.Entities.Actions.Action, GetActionByIdResponse>();
+            CreateMap<CreateActionCommand, Data.Entities.Action>();
+            CreateMap<Data.Entities.Action, GetActionByIdResponse>();
             CreateMap<ActionFunctionary, ActionFunctionaryResponse>();  
         }
     }

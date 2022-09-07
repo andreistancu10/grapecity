@@ -54,7 +54,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<DynamicFormFillingLog> DynamicFormFillingLogs { get; set; }
         public DbSet<Activity> Activities { get; set; }
         public DbSet<ActivityFunctionary> ActivityFunctionaries { get; set; }
-        public DbSet<Entities.Actions.Action> Actions { get; set; }
+        public DbSet<Entities.Action> Actions { get; set; }
         public DbSet<ActionFunctionary> ActionFunctionaries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -19,7 +19,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public GeneralObjective AssociatedGeneralObjective { get; set; }
         public SpecificObjective AssociatedSpecificObjective { get; set; }
         public List<ActivityFunctionary> ActivityFunctionarys { get; set; }
-        public List<Actions.Action> Actions { get; set; }
+        public List<Action> Actions { get; set; }
         #endregion
     }
 }
