@@ -1,5 +1,5 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 

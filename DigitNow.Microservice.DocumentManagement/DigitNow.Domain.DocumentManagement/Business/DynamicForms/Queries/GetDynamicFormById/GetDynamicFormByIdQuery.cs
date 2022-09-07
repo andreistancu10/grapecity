@@ -5,6 +5,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.GetDy
 {
     public class GetDynamicFormByIdQuery :  IQuery<DynamicFormViewModel>
     {
-        public long Id { get; set; }
+        public long FormId { get; set; }
+        public long? FormFillingId { get; set; }
     }
 }

@@ -3,7 +3,7 @@ using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {

@@ -10,5 +10,6 @@
         public int FieldType { get; set; }
         public bool Required { get; set; }
         public string InitialValue { get; set; }
+        public string Value { get; set; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace DigitNow.Domain.DocumentManagement.Data.Entities.Seed
 {
-    public static partial class Data
+    public static class DynamicFormFieldMappingsData
     {
         public static IEnumerable<DynamicFormFieldMapping> GetFormFieldMappings()
         {

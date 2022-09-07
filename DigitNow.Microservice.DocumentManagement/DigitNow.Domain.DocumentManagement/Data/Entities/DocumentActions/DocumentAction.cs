@@ -1,6 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities.DocumentActions
+namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
     public class DocumentAction : ExtendedEntity
     {

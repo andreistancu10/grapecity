@@ -5,15 +5,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Archive.Commands
 {
-    public class DeleteDocumentHandler : ICommandHandler<DeleteDocumentCommand, ResultObject>
+    public class RemoveDocumentHandler : ICommandHandler<RemoveDocumentCommand, ResultObject>
     {
         private readonly DocumentManagementDbContext _dbContext;
-        public DeleteDocumentHandler(DocumentManagementDbContext dbContext)
+
+        public RemoveDocumentHandler(DocumentManagementDbContext dbContext)
         {
             _dbContext = dbContext;
         }
 
-        public async Task<ResultObject> Handle(DeleteDocumentCommand request, CancellationToken cancellationToken)
+        public async Task<ResultObject> Handle(RemoveDocumentCommand request, CancellationToken cancellationToken)
         {
             var document = await _dbContext.Documents.FirstOrDefaultAsync(document => document.Id == request.DocumentId, cancellationToken);
             if (document == null)

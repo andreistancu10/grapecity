@@ -1,6 +1,4 @@
-﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.DynamicForms;
-using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.DynamicForms;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
@@ -17,23 +15,28 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         IQueryable<DynamicForm> GetDynamicFormsQueryAsync();
         IIncludableQueryable<DynamicFormFieldMapping, DynamicFormField> GetDynamicFormFieldMappingsQueryable(long dynamicFormId);
-        Task<DynamicFormViewModel> GetDynamicFormViewModelAsync(long dynamicFormId, CancellationToken cancellationToken);
+        Task<DynamicFormViewModel> GetDynamicFormViewModelAsync(long dynamicFormId, long? dynamicFormFillingLogId, CancellationToken token);
         Task<int> CountDynamicFilledFormsAsync(DynamicFormsFilter filter, CancellationToken cancellationToken);
         Task<List<DynamicFormFillingLog>> GetDynamicFilledFormsAsync(DynamicFormsFilter filter, int page, int count, CancellationToken token);
         Task SaveDataForDynamicFormAsync(long dynamicFormId, List<KeyValueRequestModel> values, CancellationToken cancellationToken);
+        Task RemoveDynamicFormFillingLogAsync(long dynamicFormFillingLogId, CancellationToken token);
+        Task<bool> DynamicFormFillingLogExists(long dynamicFormFillingLogId, CancellationToken token);
     }
 
     public class DynamicFormsService : IDynamicFormsService
     {
         private readonly DocumentManagementDbContext _dbContext;
-        private readonly IMapper _mapper;
         private readonly IServiceProvider _serviceProvider;
+        private readonly IDynamicFormsMappingService _mappingService;
 
-        public DynamicFormsService(DocumentManagementDbContext context, IMapper mapper, IServiceProvider serviceProvider)
+        public DynamicFormsService(
+            DocumentManagementDbContext context, 
+            IServiceProvider serviceProvider,
+            IDynamicFormsMappingService mappingService)
         {
             _dbContext = context;
-            _mapper = mapper;
             _serviceProvider = serviceProvider;
+            _mappingService = mappingService;
         }
 
         public IIncludableQueryable<DynamicFormFieldMapping, DynamicFormField> GetDynamicFormFieldMappingsQueryable(long dynamicFormId)
@@ -43,28 +46,30 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .Include(c => c.DynamicFormField);
         }
 
-        public async Task<DynamicFormViewModel> GetDynamicFormViewModelAsync(long dynamicFormId, CancellationToken cancellationToken)
+        public async Task<DynamicFormViewModel> GetDynamicFormViewModelAsync(long dynamicFormId, long? dynamicFormFillingLogId, CancellationToken token)
         {
-            var dynamicForm = await _dbContext.DynamicForms.FirstOrDefaultAsync(c => c.Id == dynamicFormId, cancellationToken);
-            var dynamicFormFieldMappings = await GetDynamicFormFieldMappingsQueryable(dynamicFormId).ToListAsync(cancellationToken);
-            var dynamicFormFields = dynamicFormFieldMappings.Select(c => c.DynamicFormField).ToList();
-            var dynamicFormControlViewModels = new List<DynamicFormControlViewModel>();
+            var dynamicForm = await _dbContext.DynamicForms
+                .FirstOrDefaultAsync(c => c.Id == dynamicFormId, token);
+            if (dynamicForm == null) throw new InvalidOperationException($"No corresponding dynamic form was found for identifier '{dynamicFormId}'.");
 
-            foreach (var mapping in dynamicFormFieldMappings)
+            var dynamicFormFieldMappings = await GetDynamicFormFieldMappingsQueryable(dynamicFormId)
+                .ToListAsync(token);
+
+            var dynamicFormFields = dynamicFormFieldMappings.Select(c => c.DynamicFormField)
+                .ToList();
+
+            if (dynamicFormFillingLogId.HasValue)
             {
-                var dynamicFormControlViewModel = _mapper.Map<DynamicFormControlViewModel>(new DynamicFormControlAggregate
-                {
-                    DynamicFormFields = dynamicFormFields,
-                    DynamicFormFieldMapping = mapping
-                });
+                var dynamicFormFillingLog = await _dbContext.DynamicFormFillingLogs
+                    .FirstAsync(x => x.Id == dynamicFormFillingLogId, token);
 
-                dynamicFormControlViewModels.Add(dynamicFormControlViewModel);
+                var dynamicFormFieldsValues = await _dbContext.DynamicFormFieldValues.Where(x => x.DynamicFormFillingLogId == dynamicFormFillingLog.Id)
+                    .ToListAsync(token);
+
+                return _mappingService.MapToDynamicFormViewModel(dynamicForm, dynamicFormFieldMappings, dynamicFormFields, dynamicFormFieldsValues);
             }
 
-            var dynamicFormViewModel = _mapper.Map<DynamicFormViewModel>(dynamicForm);
-            dynamicFormViewModel.DynamicFormControls = dynamicFormControlViewModels;
-
-            return dynamicFormViewModel;
+            return _mappingService.MapToDynamicFormViewModel(dynamicForm, dynamicFormFieldMappings, dynamicFormFields);
         }
 
         public IQueryable<DynamicForm> GetDynamicFormsQueryAsync()
@@ -120,6 +125,25 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                  .ToListAsync(token);
 
             return dynamicForms;
+        }
+
+        public async Task RemoveDynamicFormFillingLogAsync(long dynamicFormFillingLogId, CancellationToken token)
+        {
+            var dynamicFormFillingLog = await _dbContext.DynamicFormFillingLogs.FirstAsync(x => x.Id == dynamicFormFillingLogId, token);
+
+            _dbContext.DynamicFormFillingLogs.Remove(dynamicFormFillingLog);
+
+            var dynamicFormFieldValue = await _dbContext.DynamicFormFieldValues.Where(x => x.DynamicFormFillingLogId == dynamicFormFillingLogId)
+                .ToListAsync(token);
+
+            _dbContext.RemoveRange(dynamicFormFieldValue);
+
+            await _dbContext.SaveChangesAsync(token);
+        }
+
+        public Task<bool> DynamicFormFillingLogExists(long dynamicFormFillingLogId, CancellationToken token)
+        {
+            return _dbContext.DynamicFormFillingLogs.AnyAsync(x => x.Id == dynamicFormFillingLogId, token);
         }
 
         private Task<DataExpressions<DynamicFormFillingLog>> GetDynamicFormsExpressionsAsync(DynamicFormsFilter filter, CancellationToken token)

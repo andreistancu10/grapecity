@@ -1,22 +1,25 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.GetDynamicForms;
+﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.GetDynamicForms;
 using DigitNow.Domain.DocumentManagement.Data.Filters.DynamicForms;
 using DigitNow.Domain.DocumentManagement.Public.DynamicForms.Models;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Common.Mappings
 {
-    public class GetDynamicFormsMappings : AutoMapper.Profile
+    public class GetDynamicFormsMappings : Profile
     {
         public GetDynamicFormsMappings()
         {
-            CreateMap<GetDynamicFormFillingLogsRequest, GetDynamicFormFillingLogsQuery>()
-                .ForMember(x => x.Filter, opt => opt.MapFrom(src => src.Filter ?? new DynamicFormsFilterDto()));
+            CreateMap<GetHistoricalArchiveDocumentsRequest, GetHistoricalArchiveDocumentsQuery>()
+                .ForMember(x => x.Filter, opt => opt.MapFrom(src => src.Filter ?? new HistoricalArchiveDocumentsFilterDto()));
 
-            CreateMap<DynamicFormsFilterDto, DynamicFormsFilter>();
+            CreateMap<HistoricalArchiveDocumentsFilterDto, DynamicFormsFilter>()
+                .ForMember(x => x.DynamicFormCategoryFilter, opt => opt.MapFrom(src => src.CategoryFilter))
+                .ForMember(x => x.DynamicFormsRegistrationDateFilter, opt => opt.MapFrom(src => src.RegistrationDateFilter));
             {
-                CreateMap<DynamicFormsRegistrationDateFilterDto, DynamicFormsRegistrationDateFilter>()
+                CreateMap<HistoricalArchiveDocumentsRegistrationDateFilterDto, DynamicFormsRegistrationDateFilter>()
                     .ForMember(m => m.From, opt => opt.MapFrom(src => src.From))
                     .ForMember(m => m.To, opt => opt.MapFrom(src => src.To));
-                CreateMap<DynamicFormCategoryFilterDto, DynamicFormCategoryFilter>()
+                CreateMap<HistoricalArchiveDocumentsCategoryFilterDto, DynamicFormCategoryFilter>()
                     .ForMember(m => m.CategoryId, opt => opt.MapFrom(src => src.CategoryId));
             }
         }

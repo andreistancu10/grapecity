@@ -1,9 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
-using DigitNow.Domain.DocumentManagement.Data.Extensions;
-using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {

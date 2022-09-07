@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Archive.Commands;
+using DigitNow.Domain.DocumentManagement.Business.Archive.Historical.Commands.RemoveHistoricalArchiveDocument;
 using DigitNow.Domain.DocumentManagement.Business.Archive.Queries;
-using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
+using DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.GetDynamicForms;
 using DigitNow.Domain.DocumentManagement.Public.Archive.Models;
 using DigitNow.Domain.DocumentManagement.Public.Dashboard.Models;
+using DigitNow.Domain.DocumentManagement.Public.DynamicForms.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -11,7 +13,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Archive
 {
-
     [Authorize]
     [ApiController]
     [Route("api/archive")]
@@ -20,7 +21,6 @@ namespace DigitNow.Domain.DocumentManagement.Public.Archive
         private readonly IMediator _mediator;
         private readonly IMapper _mapper;
 
-
         public ArchiveController(IMediator mediator, IMapper mapper)
         {
             _mediator = mediator;
@@ -28,16 +28,32 @@ namespace DigitNow.Domain.DocumentManagement.Public.Archive
         }
 
         [HttpPost("operational/get-documents")]
-        public async Task<ActionResult<List<GetDocumentsResponse>>> GetDocumentsAsync([FromBody] GetDocumentsRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetOperationalArchiveDocumentsAsync([FromBody] GetDocumentsRequest request, CancellationToken cancellationToken)
         {
             var query = _mapper.Map<GetDocumentsOperationalArchiveQuery>(request);
             return Ok(await _mediator.Send(query, cancellationToken));
         }
 
         [HttpPut("operational/delete")]
-        public async Task<IActionResult> DeleteDocument([FromBody] DeleteDocumentRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> RemoveDocument([FromBody] RemoveDocumentRequest request, CancellationToken cancellationToken)
         {
-            var deleteDocumentCommand = _mapper.Map<DeleteDocumentCommand>(request);
+            var deleteDocumentCommand = _mapper.Map<RemoveDocumentCommand>(request);
+            return CreateResponse(await _mediator.Send(deleteDocumentCommand, cancellationToken));
+        }
+
+        [HttpPost("historical/get-documents")]
+        public async Task<IActionResult> GetHistoricalArchiveDocumentsAsync([FromBody] GetHistoricalArchiveDocumentsRequest request, CancellationToken cancellationToken)
+        {
+            var query = _mapper.Map<GetHistoricalArchiveDocumentsQuery>(request);
+            return CreateResponse(await _mediator.Send(query, cancellationToken));
+        }
+
+        [HttpDelete("historical/delete/{id}")]
+        public async Task<IActionResult> RemoveHistoricalArchiveDocumentAsync([FromRoute] long id, CancellationToken cancellationToken)
+        {
+            var request = new RemoveHistoricalArchiveDocumentCommand { Id = id };
+
+            var deleteDocumentCommand = _mapper.Map<RemoveHistoricalArchiveDocumentCommand>(request);
 
             return CreateResponse(await _mediator.Send(deleteDocumentCommand, cancellationToken));
         }
