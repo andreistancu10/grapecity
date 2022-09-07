@@ -19,7 +19,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(dest => dest.GeneralObjective, opt => opt.MapFrom<MapActionGeneralObjective>())
                 .ForMember(dest => dest.Department, opt => opt.MapFrom<MapDepartment>())
                 .ForMember(dest => dest.CreatedBy, opt => opt.MapFrom<MapCreatedBy>())
-                .ForMember(dest => dest.ModifiedBy, opt => opt.MapFrom<MapModifiedBy>());
+                .ForMember(dest => dest.ModifiedBy, opt => opt.MapFrom<MapModifiedBy>())
+                .ForMember(dest => dest.Activity, opt => opt.MapFrom<MapActivity>());
         }
 
         public class MapDepartment : IValueResolver<ActionAggregate, ActionViewModel, BasicViewModel>
@@ -58,6 +59,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                     ? null
                     : new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
             }
+        }
+    }
+
+    public class MapActivity : IValueResolver<ActionAggregate, ActionViewModel, BasicViewModel>
+    {
+        public BasicViewModel Resolve(ActionAggregate source, ActionViewModel destination, BasicViewModel destMember,
+            ResolutionContext context)
+        {
+            return new BasicViewModel(source.Action.Id, source.Action.AssociatedActivity.Title);
         }
     }
 

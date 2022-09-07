@@ -23,8 +23,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
             var activityIds = context.Actions.Select(c => c.ActivityId);
             var result = await _dbContext.Activities
                 .Where(c => activityIds.Contains(c.Id))
+                .Include(c => c.AssociatedSpecificObjective)
+                .ThenInclude(c => c.Objective)
                 .Select(c => c.AssociatedSpecificObjective)
-                .Include(c => c.Objective)
                 .ToListAsync(cancellationToken);
 
             return result.Select(c => _mapper.Map<ObjectiveModel>(c)).ToList();

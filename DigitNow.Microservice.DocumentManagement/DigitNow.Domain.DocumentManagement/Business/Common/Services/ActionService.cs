@@ -27,7 +27,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task<PagedList<Action>> GetActionsAsync(FilterActionsQuery request, CancellationToken cancellationToken)
         {
-            var descriptor = new FilterDescriptor<Action>(_dbContext.Actions.AsNoTracking(), request.SortField, request.SortOrder);
+            var descriptor = new FilterDescriptor<Action>(_dbContext.Actions.Include(c => c.AssociatedActivity).AsNoTracking(), request.SortField, request.SortOrder);
             descriptor.Query(p => request.DepartmentIds.Contains(p.DepartmentId));
             descriptor.Query(p => p.ActivityId == request.ActivityId);
             var pagedResult = await descriptor.PaginateAsync(request.PageNumber, request.PageSize, cancellationToken);
