@@ -10,7 +10,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
         public BasicViewModel Department { get; set; }
         public string Code { get; set; }
         public string Title { get; set; }
-        public string State { get; set; }
+        public ScimState State { get; set; }
         public string Detail { get; set; }
         public string ModificationMotive { get; set; }
         public BasicViewModel CreatedBy { get; set; }

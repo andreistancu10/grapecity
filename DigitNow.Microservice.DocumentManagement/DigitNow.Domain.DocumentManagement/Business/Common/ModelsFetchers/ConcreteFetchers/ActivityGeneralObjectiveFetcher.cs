@@ -3,6 +3,7 @@ using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using DigitNow.Domain.DocumentManagement.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchers
 {
@@ -11,12 +12,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IMapper _mapper;
 
-        public ActivityGeneralObjectiveFetcher(
-            DocumentManagementDbContext dbContext,
-            IMapper mapper)
+        public ActivityGeneralObjectiveFetcher(IServiceProvider serviceProvider)
         {
-            _dbContext = dbContext;
-            _mapper = mapper;
+            _dbContext = serviceProvider.GetService<DocumentManagementDbContext>();
+            _mapper = serviceProvider.GetService<IMapper>();
         }
 
         protected override async Task<List<ObjectiveModel>> FetchInternalAsync(ActivitiesFetcherContext context, CancellationToken cancellationToken)
@@ -25,10 +24,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
             var result = await _dbContext.GeneralObjectives
                 .Where(c => generalObjectivesId.Contains(c.Id))
                 .Include(c => c.Objective)
-                .Select(c => c.Objective)
                 .ToListAsync(cancellationToken);
 
-            return _mapper.Map<List<ObjectiveModel>>(result);
+            return result.Select(c => _mapper.Map<ObjectiveModel>(c)).ToList();
         }
     }
 }
