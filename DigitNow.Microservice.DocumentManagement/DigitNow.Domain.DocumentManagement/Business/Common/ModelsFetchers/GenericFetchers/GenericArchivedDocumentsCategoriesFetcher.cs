@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.GenericFetchers
 {
-    internal sealed class GenericArchivedDocumentsCategoriesFetcher : ModelFetcher<ArchivedDocumentCategoryModel, ModelFetcherContext>        
+    internal sealed class GenericArchivedDocumentsCategoriesFetcher : ModelFetcher<ArchivedDocumentCategoryModel, ModelFetcherContext>
     {
         private readonly ICatalogClient _catalogClient;
         private readonly IMapper _mapper;
@@ -19,7 +19,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Gene
 
         protected override async Task<List<ArchivedDocumentCategoryModel>> FetchInternalAsync(ModelFetcherContext context, CancellationToken cancellationToken)
         {
-            var response = await _catalogClient.ArchivedDocuments.GetArchivedDocumentCategiesAsync(new GetArchivedDocumentCategoriesRequest() ,cancellationToken);
+            var response = await _catalogClient.ArchivedDocuments.GetArchivedDocumentCategiesAsync(new GetArchivedDocumentCategoriesRequest(), cancellationToken);
 
             var documentCategoryModels = response.Categories
                 .Select(x => _mapper.Map<ArchivedDocumentCategoryModel>(x))

@@ -15,7 +15,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         IQueryable<DynamicForm> GetDynamicFormsQueryAsync();
         IIncludableQueryable<DynamicFormFieldMapping, DynamicFormField> GetDynamicFormFieldMappingsQueryable(long dynamicFormId);
-        Task<DynamicFormViewModel> GetDynamicFormViewModelAsync(long dynamicFormId, long? dynamicFormFillingLogId, CancellationToken cancellationToken);
+        Task<DynamicFormViewModel> GetDynamicFormViewModelAsync(long dynamicFormId, long? dynamicFormFillingLogId, CancellationToken token);
         Task<int> CountDynamicFilledFormsAsync(DynamicFormsFilter filter, CancellationToken cancellationToken);
         Task<List<DynamicFormFillingLog>> GetDynamicFilledFormsAsync(DynamicFormsFilter filter, int page, int count, CancellationToken token);
         Task SaveDataForDynamicFormAsync(long dynamicFormId, List<KeyValueRequestModel> values, CancellationToken cancellationToken);
@@ -129,7 +129,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task RemoveDynamicFormFillingLogAsync(long dynamicFormFillingLogId, CancellationToken token)
         {
-            var dynamicFormFillingLog = await _dbContext.DynamicFormFillingLogs.FirstAsync(x => x.Id == dynamicFormFillingLogId);
+            var dynamicFormFillingLog = await _dbContext.DynamicFormFillingLogs.FirstAsync(x => x.Id == dynamicFormFillingLogId, token);
 
             _dbContext.DynamicFormFillingLogs.Remove(dynamicFormFillingLog);
 

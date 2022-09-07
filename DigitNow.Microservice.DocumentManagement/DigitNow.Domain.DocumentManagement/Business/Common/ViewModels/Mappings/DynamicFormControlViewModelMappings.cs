@@ -19,13 +19,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(c => c.Value, opt => opt.MapFrom<FieldValueResolver>());
         }
 
-        //Mapping types:
-        //DynamicFormControlAggregate -> DynamicFormControlViewModel
-        //DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates.DynamicFormControlAggregate -> DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.DynamicFormControlViewModel
-
-        //Type Map configuration:
-        //DynamicFormControlAggregate -> DynamicFormControlViewModel
-
         private class FieldTypeResolver : IValueResolver<DynamicFormControlAggregate, DynamicFormControlViewModel, int>
         {
             public int Resolve(DynamicFormControlAggregate source, DynamicFormControlViewModel destination, int destMember, ResolutionContext context)

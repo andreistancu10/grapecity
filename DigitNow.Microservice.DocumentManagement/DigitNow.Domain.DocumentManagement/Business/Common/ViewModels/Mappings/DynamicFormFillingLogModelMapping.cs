@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
@@ -38,7 +36,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
         {
             public BasicViewModel Resolve(DynamicFormAggregate source, HistoricalArchiveDocumentsViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
-                //TODO: Review this
+                //TODO: Change this after a user is assigned to multiple departments
                 var userDepartment = source.Departments.FirstOrDefault();
                 if (userDepartment != null)
                 {

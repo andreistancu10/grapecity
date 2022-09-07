@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities.DynamicForms.Configuration
+namespace DigitNow.Domain.DocumentManagement.Data.Entities.Configuration
 {
     public class DynamicFormFieldConfiguration : IEntityTypeConfiguration<DynamicFormField>
     {
