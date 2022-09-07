@@ -11,7 +11,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Activities.Validators
             RuleFor(item => item.SpecificObjectiveId).NotNull().NotEmpty();
             RuleFor(item => item.DepartmentId).NotNull().NotEmpty();
             RuleFor(item => item.Title).NotNull().NotEmpty();
-            RuleFor(item => item.Detail).NotNull().NotEmpty();
+            RuleFor(item => item.Details).NotNull().NotEmpty();
             RuleFor(item => item.ActivityFunctionaryIds).NotNull().NotEmpty();
         }
     }

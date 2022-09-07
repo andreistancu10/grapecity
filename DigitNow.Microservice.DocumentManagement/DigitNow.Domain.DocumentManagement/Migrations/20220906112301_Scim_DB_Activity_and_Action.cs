@@ -26,7 +26,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     State = table.Column<int>(type: "int", nullable: false),
-                    Detail = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Details = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ModificationMotive = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>

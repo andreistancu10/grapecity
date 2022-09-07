@@ -150,7 +150,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<long>("DepartmentId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("Detail")
+                    b.Property<string>("Details")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("GeneralObjectiveId")
