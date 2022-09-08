@@ -9,10 +9,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public string Label { get; set; }
         public string Context { get; set; }
 
-        public DynamicForm()
-        {
-        }
-
+        public DynamicForm() { }
         public DynamicForm(long id)
         {
             Id = id;

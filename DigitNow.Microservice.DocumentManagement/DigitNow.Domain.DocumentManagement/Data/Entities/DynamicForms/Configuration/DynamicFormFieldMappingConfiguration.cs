@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DigitNow.Domain.DocumentManagement.Data.Entities.Seed;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities.Configuration
@@ -10,7 +11,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities.Configuration
             builder.ToTable(nameof(DynamicFormFieldMapping), DocumentManagementDbContext.Schema);
             builder.HasKey(p => p.Id);
 
-            builder.HasData(Seed.Data.GetFormFieldMappings());
+            builder.HasData(DynamicFormFieldMappingsData.GetFormFieldMappings());
         }
     }
 }

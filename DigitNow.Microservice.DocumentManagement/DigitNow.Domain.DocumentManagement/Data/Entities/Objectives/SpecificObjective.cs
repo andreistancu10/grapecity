@@ -1,6 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data.Entities.Activities;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities.Objectives
+namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
     public class SpecificObjective : VirtualObjective
     {

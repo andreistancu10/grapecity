@@ -17,7 +17,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
 
         protected async override Task<List<UserModel>> FetchInternalAsync(DynamicFormsFetcherContext context, CancellationToken cancellationToken)
         {
-            var createdByUsers = context.DynamicFormFillingLogs
+            var createdByUsers = context.DynamicFormValues
                 .Select(x => x.CreatedBy)
                 .ToList();
 

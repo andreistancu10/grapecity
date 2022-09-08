@@ -3,6 +3,6 @@
     public class DynamicFormViewModel
     {
         public DynamicFormDetailsViewModel DynamicFormDetails { get; set; }
-        public List<DynamicFormControlViewModel> DynamicFormControls { get; set; }
+        public List<DynamicFormControlViewModel> DynamicFormControls { get; set; } = new List<DynamicFormControlViewModel>();
     }
 }

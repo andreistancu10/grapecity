@@ -1,7 +1,5 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
-using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
-using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 
@@ -9,47 +7,84 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IDynamicFormsMappingService
     {
-        Task<List<DynamicFormFillingLogViewModel>> MapToDynamicFormViewModelAsync(IList<DynamicFormFillingLog> dynamicFormFillingLogs, CancellationToken cancellationToken);
+        DynamicFormViewModel MapToDynamicFormViewModel(
+            DynamicForm dynamicForm,
+            List<DynamicFormFieldMapping> dynamicFormFieldMappings,
+            List<DynamicFormField> dynamicFormFields);
 
+        DynamicFormViewModel MapToDynamicFormViewModel(
+            DynamicForm dynamicForm,
+            List<DynamicFormFieldMapping> dynamicFormFieldMappings,
+            List<DynamicFormField> dynamicFormFields,
+            List<DynamicFormFieldValue> dynamicFormFieldValues);
     }
+
     public class DynamicFormsMappingService : IDynamicFormsMappingService
     {
+        #region [ Fields ]
+
         private readonly IMapper _mapper;
-        private readonly DynamicFormRelationsFetcher _dynamicFormRelationsFetcher;
 
+        #endregion
 
-        public DynamicFormsMappingService(IMapper mapper, IServiceProvider serviceProvider)
+        #region [ Construction ]
+
+        public DynamicFormsMappingService(IMapper mapper)
         {
             _mapper = mapper;
-            _dynamicFormRelationsFetcher = new DynamicFormRelationsFetcher(serviceProvider);
-        }
-        public async Task<List<DynamicFormFillingLogViewModel>> MapToDynamicFormViewModelAsync(IList<DynamicFormFillingLog> dynamicFormFillingLogs, CancellationToken cancellationToken)
-        {
-            await _dynamicFormRelationsFetcher
-                .UseDynamicFormsContext(new DynamicFormsFetcherContext { DynamicFormFillingLogs = dynamicFormFillingLogs })
-                .TriggerFetchersAsync(cancellationToken);
-
-            return MapDynamicForms(dynamicFormFillingLogs)
-                .ToList();
         }
 
-        private List<DynamicFormFillingLogViewModel> MapDynamicForms(IList<DynamicFormFillingLog> dynamicFormFillingLogs)
-        {
-            var result = new List<DynamicFormFillingLogViewModel>();
+        #endregion
 
-            foreach (var dynamicFormFillingLog in dynamicFormFillingLogs)
+        #region [ IDynamicFormsMappingService ]
+
+        public DynamicFormViewModel MapToDynamicFormViewModel(
+            DynamicForm dynamicForm,
+            List<DynamicFormFieldMapping> dynamicFormFieldMappings,
+            List<DynamicFormField> dynamicFormFields) 
+            =>
+            MapToDynamicFormViewModel(
+                dynamicForm,
+                dynamicFormFieldMappings,
+                dynamicFormFields,
+                default);
+
+        public DynamicFormViewModel MapToDynamicFormViewModel(
+            DynamicForm dynamicForm,
+            List<DynamicFormFieldMapping> dynamicFormFieldMappings, 
+            List<DynamicFormField> dynamicFormFields, 
+            List<DynamicFormFieldValue> dynamicFormFieldValues)
+        {
+            return MapDynamicForm(dynamicForm, dynamicFormFieldMappings, dynamicFormFields, dynamicFormFieldValues);
+        }
+
+        #endregion
+
+        #region [ DynamicForms - Utils ]
+
+        private DynamicFormViewModel MapDynamicForm(
+            DynamicForm dynamicForm,
+            List<DynamicFormFieldMapping> dynamicFormFieldMappings,
+            List<DynamicFormField> dynamicFormFields,
+            List<DynamicFormFieldValue> dynamicFormFieldValues)
+        {
+            var dynamicFormViewModel = _mapper.Map<DynamicFormViewModel>(dynamicForm);
+
+            foreach (var mapping in dynamicFormFieldMappings)
             {
-                var aggregate = new DynamicFormAggregate
+                var aggregate = new DynamicFormControlAggregate
                 {
-                    DynamicFormFillingLog = dynamicFormFillingLog,
-                    Users = _dynamicFormRelationsFetcher.DynamicFormUsers,
-                    Departments = _dynamicFormRelationsFetcher.Departments
+                    DynamicFormFields = dynamicFormFields,
+                    DynamicFormFieldsValues = dynamicFormFieldValues,
+                    DynamicFormFieldMapping = mapping
                 };
 
-                result.Add(_mapper.Map<DynamicFormAggregate, DynamicFormFillingLogViewModel>(aggregate));
+                dynamicFormViewModel.DynamicFormControls.Add(_mapper.Map<DynamicFormControlViewModel>(aggregate));
             }
 
-            return result;
+            return dynamicFormViewModel;
         }
+
+        #endregion
     }
 }

@@ -1,4 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
+﻿using DigitNow.Domain.DocumentManagement.Contracts.DynamicForms;
 
 namespace DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.Common
 {
