@@ -12,7 +12,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(dest => dest.Code, opt => opt.MapFrom(src => src.Activity.Code))
                 .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Activity.Title))
                 .ForMember(dest => dest.State, opt => opt.MapFrom(src => src.Activity.State))
-                .ForMember(dest => dest.Detail, opt => opt.MapFrom(src => src.Activity.Detail))
+                .ForMember(dest => dest.Detail, opt => opt.MapFrom(src => src.Activity.Details))
                 .ForMember(dest => dest.ModificationMotive, opt => opt.MapFrom(src => src.Activity.ModificationMotive))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.Activity.CreatedAt))
                 .ForMember(dest => dest.ModifiedAt, opt => opt.MapFrom(src => src.Activity.ModifiedAt))
