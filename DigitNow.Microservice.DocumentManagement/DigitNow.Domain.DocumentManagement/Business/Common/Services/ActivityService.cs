@@ -33,8 +33,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             CancellationToken cancellationToken)
         {
             var descriptor = new FilterDescriptor<Activity>(_dbContext.Activities.AsNoTracking(), request.SortField, request.SortOrder);
-            descriptor.Query(p => p.Id, request.Id, () => request.GetFilterMode(p => p.Id));
-            descriptor.Query(p=>request.DepartmentIds.Contains(p.DepartmentId));
             var pagedResult = await descriptor.PaginateAsync(request.PageNumber, request.PageSize, cancellationToken);
 
             return pagedResult;
