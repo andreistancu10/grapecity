@@ -31,6 +31,7 @@ public class MigrateDatabaseHostedService : IHostedService
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
+        return;
         string migrateDatabase = Environment.GetEnvironmentVariable(EnvironmentVariables.MigrateDatebase);
         bool.TryParse(migrateDatabase, out bool applyMigrations);
         if (!applyMigrations)
