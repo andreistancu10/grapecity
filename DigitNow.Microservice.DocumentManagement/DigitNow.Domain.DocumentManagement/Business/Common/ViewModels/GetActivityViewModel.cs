@@ -12,7 +12,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
         public string Code { get; set; }
         public string Title { get; set; }
         public ScimState State { get; set; }
-        public string Detail { get; set; }
+        public string Details { get; set; }
         public string ModificationMotive { get; set; }
         public GeneralObjectiveDto AssociatedGeneralObjective { get; set; }
         public SpecificObjectiveDto AssociatedSpecificObjective { get; set; }

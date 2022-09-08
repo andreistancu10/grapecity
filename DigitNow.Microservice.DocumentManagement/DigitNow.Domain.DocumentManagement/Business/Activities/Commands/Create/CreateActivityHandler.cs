@@ -29,7 +29,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Commands.Create
                 SpecificObjectiveId = request.SpecificObjectiveId,
                 DepartmentId = request.DepartmentId,
                 Title = request.Title,
-                Detail = request.Detail
+                Details = request.Details
             };
 
             await _activityService.AddAsync(activity, cancellationToken);

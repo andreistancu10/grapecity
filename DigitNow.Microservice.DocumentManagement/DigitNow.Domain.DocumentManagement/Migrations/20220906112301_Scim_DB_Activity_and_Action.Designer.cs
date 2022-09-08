@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    [Migration("20220905084242_Scim_DB_Activity_and_Action")]
+    [Migration("20220906112301_Scim_DB_Activity_and_Action")]
     partial class Scim_DB_Activity_and_Action
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -152,7 +152,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<long>("DepartmentId")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("Detail")
+                    b.Property<string>("Details")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("GeneralObjectiveId")

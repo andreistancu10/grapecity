@@ -40,7 +40,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Commands.Update
                 });
 
             initialActivity.Title = request.Title;
-            initialActivity.Detail = request.Detail;
+            initialActivity.Details = request.Details;
             initialActivity.ModificationMotive = request.ModificationMotive;
             initialActivity.State = request.State;
 

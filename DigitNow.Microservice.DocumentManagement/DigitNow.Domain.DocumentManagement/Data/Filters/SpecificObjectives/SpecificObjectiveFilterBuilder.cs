@@ -39,7 +39,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.SpecificObjectives
 
         private void BuildTitleFilter()
         {
-            if (EntityFilter.TitleFilter != null)
+            if (EntityFilter.TitleFilter != null && EntityFilter.TitleFilter.Title != String.Empty)
             {
                 EntityPredicates.Add(x => x.Objective.Title == EntityFilter.TitleFilter.Title);
             }
