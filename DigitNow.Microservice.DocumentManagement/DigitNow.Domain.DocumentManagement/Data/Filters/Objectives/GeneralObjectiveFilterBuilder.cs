@@ -21,7 +21,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Objectives
         private void BuildFilterByTitle()
         {
             var titleFilter = EntityFilter.GeneralObjectiveTitleFilter;
-            if (titleFilter != null)
+            if (titleFilter != null && titleFilter.Title != string.Empty)
             {
                 EntityPredicates.Add(objective =>
                     objective.Objective.Title.Equals(titleFilter.Title)

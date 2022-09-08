@@ -29,7 +29,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
 
             generalObjective.Objective.ObjectiveType = ObjectiveType.General;
-            generalObjective.Objective.State = ObjectiveState.Active;
+            generalObjective.Objective.State = ScimState.Active;
 
             await _objectiveService.AddAsync(generalObjective.Objective, cancellationToken);
             await _dbContext.AddAsync(generalObjective, cancellationToken);

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using DigitNow.Domain.DocumentManagement.Data.Entities.Activities;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
@@ -11,7 +11,8 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
 
         public GeneralObjective AssociatedGeneralObjective { get; set; }
         public List<SpecificObjectiveFunctionary> SpecificObjectiveFunctionarys { get; set; }
-   
+        public List<Activity> Activities { get; set; }
+
         #endregion
 
     }

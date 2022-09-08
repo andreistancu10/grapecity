@@ -12,6 +12,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
         public BasicViewModel User { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime ModifiedAt { get; set; }
-        public ObjectiveState State { get; set; }
+        public ScimState State { get; set; }
     }
 }

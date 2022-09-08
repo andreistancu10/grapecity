@@ -1,12 +1,13 @@
-﻿#define MIGRATION_ONLY
+﻿#undef MIGRATION_ONLY
 
 #if    MIGRATION_ONLY
 #endif
 
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Actions;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Activities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
 
 namespace DigitNow.Domain.DocumentManagement.Data
 {
@@ -48,6 +49,10 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<DynamicFormFieldMapping> DynamicFormFieldMappings { get; set; }
         public DbSet<DynamicFormFieldValue> DynamicFormFieldValues { get; set; }
         public DbSet<DynamicFormFillingLog> DynamicFormFillingLogs { get; set; }
+        public DbSet<Activity> Activities { get; set; }
+        public DbSet<ActivityFunctionary> ActivityFunctionaries { get; set; }
+        public DbSet<Entities.Actions.Action> Actions { get; set; }
+        public DbSet<ActionFunctionary> ActionFunctionaries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

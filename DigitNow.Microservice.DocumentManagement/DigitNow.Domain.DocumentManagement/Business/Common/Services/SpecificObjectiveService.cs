@@ -36,7 +36,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
 
             specificObjective.Objective.ObjectiveType = ObjectiveType.Specific;
-            specificObjective.Objective.State = ObjectiveState.Active;
+            specificObjective.Objective.State = ScimState.Active;
             specificObjective.Objective.SpecificObjective = specificObjective;
             await _objectiveService.AddAsync(specificObjective.Objective, cancellationToken);
 

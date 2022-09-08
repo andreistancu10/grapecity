@@ -59,6 +59,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings
             CreateMap<UploadedFile, DocumentFileModel>();
             CreateMap<DocumentFileModel, UploadedFile>();
             CreateMap<StoredFileModel, UploadedFile>();
+
+            CreateMap<GeneralObjective, ObjectiveModel>()
+                .ForMember(c => c.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(c => c.Title, opt => opt.MapFrom(src => src.Objective.Title));
+
+            CreateMap<SpecificObjective, ObjectiveModel>()
+                .ForMember(c => c.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(c => c.Title, opt => opt.MapFrom(src => src.Objective.Title));
         }
 
         private class MapDocumentCategoryId :
