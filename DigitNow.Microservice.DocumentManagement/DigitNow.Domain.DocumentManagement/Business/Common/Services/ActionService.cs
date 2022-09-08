@@ -1,14 +1,13 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Actions.Queries.FilterActions;
 using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Infrastructure.Data.Abstractions;
-using HTSS.Platform.Infrastructure.Data.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using Action = DigitNow.Domain.DocumentManagement.Data.Entities.Action;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
+    //TODO: Refactor this (Exclude query from parameters)
     public interface IActionService
     {
         Task<PagedList<Action>> GetActionsAsync(FilterActionsQuery request, CancellationToken cancellationToken);
@@ -29,6 +28,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         public async Task<PagedList<Action>> GetActionsAsync(FilterActionsQuery request, CancellationToken cancellationToken)
         {
             var actions = await _dbContext.Actions
+                .Include(x => x.AssociatedActivity)
                 .Where(x => x.ActivityId == request.ActivityId)
                 .Skip((int)(request.PageSize * (request.PageNumber - 1)))
                 .Take((int)request.PageSize)

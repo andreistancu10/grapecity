@@ -32,12 +32,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Queries.FilterActi
         public async Task<ResultPagedList<ActionViewModel>> Handle(FilterActionsQuery request, CancellationToken cancellationToken)
         {
             var currentUser = await _identityService.GetCurrentUserAsync(cancellationToken);
-            request.DepartmentIds = currentUser.Departments.Select(c => c.Id);
             var actionsPagedList = await _actionService.GetActionsAsync(request, cancellationToken);
 
             if (actionsPagedList.List.Count == 0)
             {
-                return new ResultPagedList<ActionViewModel>(new PagingHeader(0, 0, 0, 0), null);
+                return new ResultPagedList<ActionViewModel>(new PagingHeader(0, 0, 0, 0), new List<ActionViewModel>());
             }
 
             await _actionRelationsFetcher.UseActionFetcherContext(

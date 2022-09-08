@@ -2,7 +2,7 @@
 
 namespace DigitNow.Domain.DocumentManagement.Public.Actions.Models
 {
-    public class FilterActionsRequest : AbstractFilterModel<Action>
+    public class FilterActionsRequest : AbstractFilterModel<Data.Entities.Action>
     {
         public long ActivityId { get; set; }
     }
