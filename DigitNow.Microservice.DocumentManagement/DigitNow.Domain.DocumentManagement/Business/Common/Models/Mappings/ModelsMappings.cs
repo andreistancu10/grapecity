@@ -7,6 +7,7 @@ using DigitNow.Domain.Catalog.Contracts.InternalDocumentTypes;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
 using Newtonsoft.Json;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings
@@ -57,6 +58,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings
             CreateMap<UploadedFile, DocumentFileModel>();
             CreateMap<DocumentFileModel, UploadedFile>();
             CreateMap<StoredFileModel, UploadedFile>();
+
+            CreateMap<GeneralObjective, ObjectiveModel>()
+                .ForMember(c => c.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(c => c.Title, opt => opt.MapFrom(src => src.Objective.Title));
+
+            CreateMap<SpecificObjective, ObjectiveModel>()
+                .ForMember(c => c.Id, opt => opt.MapFrom(src => src.Id))
+                .ForMember(c => c.Title, opt => opt.MapFrom(src => src.Objective.Title));
         }
 
         private class MapDocumentCategoryId :

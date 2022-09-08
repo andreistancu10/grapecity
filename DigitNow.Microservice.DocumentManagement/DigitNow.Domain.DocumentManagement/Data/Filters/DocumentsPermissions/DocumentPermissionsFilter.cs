@@ -23,6 +23,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.DocumentsRights
 
     public class DocumentRegistryOfficeDepartmentRightsFilter
     {
+        public long UserId { get; set; }
         public long DepartmentId { get; set; }
     }
 

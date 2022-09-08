@@ -79,7 +79,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             document.Status = status;
         }
 
-        protected async virtual Task TransferUserResponsibilityAsync(WorkflowHistoryLog oldRecord, WorkflowHistoryLog newRecord, ICreateWorkflowHistoryCommand command, CancellationToken token)
+        protected async virtual Task TransferUserResponsibilityAsync(WorkflowHistoryLog oldRecord, WorkflowHistoryLog newRecord, ICreateWorkflowHistoryCommand command, CancellationToken token, bool makeDocumentVisibleForDepartment = false)
         {
             if (oldRecord == null)
             {
@@ -90,7 +90,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.BaseMan
             newRecord.RecipientType = oldRecord.RecipientType;
             newRecord.RecipientName = oldRecord.RecipientName;
 
-            await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: false, command.DocumentId, newRecord.RecipientId, newRecord.DocumentStatus, token);
+            await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment, command.DocumentId, newRecord.RecipientId, newRecord.DocumentStatus, token);
         }
 
         protected virtual void TransitionNotAllowed(ICreateWorkflowHistoryCommand command)

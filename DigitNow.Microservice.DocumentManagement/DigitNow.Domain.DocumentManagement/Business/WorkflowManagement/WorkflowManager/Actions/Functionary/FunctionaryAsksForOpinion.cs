@@ -27,6 +27,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                 return command;
 
             var headOfDepartment = await IdentityService.GetHeadOfDepartmentUserAsync((long)command.RecipientId, token);
+            var initialSenderDepartmentId = document.DestinationDepartmentId;
 
             if (!UserExists(headOfDepartment, command))
                 return command;
@@ -37,7 +38,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
             await CreateActionOnDocument(document, UserActionsOnDocument.AsksForOpinion, makeDocumentVisibleForDepartment: false, token);
             await UpdateDocumentBasedOnWorkflowDecisionAsync(makeDocumentVisibleForDepartment: false, command.DocumentId, headOfDepartment.Id, DocumentStatus.OpinionRequestedUnallocated, token);
 
-            await MailSenderService.SendMail_OnOpinionRequestedByAnotherDepartment(headOfDepartment, document.DestinationDepartmentId, document, token);
+            await MailSenderService.SendMail_OnOpinionRequestedByAnotherDepartment(headOfDepartment, initialSenderDepartmentId, document, token);
             return command;
         }
         #endregion

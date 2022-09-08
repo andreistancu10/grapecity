@@ -40,7 +40,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.WorkflowManagement.Workflo
                     .FirstOrDefault();
 
             document.Status = DocumentStatus.New;
-            document.DestinationDepartmentId = oldWorkflowResponsible.DestinationDepartmentId;
+            document.DestinationDepartmentId = oldWorkflowResponsible.RecipientId;
 
             await PassDocumentToDepartment(document, command, token);
 
