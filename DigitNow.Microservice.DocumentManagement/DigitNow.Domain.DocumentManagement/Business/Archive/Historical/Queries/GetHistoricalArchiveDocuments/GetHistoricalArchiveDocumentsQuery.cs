@@ -3,7 +3,7 @@ using HTSS.Platform.Core.CQRS;
 
 namespace DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.GetDynamicForms
 {
-    public class GetDynamicFormFillingLogsQuery : IQuery<GetDynamicFormFillingLogsResponse>
+    public class GetHistoricalArchiveDocumentsQuery : IQuery<ResultObject>
     {
         public int Page { get; set; } = 1;
         public int Count { get; set; } = 10;

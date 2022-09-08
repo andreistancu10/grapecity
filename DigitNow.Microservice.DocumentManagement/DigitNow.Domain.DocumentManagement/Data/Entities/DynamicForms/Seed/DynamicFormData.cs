@@ -1,6 +1,6 @@
 ﻿namespace DigitNow.Domain.DocumentManagement.Data.Entities.Seed
 {
-    public static partial class Data
+    public static class DynamicFormData
     {
         public static IEnumerable<DynamicForm> GetForms()
         {

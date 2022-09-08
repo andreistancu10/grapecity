@@ -14,9 +14,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.GetDy
             _dynamicFormsService = dynamicFormsService;
         }
 
-        public async Task<DynamicFormViewModel> Handle(GetDynamicFormByIdQuery request, CancellationToken cancellationToken)
+        public Task<DynamicFormViewModel> Handle(GetDynamicFormByIdQuery request, CancellationToken cancellationToken)
         {
-            return await _dynamicFormsService.GetDynamicFormViewModelAsync(request.Id, cancellationToken);
+            if (request.FormFillingId.HasValue)
+            {
+                return _dynamicFormsService.GetDynamicFormViewModelAsync(request.FormId, request.FormFillingId.Value, cancellationToken);
+            }
+            return _dynamicFormsService.GetDynamicFormViewModelAsync(request.FormId, default, cancellationToken);
         }
     }
 }

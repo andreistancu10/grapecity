@@ -11,8 +11,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IDocumentMappingService
     {
-        Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(int languageId, IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken);
-        Task<List<ReportViewModel>> MapToReportViewModelAsync(int languageId, IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken);
+        Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(int languageId, IList<VirtualDocument> virtualDocuments, CancellationToken token);
+        Task<List<ReportViewModel>> MapToReportViewModelAsync(int languageId, IList<VirtualDocument> virtualDocuments, CancellationToken token);
+        Task<List<HistoricalArchiveDocumentsViewModel>> MapToHistoricalArchiveDocumentsViewModelAsync(IList<DynamicFormFillingLog> dynamicFormValues, CancellationToken token);
     }
 
     public class DocumentMappingService : IDocumentMappingService
@@ -25,6 +26,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private UserModel _currentUser;
         private readonly DocumentRelationsFetcher _documentRelationsFetcher;
         private readonly DocumentReportRelationsFetcher _documentReportRelationsFetcher;
+        private readonly DynamicFormRelationsFetcher _dynamicFormRelationsFetcher;
 
         #endregion
 
@@ -37,44 +39,56 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             _identityService = identityService;
             _mapper = mapper;
+
             _documentRelationsFetcher = new DocumentRelationsFetcher(serviceProvider);
             _documentReportRelationsFetcher = new DocumentReportRelationsFetcher(serviceProvider);
+            _dynamicFormRelationsFetcher = new DynamicFormRelationsFetcher(serviceProvider);
         }
 
         #endregion
 
         #region [ IDocumentMappingService ]
 
-        public async Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(int languageId, IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
+        public async Task<List<DocumentViewModel>> MapToDocumentViewModelAsync(int languageId, IList<VirtualDocument> virtualDocuments, CancellationToken token)
         {
             if (!virtualDocuments.Any())
             {
                 return new List<DocumentViewModel>();
             }
 
-            _currentUser = await _identityService.GetCurrentUserAsync(cancellationToken);
+            _currentUser = await _identityService.GetCurrentUserAsync(token);
 
             await _documentRelationsFetcher
                 .UseDocumentsContext(new DocumentsFetcherContext { Documents = virtualDocuments })
                 .UseTranslationsContext(new LanguageFetcherContext { LanguageId = languageId })
-                .TriggerFetchersAsync(cancellationToken);
+                .TriggerFetchersAsync(token);
 
             return MapDocuments(virtualDocuments)
                 .OrderByDescending(x => x.RegistrationDate)
                 .ToList();
         }
 
-        public async Task<List<ReportViewModel>> MapToReportViewModelAsync(int languageId, IList<VirtualDocument> virtualDocuments, CancellationToken cancellationToken)
+        public async Task<List<ReportViewModel>> MapToReportViewModelAsync(int languageId, IList<VirtualDocument> virtualDocuments, CancellationToken token)
         {
             if (!virtualDocuments.Any()) return new List<ReportViewModel>();
 
             await _documentReportRelationsFetcher
                 .UseDocumentsContext(new DocumentsFetcherContext { Documents = virtualDocuments })
                 .UseTranslationsContext(new LanguageFetcherContext { LanguageId = languageId })
-                .TriggerFetchersAsync(cancellationToken);
+                .TriggerFetchersAsync(token);
 
             return MapDocumentsReports(virtualDocuments)
                 .OrderByDescending(x => x.RegistrationDate)
+                .ToList();
+        }
+
+        public async Task<List<HistoricalArchiveDocumentsViewModel>> MapToHistoricalArchiveDocumentsViewModelAsync(IList<DynamicFormFillingLog> dynamicFormValues, CancellationToken token)
+        {
+            await _dynamicFormRelationsFetcher
+                .UseDynamicFormsContext(new DynamicFormsFetcherContext { DynamicFormValues = dynamicFormValues })
+                .TriggerFetchersAsync(token);
+
+            return MapHistoricalArchiveDocuments(dynamicFormValues)
                 .ToList();
         }
 
@@ -184,6 +198,30 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             return result;
         }
+        #endregion
+
+        #region [ Historical Archive Documents - Utils ]
+
+        private List<HistoricalArchiveDocumentsViewModel> MapHistoricalArchiveDocuments(IList<DynamicFormFillingLog> dynamicFormValues)
+        {
+            var result = new List<HistoricalArchiveDocumentsViewModel>();
+
+            foreach (var dynamicFormValue in dynamicFormValues)
+            {
+                var aggregate = new DynamicFormAggregate
+                {
+                    FormValues = dynamicFormValue,
+                    Categories = _dynamicFormRelationsFetcher.Categories,
+                    Users = _dynamicFormRelationsFetcher.DynamicFormUsers,
+                    Departments = _dynamicFormRelationsFetcher.Departments
+                };
+
+                result.Add(_mapper.Map<DynamicFormAggregate, HistoricalArchiveDocumentsViewModel>(aggregate));
+            }
+
+            return result;
+        }
+
         #endregion
     }
 }

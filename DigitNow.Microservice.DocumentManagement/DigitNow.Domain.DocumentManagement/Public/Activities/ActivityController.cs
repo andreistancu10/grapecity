@@ -26,7 +26,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Activities
         }
 
         [HttpPost("filter")]
-        public async Task<IActionResult> GetGeneralObjectivesAsync([FromBody] FilterActivitiesRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetActivitiesAsync([FromBody] FilterActivitiesRequest request, CancellationToken cancellationToken)
         {
             var query = _mapper.Map<FilterActivitiesQuery>(request);
 

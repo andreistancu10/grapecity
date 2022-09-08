@@ -1,7 +1,7 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives.Abstractions;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Abstractions;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities.Objectives
+namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
     public class Objective : ExtendedEntity, IObjective
     {

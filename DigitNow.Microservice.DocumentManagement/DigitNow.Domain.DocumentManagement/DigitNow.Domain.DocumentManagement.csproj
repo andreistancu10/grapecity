@@ -48,8 +48,8 @@
 	<ItemGroup>
 		<PackageReference Include="DigitNow.Domain.Authentication.Client" Version="6.0.10" />
 		<PackageReference Include="DigitNow.Domain.Authentication.Contracts" Version="6.0.10" />
-		<PackageReference Include="DigitNow.Domain.Catalog.Client" Version="6.0.10" />
-		<PackageReference Include="DigitNow.Domain.Catalog.Contracts" Version="6.0.10" />
+		<PackageReference Include="DigitNow.Domain.Catalog.Client" Version="6.0.11" />
+		<PackageReference Include="DigitNow.Domain.Catalog.Contracts" Version="6.0.11" />
 		<PackageReference Include="Domain.Localization.Client" Version="6.0.1" />
 		<PackageReference Include="Domain.Mail.Client" Version="6.0.2" />
 		<PackageReference Include="Domain.Mail.Contracts" Version="6.0.2" />

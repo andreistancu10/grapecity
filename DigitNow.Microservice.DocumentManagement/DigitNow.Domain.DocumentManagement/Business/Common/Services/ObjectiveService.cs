@@ -1,6 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Text;

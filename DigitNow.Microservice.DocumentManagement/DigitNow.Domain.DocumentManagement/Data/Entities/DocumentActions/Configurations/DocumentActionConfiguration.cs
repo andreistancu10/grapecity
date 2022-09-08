@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities.DocumentActions.Configurations
+namespace DigitNow.Domain.DocumentManagement.Data.Entities.Configurations
 {
     public class DocumentActionConfiguration : IEntityTypeConfiguration<DocumentAction>
     {

@@ -1,6 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.GeneralObjectives;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
 using DigitNow.Domain.DocumentManagement.Data.Filters;
 using DigitNow.Domain.DocumentManagement.Data.Filters.Objectives;

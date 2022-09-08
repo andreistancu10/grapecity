@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using DigitNow.Domain.DocumentManagement.Data.Entities.Seed;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities.Configuration
@@ -12,7 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities.Configuration
             builder.Property(p => p.Name).HasMaxLength(256).IsRequired();
             builder.HasIndex(p => p.Name).IsUnique();
 
-            builder.HasData(Seed.Data.GetFormFields());
+            builder.HasData(DynamicFormFieldData.GetFormFields());
         }
     }
 }

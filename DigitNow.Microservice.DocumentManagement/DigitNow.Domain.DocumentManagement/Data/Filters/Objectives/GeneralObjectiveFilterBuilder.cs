@@ -1,4 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Data.Entities.Objectives;
+﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Filters.Objectives
 {

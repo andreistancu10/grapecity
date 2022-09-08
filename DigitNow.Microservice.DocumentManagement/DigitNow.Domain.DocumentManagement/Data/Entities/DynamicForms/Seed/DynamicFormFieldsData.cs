@@ -1,9 +1,8 @@
-﻿using DigitNow.Domain.DocumentManagement.Contracts.Documents.Enums;
-using DigitNow.Domain.DocumentManagement.utils;
+﻿using DigitNow.Domain.DocumentManagement.Contracts.DynamicForms;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities.Seed
 {
-    public static partial class Data
+    public static partial class DynamicFormFieldData
     {
         public static IEnumerable<DynamicFormField> GetFormFields()
         {
