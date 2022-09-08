@@ -1,7 +1,7 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Activities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Actions;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities.Actions
+namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
     public class Action: ExtendedEntity
     {
