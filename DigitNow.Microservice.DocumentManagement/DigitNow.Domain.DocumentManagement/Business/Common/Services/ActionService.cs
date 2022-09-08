@@ -1,6 +1,7 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Actions.Queries.FilterActions;
 using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Data;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Infrastructure.Data.Abstractions;
 using HTSS.Platform.Infrastructure.Data.EntityFramework;
 using Microsoft.EntityFrameworkCore;
@@ -27,10 +28,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task<PagedList<Action>> GetActionsAsync(FilterActionsQuery request, CancellationToken cancellationToken)
         {
-            var descriptor = new FilterDescriptor<Action>(_dbContext.Actions.Include(c => c.AssociatedActivity).AsNoTracking(), request.SortField, request.SortOrder);
-            var pagedResult = await descriptor.PaginateAsync(request.PageNumber, request.PageSize, cancellationToken);
+            var actions = await _dbContext.Actions
+                .Where(x => x.ActivityId == request.ActivityId)
+                .Skip((int)(request.PageSize * (request.PageNumber - 1)))
+                .Take((int)request.PageSize)
+                .ToListAsync(cancellationToken);
 
-            return pagedResult;
+            return new PagedList<Action>(actions.AsQueryable(), request.PageNumber, request.PageSize);
         }
 
         public async Task<Action> CreateAsync(Action action, CancellationToken cancellationToken)
