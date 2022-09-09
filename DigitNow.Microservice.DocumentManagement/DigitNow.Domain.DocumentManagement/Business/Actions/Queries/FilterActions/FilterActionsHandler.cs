@@ -57,7 +57,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Queries.FilterActi
                 }))
                 .ToList();
 
-            var resultPagedList = new ResultPagedList<ActionViewModel>(actionsPagedList.GetHeader(), actionViewModels);
+            var resultPagedList = new ResultPagedList<ActionViewModel>(actionsPagedList.GetHeader(), actionViewModels.OrderByDescending(x => x.CreatedAt).ToList());
 
             return resultPagedList;
         }
