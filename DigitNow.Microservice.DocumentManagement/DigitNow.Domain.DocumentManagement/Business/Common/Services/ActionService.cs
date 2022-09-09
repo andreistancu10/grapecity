@@ -1,4 +1,5 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Actions.Queries.FilterActions;
+using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities;
 using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
@@ -11,7 +12,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     //TODO: Refactor this (Exclude query from parameters)
     public interface IActionService : IScimStateService
     {
-        Task<PagedList<Action>> GetActionsAsync(FilterActionsQuery request, CancellationToken cancellationToken);
+        Task<PagedList<Action>> GetActionsAsync(ActionFilter filter, CancellationToken cancellationToken);
         Task<Action> CreateAsync(Action action, CancellationToken cancellationToken);
         Task UpdateAsync(Action action, CancellationToken cancellationToken);
         IQueryable<Action> FindQuery();
@@ -23,16 +24,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
         }
 
-        public async Task<PagedList<Action>> GetActionsAsync(FilterActionsQuery request, CancellationToken cancellationToken)
+        public async Task<PagedList<Action>> GetActionsAsync(ActionFilter filter, CancellationToken cancellationToken)
         {
             var actions = await DbContext.Actions
                 .Include(x => x.AssociatedActivity)
-                .Where(x => x.ActivityId == request.ActivityId)
-                .Skip((int)(request.PageSize * (request.PageNumber - 1)))
-                .Take((int)request.PageSize)
+                .Where(x => x.ActivityId == filter.ActivityId)
+                .Skip((int)(filter.PageSize ?? 20 * (filter.PageNumber - 1)))
+                .Take(filter.PageSize ?? 20)
                 .ToListAsync(cancellationToken);
 
-            return new PagedList<Action>(actions.AsQueryable(), request.PageNumber, request.PageSize);
+            return new PagedList<Action>(actions.AsQueryable(), filter.PageNumber, filter.PageSize);
         }
 
         public async Task<Action> CreateAsync(Action action, CancellationToken cancellationToken)
