@@ -3,6 +3,7 @@ using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Data;
 using HTSS.Platform.Infrastructure.Data.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
 using Action = DigitNow.Domain.DocumentManagement.Data.Entities.Action;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
@@ -61,18 +62,32 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private async Task SetActionCodeAsync(Action action, CancellationToken token)
         {
             var lastAction = await _dbContext.Actions
-                .Where(item => item.CreatedAt.Year == DateTime.UtcNow.Year && item.ActivityId == action.ActivityId)
-                .OrderByDescending(p => p.CreatedAt)
-                .FirstOrDefaultAsync(token);
+                     .Where(item => item.ActivityId == action.ActivityId)
+                     .OrderByDescending(p => p.CreatedAt)
+                     .FirstOrDefaultAsync(token);
 
-            var order = lastAction?.Id ?? 0;
-            var activity = await _dbContext.Activities
-                .FirstOrDefaultAsync(x => x.Id == action.ActivityId, token);
-
-            if (activity != null)
+            var sb = new StringBuilder();
+            if (lastAction == null)
             {
-                action.Code = $"ACT{DateTime.Now.Year}_{activity.GeneralObjectiveId}.{activity.SpecificObjectiveId}.{activity.Id}.{++order}";
+                var activity = await _dbContext.Activities
+                    .Where(item => item.Id == action.ActivityId)
+                    .FirstOrDefaultAsync(token);
+
+                sb.Append(activity.Code.Replace("ACTIV", "ACT"));
+                sb.Append(".1");
             }
+            else
+            {
+                string[] subs = lastAction.Code.Split('.');
+                sb.Append(subs[0]);
+                sb.Append('.');
+                sb.Append(subs[1]);
+                sb.Append('.');
+                sb.Append(subs[2]);
+                sb.Append('.');
+                sb.Append(int.Parse(subs[3]) + 1);
+            }
+            action.Code = sb.ToString();
         }
     }
 }
