@@ -1,23 +1,26 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
+using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
-    public interface IGeneralObjectiveService
+    public interface IGeneralObjectiveService : IScimStateService
     {
         Task<GeneralObjective> AddAsync(GeneralObjective generalObjective, CancellationToken cancellationToken);
         Task UpdateAsync(GeneralObjective generalObjective, CancellationToken cancellationToken);
         IQueryable<GeneralObjective> FindQuery();
     }
-    public class GeneralObjectiveService : IGeneralObjectiveService
+
+    public class GeneralObjectiveService : ScimStateService, IGeneralObjectiveService
     {
-        private readonly DocumentManagementDbContext _dbContext;
         private readonly IObjectiveService _objectiveService;
 
-        public GeneralObjectiveService(DocumentManagementDbContext dbContext, IObjectiveService objectiveService)
+        public GeneralObjectiveService(
+            DocumentManagementDbContext dbContext,
+            IObjectiveService objectiveService) : base(dbContext)
         {
-            _dbContext = dbContext;
             _objectiveService = objectiveService;
         }
 
@@ -32,22 +35,22 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             generalObjective.Objective.State = ScimState.Active;
 
             await _objectiveService.AddAsync(generalObjective.Objective, cancellationToken);
-            await _dbContext.AddAsync(generalObjective, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await DbContext.AddAsync(generalObjective, cancellationToken);
+            await DbContext.SaveChangesAsync(cancellationToken);
 
             return generalObjective;
         }
 
         public IQueryable<GeneralObjective> FindQuery()
         {
-            return _dbContext.GeneralObjectives.AsQueryable();
+            return DbContext.GeneralObjectives.AsQueryable();
         }
 
         public async Task UpdateAsync(GeneralObjective generalObjective, CancellationToken cancellationToken)
         {
-            await _dbContext.SingleUpdateAsync(generalObjective, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
-
+            await ChangeStateAsync(new List<long> { generalObjective.Id }, ScimEntity.GeneralObjective, generalObjective.Objective?.State, cancellationToken);
+            await DbContext.SingleUpdateAsync(generalObjective, cancellationToken);
+            await DbContext.SaveChangesAsync(cancellationToken);
         }
     }
 }

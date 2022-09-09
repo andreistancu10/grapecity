@@ -3,31 +3,30 @@ using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
-    public interface ISpecificObjectiveService
+    public interface ISpecificObjectiveService : IScimStateService
     {
         Task<SpecificObjective> AddAsync(SpecificObjective specificObjective, CancellationToken cancellationToken);
         Task UpdateAsync(SpecificObjective specificObjective, CancellationToken cancellationToken);
         IQueryable<SpecificObjective> FindQuery();
     }
-    public class SpecificObjectiveService : ISpecificObjectiveService
+    public class SpecificObjectiveService : ScimStateService, ISpecificObjectiveService
     {
-        private readonly DocumentManagementDbContext _dbContext;
         private readonly IObjectiveService _objectiveService;
         private readonly IGeneralObjectiveService _generalObjectiveService;
 
-
-        public SpecificObjectiveService(DocumentManagementDbContext dbContext,
+        public SpecificObjectiveService(
+            DocumentManagementDbContext dbContext,
             IObjectiveService objectiveService,
-            IGeneralObjectiveService generalObjectiveService)
+            IGeneralObjectiveService generalObjectiveService) : base(dbContext)
         {
-            _dbContext = dbContext;
             _objectiveService = objectiveService;
             _generalObjectiveService = generalObjectiveService;
-
         }
+
         public async Task<SpecificObjective> AddAsync(SpecificObjective specificObjective, CancellationToken cancellationToken)
         {
             if (specificObjective.Objective == null)
@@ -49,28 +48,29 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             specificObjective.AssociatedGeneralObjective = generalObjective;
 
-            await _dbContext.SpecificObjectives.AddAsync(specificObjective, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await DbContext.SpecificObjectives.AddAsync(specificObjective, cancellationToken);
+            await DbContext.SaveChangesAsync(cancellationToken);
 
             return specificObjective;
         }
 
         public IQueryable<SpecificObjective> FindAllQuery(Expression<Func<SpecificObjective, bool>> predicate)
         {
-            return _dbContext.SpecificObjectives
+            return DbContext.SpecificObjectives
               .Include(x => x.Objective)
               .Where(predicate);
         }
 
         public IQueryable<SpecificObjective> FindQuery()
         {
-            return _dbContext.SpecificObjectives.AsQueryable();
+            return DbContext.SpecificObjectives.AsQueryable();
         }
 
         public async Task UpdateAsync(SpecificObjective specificObjective, CancellationToken cancellationToken)
         {
-            await _dbContext.SingleUpdateAsync(specificObjective, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await ChangeStateAsync(new List<long> { specificObjective.Id }, ScimEntity.SpecificObjective, specificObjective.Objective?.State, cancellationToken);
+            await DbContext.SingleUpdateAsync(specificObjective, cancellationToken);
+            await DbContext.SaveChangesAsync(cancellationToken);
         }
     }
 }

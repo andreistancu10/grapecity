@@ -5,13 +5,14 @@ using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Text;
 using DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterActivities;
+using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using HTSS.Platform.Infrastructure.Data.Abstractions;
 using HTSS.Platform.Infrastructure.Data.EntityFramework;
 using Nest;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
-    public interface IActivityService
+    public interface IActivityService : IScimStateService
     {
         Task<PagedList<Activity>> GetActivitiesAsync(FilterActivitiesQuery request, CancellationToken cancellationToken);
         Task<long> CountActivitiesAsync(FilterActivitiesQuery query, CancellationToken cancellationToken);
@@ -20,19 +21,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         IQueryable<Activity> FindQuery();
     }
 
-    public class ActivityService : IActivityService
+    public class ActivityService : ScimStateService, IActivityService
     {
-        private readonly DocumentManagementDbContext _dbContext;
-
-        public ActivityService(DocumentManagementDbContext dbContext)
+        public ActivityService(DocumentManagementDbContext dbContext) : base(dbContext)
         {
-            _dbContext = dbContext;
         }
 
         public async Task<PagedList<Activity>> GetActivitiesAsync(FilterActivitiesQuery request,
             CancellationToken cancellationToken)
         {
-            var descriptor = new FilterDescriptor<Activity>(_dbContext.Activities.AsNoTracking(), request.SortField, request.SortOrder);
+            var descriptor = new FilterDescriptor<Activity>(DbContext.Activities.AsNoTracking(), request.SortField, request.SortOrder);
             var pagedResult = await descriptor.PaginateAsync(request.PageNumber, request.PageSize, cancellationToken);
 
             return pagedResult;
@@ -41,18 +39,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         public async Task<long> CountActivitiesAsync(FilterActivitiesQuery query,
             CancellationToken cancellationToken)
         {
-            return await _dbContext.Activities.CountAsync(c => query.DepartmentIds.Contains(c.DepartmentId), cancellationToken);
+            return await DbContext.Activities.CountAsync(c => query.DepartmentIds.Contains(c.DepartmentId), cancellationToken);
         }
 
         public async Task<Activity> AddAsync(Activity activity, CancellationToken token)
         {
             activity.State = ScimState.Active;
-            var dbContextTransaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, token);
+            var dbContextTransaction = await DbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, token);
             try
             {
-                _dbContext.Entry(activity).State = EntityState.Added;
+                DbContext.Entry(activity).State = EntityState.Added;
                 await SetActivityCodeAsync(activity, token);
-                await _dbContext.SaveChangesAsync(token);
+                await DbContext.SaveChangesAsync(token);
                 await dbContextTransaction.CommitAsync(token);
             }
             catch
@@ -70,18 +68,19 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public IQueryable<Activity> FindQuery()
         {
-            return _dbContext.Activities.AsQueryable();
+            return DbContext.Activities.AsQueryable();
         }
 
         public async Task UpdateAsync(Activity activity, CancellationToken cancellationToken)
         {
-            await _dbContext.SingleUpdateAsync(activity, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await ChangeStateAsync(new List<long> { activity.Id }, ScimEntity.ScimActivity, activity.State, cancellationToken);
+            await DbContext.SingleUpdateAsync(activity, cancellationToken);
+            await DbContext.SaveChangesAsync(cancellationToken);
         }
 
         private async Task SetActivityCodeAsync(Activity activity, CancellationToken token)
         {
-            var lastActivity = await _dbContext.Activities
+            var lastActivity = await DbContext.Activities
                     .Where(item => item.SpecificObjectiveId == activity.SpecificObjectiveId)
                     .OrderByDescending(p => p.CreatedAt)
                     .FirstOrDefaultAsync(token);
@@ -89,7 +88,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var sb = new StringBuilder();
             if (lastActivity == null)
             {
-                var specificObjective = await _dbContext.SpecificObjectives
+                var specificObjective = await DbContext.SpecificObjectives
                     .Where(item => item.ObjectiveId == activity.SpecificObjectiveId)
                     .Include(o => o.Objective)
                     .FirstOrDefaultAsync(token);
