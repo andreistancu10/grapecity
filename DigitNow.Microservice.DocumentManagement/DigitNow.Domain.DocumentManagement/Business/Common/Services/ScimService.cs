@@ -95,7 +95,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .Select(c => c.Id)
                 .ToListAsync(cancellationToken);
 
-            await ChangeActivitiesStateAsync(activityIds, state, cancellationToken);
+            await ChangeStateAsync(activityIds, ScimEntity.ScimActivity, state, cancellationToken);
         }
 
         private async Task ChangeActivitiesStateAsync(ICollection<long> entityIds, ScimState state, CancellationToken cancellationToken)
@@ -112,7 +112,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .Select(c => c.Id)
                 .ToListAsync(cancellationToken);
 
-            await ChangeActionsStateAsync(actionIds, state, cancellationToken);
+            await ChangeStateAsync(actionIds, ScimEntity.ScimAction, state, cancellationToken);
         }
 
         private async Task ChangeActionsStateAsync(ICollection<long> entityIds, ScimState state, CancellationToken cancellationToken)
