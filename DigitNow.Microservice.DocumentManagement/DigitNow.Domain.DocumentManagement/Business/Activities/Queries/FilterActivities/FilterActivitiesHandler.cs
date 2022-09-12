@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
@@ -33,7 +34,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterA
         {
             var currentUser = await _identityService.GetCurrentUserAsync(cancellationToken);
             request.DepartmentIds = currentUser.Departments.Select(c => c.Id);
-            var activitiesPagedList = await _activityService.GetActivitiesAsync(request, cancellationToken);
+            var activitiesPagedList = await _activityService.GetActivitiesAsync(_mapper.Map<ActivityFilter>(request), cancellationToken);
 
             if (activitiesPagedList.List.Count == 0)
             {
@@ -58,7 +59,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterA
                 }))
                 .ToList();
 
-            var resultPagedList = new ResultPagedList<ActivityViewModel>(activitiesPagedList.GetHeader(), activityViewModels);
+            var resultPagedList = new ResultPagedList<ActivityViewModel>(activitiesPagedList.GetHeader(), activityViewModels.OrderByDescending(x => x.CreatedAt).ToList());
 
             return resultPagedList;
         }

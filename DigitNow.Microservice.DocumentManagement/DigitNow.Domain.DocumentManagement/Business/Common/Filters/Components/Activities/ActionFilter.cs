@@ -1,13 +1,12 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Infrastructure.Data.Abstractions;
+using Action = DigitNow.Domain.DocumentManagement.Data.Entities.Action;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities
 {
-    public class ActivityFilter : AbstractFilterModel<Activity>, IQuery<PagedList<ActivityViewModel>>
+    public class ActionFilter : AbstractFilterModel<Action>, IQuery<PagedList<ActionViewModel>>
     {
-        public long? Id { get; set; }
-        public IEnumerable<long> DepartmentIds { get; set; }
+        public long ActivityId { get; set; }
     }
 }

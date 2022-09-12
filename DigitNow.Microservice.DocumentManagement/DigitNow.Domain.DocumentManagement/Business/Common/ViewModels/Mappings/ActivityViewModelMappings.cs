@@ -75,7 +75,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
         public BasicViewModel Resolve(ActivityAggregate source, ActivityViewModel destination, BasicViewModel destMember,
             ResolutionContext context)
         {
-            var foundSpecificObjective = source.SpecificObjectives.FirstOrDefault(c => c.Id == source.Activity.SpecificObjectiveId);
+            var foundSpecificObjective = source.SpecificObjectives.FirstOrDefault(c => c.ObjectiveId == source.Activity.SpecificObjectiveId);
             return foundSpecificObjective == null
                 ? null
                 : new BasicViewModel(foundSpecificObjective.Id, foundSpecificObjective.Title);
@@ -87,7 +87,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
         public BasicViewModel Resolve(ActivityAggregate source, ActivityViewModel destination, BasicViewModel destMember,
             ResolutionContext context)
         {
-            var foundGeneralObjective = source.GeneralObjectives.FirstOrDefault(c => c.Id == source.Activity.GeneralObjectiveId);
+            var foundGeneralObjective = source.GeneralObjectives.FirstOrDefault(c => c.ObjectiveId == source.Activity.GeneralObjectiveId);
             return foundGeneralObjective == null
                 ? null
                 : new BasicViewModel(foundGeneralObjective.Id, foundGeneralObjective.Title);

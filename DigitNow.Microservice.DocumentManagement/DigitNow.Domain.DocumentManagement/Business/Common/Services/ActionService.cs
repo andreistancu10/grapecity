@@ -1,5 +1,7 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Actions.Queries.FilterActions;
+using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities;
 using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
+using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using HTSS.Platform.Infrastructure.Data.Abstractions;
 using Microsoft.EntityFrameworkCore;
@@ -9,67 +11,65 @@ using Action = DigitNow.Domain.DocumentManagement.Data.Entities.Action;
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     //TODO: Refactor this (Exclude query from parameters)
-    public interface IActionService
+    public interface IActionService : IScimStateService
     {
-        Task<PagedList<Action>> GetActionsAsync(FilterActionsQuery request, CancellationToken cancellationToken);
+        Task<PagedList<Action>> GetActionsAsync(ActionFilter filter, CancellationToken cancellationToken);
         Task<Action> CreateAsync(Action action, CancellationToken cancellationToken);
         Task UpdateAsync(Action action, CancellationToken cancellationToken);
         IQueryable<Action> FindQuery();
     }
 
-    public class ActionService : IActionService
+    public class ActionService : ScimStateService, IActionService
     {
-        private readonly DocumentManagementDbContext _dbContext;
-
-        public ActionService(DocumentManagementDbContext dbContext)
+        public ActionService(DocumentManagementDbContext dbContext) : base(dbContext)
         {
-            _dbContext = dbContext;
         }
 
-        public async Task<PagedList<Action>> GetActionsAsync(FilterActionsQuery request, CancellationToken cancellationToken)
+        public async Task<PagedList<Action>> GetActionsAsync(ActionFilter filter, CancellationToken cancellationToken)
         {
-            var actions = await _dbContext.Actions
+            var actions = await DbContext.Actions
                 .Include(x => x.AssociatedActivity)
-                .Where(x => x.ActivityId == request.ActivityId)
-                .Skip((int)(request.PageSize * (request.PageNumber - 1)))
-                .Take((int)request.PageSize)
+                .Where(x => x.ActivityId == filter.ActivityId)
+                .Skip((int)(filter.PageSize ?? 20 * (filter.PageNumber - 1)))
+                .Take(filter.PageSize ?? 20)
                 .ToListAsync(cancellationToken);
 
-            return new PagedList<Action>(actions.AsQueryable(), request.PageNumber, request.PageSize);
+            return new PagedList<Action>(actions.AsQueryable(), filter.PageNumber, filter.PageSize);
         }
 
         public async Task<Action> CreateAsync(Action action, CancellationToken cancellationToken)
         {
             action.State = ScimState.Active;
             await SetActionCodeAsync(action, cancellationToken);
-            await _dbContext.Actions.AddAsync(action, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await DbContext.Actions.AddAsync(action, cancellationToken);
+            await DbContext.SaveChangesAsync(cancellationToken);
 
             return action;
         }
 
         public async Task UpdateAsync(Action action, CancellationToken cancellationToken)
         {
-            await _dbContext.SingleUpdateAsync(action, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            await ChangeStateAsync(new List<long> { action.Id }, ScimEntity.ScimAction, action.State, cancellationToken);
+            await DbContext.SingleUpdateAsync(action, cancellationToken);
+            await DbContext.SaveChangesAsync(cancellationToken);
         }
 
         public IQueryable<Action> FindQuery()
         {
-            return _dbContext.Actions.AsQueryable();
+            return DbContext.Actions.AsQueryable();
         }
 
         private async Task SetActionCodeAsync(Action action, CancellationToken token)
         {
-            var lastAction = await _dbContext.Actions
-                     .Where(item => item.ActivityId == action.ActivityId)
-                     .OrderByDescending(p => p.CreatedAt)
-                     .FirstOrDefaultAsync(token);
+            var lastAction = await DbContext.Actions
+                                 .Where(item => item.ActivityId == action.ActivityId)
+                                 .OrderByDescending(p => p.CreatedAt)
+                                 .FirstOrDefaultAsync(token);
 
             var sb = new StringBuilder();
             if (lastAction == null)
             {
-                var activity = await _dbContext.Activities
+                var activity = await DbContext.Activities
                     .Where(item => item.Id == action.ActivityId)
                     .FirstOrDefaultAsync(token);
 

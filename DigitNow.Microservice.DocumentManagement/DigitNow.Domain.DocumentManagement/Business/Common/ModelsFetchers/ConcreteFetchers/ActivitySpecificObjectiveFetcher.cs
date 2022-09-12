@@ -22,7 +22,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
         {
             var specificObjectiveIds = context.Activities.Select(c => c.SpecificObjectiveId);
             var result = await _dbContext.SpecificObjectives
-                .Where(c => specificObjectiveIds.Contains(c.Id))
+                .Where(c => specificObjectiveIds.Contains(c.ObjectiveId))
                 .Include(c => c.Objective)
                 .ToListAsync(cancellationToken);
 
