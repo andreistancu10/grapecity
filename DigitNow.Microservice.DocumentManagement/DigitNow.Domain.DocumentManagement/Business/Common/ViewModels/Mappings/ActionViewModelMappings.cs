@@ -54,14 +54,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 ResolutionContext context)
             {
                 var foundUser = source.Users.FirstOrDefault(c => c.Id == source.Action.ModifiedBy);
-
-                if(foundUser == null)
+                if (foundUser != null)
                 {
-                    var user = source.Users.FirstOrDefault(c => c.Id == source.Action.CreatedBy);
-                    return new BasicViewModel(user.Id, $"{user.FirstName} {user.LastName}");
+                    return new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
                 }
 
-                return new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
+                foundUser = source.Users.FirstOrDefault(c => c.Id == source.Action.CreatedBy);
+                if (foundUser != null)
+                {
+                    return new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
+                }
+
+                return default;
             }
         }
     }

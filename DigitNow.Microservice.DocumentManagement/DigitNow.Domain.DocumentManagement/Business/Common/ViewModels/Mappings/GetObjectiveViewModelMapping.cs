@@ -60,14 +60,19 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
 
             private static BasicViewModel ExtractUser(GeneralObjectiveAggregate source)
             {
-                var foundUser = source.Users.FirstOrDefault(x => x.Id == source.GeneralObjective.CreatedBy);
-                if (foundUser == null)
+                var foundUser = source.Users.FirstOrDefault(c => c.Id == source.GeneralObjective.ModifiedBy);
+                if (foundUser != null)
                 {
-                    var user = source.Users.FirstOrDefault(c => c.Id == source.GeneralObjective.CreatedBy);
-                    return new BasicViewModel(user.Id, $"{user.FirstName} {user.LastName}");
+                    return new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
                 }
 
-                return new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
+                foundUser = source.Users.FirstOrDefault(c => c.Id == source.GeneralObjective.CreatedBy);
+                if (foundUser != null)
+                {
+                    return new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
+                }
+
+                return default;
             }
         }
     }
