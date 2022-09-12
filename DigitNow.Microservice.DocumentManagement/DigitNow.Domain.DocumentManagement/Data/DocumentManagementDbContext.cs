@@ -70,8 +70,6 @@ namespace DigitNow.Domain.DocumentManagement.Data
                     case EntityState.Added:
                         entry.Entity.CreatedAt = DateTime.Now;
                         entry.Entity.CreatedBy = _identityService.GetCurrentUserId();
-                        entry.Entity.ModifiedAt = DateTime.Now;
-                        entry.Entity.ModifiedBy = _identityService.GetCurrentUserId();
                         break;
                     case EntityState.Modified:
                         entry.Entity.ModifiedAt = DateTime.Now;

@@ -18,11 +18,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Conc
         protected override async Task<List<UserModel>> FetchInternalAsync(ActivitiesFetcherContext context, CancellationToken cancellationToken)
         {
             var createdByUsers = context.Activities.Where(c => c.CreatedBy > 0).Select(x => x.CreatedBy).ToList();
-            var modifiedByUsers = context.Activities.Where(c => c.ModifiedBy > 0).Select(c => c.ModifiedBy).ToList();
-
+            var modifiedByUsers = context.Activities.Where(c => c.ModifiedBy > 0 && c.ModifiedBy != null).Select(c => c.ModifiedBy).ToList();
+            var modifiedTargetUsers = new List<long>();
+            modifiedByUsers.ForEach(x =>
+            {
+                if (x != null)
+                    modifiedTargetUsers.Add((long)x);
+            });
             var targetUsers = new List<long>();
             targetUsers.AddRange(createdByUsers);
-            targetUsers.AddRange(modifiedByUsers);
+            targetUsers.AddRange(modifiedTargetUsers);
             targetUsers = targetUsers.Distinct().ToList();
 
             var usersList = await _authenticationClient.Users.GetUsersByFilterAsync(new GetUsersByFilterRequest(), cancellationToken);
