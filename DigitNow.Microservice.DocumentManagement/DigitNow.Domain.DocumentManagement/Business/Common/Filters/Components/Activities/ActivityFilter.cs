@@ -8,6 +8,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
     public class ActivityFilter : AbstractFilterModel<Activity>, IQuery<PagedList<ActivityViewModel>>
     {
         public long? Id { get; set; }
-        public IEnumerable<long> DepartmentIds { get; set; }
+        public SpecificObjectivesFilterDto SpecificObjectivesFilter { get; set; }
+        public ActivitiesFilterDto ActivitiesFilter { get; set; }
+        public DepartmentsFilterDto DepartmentsFilter { get; set; }
+        public FunctionariesFilterDto FunctionariesFilter { get; set; }
     }
+}
 }
