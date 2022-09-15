@@ -1,9 +1,9 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
+using DigitNow.Domain.DocumentManagement.Contracts.Scim;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {

@@ -1,6 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Contracts.Risks.Enums;
-using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
+using DigitNow.Domain.DocumentManagement.Contracts.Scim;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
 using Microsoft.EntityFrameworkCore;
@@ -61,14 +61,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         private async Task SetRiskCodeAsync(Risk risk, CancellationToken token)
         {
-            var lastRisk = await DbContext.Risks
+            var lastRiskId = await DbContext.Risks
                 .Where(item => item.CreatedAt.Year == DateTime.UtcNow.Year)
                 .OrderByDescending(p => p.CreatedAt)
+                .Select(x => x.Id)
                 .FirstOrDefaultAsync(token);
 
-            var order = lastRisk != null ? lastRisk.Id : 0;
-
-            risk.Code = $"RISK{DateTime.Now.Year}_{++order}";
+            risk.Code = $"RISK{DateTime.Now.Year}_{++lastRiskId}";
         }
 
         public static string CalculateRiskExposureEvaluation(RiskProbability probability, RiskProbability impact)

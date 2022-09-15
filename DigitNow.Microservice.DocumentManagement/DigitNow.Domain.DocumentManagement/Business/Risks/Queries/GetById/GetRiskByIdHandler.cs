@@ -32,7 +32,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Risks.Queries.GetById
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (risk == null)
-                return null;
+                return new GetRiskViewModel();
 
             return _mapper.Map<GetRiskViewModel>(risk);
         }
