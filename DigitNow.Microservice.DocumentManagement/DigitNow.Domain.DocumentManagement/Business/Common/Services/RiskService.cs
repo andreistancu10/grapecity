@@ -10,8 +10,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IRiskService : IScimStateService
     {
-        Task<Risk> AddAsync(Risk Risk, CancellationToken cancellationToken);
-        Task UpdateAsync(Risk Risk, CancellationToken cancellationToken);
+        Task<Risk> AddAsync(Risk risk, CancellationToken cancellationToken);
+        Task UpdateAsync(Risk risk, CancellationToken cancellationToken);
         IQueryable<Risk> FindQuery();
     }
 
@@ -21,22 +21,22 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
         }
 
-        public async Task<Risk> AddAsync(Risk risk, CancellationToken token)
+        public async Task<Risk> AddAsync(Risk risk, CancellationToken cancellationToken)
         {
             risk.State = ScimState.Active;
             risk.RiskExposureEvaluation =
                 CalculateRiskExposureEvaluation(risk.ProbabilityOfApparitionEstimation, risk.ImpactOfObjectivesEstimation);
-            var dbContextTransaction = await DbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, token);
+            var dbContextTransaction = await DbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
             try
             {
                 DbContext.Entry(risk).State = EntityState.Added;
-                await SetRiskCodeAsync(risk, token);
-                await DbContext.SaveChangesAsync(token);
-                await dbContextTransaction.CommitAsync(token);
+                await SetRiskCodeAsync(risk, cancellationToken);
+                await DbContext.SaveChangesAsync(cancellationToken);
+                await dbContextTransaction.CommitAsync(cancellationToken);
             }
             catch
             {
-                await dbContextTransaction.RollbackAsync(token);
+                await dbContextTransaction.RollbackAsync(cancellationToken);
                 throw;
             }
             finally
