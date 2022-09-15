@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Activities.Queries.GetById;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
@@ -7,6 +8,7 @@ using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Actions.Queries.GetById
 {
@@ -14,6 +16,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Queries.GetById
     {
         private readonly IMapper _mapper;
         private readonly IActionService _actionService;
+        private readonly IServiceProvider _serviceProvider;
         private readonly ActivityRelationsFetcher _activityRelationsFetcher;
 
         public GetActionByIdHandler(
@@ -22,6 +25,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Queries.GetById
             IActionService actionService)
         {
             _mapper = mapper;
+            _serviceProvider = serviceProvider;
             _actionService = actionService;
             _activityRelationsFetcher = new ActivityRelationsFetcher(serviceProvider);
         }
@@ -29,7 +33,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Queries.GetById
         public async Task<GetActionByIdResponse> Handle(GetActionByIdQuery request, CancellationToken cancellationToken)
         {
             var action = await _actionService.FindQuery()
-                .Include(c => c.AssociatedActivity)
                 .AsNoTracking()
                 .Include(x => x.ActionFunctionaries)
                 .FirstOrDefaultAsync(item => item.Id == request.Id, cancellationToken);
@@ -39,28 +42,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Queries.GetById
                 return null;
             }
 
-            var associatedActivity = action.AssociatedActivity;
-
-            await _activityRelationsFetcher.UseActivityFetcherContext(
-                    new ActivitiesFetcherContext
-                    {
-                        Activities = new List<Activity>
-                        {
-                            associatedActivity
-                        }
-                    })
-                .TriggerFetchersAsync(cancellationToken);
-
-            var activityViewModel =
-                _mapper.Map<ActivityAggregate, ActivityViewModel>(new ActivityAggregate
-                {
-                    Activity = associatedActivity,
-                    Departments = _activityRelationsFetcher.Departments,
-                    Users = _activityRelationsFetcher.Users,
-                    GeneralObjectives = _activityRelationsFetcher.GeneralObjective,
-                    SpecificObjectives = _activityRelationsFetcher.SpecificObjective
-                });
-
+            var getActivityByIdHandler = new GetActivityByIdHandler(_mapper, _serviceProvider.GetService<IActivityService>());
+            var activityViewModel = await getActivityByIdHandler.Handle(new GetActivityByIdQuery(action.ActivityId), cancellationToken);
             var response = _mapper.Map<GetActionByIdResponse>(action);
             response.Activity = activityViewModel;
 

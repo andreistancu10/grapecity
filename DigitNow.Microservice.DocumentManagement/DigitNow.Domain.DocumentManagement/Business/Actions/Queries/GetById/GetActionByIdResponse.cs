@@ -6,7 +6,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Queries.GetById
     public class GetActionByIdResponse
     {
         public long Id { get; set; }
-        public ActivityViewModel Activity { get; set; }
+        public GetActivityViewModel Activity { get; set; }
         public long DepartmentId { get; set; }
         public string Code { get; set; }
         public string Title { get; set; }
