@@ -5,7 +5,7 @@ using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
 using HTSS.Platform.Core.CQRS;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Actions.Commands
+namespace DigitNow.Domain.DocumentManagement.Business.Actions.Commands.Create
 {
     public class CreateActionHandler : ICommandHandler<CreateActionCommand, ResultObject>
     {
