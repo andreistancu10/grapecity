@@ -1,11 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Activities.Queries.GetById;
-using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
-using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
-using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
-using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +12,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Queries.GetById
         private readonly IMapper _mapper;
         private readonly IActionService _actionService;
         private readonly IServiceProvider _serviceProvider;
-        private readonly ActivityRelationsFetcher _activityRelationsFetcher;
 
         public GetActionByIdHandler(
             IMapper mapper,
@@ -27,7 +21,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Queries.GetById
             _mapper = mapper;
             _serviceProvider = serviceProvider;
             _actionService = actionService;
-            _activityRelationsFetcher = new ActivityRelationsFetcher(serviceProvider);
         }
 
         public async Task<GetActionByIdResponse> Handle(GetActionByIdQuery request, CancellationToken cancellationToken)
