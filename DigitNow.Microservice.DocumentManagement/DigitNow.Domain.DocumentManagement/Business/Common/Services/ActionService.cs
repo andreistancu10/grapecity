@@ -30,7 +30,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var actions = await DbContext.Actions
                 .Include(x => x.AssociatedActivity)
                 .Where(x => x.ActivityId == filter.ActivityId)
-                .Skip((int)(filter.PageSize ?? 20 * (filter.PageNumber - 1)))
+                .Skip((int)((filter.PageSize ?? 20) * (filter.PageNumber - 1)))
                 .Take(filter.PageSize ?? 20)
                 .ToListAsync(cancellationToken);
 
