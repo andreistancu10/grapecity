@@ -5,8 +5,16 @@ using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Text;
 using DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterActivities;
+using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
+using DigitNow.Domain.DocumentManagement.Business.Common.Filters;
+using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Abstractions;
 using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities;
+using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Documents;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
+using DigitNow.Domain.DocumentManagement.Data.Extensions;
+using DigitNow.Domain.DocumentManagement.Data.Filters;
+using DigitNow.Domain.DocumentManagement.Data.Filters.SpecificObjectives;
 using HTSS.Platform.Infrastructure.Data.Abstractions;
 using HTSS.Platform.Infrastructure.Data.EntityFramework;
 using Nest;
@@ -15,7 +23,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IActivityService : IScimStateService
     {
-        Task<PagedList<Activity>> GetActivitiesAsync(ActivityFilter filter, CancellationToken cancellationToken);
+        Task<PagedList<Activity>> GetActivitiesAsync(ActivityFilter filter, UserModel currentUser, CancellationToken cancellationToken);
         Task<long> CountActivitiesAsync(ActivityFilter filter, CancellationToken cancellationToken);
         Task<Activity> AddAsync(Activity activity, CancellationToken cancellationToken);
         Task UpdateAsync(Activity activity, CancellationToken cancellationToken);
@@ -24,15 +32,21 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
     public class ActivityService : ScimStateService, IActivityService
     {
-        public ActivityService(DocumentManagementDbContext dbContext) : base(dbContext)
+        private readonly IServiceProvider _serviceProvider;
+
+        public ActivityService(
+            DocumentManagementDbContext dbContext,
+            IServiceProvider serviceProvider) : base(dbContext)
         {
+            _serviceProvider = serviceProvider;
         }
 
-        public async Task<PagedList<Activity>> GetActivitiesAsync(ActivityFilter filter,
-            CancellationToken cancellationToken)
+        public async Task<PagedList<Activity>> GetActivitiesAsync(ActivityFilter filter, UserModel currentUser, CancellationToken cancellationToken)
         {
-            var descriptor = new FilterDescriptor<Activity>(DbContext.Activities.AsNoTracking(), filter.SortField, filter.SortOrder);
-            var pagedResult = await descriptor.PaginateAsync(filter.PageNumber, filter.PageSize, cancellationToken);
+            return await GetBuiltInActivitiesQuery()
+                .WhereAll((await GetActivitiesDataExpressions(currentUser, filter, cancellationToken)).ToPredicates())
+                .AsNoTracking()
+                .CountAsync(cancellationToken);
 
             return pagedResult;
         }
@@ -40,7 +54,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         public async Task<long> CountActivitiesAsync(ActivityFilter filter,
             CancellationToken cancellationToken)
         {
-            return await DbContext.Activities.CountAsync(c => filter.DepartmentIds.Contains(c.DepartmentId), cancellationToken);
+            return await DbContext.Activities.CountAsync(c => filter.DepartmentsFilter.DepartmentIds.Contains(c.DepartmentId), cancellationToken);
         }
 
         public async Task<Activity> AddAsync(Activity activity, CancellationToken token)
@@ -107,6 +121,150 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 sb.Append(int.Parse(subs[2]) + 1);
             }
             activity.Code = sb.ToString();
+        }
+
+
+        private async Task<DataExpressions<Activity>> GetActivitiesDataExpressions(
+            UserModel currentUser,
+            ActivityFilter filter,
+            CancellationToken token)
+        {
+            var activitiesFilterComponent = new ActivitiesFilterComponent(_serviceProvider);
+            var activitiesFilterComponentContext = new ActivitiesFilterComponentContext
+            {
+                CurrentUser = currentUser,
+                ActivitiesPermissionsFilter = new ActivitiesPermissionsFilter
+                {
+                    UserPermissionsFilter = new ActivityUserPermissionsFilter()
+                },
+                
+            };
+
+            return await activitiesFilterComponent.ExtractDataExpressionsAsync(activitiesFilterComponentContext, token);
+        }
+
+        private IQueryable<SpecificObjective> GetBuiltInActivitiesQuery()
+        {
+            return DbContext.SpecificObjectives
+                .Include(x => x.Objective)
+                .Include(x => x.SpecificObjectiveFunctionarys)
+                .Include(x => x.AssociatedGeneralObjective);
+        }
+    }
+
+    internal class ActivitiesFilterComponentContext : IDataExpressionFilterComponentContext
+    {
+        public UserModel CurrentUser { get; set; }
+        public ActivitiesPermissionsFilter ActivitiesPermissionsFilter { get; set; }
+    }
+
+    internal class ActivitiesFilterComponent : DataExpressionFilterComponent<Activity, ActivitiesFilterComponentContext>
+    {
+        public ActivitiesFilterComponent(IServiceProvider serviceProvider) : base(serviceProvider)
+        {
+        }
+
+        protected override Task<DataExpressions<Activity>> SetCustomDataExpressionsAsync(ActivitiesFilterComponentContext context, CancellationToken token)
+        {
+            var currentUser = context.CurrentUser;
+
+            var filter = new ActivitiesPermissionsFilter
+            {
+                DepartmentsFilter = new ActivityUserPermissionsFilter
+                {
+                    DepartmentIds = currentUser.Departments.Select(x => x.Id).ToList(),
+                }
+            };
+
+            return Task.FromResult(new ActivityFilterBuilder(ServiceProvider, filter)
+                .Build());
+        }
+    }
+
+    internal class ActivitiesPermissionsFilter : DataFilter
+    {
+        public ActivitySpecificObjectivesFilter SpecificObjectivesFilter { get; set; }
+        public ActivityActivitiesFilter ActivitiesFilter { get; set; }
+        public ActivityFunctionariesFilter FunctionariesFilter { get; set; }
+        public ActivityUserPermissionsFilter UserPermissionsFilter { get; set; }
+    }
+
+    internal class ActivityUserPermissionsFilter
+    {
+        public List<long> DepartmentIds { get; set; }
+    }
+
+    internal class ActivityActivitiesFilter
+    {
+        public List<long> ActivityIds { get; set; }
+    }
+
+    internal class ActivitySpecificObjectivesFilter
+    {
+        public List<long> SpecificObjectiveIds { get; set; }
+    }
+
+    internal class ActivityFunctionariesFilter
+    {
+        public List<long> FunctionaryIds { get; set; }
+    }
+
+    internal class ActivityFilterBuilder : DataExpressionFilterBuilder<Activity, ActivitiesPermissionsFilter>
+    {
+        public ActivityFilterBuilder(IServiceProvider serviceProvider, ActivitiesPermissionsFilter filter)
+            : base(serviceProvider, filter)
+        {
+        }
+
+        protected override void InternalBuild()
+        {
+            if (EntityFilter.UserPermissionsFilter != null)
+            {
+                BuildActivitiesFilter();
+            }
+
+            if (EntityFilter.SpecificObjectivesFilter != null)
+            {
+                BuildSpecificObjectivesFilter();
+            }
+
+            if (EntityFilter.FunctionariesFilter != null)
+            {
+                BuildFunctionariesFilter();
+            }
+
+            if (EntityFilter.ActivitiesFilter != null)
+            {
+                BuildActivitiesFilter();
+            }
+        }
+
+        private void BuildUserPermissionsFilter()
+        {
+            var departmentIds = EntityFilter.UserPermissionsFilter.DepartmentIds;
+
+            EntityPredicates.Add(x => departmentIds.Contains(x.DepartmentId));
+        }
+
+        private void BuildSpecificObjectivesFilter()
+        {
+            var specificObjectiveIds = EntityFilter.SpecificObjectivesFilter.SpecificObjectiveIds;
+
+            EntityPredicates.Add(x => specificObjectiveIds.Contains(x.SpecificObjectiveId));
+        }
+
+        private void BuildActivitiesFilter()
+        {
+            var departments = EntityFilter.UserPermissionsFilter.DepartmentIds;
+
+            EntityPredicates.Add(x => departments.Contains(x.DepartmentId));
+        }
+
+        private void BuildFunctionariesFilter()
+        {
+            var departments = EntityFilter.UserPermissionsFilter.DepartmentIds;
+
+            EntityPredicates.Add(x => departments.Contains(x.DepartmentId));
         }
     }
 }
