@@ -65,12 +65,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             DbContext.GeneralObjectives.UpdateRange(generalObjectives);
 
             var specificObjectiveIds = await DbContext.SpecificObjectives
-                .Where(c => entityIds.Contains(c.GeneralObjectiveId) && c.Objective.State != state)
+                .Where(c => entityIds.Contains(c.GeneralObjectiveId))
                 .Select(c => c.Id)
                 .ToListAsync(cancellationToken);
 
             var generalObjectiveActivityIds = await DbContext.Activities
-                .Where(c => entityIds.Contains(c.GeneralObjectiveId) && c.State != state)
+                .Where(c => entityIds.Contains(c.GeneralObjectiveId))
                 .Select(c => c.Id)
                 .ToListAsync(cancellationToken);
 
@@ -90,7 +90,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             DbContext.SpecificObjectives.UpdateRange(specificObjectives);
 
             var activityIds = await DbContext.Activities
-                .Where(c => entityIds.Contains(c.SpecificObjectiveId) && c.State != state)
+                .Where(c => entityIds.Contains(c.SpecificObjectiveId))
                 .Select(c => c.Id)
                 .ToListAsync(cancellationToken);
 
@@ -108,7 +108,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             DbContext.Activities.UpdateRange(activities);
 
             var actionIds = await DbContext.Actions
-                .Where(c => entityIds.Contains(c.ActivityId) && c.State != state)
+                .Where(c => entityIds.Contains(c.ActivityId))
                 .Select(c => c.Id)
                 .ToListAsync(cancellationToken);
 
