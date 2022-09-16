@@ -1,6 +1,7 @@
 ﻿#undef MIGRATION_ONLY
 
 #if    MIGRATION_ONLY
+using Microsoft.EntityFrameworkCore.Design;
 #endif
 
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
@@ -8,7 +9,7 @@ using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Actions;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Activities;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Design;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
 
 namespace DigitNow.Domain.DocumentManagement.Data
 {
@@ -54,6 +55,8 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<ActivityFunctionary> ActivityFunctionaries { get; set; }
         public DbSet<Entities.Action> Actions { get; set; }
         public DbSet<ActionFunctionary> ActionFunctionaries { get; set; }
+        public DbSet<Risk> Risks { get; set; }
+        public DbSet<RiskControlAction> RiskControlActions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

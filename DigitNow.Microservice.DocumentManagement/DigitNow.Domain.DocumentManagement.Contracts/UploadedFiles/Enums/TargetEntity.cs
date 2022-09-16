@@ -6,6 +6,7 @@
         GeneralObjective,
         SpecificObjective,
         ScimActivity,
-        ScimAction
+        ScimAction,
+        ScimRisk
     }
 }

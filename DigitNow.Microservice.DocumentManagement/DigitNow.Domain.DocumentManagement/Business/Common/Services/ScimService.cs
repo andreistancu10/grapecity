@@ -1,5 +1,5 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
-using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
+using DigitNow.Domain.DocumentManagement.Contracts.Scim;
 using DigitNow.Domain.DocumentManagement.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,12 +21,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         }
 
         public virtual async Task ChangeStateAsync(
-            ICollection<long> entityIds, 
-            ScimEntity scimEntity, 
+            ICollection<long> entityIds,
+            ScimEntity scimEntity,
             ScimState? state,
             CancellationToken cancellationToken)
         {
-            if (!entityIds.Any() || state == null)
+            if (!entityIds.Any() || !state.HasValue)
             {
                 return;
             }
@@ -34,19 +34,23 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             switch (scimEntity)
             {
                 case ScimEntity.GeneralObjective:
-                    await ChangeGeneralObjectivesStateAsync(entityIds, (ScimState)state, cancellationToken);
+                    await ChangeGeneralObjectivesStateAsync(entityIds, state.Value, cancellationToken);
                     break;
 
                 case ScimEntity.SpecificObjective:
-                    await ChangeSpecificObjectivesStateAsync(entityIds, (ScimState)state, cancellationToken);
+                    await ChangeSpecificObjectivesStateAsync(entityIds, state.Value, cancellationToken);
                     break;
 
                 case ScimEntity.ScimActivity:
-                    await ChangeActivitiesStateAsync(entityIds, (ScimState)state, cancellationToken);
+                    await ChangeActivitiesStateAsync(entityIds, state.Value, cancellationToken);
                     break;
 
                 case ScimEntity.ScimAction:
-                    await ChangeActionsStateAsync(entityIds, (ScimState)state, cancellationToken);
+                    await ChangeActionsStateAsync(entityIds, state.Value, cancellationToken);
+                    break;
+
+                case ScimEntity.ScimRisk:
+                    await ChangeRisksStateAsync(entityIds, state.Value, cancellationToken);
                     break;
 
                 default:
@@ -123,6 +127,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             actions.ForEach(c => c.State = state);
             DbContext.Actions.UpdateRange(actions);
+        }
+
+        private async Task ChangeRisksStateAsync(ICollection<long> entityIds, ScimState state, CancellationToken cancellationToken)
+        {
+            var risks = await DbContext.Risks
+                .Where(c => entityIds.Contains(c.Id) && c.State != state)
+                .ToListAsync(cancellationToken);
+
+            risks.ForEach(c => c.State = state);
+            DbContext.Risks.UpdateRange(risks);
         }
     }
 }

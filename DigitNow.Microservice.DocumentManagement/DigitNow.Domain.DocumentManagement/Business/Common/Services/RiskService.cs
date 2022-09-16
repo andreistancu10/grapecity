@@ -1,0 +1,90 @@
+﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
+using DigitNow.Domain.DocumentManagement.Contracts.Risks.Enums;
+using DigitNow.Domain.DocumentManagement.Contracts.Scim;
+using DigitNow.Domain.DocumentManagement.Data;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
+using Microsoft.EntityFrameworkCore;
+using System.Data;
+
+namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
+{
+    public interface IRiskService : IScimStateService
+    {
+        Task<Risk> AddAsync(Risk risk, CancellationToken cancellationToken);
+        Task UpdateAsync(Risk risk, CancellationToken cancellationToken);
+        IQueryable<Risk> FindQuery();
+    }
+
+    public class RiskService : ScimStateService, IRiskService
+    {
+        public RiskService(DocumentManagementDbContext dbContext) : base(dbContext)
+        {
+        }
+
+        public async Task<Risk> AddAsync(Risk risk, CancellationToken cancellationToken)
+        {
+            risk.State = ScimState.Active;
+            risk.RiskExposureEvaluation =
+                CalculateRiskExposureEvaluation(risk.ProbabilityOfApparitionEstimation, risk.ImpactOfObjectivesEstimation);
+            var dbContextTransaction = await DbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+            try
+            {
+                DbContext.Entry(risk).State = EntityState.Added;
+                await SetRiskCodeAsync(risk, cancellationToken);
+                await DbContext.SaveChangesAsync(cancellationToken);
+                await dbContextTransaction.CommitAsync(cancellationToken);
+            }
+            catch
+            {
+                await dbContextTransaction.RollbackAsync(cancellationToken);
+                throw;
+            }
+            finally
+            {
+                dbContextTransaction?.Dispose();
+            }
+
+            return risk;
+        }
+
+        public IQueryable<Risk> FindQuery()
+        {
+            return DbContext.Risks.AsQueryable();
+        }
+
+        public async Task UpdateAsync(Risk Risk, CancellationToken cancellationToken)
+        {
+            await ChangeStateAsync(new List<long> { Risk.Id }, ScimEntity.ScimRisk, Risk.State, cancellationToken);
+            await DbContext.SingleUpdateAsync(Risk, cancellationToken);
+            await DbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        private async Task SetRiskCodeAsync(Risk risk, CancellationToken token)
+        {
+            var lastRiskId = await DbContext.Risks
+                .Where(item => item.CreatedAt.Year == DateTime.UtcNow.Year)
+                .OrderByDescending(p => p.CreatedAt)
+                .Select(x => x.Id)
+                .FirstOrDefaultAsync(token);
+
+            risk.Code = $"RISK{DateTime.Now.Year}_{++lastRiskId}";
+        }
+
+        public static string CalculateRiskExposureEvaluation(RiskProbability probability, RiskProbability impact)
+        {
+            return (probability, impact) switch
+            {
+                (RiskProbability.Low, RiskProbability.Low) => RiskExposure.SS,
+                (RiskProbability.Low, RiskProbability.Medium) => RiskExposure.SM,
+                (RiskProbability.Low, RiskProbability.High) => RiskExposure.SR,
+                (RiskProbability.Medium, RiskProbability.Low) => RiskExposure.MS,
+                (RiskProbability.Medium, RiskProbability.Medium) => RiskExposure.MM,
+                (RiskProbability.Medium, RiskProbability.High) => RiskExposure.MR,
+                (RiskProbability.High, RiskProbability.Low) => RiskExposure.RS,
+                (RiskProbability.High, RiskProbability.Medium) => RiskExposure.RM,
+                (RiskProbability.High, RiskProbability.High) => RiskExposure.RR,
+                _ => null,
+            };
+        }
+    }
+}

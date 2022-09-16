@@ -1,7 +1,6 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Actions.Queries.FilterActions;
-using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities;
 using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
-using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
+using DigitNow.Domain.DocumentManagement.Contracts.Scim;
 using DigitNow.Domain.DocumentManagement.Data;
 using HTSS.Platform.Infrastructure.Data.Abstractions;
 using Microsoft.EntityFrameworkCore;
