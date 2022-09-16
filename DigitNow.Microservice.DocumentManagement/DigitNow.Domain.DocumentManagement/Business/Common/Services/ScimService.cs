@@ -56,8 +56,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 default:
                     throw new ArgumentOutOfRangeException(nameof(scimEntity), scimEntity, null);
             }
-
-            await DbContext.SaveChangesAsync(cancellationToken);
         }
 
         private async Task ChangeGeneralObjectivesStateAsync(ICollection<long> entityIds, ScimState state, CancellationToken cancellationToken)
@@ -67,11 +65,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .Where(c => entityIds.Contains(c.Id) && c.Objective.State != state)
                 .ToListAsync(cancellationToken);
 
-            generalObjectives.ForEach(c => c.Objective.State = ScimState.Inactive);
+            generalObjectives.ForEach(c => c.Objective.State = state);
             DbContext.GeneralObjectives.UpdateRange(generalObjectives);
 
             var specificObjectiveIds = await DbContext.SpecificObjectives
-                .Where(c => entityIds.Contains(c.GeneralObjectiveId) && c.Objective.State == ScimState.Active)
+                .Where(c => entityIds.Contains(c.GeneralObjectiveId) && c.Objective.State != state)
                 .Select(c => c.Id)
                 .ToListAsync(cancellationToken);
 
@@ -82,6 +80,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             await ChangeStateAsync(specificObjectiveIds, ScimEntity.SpecificObjective, state, cancellationToken);
             await ChangeStateAsync(generalObjectiveActivityIds, ScimEntity.ScimActivity, state, cancellationToken);
+            await DbContext.SaveChangesAsync(cancellationToken);
         }
 
         private async Task ChangeSpecificObjectivesStateAsync(ICollection<long> entityIds, ScimState state, CancellationToken cancellationToken)
@@ -100,6 +99,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .ToListAsync(cancellationToken);
 
             await ChangeStateAsync(activityIds, ScimEntity.ScimActivity, state, cancellationToken);
+            await DbContext.SaveChangesAsync(cancellationToken);
         }
 
         private async Task ChangeActivitiesStateAsync(ICollection<long> entityIds, ScimState state, CancellationToken cancellationToken)
@@ -117,6 +117,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .ToListAsync(cancellationToken);
 
             await ChangeStateAsync(actionIds, ScimEntity.ScimAction, state, cancellationToken);
+            await DbContext.SaveChangesAsync(cancellationToken);
         }
 
         private async Task ChangeActionsStateAsync(ICollection<long> entityIds, ScimState state, CancellationToken cancellationToken)
@@ -127,6 +128,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             actions.ForEach(c => c.State = state);
             DbContext.Actions.UpdateRange(actions);
+            await DbContext.SaveChangesAsync(cancellationToken);
         }
 
         private async Task ChangeRisksStateAsync(ICollection<long> entityIds, ScimState state, CancellationToken cancellationToken)
