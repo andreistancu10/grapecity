@@ -10,6 +10,7 @@ using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
 using DigitNow.Domain.DocumentManagement.Data.Filters;
 using DigitNow.Domain.DocumentManagement.Data.Filters.Activities;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -58,9 +59,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         public async Task<Activity> AddAsync(Activity activity, CancellationToken token)
         {
             activity.State = ScimState.Active;
-            var dbContextTransaction = await DbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, token);
+            IDbContextTransaction dbContextTransaction = null;
+
             try
             {
+                dbContextTransaction = await DbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, token);
                 DbContext.Entry(activity).State = EntityState.Added;
                 await SetActivityCodeAsync(activity, token);
                 await DbContext.SaveChangesAsync(token);
@@ -68,12 +71,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
             catch
             {
-                await dbContextTransaction.RollbackAsync(token);
+                await dbContextTransaction?.RollbackAsync(token);
                 throw;
             }
             finally
             {
-                dbContextTransaction.Dispose();
+                dbContextTransaction?.Dispose();
             }
 
             return activity;
@@ -122,7 +125,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         }
 
 
-        private async Task<DataExpressions<Activity>> GetActivitiesDataExpressions(
+        private Task<DataExpressions<Activity>> GetActivitiesDataExpressions(
             ActivityFilter filter,
             UserModel currentUser,
             CancellationToken token)
@@ -134,7 +137,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 ActivityFilter = filter
             };
 
-            return await activitiesFilterComponent.ExtractDataExpressionsAsync(activitiesFilterComponentContext, token);
+            return activitiesFilterComponent.ExtractDataExpressionsAsync(activitiesFilterComponentContext, token);
         }
 
         private IQueryable<Activity> GetBuiltInActivitiesQuery()
