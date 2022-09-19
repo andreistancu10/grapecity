@@ -15,7 +15,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(dest => dest.Detail, opt => opt.MapFrom(src => src.Activity.Details))
                 .ForMember(dest => dest.ModificationMotive, opt => opt.MapFrom(src => src.Activity.ModificationMotive))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.Activity.CreatedAt))
-                .ForMember(dest => dest.ModifiedAt, opt => opt.MapFrom(src => src.Activity.ModifiedAt))
+                .ForMember(dest => dest.ModifiedAt, opt => opt.MapFrom(src => src.Activity.ModifiedAt ?? src.Activity.CreatedAt))
                 .ForMember(dest => dest.GeneralObjective, opt => opt.MapFrom<MapGeneralObjective>())
                 .ForMember(dest => dest.SpecificObjective, opt => opt.MapFrom<MapSpecificObjective>())
                 .ForMember(dest => dest.Department, opt => opt.MapFrom<MapDepartment>())
@@ -54,10 +54,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 ResolutionContext context)
             {
                 var foundUser = source.Users.FirstOrDefault(c => c.Id == source.Activity.ModifiedBy);
+                if (foundUser != null)
+                {
+                    return new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
+                }
 
-                return foundUser == null
-                    ? null
-                    : new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
+                foundUser = source.Users.FirstOrDefault(c => c.Id == source.Activity.CreatedBy);
+                if (foundUser != null)
+                {
+                    return new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
+                }
+
+                return default;
             }
         }
     }

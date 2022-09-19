@@ -29,7 +29,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.GetById
                 .Include(item => item.ActivityFunctionarys).FirstOrDefaultAsync(cancellationToken);
 
             if (activity == null)
-                return null;
+                return new GetActivityViewModel();
 
             return _mapper.Map<GetActivityViewModel>(activity);
         }

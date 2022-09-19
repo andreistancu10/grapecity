@@ -7,6 +7,9 @@
         Date,
         CityDropdown,
         DistrictDropdown,
-        CountryDropdown
+        CountryDropdown,
+        DepartmentDropdown,
+        Checkbox,
+        InternalDocumentType
     }
 }

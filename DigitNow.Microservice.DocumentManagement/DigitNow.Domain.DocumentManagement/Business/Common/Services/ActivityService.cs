@@ -1,6 +1,11 @@
-﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities;
+using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
+using DigitNow.Domain.DocumentManagement.Contracts.Scim;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using HTSS.Platform.Infrastructure.Data.Abstractions;
+using HTSS.Platform.Infrastructure.Data.EntityFramework;
+using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Text;
 using DigitNow.Domain.DocumentManagement.Business.Common.Filters;

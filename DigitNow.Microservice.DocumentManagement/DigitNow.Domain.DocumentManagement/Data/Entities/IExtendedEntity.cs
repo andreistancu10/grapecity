@@ -7,8 +7,8 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         DateTime CreatedAt { get; set; }
         long CreatedBy { get; set; }
 
-        DateTime ModifiedAt { get; set; }
-        long ModifiedBy { get; set; }
+        DateTime? ModifiedAt { get; set; }
+        long? ModifiedBy { get; set; }
     }
 
     public interface ISoftExtendedEntity : IExtendedEntity

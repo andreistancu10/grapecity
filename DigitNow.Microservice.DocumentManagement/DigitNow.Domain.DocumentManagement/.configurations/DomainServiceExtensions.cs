@@ -108,6 +108,8 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<ISpecificObjectivesDashboardServices, SpecificObjectivesDashboardServices>();
             services.AddTransient<IActivityService, ActivityService>();
             services.AddTransient<IActivityFunctionaryService, ActivityFunctionaryService>();
+            services.AddTransient<IRiskControlActionService, RiskControlActionService>();
+            services.AddTransient<IRiskService, RiskService>();
 
             return services;
         }

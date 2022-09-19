@@ -20,10 +20,10 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public long CreatedBy { get; set; }
 
         [Column(nameof(ModifiedAt), Order = 4)]
-        public DateTime ModifiedAt { get; set; }
+        public DateTime? ModifiedAt { get; set; }
 
         [Column(nameof(ModifiedBy), Order = 5)]
-        public long ModifiedBy { get; set; }
+        public long? ModifiedBy { get; set; }
 
         #endregion
 
