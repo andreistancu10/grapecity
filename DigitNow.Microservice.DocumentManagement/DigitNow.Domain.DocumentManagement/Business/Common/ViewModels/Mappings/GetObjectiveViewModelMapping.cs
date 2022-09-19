@@ -17,6 +17,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(c => c.ModificationMotive, opt => opt.MapFrom(src => src.Objective.ModificationMotive))
                 .ForMember(c => c.GeneralObjectiveId, opt => opt.MapFrom(src => src.GeneralObjectiveId))
                 .ForMember(c => c.DepartmentId, opt => opt.MapFrom(src => src.DepartmentId))
+                .ForPath(c => c.AssociatedGeneralObjective.ObjectiveId, opt => opt.MapFrom(src => src.AssociatedGeneralObjective.ObjectiveId))
                 .ForPath(c => c.AssociatedGeneralObjective.Code, opt => opt.MapFrom(src => src.AssociatedGeneralObjective.Objective.Code))
                 .ForPath(c => c.AssociatedGeneralObjective.State, opt => opt.MapFrom(src => src.AssociatedGeneralObjective.Objective.State))
                 .ForPath(c => c.AssociatedGeneralObjective.Title, opt => opt.MapFrom(src => src.AssociatedGeneralObjective.Objective.Title))

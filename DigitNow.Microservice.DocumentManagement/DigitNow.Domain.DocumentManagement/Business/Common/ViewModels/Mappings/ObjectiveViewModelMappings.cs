@@ -39,22 +39,27 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
         }
 
         private class MapObjectiveFunctionary :
-            IValueResolver<VirtualObjectiveAgregate<SpecificObjective>, SpecificObjectiveViewModel, BasicViewModel>
+            IValueResolver<VirtualObjectiveAgregate<SpecificObjective>, SpecificObjectiveViewModel, List<BasicViewModel>>
         {
-            public BasicViewModel Resolve(VirtualObjectiveAgregate<SpecificObjective> source, SpecificObjectiveViewModel destination, BasicViewModel destMember, ResolutionContext context) =>
+            public List<BasicViewModel> Resolve(VirtualObjectiveAgregate<SpecificObjective> source, SpecificObjectiveViewModel destination, List<BasicViewModel> destMember, ResolutionContext context) =>
                 ExtractDepartment(source);
 
-            private static BasicViewModel ExtractDepartment<T>(VirtualObjectiveAgregate<T> source)
+            private static List<BasicViewModel> ExtractDepartment<T>(VirtualObjectiveAgregate<T> source)
                 where T : VirtualObjective
             {
-                var functionary = source.VirtualObjective.Objective.SpecificObjective.SpecificObjectiveFunctionarys?.Select(x => x.FunctionaryId).ToList();
-                if (functionary != null)
+                var functionarysIds = source.VirtualObjective.Objective.SpecificObjective.SpecificObjectiveFunctionarys?.Select(x => x.FunctionaryId).ToList();
+                if (functionarysIds != null)
                 {
-                    var foundUser = source.Users.FirstOrDefault(x => functionary.Contains(x.Id));
-                    if (foundUser != null)
+                    var functionarys = new List<BasicViewModel>();
+                    foreach (var functionaryId in functionarysIds)
                     {
-                        return new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
+                        var foundUser = source.Users.FirstOrDefault(x => x.Id == functionaryId);
+                        if (foundUser != null)
+                        {
+                            functionarys.Add(new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}"));
+                        }
                     }
+                    return functionarys;
                 }
                 return default;
             }
