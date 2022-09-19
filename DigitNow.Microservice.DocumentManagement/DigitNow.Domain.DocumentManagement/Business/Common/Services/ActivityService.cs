@@ -1,21 +1,16 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities;
-using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
+﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Contracts.Scim;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using HTSS.Platform.Infrastructure.Data.Abstractions;
-using HTSS.Platform.Infrastructure.Data.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Text;
 using DigitNow.Domain.DocumentManagement.Business.Common.Filters;
 using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Abstractions;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
-using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
 using DigitNow.Domain.DocumentManagement.Data.Filters;
 using DigitNow.Domain.DocumentManagement.Data.Filters.Activities;
-using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
