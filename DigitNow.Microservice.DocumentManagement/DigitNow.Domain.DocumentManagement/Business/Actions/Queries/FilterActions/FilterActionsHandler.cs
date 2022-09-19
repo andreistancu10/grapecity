@@ -6,6 +6,7 @@ using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Concrete
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
+using DigitNow.Domain.DocumentManagement.Data.Filters.Actions;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Infrastructure.Data.Abstractions;
 
@@ -33,7 +34,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Queries.FilterActi
         public async Task<ResultPagedList<ActionViewModel>> Handle(FilterActionsQuery request, CancellationToken cancellationToken)
         {
             var currentUser = await _identityService.GetCurrentUserAsync(cancellationToken);
-            var actionsPagedList = await _actionService.GetActionsAsync(_mapper.Map<ActionFilter>(request), cancellationToken);
+            var actionsPagedList = await _actionService.GetActionsAsync(_mapper.Map<ActionsFilter>(request), cancellationToken);
 
             if (actionsPagedList.List.Count == 0)
             {

@@ -5,6 +5,7 @@ using HTSS.Platform.Infrastructure.Data.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Actions;
+using DigitNow.Domain.DocumentManagement.Data.Filters.Actions;
 using Action = DigitNow.Domain.DocumentManagement.Data.Entities.Action;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
@@ -12,7 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     //TODO: Refactor this (Exclude query from parameters)
     public interface IActionService : IScimStateService
     {
-        Task<PagedList<Action>> GetActionsAsync(ActionFilter filter, CancellationToken cancellationToken);
+        Task<PagedList<Action>> GetActionsAsync(ActionsFilter filter, CancellationToken cancellationToken);
         Task<Action> CreateAsync(Action action, CancellationToken cancellationToken);
         Task UpdateAsync(Action action, CancellationToken cancellationToken);
         IQueryable<Action> FindQuery();
@@ -24,7 +25,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
         }
 
-        public async Task<PagedList<Action>> GetActionsAsync(ActionFilter filter, CancellationToken cancellationToken)
+        public async Task<PagedList<Action>> GetActionsAsync(ActionsFilter filter, CancellationToken cancellationToken)
         {
             var actions = await DbContext.Actions
                 .Include(x => x.AssociatedActivity)

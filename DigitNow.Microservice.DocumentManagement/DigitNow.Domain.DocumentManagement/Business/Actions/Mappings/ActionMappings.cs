@@ -4,6 +4,7 @@ using DigitNow.Domain.DocumentManagement.Business.Actions.Queries.FilterActions;
 using DigitNow.Domain.DocumentManagement.Business.Actions.Queries.GetById;
 using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Actions;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Actions;
+using DigitNow.Domain.DocumentManagement.Data.Filters.Actions;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Actions.Mappings
 {
@@ -19,7 +20,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Mappings
                 .ForPath(dest => dest.Activity.Code, opt => opt.MapFrom(src => src.AssociatedActivity.Code))
                 .ForPath(dest => dest.Activity.Details, opt => opt.MapFrom(src => src.AssociatedActivity.Details));
             CreateMap<ActionFunctionary, ActionFunctionaryResponse>();
-            CreateMap<FilterActionsQuery, ActionFilter>();
+            CreateMap<FilterActionsQuery, ActionsFilter>();
         }
     }
 }
