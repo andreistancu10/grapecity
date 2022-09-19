@@ -1,20 +1,26 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities;
-using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
+﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Contracts.Scim;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using HTSS.Platform.Infrastructure.Data.Abstractions;
-using HTSS.Platform.Infrastructure.Data.EntityFramework;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Text;
+using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
+using DigitNow.Domain.DocumentManagement.Data.Extensions;
+using DigitNow.Domain.DocumentManagement.Data.Filters;
+using DigitNow.Domain.DocumentManagement.Data.Filters.Activities;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IActivityService : IScimStateService
     {
-        Task<PagedList<Activity>> GetActivitiesAsync(ActivityFilter filter, CancellationToken cancellationToken);
-        Task<long> CountActivitiesAsync(ActivityFilter filter, CancellationToken cancellationToken);
+        Task<List<Activity>> GetActivitiesAsync(ActivityFilter filter, UserModel currentUser,
+            int page, int count,
+            CancellationToken cancellationToken);
+        Task<long> CountActivitiesAsync(ActivityFilter filter, UserModel currentUser,
+            CancellationToken cancellationToken);
         Task<Activity> AddAsync(Activity activity, CancellationToken cancellationToken);
         Task UpdateAsync(Activity activity, CancellationToken cancellationToken);
         IQueryable<Activity> FindQuery();
@@ -22,31 +28,42 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
     public class ActivityService : ScimStateService, IActivityService
     {
-        public ActivityService(DocumentManagementDbContext dbContext) : base(dbContext)
+        private readonly IServiceProvider _serviceProvider;
+
+        public ActivityService(
+            DocumentManagementDbContext dbContext,
+            IServiceProvider serviceProvider) : base(dbContext)
         {
+            _serviceProvider = serviceProvider;
         }
 
-        public async Task<PagedList<Activity>> GetActivitiesAsync(ActivityFilter filter,
-            CancellationToken cancellationToken)
+        public async Task<List<Activity>> GetActivitiesAsync(ActivityFilter filter, UserModel currentUser, int page, int count, CancellationToken cancellationToken)
         {
-            var descriptor = new FilterDescriptor<Activity>(DbContext.Activities.AsNoTracking(), filter.SortField, filter.SortOrder);
-            var pagedResult = await descriptor.PaginateAsync(filter.PageNumber, filter.PageSize, cancellationToken);
-
-            return pagedResult;
+            return await GetBuiltInActivitiesQuery()
+                  .WhereAll((await GetActivitiesDataExpressions(filter, currentUser, cancellationToken)).ToPredicates())
+                  .OrderByDescending(x => x.CreatedAt)
+                  .Skip((page - 1) * count)
+                  .Take(count)
+                  .AsNoTracking()
+                  .ToListAsync(cancellationToken);
         }
 
-        public async Task<long> CountActivitiesAsync(ActivityFilter filter,
-            CancellationToken cancellationToken)
+        public async Task<long> CountActivitiesAsync(ActivityFilter filter, UserModel currentUser, CancellationToken cancellationToken)
         {
-            return await DbContext.Activities.CountAsync(c => filter.DepartmentIds.Contains(c.DepartmentId), cancellationToken);
+            return await GetBuiltInActivitiesQuery()
+                .WhereAll((await GetActivitiesDataExpressions(filter, currentUser, cancellationToken)).ToPredicates())
+                .AsNoTracking()
+                .CountAsync(cancellationToken);
         }
 
         public async Task<Activity> AddAsync(Activity activity, CancellationToken token)
         {
             activity.State = ScimState.Active;
-            var dbContextTransaction = await DbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, token);
+            IDbContextTransaction dbContextTransaction = null;
+
             try
             {
+                dbContextTransaction = await DbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, token);
                 DbContext.Entry(activity).State = EntityState.Added;
                 await SetActivityCodeAsync(activity, token);
                 await DbContext.SaveChangesAsync(token);
@@ -54,7 +71,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
             catch
             {
-                await dbContextTransaction.RollbackAsync(token);
+                await dbContextTransaction?.RollbackAsync(token);
                 throw;
             }
             finally
@@ -105,6 +122,29 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 sb.Append(int.Parse(subs[2]) + 1);
             }
             activity.Code = sb.ToString();
+        }
+
+
+        private Task<DataExpressions<Activity>> GetActivitiesDataExpressions(
+            ActivityFilter filter,
+            UserModel currentUser,
+            CancellationToken token)
+        {
+            var activitiesFilterComponent = new ActivitiesFilterComponent(_serviceProvider);
+            var activitiesFilterComponentContext = new ActivitiesFilterComponentContext
+            {
+                CurrentUser = currentUser,
+                ActivityFilter = filter
+            };
+
+            return activitiesFilterComponent.ExtractDataExpressionsAsync(activitiesFilterComponentContext, token);
+        }
+
+        private IQueryable<Activity> GetBuiltInActivitiesQuery()
+        {
+            return DbContext.Activities
+                .Include(c => c.ActivityFunctionarys)
+                .Include(x => x.AssociatedGeneralObjective);
         }
     }
 }

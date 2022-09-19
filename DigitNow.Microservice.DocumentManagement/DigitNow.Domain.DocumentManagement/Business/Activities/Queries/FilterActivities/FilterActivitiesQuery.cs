@@ -1,5 +1,7 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Filters.Activities;
+using DigitNow.Domain.DocumentManagement.utils;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Infrastructure.Data.Abstractions;
 
@@ -7,7 +9,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterA
 {
     public class FilterActivitiesQuery : AbstractFilterModel<Activity>, IQuery<ResultPagedList<ActivityViewModel>>
     {
-        public long? Id { get; set; }
-        public IEnumerable<long> DepartmentIds { get; set; }
+        public int LanguageId { get; set; } = LanguagesUtils.RomanianLanguageId;
+        public ActivityFilter Filter { get; set; }
     }
 }
