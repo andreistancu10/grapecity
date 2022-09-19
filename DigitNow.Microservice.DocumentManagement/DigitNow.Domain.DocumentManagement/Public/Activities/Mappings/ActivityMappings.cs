@@ -2,7 +2,6 @@
 using DigitNow.Domain.DocumentManagement.Business.Activities.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.Activities.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterActivities;
-using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities;
 using DigitNow.Domain.DocumentManagement.Data.Filters.Activities;
 using DigitNow.Domain.DocumentManagement.Public.Activities.Models;
 

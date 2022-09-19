@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities;
+using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Actions;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;

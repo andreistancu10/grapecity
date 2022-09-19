@@ -1,5 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities;
-using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Filters.Activities;
 using DigitNow.Domain.DocumentManagement.utils;
