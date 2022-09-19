@@ -1,11 +1,12 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
+using DigitNow.Domain.DocumentManagement.Data.Filters.Activities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Infrastructure.Data.Abstractions;
 
@@ -33,10 +34,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterA
         public async Task<ResultPagedList<ActivityViewModel>> Handle(FilterActivitiesQuery request, CancellationToken cancellationToken)
         {
             var currentUser = await _identityService.GetCurrentUserAsync(cancellationToken);
-            request.DepartmentIds = currentUser.Departments.Select(c => c.Id);
-            var activitiesPagedList = await _activityService.GetActivitiesAsync(_mapper.Map<ActivityFilter>(request), cancellationToken);
 
-            if (activitiesPagedList.List.Count == 0)
+            request.Filter.DepartmentsFilter = SetDepartmentsFilter(request.Filter.DepartmentsFilter.DepartmentIds, currentUser);
+
+            var page = request.PageNumber ?? 1;
+            var count = request.PageSize ?? 50;
+
+            var activities = await _activityService.GetActivitiesAsync(request.Filter, currentUser, page, count, cancellationToken);
+
+            if (activities.Count == 0)
             {
                 return new ResultPagedList<ActivityViewModel>(new PagingHeader(0, 0, 0, 0), null);
             }
@@ -44,11 +50,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterA
             await _activityRelationsFetcher.UseActivityFetcherContext(
                     new ActivitiesFetcherContext
                     {
-                        Activities = activitiesPagedList.List
+                        Activities = activities
                     })
                 .TriggerFetchersAsync(cancellationToken);
 
-            var activityViewModels = activitiesPagedList.List.Select(c =>
+            var activityViewModels = activities.Select(c =>
                 _mapper.Map<ActivityAggregate, ActivityViewModel>(new ActivityAggregate
                 {
                     Activity = c,
@@ -59,9 +65,27 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterA
                 }))
                 .ToList();
 
-            var resultPagedList = new ResultPagedList<ActivityViewModel>(activitiesPagedList.GetHeader(), activityViewModels.OrderByDescending(x => x.CreatedAt).ToList());
+            var pagedList = new PagedList<ActivityViewModel>(activityViewModels, activityViewModels.Count, page, count);
+            var resultPagedList = new ResultPagedList<ActivityViewModel>(pagedList.GetHeader(), activityViewModels.OrderByDescending(x => x.CreatedAt).ToList());
 
             return resultPagedList;
+        }
+
+        private DepartmentsFilter SetDepartmentsFilter(IReadOnlyCollection<long> departmentsFilterDepartmentIds, UserModel currentUser)
+        {
+            if (!departmentsFilterDepartmentIds.Any())
+            {
+                return new DepartmentsFilter
+                {
+                    DepartmentIds = currentUser.Departments.Select(c => c.Id).ToList()
+                };
+            }
+
+            return new DepartmentsFilter
+            {
+                DepartmentIds = currentUser.Departments.Select(c => c.Id)
+                    .Intersect(departmentsFilterDepartmentIds).ToList()
+            };
         }
     }
 }

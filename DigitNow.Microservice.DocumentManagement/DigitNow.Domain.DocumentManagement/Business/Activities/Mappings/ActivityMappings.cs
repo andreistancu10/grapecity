@@ -8,7 +8,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Mappings
     {
         public ActivityMappings()
         {
-            CreateMap<FilterActivitiesQuery,ActivityFilter>();
+            //CreateMap<FilterActivitiesQuery,ActivityFilter>(); TODO
         }
     }
 }

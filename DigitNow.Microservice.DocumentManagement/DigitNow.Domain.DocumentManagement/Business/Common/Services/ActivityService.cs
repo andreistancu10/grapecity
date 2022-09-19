@@ -4,27 +4,24 @@ using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Text;
-using DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterActivities;
-using DigitNow.Domain.DocumentManagement.Business.Common.Factories;
 using DigitNow.Domain.DocumentManagement.Business.Common.Filters;
 using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Abstractions;
-using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities;
-using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Documents;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
 using DigitNow.Domain.DocumentManagement.Data.Filters;
-using DigitNow.Domain.DocumentManagement.Data.Filters.SpecificObjectives;
+using DigitNow.Domain.DocumentManagement.Data.Filters.Activities;
 using HTSS.Platform.Infrastructure.Data.Abstractions;
-using HTSS.Platform.Infrastructure.Data.EntityFramework;
-using Nest;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IActivityService : IScimStateService
     {
-        Task<PagedList<Activity>> GetActivitiesAsync(ActivityFilter filter, UserModel currentUser, CancellationToken cancellationToken);
-        Task<long> CountActivitiesAsync(ActivityFilter filter, CancellationToken cancellationToken);
+        Task<List<Activity>> GetActivitiesAsync(ActivityFilter filter, UserModel currentUser,
+            int page, int count,
+            CancellationToken cancellationToken);
+        Task<long> CountActivitiesAsync(ActivityFilter filter, UserModel currentUser,
+            CancellationToken cancellationToken);
         Task<Activity> AddAsync(Activity activity, CancellationToken cancellationToken);
         Task UpdateAsync(Activity activity, CancellationToken cancellationToken);
         IQueryable<Activity> FindQuery();
@@ -41,20 +38,23 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             _serviceProvider = serviceProvider;
         }
 
-        public async Task<PagedList<Activity>> GetActivitiesAsync(ActivityFilter filter, UserModel currentUser, CancellationToken cancellationToken)
+        public async Task<List<Activity>> GetActivitiesAsync(ActivityFilter filter, UserModel currentUser, int page, int count, CancellationToken cancellationToken)
         {
             return await GetBuiltInActivitiesQuery()
-                .WhereAll((await GetActivitiesDataExpressions(currentUser, filter, cancellationToken)).ToPredicates())
-                .AsNoTracking()
-                .CountAsync(cancellationToken);
-
-            return pagedResult;
+                  .WhereAll((await GetActivitiesDataExpressions(filter, currentUser, cancellationToken)).ToPredicates())
+                  .OrderByDescending(x => x.CreatedAt)
+                  .Skip((page - 1) * count)
+                  .Take(count)
+                  .AsNoTracking()
+                  .ToListAsync(cancellationToken);
         }
 
-        public async Task<long> CountActivitiesAsync(ActivityFilter filter,
-            CancellationToken cancellationToken)
+        public async Task<long> CountActivitiesAsync(ActivityFilter filter, UserModel currentUser, CancellationToken cancellationToken)
         {
-            return await DbContext.Activities.CountAsync(c => filter.DepartmentsFilter.DepartmentIds.Contains(c.DepartmentId), cancellationToken);
+            return await GetBuiltInActivitiesQuery()
+                .WhereAll((await GetActivitiesDataExpressions(filter, currentUser, cancellationToken)).ToPredicates())
+                .AsNoTracking()
+                .CountAsync(cancellationToken);
         }
 
         public async Task<Activity> AddAsync(Activity activity, CancellationToken token)
@@ -125,29 +125,24 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
 
         private async Task<DataExpressions<Activity>> GetActivitiesDataExpressions(
-            UserModel currentUser,
             ActivityFilter filter,
+            UserModel currentUser,
             CancellationToken token)
         {
             var activitiesFilterComponent = new ActivitiesFilterComponent(_serviceProvider);
             var activitiesFilterComponentContext = new ActivitiesFilterComponentContext
             {
                 CurrentUser = currentUser,
-                ActivitiesPermissionsFilter = new ActivitiesPermissionsFilter
-                {
-                    UserPermissionsFilter = new ActivityUserPermissionsFilter()
-                },
-                
+                ActivityFilter = filter
             };
 
             return await activitiesFilterComponent.ExtractDataExpressionsAsync(activitiesFilterComponentContext, token);
         }
 
-        private IQueryable<SpecificObjective> GetBuiltInActivitiesQuery()
+        private IQueryable<Activity> GetBuiltInActivitiesQuery()
         {
-            return DbContext.SpecificObjectives
-                .Include(x => x.Objective)
-                .Include(x => x.SpecificObjectiveFunctionarys)
+            return DbContext.Activities
+                .Include(c => c.ActivityFunctionarys)
                 .Include(x => x.AssociatedGeneralObjective);
         }
     }
@@ -155,7 +150,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     internal class ActivitiesFilterComponentContext : IDataExpressionFilterComponentContext
     {
         public UserModel CurrentUser { get; set; }
-        public ActivitiesPermissionsFilter ActivitiesPermissionsFilter { get; set; }
+        public ActivityFilter ActivityFilter { get; set; }
     }
 
     internal class ActivitiesFilterComponent : DataExpressionFilterComponent<Activity, ActivitiesFilterComponentContext>
@@ -170,14 +165,33 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             var filter = new ActivitiesPermissionsFilter
             {
-                DepartmentsFilter = new ActivityUserPermissionsFilter
+                UserPermissionsFilter = new ActivityUserPermissionsFilter
                 {
-                    DepartmentIds = currentUser.Departments.Select(x => x.Id).ToList(),
+                    DepartmentIds = SetDepartmentsFilter(context.ActivityFilter.DepartmentsFilter.DepartmentIds, currentUser)
+                },
+                ActivitiesFilter = new ActivityActivitiesFilter
+                {
+                    ActivityIds = context.ActivityFilter.ActivitiesFilter.ActivityIds,
+                },
+                FunctionariesFilter = new ActivityFunctionariesFilter
+                {
+                    FunctionaryIds = context.ActivityFilter.FunctionariesFilter.FunctionaryIds
+                },
+                SpecificObjectivesFilter = new ActivitySpecificObjectivesFilter
+                {
+                    SpecificObjectiveIds = context.ActivityFilter.SpecificObjectivesFilter.SpecificObjectiveIds
                 }
             };
 
             return Task.FromResult(new ActivityFilterBuilder(ServiceProvider, filter)
                 .Build());
+        }
+
+        private List<long> SetDepartmentsFilter(IReadOnlyCollection<long> departmentsFilterDepartmentIds, UserModel currentUser)
+        {
+            return departmentsFilterDepartmentIds.Any()
+                ? currentUser.Departments.Select(c => c.Id).Intersect(departmentsFilterDepartmentIds).ToList()
+                : currentUser.Departments.Select(c => c.Id).ToList();
         }
     }
 
@@ -220,7 +234,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             if (EntityFilter.UserPermissionsFilter != null)
             {
-                BuildActivitiesFilter();
+                BuildUserPermissionsFilter();
             }
 
             if (EntityFilter.SpecificObjectivesFilter != null)
@@ -228,10 +242,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 BuildSpecificObjectivesFilter();
             }
 
-            if (EntityFilter.FunctionariesFilter != null)
-            {
-                BuildFunctionariesFilter();
-            }
+            //if (EntityFilter.FunctionariesFilter != null)
+            //{
+            //    BuildFunctionariesFilter();
+            //}
 
             if (EntityFilter.ActivitiesFilter != null)
             {
@@ -255,16 +269,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         private void BuildActivitiesFilter()
         {
-            var departments = EntityFilter.UserPermissionsFilter.DepartmentIds;
+            var activityIds = EntityFilter.ActivitiesFilter.ActivityIds;
 
-            EntityPredicates.Add(x => departments.Contains(x.DepartmentId));
+            EntityPredicates.Add(x => activityIds.Contains(x.Id));
         }
 
         private void BuildFunctionariesFilter()
         {
-            var departments = EntityFilter.UserPermissionsFilter.DepartmentIds;
+            var functionaryIds = EntityFilter.FunctionariesFilter.FunctionaryIds;
 
-            EntityPredicates.Add(x => departments.Contains(x.DepartmentId));
+            EntityPredicates.Add(x => functionaryIds.Intersect(x.ActivityFunctionarys.Select(c => c.FunctionaryId)).Any());
         }
     }
 }
