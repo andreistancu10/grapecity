@@ -74,7 +74,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
             finally
             {
-                dbContextTransaction?.Dispose();
+                dbContextTransaction.Dispose();
             }
 
             return activity;
@@ -186,9 +186,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .Build());
         }
 
-        private List<long> SetDepartmentsFilter(IReadOnlyCollection<long> departmentsFilterDepartmentIds, UserModel currentUser)
+        private static List<long> SetDepartmentsFilter(IReadOnlyCollection<long> departmentsFilterDepartmentIds, UserModel currentUser)
         {
-            departmentsFilterDepartmentIds=departmentsFilterDepartmentIds.Any()
+            departmentsFilterDepartmentIds = departmentsFilterDepartmentIds.Any()
                 ? currentUser.Departments.Select(c => c.Id).Intersect(departmentsFilterDepartmentIds).ToList()
                 : currentUser.Departments.Select(c => c.Id).ToList();
 

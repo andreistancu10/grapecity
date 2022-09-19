@@ -67,22 +67,5 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterA
 
             return resultPagedList;
         }
-
-        private DepartmentsFilter SetDepartmentsFilter(IReadOnlyCollection<long> departmentsFilterDepartmentIds, UserModel currentUser)
-        {
-            if (!departmentsFilterDepartmentIds.Any())
-            {
-                return new DepartmentsFilter
-                {
-                    DepartmentIds = currentUser.Departments.Select(c => c.Id).ToList()
-                };
-            }
-
-            return new DepartmentsFilter
-            {
-                DepartmentIds = currentUser.Departments.Select(c => c.Id)
-                    .Intersect(departmentsFilterDepartmentIds).ToList()
-            };
-        }
     }
 }
