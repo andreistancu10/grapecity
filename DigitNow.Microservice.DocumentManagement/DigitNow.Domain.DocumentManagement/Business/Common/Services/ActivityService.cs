@@ -1,7 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Text;
 using DigitNow.Domain.DocumentManagement.Business.Common.Filters;
@@ -11,7 +10,7 @@ using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
 using DigitNow.Domain.DocumentManagement.Data.Filters;
 using DigitNow.Domain.DocumentManagement.Data.Filters.Activities;
-using HTSS.Platform.Infrastructure.Data.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -189,9 +188,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         private List<long> SetDepartmentsFilter(IReadOnlyCollection<long> departmentsFilterDepartmentIds, UserModel currentUser)
         {
-            return departmentsFilterDepartmentIds.Any()
+            departmentsFilterDepartmentIds=departmentsFilterDepartmentIds.Any()
                 ? currentUser.Departments.Select(c => c.Id).Intersect(departmentsFilterDepartmentIds).ToList()
                 : currentUser.Departments.Select(c => c.Id).ToList();
+
+            if (!departmentsFilterDepartmentIds.Any())
+            {
+                departmentsFilterDepartmentIds = currentUser.Departments.Select(c => c.Id).ToList();
+            }
+
+            return departmentsFilterDepartmentIds.ToList();
         }
     }
 
@@ -237,17 +243,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 BuildUserPermissionsFilter();
             }
 
-            if (EntityFilter.SpecificObjectivesFilter != null)
+            if (EntityFilter.SpecificObjectivesFilter != null && EntityFilter.SpecificObjectivesFilter.SpecificObjectiveIds.Any())
             {
                 BuildSpecificObjectivesFilter();
             }
 
-            //if (EntityFilter.FunctionariesFilter != null)
-            //{
-            //    BuildFunctionariesFilter();
-            //}
+            if (EntityFilter.FunctionariesFilter != null && EntityFilter.FunctionariesFilter.FunctionaryIds.Any())
+            {
+                BuildFunctionariesFilter();
+            }
 
-            if (EntityFilter.ActivitiesFilter != null)
+            if (EntityFilter.ActivitiesFilter != null && EntityFilter.ActivitiesFilter.ActivityIds.Any())
             {
                 BuildActivitiesFilter();
             }
@@ -278,7 +284,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             var functionaryIds = EntityFilter.FunctionariesFilter.FunctionaryIds;
 
-            EntityPredicates.Add(x => functionaryIds.Intersect(x.ActivityFunctionarys.Select(c => c.FunctionaryId)).Any());
+            EntityPredicates.Add(x => x.ActivityFunctionarys.Any(y => functionaryIds.Contains(y.FunctionaryId)));
         }
     }
 }

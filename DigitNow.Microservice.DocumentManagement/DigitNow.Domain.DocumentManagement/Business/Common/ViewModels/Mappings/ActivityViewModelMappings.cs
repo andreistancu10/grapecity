@@ -70,7 +70,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             var foundSpecificObjective = source.SpecificObjectives.FirstOrDefault(c => c.ObjectiveId == source.Activity.SpecificObjectiveId);
             return foundSpecificObjective == null
                 ? null
-                : new BasicViewModel(foundSpecificObjective.Id, foundSpecificObjective.Title);
+                : new BasicViewModel(foundSpecificObjective.ObjectiveId, foundSpecificObjective.Title);
         }
     }
 
@@ -82,7 +82,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             var foundGeneralObjective = source.GeneralObjectives.FirstOrDefault(c => c.ObjectiveId == source.Activity.GeneralObjectiveId);
             return foundGeneralObjective == null
                 ? null
-                : new BasicViewModel(foundGeneralObjective.Id, foundGeneralObjective.Title);
+                : new BasicViewModel(foundGeneralObjective.ObjectiveId, foundGeneralObjective.Title);
         }
     }
 }

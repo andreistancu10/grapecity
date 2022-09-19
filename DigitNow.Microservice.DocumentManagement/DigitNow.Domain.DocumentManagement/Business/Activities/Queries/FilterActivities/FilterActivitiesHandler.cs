@@ -34,9 +34,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterA
         public async Task<ResultPagedList<ActivityViewModel>> Handle(FilterActivitiesQuery request, CancellationToken cancellationToken)
         {
             var currentUser = await _identityService.GetCurrentUserAsync(cancellationToken);
-
-            request.Filter.DepartmentsFilter = SetDepartmentsFilter(request.Filter.DepartmentsFilter.DepartmentIds, currentUser);
-
             var page = request.PageNumber ?? 1;
             var count = request.PageSize ?? 50;
 
