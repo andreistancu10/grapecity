@@ -143,7 +143,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private IQueryable<Activity> GetBuiltInActivitiesQuery()
         {
             return DbContext.Activities
-                .Include(c => c.ActivityFunctionarys)
+                .Include(c => c.ActivityFunctionaries)
                 .Include(x => x.AssociatedGeneralObjective);
         }
     }
