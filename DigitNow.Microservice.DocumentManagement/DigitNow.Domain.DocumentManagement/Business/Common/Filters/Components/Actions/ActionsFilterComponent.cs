@@ -31,18 +31,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
                 .Build());
         }
 
-        private static List<long> SetDepartmentsFilter(IReadOnlyCollection<long> departmentsFilterDepartmentIds, UserModel currentUser)
+        private static List<long> SetDepartmentsFilter(IReadOnlyCollection<long> departmentIds, UserModel currentUser)
         {
-            departmentsFilterDepartmentIds = departmentsFilterDepartmentIds.Any()
-                ? currentUser.Departments.Select(c => c.Id).Intersect(departmentsFilterDepartmentIds).ToList()
-                : currentUser.Departments.Select(c => c.Id).ToList();
-
-            if (!departmentsFilterDepartmentIds.Any())
+            if (departmentIds == null || !departmentIds.Any())
             {
-                departmentsFilterDepartmentIds = currentUser.Departments.Select(c => c.Id).ToList();
+                departmentIds = currentUser.Departments.Select(c => c.Id).ToList();
+            }
+            else
+            {
+                departmentIds = currentUser.Departments.Select(c => c.Id).Intersect(departmentIds).ToList();
             }
 
-            return departmentsFilterDepartmentIds.ToList();
+            return departmentIds.ToList();
         }
     }
 }
