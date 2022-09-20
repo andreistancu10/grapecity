@@ -20,7 +20,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Common.Models.Mappings
             CreateMap<ActivitiesFilterDto, ActivitiesFilter>();
             CreateMap<DepartmentsFilterDto, DepartmentsFilter>();
             CreateMap<FunctionariesFilterDto, FunctionariesFilter>();
-            CreateMap<ActionsFilterDto, ActionsFilter>();
+            CreateMap<ActionsFilterDto, ActionFilter>();
         }
     }
 }

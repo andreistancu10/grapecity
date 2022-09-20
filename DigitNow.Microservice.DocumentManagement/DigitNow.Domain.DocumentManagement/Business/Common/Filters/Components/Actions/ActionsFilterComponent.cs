@@ -1,5 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Data.Filters;
+using DigitNow.Domain.DocumentManagement.Data.Filters.Actions;
 using Action = DigitNow.Domain.DocumentManagement.Data.Entities.Action;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Actions
@@ -16,21 +17,21 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
 
             var filter = new ActionPermissionsFilter
             {
-                UserPermissionsFilter = new ActionUserPermissionsFilter
+                DepartmentsFilter = new ActionUserPermissionsFilter
                 {
-                    DepartmentIds = SetDepartmentsFilter(context.ActionsFilter.DepartmentsFilter.DepartmentIds, currentUser)
+                    DepartmentIds = SetDepartmentsFilter(context.ActionFilter.DepartmentsFilter.DepartmentIds, currentUser)
                 },
-                ActionsFilter = new ActionActionsFilter
+                ActionsFilter = new ActionsFilter
                 {
-                    ActionIds = context.ActionsFilter.ActionsFilter.ActionIds,
+                    ActionIds = context.ActionFilter.ActionsFilter.ActionIds,
                 },
                 FunctionariesFilter = new ActionFunctionariesFilter
                 {
-                    FunctionaryIds = context.ActionsFilter.FunctionariesFilter.FunctionaryIds
+                    FunctionaryIds = context.ActionFilter.FunctionariesFilter.FunctionaryIds
                 },
                 SpecificObjectivesFilter = new ActionSpecificObjectivesFilter
                 {
-                    SpecificObjectiveIds = context.ActionsFilter.SpecificObjectivesFilter.SpecificObjectiveIds
+                    SpecificObjectiveIds = context.ActionFilter.SpecificObjectivesFilter.SpecificObjectiveIds
                 }
             };
 

@@ -2,6 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Filters;
+using DigitNow.Domain.DocumentManagement.Data.Filters.Common;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities
 {
@@ -17,22 +18,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
 
             var filter = new ActivitiesPermissionsFilter
             {
-                UserPermissionsFilter = new ActivityUserPermissionsFilter
+                DepartmentsFilter = new DepartmentsFilter
                 {
                     DepartmentIds = SetDepartmentsFilter(context.ActivityFilter.DepartmentsFilter.DepartmentIds, currentUser)
                 },
-                ActivitiesFilter = new ActivityActivitiesFilter
-                {
-                    ActivityIds = context.ActivityFilter.ActivitiesFilter.ActivityIds,
-                },
-                FunctionariesFilter = new ActivityFunctionariesFilter
-                {
-                    FunctionaryIds = context.ActivityFilter.FunctionariesFilter.FunctionaryIds
-                },
-                SpecificObjectivesFilter = new ActivitySpecificObjectivesFilter
-                {
-                    SpecificObjectiveIds = context.ActivityFilter.SpecificObjectivesFilter.SpecificObjectiveIds
-                }
+                ActivitiesFilter = context.ActivityFilter.ActivitiesFilter,
+                FunctionariesFilter = context.ActivityFilter.FunctionariesFilter,
+                SpecificObjectivesFilter = context.ActivityFilter.SpecificObjectivesFilter
             };
 
             return Task.FromResult(new ActivityFilterBuilder(ServiceProvider, filter)

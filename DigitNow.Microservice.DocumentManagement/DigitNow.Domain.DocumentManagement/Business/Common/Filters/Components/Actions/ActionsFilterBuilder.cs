@@ -12,7 +12,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
 
         protected override void InternalBuild()
         {
-            if (EntityFilter.UserPermissionsFilter != null)
+            if (EntityFilter.DepartmentsFilter != null)
             {
                 BuildUserPermissionsFilter();
             }
@@ -35,7 +35,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
 
         private void BuildUserPermissionsFilter()
         {
-            var departmentIds = EntityFilter.UserPermissionsFilter.DepartmentIds;
+            var departmentIds = EntityFilter.DepartmentsFilter.DepartmentIds;
 
             EntityPredicates.Add(x => departmentIds.Contains(x.DepartmentId));
         }

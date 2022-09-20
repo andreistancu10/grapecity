@@ -1,19 +1,21 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Contracts.Scim;
 using DigitNow.Domain.DocumentManagement.Data;
-using HTSS.Platform.Infrastructure.Data.Abstractions;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Actions;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
+using DigitNow.Domain.DocumentManagement.Data.Extensions;
+using DigitNow.Domain.DocumentManagement.Data.Filters;
 using DigitNow.Domain.DocumentManagement.Data.Filters.Actions;
 using Action = DigitNow.Domain.DocumentManagement.Data.Entities.Action;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
-    //TODO: Refactor this (Exclude query from parameters)
     public interface IActionService : IScimStateService
     {
-        Task<PagedList<Action>> GetActionsAsync(ActionsFilter filter, CancellationToken cancellationToken);
+        Task<List<Action>> GetActionsAsync(ActionFilter filter, UserModel currentUser, int page, int count,
+            CancellationToken cancellationToken);
         Task<Action> CreateAsync(Action action, CancellationToken cancellationToken);
         Task UpdateAsync(Action action, CancellationToken cancellationToken);
         IQueryable<Action> FindQuery();
@@ -21,20 +23,24 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
     public class ActionService : ScimStateService, IActionService
     {
-        public ActionService(DocumentManagementDbContext dbContext) : base(dbContext)
+        private readonly IServiceProvider _serviceProvider;
+
+        public ActionService(
+            DocumentManagementDbContext dbContext,
+            IServiceProvider serviceProvider) : base(dbContext)
         {
+            _serviceProvider = serviceProvider;
         }
 
-        public async Task<PagedList<Action>> GetActionsAsync(ActionsFilter filter, CancellationToken cancellationToken)
+        public async Task<List<Action>> GetActionsAsync(ActionFilter filter, UserModel currentUser, int page, int count, CancellationToken cancellationToken)
         {
-            var actions = await DbContext.Actions
-                .Include(x => x.AssociatedActivity)
-                .Where(x => x.ActivityId == filter.ActivityId)
-                .Skip((int)((filter.PageSize ?? 20) * (filter.PageNumber - 1)))
-                .Take(filter.PageSize ?? 20)
+            return await GetBuiltInActionsQuery()
+                .WhereAll((await GetActionsDataExpressions(filter, currentUser, cancellationToken)).ToPredicates())
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((page - 1) * count)
+                .Take(count)
+                .AsNoTracking()
                 .ToListAsync(cancellationToken);
-
-            return new PagedList<Action>(actions.AsQueryable(), filter.PageNumber, filter.PageSize);
         }
 
         public async Task<Action> CreateAsync(Action action, CancellationToken cancellationToken)
@@ -67,6 +73,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                                  .FirstOrDefaultAsync(token);
 
             var sb = new StringBuilder();
+
             if (lastAction == null)
             {
                 var activity = await DbContext.Activities
@@ -88,6 +95,28 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 sb.Append(int.Parse(subs[3]) + 1);
             }
             action.Code = sb.ToString();
+        }
+
+        private Task<DataExpressions<Action>> GetActionsDataExpressions(
+            ActionFilter filter,
+            UserModel currentUser,
+            CancellationToken token)
+        {
+            var activitiesFilterComponent = new ActionsFilterComponent(_serviceProvider);
+            var activitiesFilterComponentContext = new ActionsFilterComponentContext
+            {
+                CurrentUser = currentUser,
+                ActionFilter = filter
+            };
+
+            return activitiesFilterComponent.ExtractDataExpressionsAsync(activitiesFilterComponentContext, token);
+        }
+
+        private IQueryable<Action> GetBuiltInActionsQuery()
+        {
+            return DbContext.Actions
+                .Include(c => c.ActionFunctionaries)
+                .Include(x => x.AssociatedActivity);
         }
     }
 }

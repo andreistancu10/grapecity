@@ -7,6 +7,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
     internal class ActionsFilterComponentContext : IDataExpressionFilterComponentContext
     {
         public UserModel CurrentUser { get; set; }
-        public ActionsFilter ActionsFilter { get; set; }
+        public ActionFilter ActionFilter { get; set; }
     }
 }

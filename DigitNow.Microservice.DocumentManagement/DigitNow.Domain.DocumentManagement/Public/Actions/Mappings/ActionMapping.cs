@@ -17,7 +17,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Actions.Mappings
             CreateMap<CreateActionRequest, CreateActionCommand>();
             CreateMap<UpdateActionRequest, UpdateActionCommand>();
             CreateMap<FilterActionsRequest, FilterActionsQuery>();
-            CreateMap<ActionFilterDto, ActionsFilter>();
+            CreateMap<ActionFilterDto, ActionFilter>();
         }
     }
 }
