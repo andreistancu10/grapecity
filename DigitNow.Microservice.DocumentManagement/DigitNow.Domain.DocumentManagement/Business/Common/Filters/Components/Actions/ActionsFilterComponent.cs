@@ -19,12 +19,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
             {
                 DepartmentsFilter = new DepartmentsFilter
                 {
-                    DepartmentIds = SetDepartmentsFilter(context.ActionFilter.DepartmentsFilter.DepartmentIds, currentUser)
+                    DepartmentIds = SetDepartmentsFilter(context.ActionFilter?.DepartmentsFilter?.DepartmentIds, currentUser)
                 },
-                ActionsFilter = context.ActionFilter.ActionsFilter,
-                FunctionariesFilter = context.ActionFilter.FunctionariesFilter,
-                SpecificObjectivesFilter = context.ActionFilter.SpecificObjectivesFilter,
-                ActivitiesFilter = context.ActionFilter.ActivitiesFilter
+                ActionsFilter = context.ActionFilter?.ActionsFilter,
+                FunctionariesFilter = context.ActionFilter?.FunctionariesFilter,
+                SpecificObjectivesFilter = context.ActionFilter?.SpecificObjectivesFilter,
+                ActivitiesFilter = context.ActionFilter?.ActivitiesFilter
             };
 
             return Task.FromResult(new ActionFilterBuilder(ServiceProvider, filter)

@@ -12,22 +12,22 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
 
         protected override void InternalBuild()
         {
-            if (EntityFilter.DepartmentsFilter != null)
+            if (EntityFilter?.DepartmentsFilter != null)
             {
                 BuildUserPermissionsFilter();
             }
 
-            if (EntityFilter.SpecificObjectivesFilter != null && EntityFilter.SpecificObjectivesFilter.SpecificObjectiveIds.Any())
+            if (EntityFilter?.SpecificObjectivesFilter != null && EntityFilter.SpecificObjectivesFilter.SpecificObjectiveIds.Any())
             {
                 BuildSpecificObjectivesFilter();
             }
 
-            if (EntityFilter.FunctionariesFilter != null && EntityFilter.FunctionariesFilter.FunctionaryIds.Any())
+            if (EntityFilter?.FunctionariesFilter != null && EntityFilter.FunctionariesFilter.FunctionaryIds.Any())
             {
                 BuildFunctionariesFilter();
             }
 
-            if (EntityFilter.ActivitiesFilter != null && EntityFilter.ActivitiesFilter.ActivityIds.Any())
+            if (EntityFilter?.ActivitiesFilter != null && EntityFilter.ActivitiesFilter.ActivityIds.Any())
             {
                 BuildActivitiesFilter();
             }
