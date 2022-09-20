@@ -25,7 +25,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Queries
                 .Where(item => item.ObjectiveId == request.ObjectiveId)
                 .Include(item => item.Objective)
                 .Include(item => item.AssociatedGeneralObjective.Objective)
-                .Include(item => item.SpecificObjectiveFunctionarys).FirstOrDefaultAsync(cancellationToken);
+                .Include(item => item.SpecificObjectiveFunctionaries).FirstOrDefaultAsync(cancellationToken);
 
             if (specificObjective == null)
             {

@@ -22,7 +22,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForPath(c => c.AssociatedSpecificObjective.Title, opt => opt.MapFrom(src => src.AssociatedSpecificObjective.Objective.Title))
                 .ForPath(c => c.AssociatedSpecificObjective.Details, opt => opt.MapFrom(src => src.AssociatedSpecificObjective.Objective.Details))
                 .ForPath(c => c.AssociatedSpecificObjective.ModificationMotive, opt => opt.MapFrom(src => src.AssociatedGeneralObjective.Objective.ModificationMotive))
-            .ForPath(c => c.FunctionaryIds, opt => opt.MapFrom(src => src.ActivityFunctionarys.Select(x => x.FunctionaryId).ToList()));
+            .ForPath(c => c.FunctionaryIds, opt => opt.MapFrom(src => src.ActivityFunctionaries.Select(x => x.FunctionaryId).ToList()));
 
             CreateMap<GeneralObjective, GeneralObjectiveDto>()
                 .ForMember(c => c.ObjectiveId, opt => opt.MapFrom(src => src.ObjectiveId))
@@ -38,6 +38,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(c => c.State, opt => opt.MapFrom(src => src.Objective.State))
                 .ForMember(c => c.Title, opt => opt.MapFrom(src => src.Objective.Title))
                 .ForMember(c => c.Details, opt => opt.MapFrom(src => src.Objective.Details))
+                .ForMember(c => c.DepartmentId, opt => opt.MapFrom(src => src.DepartmentId))
                 .ForMember(c => c.ModificationMotive, opt => opt.MapFrom(src => src.Objective.ModificationMotive));
         }
     }

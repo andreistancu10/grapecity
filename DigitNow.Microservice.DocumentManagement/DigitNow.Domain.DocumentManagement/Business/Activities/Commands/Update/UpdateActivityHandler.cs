@@ -28,7 +28,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Commands.Update
             var initialActivity = await _activityService.FindQuery().Where(item => item.Id == request.Id)
                 .Include(item => item.AssociatedGeneralObjective)
                 .Include(item => item.AssociatedSpecificObjective)
-                .Include(item => item.ActivityFunctionarys)
+                .Include(item => item.ActivityFunctionaries)
                     .FirstOrDefaultAsync(cancellationToken);
 
             if (initialActivity == null)

@@ -28,7 +28,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
             var initialSpecificObjective = await _specificObjectiveService.FindQuery()
                 .Where(item => item.ObjectiveId == request.ObjectiveId)
                 .Include(item => item.Objective)
-                .Include(item => item.SpecificObjectiveFunctionarys)
+                .Include(item => item.SpecificObjectiveFunctionaries)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (initialSpecificObjective == null)

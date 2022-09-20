@@ -12,7 +12,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities.Configurations
             builder.HasKey(p => p.Id);
 
             builder.HasOne(item => item.SpecificObjective)
-                 .WithMany(item => item.SpecificObjectiveFunctionarys)
+                 .WithMany(item => item.SpecificObjectiveFunctionaries)
                  .HasPrincipalKey(x => x.ObjectiveId)
                  .HasForeignKey(item => item.SpecificObjectiveId);
         }

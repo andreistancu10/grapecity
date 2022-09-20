@@ -18,7 +18,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         #region [ References ]
         public GeneralObjective AssociatedGeneralObjective { get; set; }
         public SpecificObjective AssociatedSpecificObjective { get; set; }
-        public List<ActivityFunctionary> ActivityFunctionarys { get; set; }
+        public List<ActivityFunctionary> ActivityFunctionaries { get; set; }
         public List<Action> Actions { get; set; }
         public List<Risk> Risks { get; set; }
         #endregion
