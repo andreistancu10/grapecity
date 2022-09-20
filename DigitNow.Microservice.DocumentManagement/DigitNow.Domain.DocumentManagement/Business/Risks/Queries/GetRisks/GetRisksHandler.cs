@@ -16,11 +16,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Risks.Queries.GetRisks
         }
         public async Task<ResultObject> Handle(GetRisksQuery request, CancellationToken cancellationToken)
         {
-            var totalItems = await _riskService.CountRisksAsync(request.Filter, cancellationToken);
+            var totalItems = await _riskService.CountAsync(request.Filter, cancellationToken);
 
             if (totalItems == 0) return ResultObject.Ok(GetEmptyPageRisksResponse(request));
 
-            var risks = await _riskService.GetRisksAsync(request.Filter,
+            var risks = await _riskService.GetAllAsync(request.Filter,
                 request.Page,
                 request.Count,
                 cancellationToken);
