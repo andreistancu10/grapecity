@@ -110,6 +110,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<IActivityFunctionaryService, ActivityFunctionaryService>();
             services.AddTransient<IRiskControlActionService, RiskControlActionService>();
             services.AddTransient<IRiskService, RiskService>();
+            services.AddTransient<IRiskMappingService, RiskMappingService>();
 
             return services;
         }

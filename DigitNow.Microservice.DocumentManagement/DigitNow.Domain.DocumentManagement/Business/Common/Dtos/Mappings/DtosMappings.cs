@@ -2,6 +2,8 @@
 using DigitNow.Domain.Authentication.Contracts;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Actions;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Activities;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos.Mappings
@@ -27,6 +29,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos.Mappings
                 .ForMember(x => x.WebSite, opt => opt.Ignore())
                 .ForMember(x => x.Header, opt => opt.Ignore())
                 .ForMember(x => x.IsLegalEntity, opt => opt.Ignore());
+
+            CreateMap<ActionFunctionary, FunctionaryDto>()
+               .ForMember(x => x.EntityId, opt => opt.MapFrom(src => src.ActionId));
+
+            CreateMap<ActivityFunctionary, FunctionaryDto>()
+               .ForMember(x => x.EntityId, opt => opt.MapFrom(src => src.ActivityId));
+
+            CreateMap<SpecificObjectiveFunctionary, FunctionaryDto>()
+               .ForMember(x => x.EntityId, opt => opt.MapFrom(src => src.SpecificObjectiveId));
         }
     }
 }

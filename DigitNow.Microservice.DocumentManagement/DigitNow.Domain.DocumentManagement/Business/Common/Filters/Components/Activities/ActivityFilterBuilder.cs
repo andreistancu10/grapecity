@@ -58,7 +58,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
         {
             var functionaryIds = EntityFilter.FunctionariesFilter.FunctionaryIds;
 
-            EntityPredicates.Add(x => x.ActivityFunctionarys.Any(y => functionaryIds.Contains(y.FunctionaryId)));
+            EntityPredicates.Add(x => x.ActivityFunctionaries.Any(y => functionaryIds.Contains(y.FunctionaryId)));
         }
     }
 }

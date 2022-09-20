@@ -91,7 +91,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             return _dbContext.SpecificObjectives
                  .Include(x => x.Objective)
-                 .Include(x => x.SpecificObjectiveFunctionarys)
+                 .Include(x => x.SpecificObjectiveFunctionaries)
                  .Include(x => x.AssociatedGeneralObjective);
         }
     }
