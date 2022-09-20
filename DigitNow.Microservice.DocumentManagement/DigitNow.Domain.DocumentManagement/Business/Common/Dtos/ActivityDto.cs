@@ -10,6 +10,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos
         public ScimState State { get; set; }
         public string Details { get; set; }
         public long DepartmentId { get; set; }
-        public List<FunctionaryDto> ActivityFunctionarys { get; set; }
+        public List<FunctionaryDto> ActivityFunctionaries { get; set; }
     }
 }

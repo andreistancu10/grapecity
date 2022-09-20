@@ -23,7 +23,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForPath(c => c.AssociatedGeneralObjective.Title, opt => opt.MapFrom(src => src.AssociatedGeneralObjective.Objective.Title))
                 .ForPath(c => c.AssociatedGeneralObjective.Details, opt => opt.MapFrom(src => src.AssociatedGeneralObjective.Objective.Details))
                 .ForPath(c => c.AssociatedGeneralObjective.ModificationMotive, opt => opt.MapFrom(src => src.AssociatedGeneralObjective.Objective.ModificationMotive))
-                .ForPath(c => c.FunctionaryId, opt => opt.MapFrom(src => src.SpecificObjectiveFunctionarys.Select(x => x.FunctionaryId).ToList()));
+                .ForPath(c => c.FunctionaryId, opt => opt.MapFrom(src => src.SpecificObjectiveFunctionaries.Select(x => x.FunctionaryId).ToList()));
 
             CreateMap<GeneralObjectiveAggregate, GeneralObjectiveViewModel>()
                 .ForMember(c => c.Id, opt => opt.MapFrom(src => src.GeneralObjective.ObjectiveId))

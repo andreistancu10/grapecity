@@ -26,8 +26,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.GetById
                 .Include(item => item.AssociatedGeneralObjective.Objective)
                 .Include(item => item.AssociatedSpecificObjective)
                 .Include(item => item.AssociatedSpecificObjective.Objective)
-                .Include(item => item.AssociatedSpecificObjective.SpecificObjectiveFunctionarys)
-                .Include(item => item.ActivityFunctionarys).FirstOrDefaultAsync(cancellationToken);
+                .Include(item => item.AssociatedSpecificObjective.SpecificObjectiveFunctionaries)
+                .Include(item => item.ActivityFunctionaries).FirstOrDefaultAsync(cancellationToken);
 
             if (activity == null)
                 return new GetActivityViewModel();

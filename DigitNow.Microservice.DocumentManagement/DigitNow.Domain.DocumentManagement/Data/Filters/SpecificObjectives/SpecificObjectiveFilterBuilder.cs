@@ -57,7 +57,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.SpecificObjectives
         {
             if (EntityFilter.FunctionaryFilter != null)
             {
-                EntityPredicates.Add(x => x.SpecificObjectiveFunctionarys.Any(x => x.FunctionaryId == EntityFilter.FunctionaryFilter.FunctionaryId));
+                EntityPredicates.Add(x => x.SpecificObjectiveFunctionaries.Any(x => x.FunctionaryId == EntityFilter.FunctionaryFilter.FunctionaryId));
             }
         }
 

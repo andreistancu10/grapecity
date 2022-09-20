@@ -47,19 +47,19 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             private static List<BasicViewModel> ExtractDepartment<T>(VirtualObjectiveAgregate<T> source)
                 where T : VirtualObjective
             {
-                var functionarysIds = source.VirtualObjective.Objective.SpecificObjective.SpecificObjectiveFunctionarys?.Select(x => x.FunctionaryId).ToList();
-                if (functionarysIds != null)
+                var functionariesIds = source.VirtualObjective.Objective.SpecificObjective.SpecificObjectiveFunctionaries?.Select(x => x.FunctionaryId).ToList();
+                if (functionariesIds.Any())
                 {
-                    var functionarys = new List<BasicViewModel>();
-                    foreach (var functionaryId in functionarysIds)
+                    var functionaries = new List<BasicViewModel>();
+                    foreach (var functionaryId in functionariesIds)
                     {
                         var foundUser = source.Users.FirstOrDefault(x => x.Id == functionaryId);
                         if (foundUser != null)
                         {
-                            functionarys.Add(new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}"));
+                            functionaries.Add(new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}"));
                         }
                     }
-                    return functionarys;
+                    return functionaries;
                 }
                 return default;
             }

@@ -11,6 +11,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos
         public string Details { get; set; }
         public string ModificationMotive { get; set; }
         public long DepartmentId { get; set; }
-        public List<FunctionaryDto> SpecificObjectiveFunctionarys { get; set; }
+        public List<FunctionaryDto> SpecificObjectiveFunctionaries { get; set; }
     }
 }

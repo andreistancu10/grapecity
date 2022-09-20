@@ -12,7 +12,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities.Activities.Configurat
             builder.HasKey(p => p.Id);
 
             builder.HasOne(item => item.Activity)
-                 .WithMany(item => item.ActivityFunctionarys)
+                 .WithMany(item => item.ActivityFunctionaries)
                  .HasForeignKey(item => item.ActivityId);
         }
     }

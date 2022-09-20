@@ -22,7 +22,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Queries.GetById
         {
             var action = await _actionService.FindQuery()
                 .Include(c => c.AssociatedActivity)
-                .Include(c => c.AssociatedActivity.ActivityFunctionarys)
+                .Include(c => c.AssociatedActivity.ActivityFunctionaries)
                 .AsNoTracking()
                 .Include(x => x.ActionFunctionaries)
                 .FirstOrDefaultAsync(item => item.Id == request.Id, cancellationToken);

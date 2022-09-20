@@ -19,7 +19,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Mappings
                 .ForPath(dest => dest.Activity.Code, opt => opt.MapFrom(src => src.AssociatedActivity.Code))
                 .ForPath(dest => dest.Activity.Details, opt => opt.MapFrom(src => src.AssociatedActivity.Details))
                 .ForPath(dest => dest.Activity.DepartmentId, opt => opt.MapFrom(src => src.AssociatedActivity.DepartmentId))
-                .ForPath(dest => dest.Activity.ActivityFunctionarys, opt => opt.MapFrom(src => src.AssociatedActivity.ActivityFunctionarys));
+                .ForPath(dest => dest.Activity.ActivityFunctionaries, opt => opt.MapFrom(src => src.AssociatedActivity.ActivityFunctionaries));
 
 
             CreateMap<ActionFunctionary, ActionFunctionaryResponse>();
