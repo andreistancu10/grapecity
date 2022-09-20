@@ -3,9 +3,9 @@ using Action = DigitNow.Domain.DocumentManagement.Data.Entities.Action;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Actions
 {
-    internal class ActionsFilterBuilder : DataExpressionFilterBuilder<Action, ActionPermissionsFilter>
+    internal class ActionFilterBuilder : DataExpressionFilterBuilder<Action, ActionPermissionsFilter>
     {
-        public ActionsFilterBuilder(IServiceProvider serviceProvider, ActionPermissionsFilter filter)
+        public ActionFilterBuilder(IServiceProvider serviceProvider, ActionPermissionsFilter filter)
             : base(serviceProvider, filter)
         {
         }
@@ -31,6 +31,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
             {
                 BuildActionsFilter();
             }
+
+            if (EntityFilter.ActivitiesFilter != null && EntityFilter.ActivitiesFilter.ActivityIds.Any())
+            {
+                BuildActivitiesFilter();
+            }
         }
 
         private void BuildUserPermissionsFilter()
@@ -44,7 +49,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
         {
             var specificObjectiveIds = EntityFilter.SpecificObjectivesFilter.SpecificObjectiveIds;
 
-            EntityPredicates.Add(x => specificObjectiveIds.Contains(x.SpecificObjectiveId));
+            EntityPredicates.Add(x => specificObjectiveIds.Contains(x.AssociatedActivity.SpecificObjectiveId));
         }
 
         private void BuildActionsFilter()
@@ -54,11 +59,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
             EntityPredicates.Add(x => activityIds.Contains(x.Id));
         }
 
+        private void BuildActivitiesFilter()
+        {
+            var activityIds = EntityFilter.ActivitiesFilter.ActivityIds;
+
+            EntityPredicates.Add(x => activityIds.Contains(x.Id));
+        }
+
         private void BuildFunctionariesFilter()
         {
             var functionaryIds = EntityFilter.FunctionariesFilter.FunctionaryIds;
 
-            EntityPredicates.Add(x => x.ActionsFunctionarys.Any(y => functionaryIds.Contains(y.FunctionaryId)));
+            EntityPredicates.Add(x => x.ActionFunctionaries.Any(y => functionaryIds.Contains(y.FunctionaryId)));
         }
     }
 }
