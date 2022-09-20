@@ -1,10 +1,17 @@
-﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
+﻿using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Contracts.Risks.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Scim;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
+using DigitNow.Domain.DocumentManagement.Data.Extensions;
+using DigitNow.Domain.DocumentManagement.Data.Filters.Risks;
+using DigitNow.Domain.DocumentManagement.Data.Filters;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
+using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Documents;
+using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Risks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -12,13 +19,23 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         Task<Risk> AddAsync(Risk risk, CancellationToken cancellationToken);
         Task UpdateAsync(Risk risk, CancellationToken cancellationToken);
+        Task<long> CountAsync(RiskFilter filter, CancellationToken cancellationToken);
         IQueryable<Risk> FindQuery();
+        Task<List<Risk>> GetAllAsync(RiskFilter filter, int page, int count, CancellationToken cancellationToken);
     }
 
     public class RiskService : ScimStateService, IRiskService
     {
-        public RiskService(DocumentManagementDbContext dbContext) : base(dbContext)
+        private readonly DocumentManagementDbContext _dbContext;
+        private readonly IIdentityService _identityService;
+        private readonly IServiceProvider _serviceProvider;
+        private UserModel _currentUser;
+
+        public RiskService(DocumentManagementDbContext dbContext, IIdentityService identityService, IServiceProvider serviceProvider) : base(dbContext)
         {
+            _dbContext = dbContext;
+            _identityService = identityService;
+            _serviceProvider = serviceProvider;
         }
 
         public async Task<Risk> AddAsync(Risk risk, CancellationToken cancellationToken)
@@ -85,6 +102,61 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 (RiskProbability.High, RiskProbability.High) => RiskExposure.RR,
                 _ => null,
             };
+        }
+
+        public async Task<long> CountAsync(RiskFilter filter, CancellationToken cancellationToken)
+        {
+            _currentUser = await _identityService.GetCurrentUserAsync(cancellationToken);
+            
+            return await _dbContext.Risks
+                .WhereAll((await GetRisksExpressions(_currentUser, filter, cancellationToken)).ToPredicates())
+                .AsNoTracking()
+                .CountAsync(cancellationToken);
+        }
+
+        private async Task<DataExpressions<Risk>> GetRisksExpressions(UserModel currentUser, RiskFilter filter, CancellationToken token)
+        {
+            var dataExpressions = new DataExpressions<Risk>();
+
+            dataExpressions.AddRange(await GetRisksExpressionsAsync(filter, token));
+            dataExpressions.AddRange(await GetRisksUserRightsExpressionsAsync(currentUser, token));
+
+            return dataExpressions;
+        }
+
+        private Task<DataExpressions<Risk>> GetRisksUserRightsExpressionsAsync(UserModel currentUser, CancellationToken token)
+        {
+            var rightsComponent = new RisksPermissionsFilterComponent(_serviceProvider);
+            var rightsComponentContext = new RisksPermissionsFilterComponentContext
+            {
+                CurrentUser = currentUser
+            };
+
+            return rightsComponent.ExtractDataExpressionsAsync(rightsComponentContext, token);
+        }
+
+        private Task<DataExpressions<Risk>> GetRisksExpressionsAsync(RiskFilter filter, CancellationToken token)
+        {
+            var filterComponent = new RisksFilterComponent(_serviceProvider);
+            var filterComponentContext = new RisksFilterComponentContext
+            {
+                RiskFilter = filter
+            };
+
+            return filterComponent.ExtractDataExpressionsAsync(filterComponentContext, token);
+        }
+
+        public async Task<List<Risk>> GetAllAsync(RiskFilter filter, int page, int count, CancellationToken cancellationToken)
+        {
+            var risks = await _dbContext.Risks
+                .WhereAll((await GetRisksExpressions(_currentUser, filter, cancellationToken)).ToPredicates())
+                .OrderByDescending(x => x.CreatedAt)
+                .Skip((page - 1) * count)
+                .Take(count)
+                .AsNoTracking()
+                .ToListAsync(cancellationToken);
+
+            return risks;
         }
     }
 }
