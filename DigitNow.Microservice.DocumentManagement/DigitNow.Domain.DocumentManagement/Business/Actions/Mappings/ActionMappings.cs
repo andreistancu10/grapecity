@@ -2,7 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Business.Actions.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.Actions.Queries.FilterActions;
 using DigitNow.Domain.DocumentManagement.Business.Actions.Queries.GetById;
-using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities;
+using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Actions;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Actions;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Actions.Mappings
