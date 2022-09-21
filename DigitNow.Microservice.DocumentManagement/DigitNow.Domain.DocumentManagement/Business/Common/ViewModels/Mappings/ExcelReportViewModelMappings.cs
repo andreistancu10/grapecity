@@ -11,7 +11,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             CreateMap<ReportViewModel, ExportReportViewModel>()
                .ForMember(c => c.Recipient, opt => opt.MapFrom(src => src.Recipient.Name))
                .ForMember(c => c.Issuer, opt => opt.MapFrom(src => src.Issuer.Name))
-               .ForMember(c => c.CurrentStatus, opt => opt.MapFrom(src => src.Issuer.Name))
+               .ForMember(c => c.CurrentStatus, opt => opt.MapFrom(src => src.CurrentStatus.Label))
                .ForMember(c => c.DocumentType, opt => opt.MapFrom(src => src.DocumentType.Label))
                .ForMember(c => c.DocumentCategory, opt => opt.MapFrom(src => src.DocumentCategory.Name))
                .ForMember(c => c.Functionary, opt => opt.MapFrom<MapFunctionary>())

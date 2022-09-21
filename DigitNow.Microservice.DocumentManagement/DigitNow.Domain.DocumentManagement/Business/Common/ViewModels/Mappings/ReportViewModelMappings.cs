@@ -214,7 +214,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 var foundTranslation = source.DocumentStatusTranslations.FirstOrDefault(x => x.Status == source.VirtualDocument.Document.Status);
                 if (foundTranslation != null)
                 {
-                    viewModel.Status = foundTranslation.Status;
+                    viewModel.Label = foundTranslation.Translation;
                 }
 
                 return viewModel;
