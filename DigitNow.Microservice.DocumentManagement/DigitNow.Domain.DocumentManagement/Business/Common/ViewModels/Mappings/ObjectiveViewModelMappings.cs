@@ -47,26 +47,33 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             private static List<BasicViewModel> ExtractDepartment<T>(VirtualObjectiveAgregate<T> source)
                 where T : VirtualObjective
             {
-                var functionariesIds = source.VirtualObjective.Objective.SpecificObjective.SpecificObjectiveFunctionaries?.Select(x => x.FunctionaryId).ToList() ?? new List<long>();
+                var specificObjectiveFunctionaries = source.VirtualObjective.Objective.SpecificObjective.SpecificObjectiveFunctionaries;
 
-                if (functionariesIds.Any())
+                if (specificObjectiveFunctionaries == null)
                 {
-                    var functionaries = new List<BasicViewModel>();
-
-                    foreach (var functionaryId in functionariesIds)
-                    {
-                        var foundUser = source.Users.FirstOrDefault(x => x.Id == functionaryId);
-
-                        if (foundUser != null)
-                        {
-                            functionaries.Add(new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}"));
-                        }
-                    }
-
-                    return functionaries;
+                    return default;
                 }
 
-                return default;
+                var functionariesIds = specificObjectiveFunctionaries.Select(x => x.FunctionaryId).ToList();
+
+                if (!functionariesIds.Any())
+                {
+                    return default;
+                }
+
+                var functionaries = new List<BasicViewModel>();
+
+                foreach (var functionaryId in functionariesIds)
+                {
+                    var foundUser = source.Users.FirstOrDefault(x => x.Id == functionaryId);
+
+                    if (foundUser != null)
+                    {
+                        functionaries.Add(new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}"));
+                    }
+                }
+
+                return functionaries;
             }
         }
 
