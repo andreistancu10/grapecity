@@ -1,56 +1,24 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Models;
-using DigitNow.Domain.DocumentManagement.Business.Common.Services;
-using DigitNow.Domain.DocumentManagement.Data.Entities;
+﻿using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Filters;
+using DigitNow.Domain.DocumentManagement.Data.Filters.Activities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities
 {
     internal class ActivitiesFilterComponent : DataExpressionFilterComponent<Activity, ActivitiesFilterComponentContext>
     {
-        public ActivitiesFilterComponent(IServiceProvider serviceProvider) : base(serviceProvider)
-        {
-        }
+        public ActivitiesFilterComponent(IServiceProvider serviceProvider) : base(serviceProvider){}
 
         protected override Task<DataExpressions<Activity>> SetCustomDataExpressionsAsync(ActivitiesFilterComponentContext context, CancellationToken token)
         {
-            var currentUser = context.CurrentUser;
+            var dataExpressions = new DataExpressions<Activity>();
 
-            var filter = new ActivitiesPermissionsFilter
+            if (!context.ActivityFilter.IsEmpty())
             {
-                UserPermissionsFilter = new ActivityUserPermissionsFilter
-                {
-                    DepartmentIds = SetDepartmentsFilter(context.ActivityFilter.DepartmentsFilter.DepartmentIds, currentUser)
-                },
-                ActivitiesFilter = new ActivityActivitiesFilter
-                {
-                    ActivityIds = context.ActivityFilter.ActivitiesFilter.ActivityIds,
-                },
-                FunctionariesFilter = new ActivityFunctionariesFilter
-                {
-                    FunctionaryIds = context.ActivityFilter.FunctionariesFilter.FunctionaryIds
-                },
-                SpecificObjectivesFilter = new ActivitySpecificObjectivesFilter
-                {
-                    SpecificObjectiveIds = context.ActivityFilter.SpecificObjectivesFilter.SpecificObjectiveIds
-                }
-            };
-
-            return Task.FromResult(new ActivityFilterBuilder(ServiceProvider, filter)
-                .Build());
-        }
-
-        private static List<long> SetDepartmentsFilter(IReadOnlyCollection<long> departmentsFilterDepartmentIds, UserModel currentUser)
-        {
-            departmentsFilterDepartmentIds = departmentsFilterDepartmentIds.Any()
-                ? currentUser.Departments.Select(c => c.Id).Intersect(departmentsFilterDepartmentIds).ToList()
-                : currentUser.Departments.Select(c => c.Id).ToList();
-
-            if (!departmentsFilterDepartmentIds.Any())
-            {
-                departmentsFilterDepartmentIds = currentUser.Departments.Select(c => c.Id).ToList();
+                var filterBuilder = new ActivityFilterBuilder(ServiceProvider, context.ActivityFilter);
+                dataExpressions.AddRange(filterBuilder.Build());
             }
 
-            return departmentsFilterDepartmentIds.ToList();
+            return Task.FromResult(dataExpressions);
         }
     }
 }

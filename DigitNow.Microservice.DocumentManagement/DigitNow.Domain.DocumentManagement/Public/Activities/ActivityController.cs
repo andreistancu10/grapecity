@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Activities
 {
-    [Authorize]
+    //[Authorize]
     [ApiController]
     [Route("api/activity")]
     public class ActivityController : ApiController
