@@ -26,6 +26,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities.Risks
         public string? UtilizedDocumentation { get; set; }
 
         public List<RiskControlAction> RiskControlActions { get; set; }
+        public List<RiskTrackingReport> RiskTrackingReports { get; set; } = new();
 
         public GeneralObjective AssociatedGeneralObjective { get; set; }
         public SpecificObjective AssociatedSpecificObjective { get; set; }

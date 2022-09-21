@@ -2,7 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Contracts.Risks.Enums;
 using HTSS.Platform.Core.CQRS;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Risks.Commands.Create
+namespace DigitNow.Domain.DocumentManagement.Business.Risks.Commands.CreateRisk
 {
     public class CreateRiskCommand : ICommand<ResultObject>
     {

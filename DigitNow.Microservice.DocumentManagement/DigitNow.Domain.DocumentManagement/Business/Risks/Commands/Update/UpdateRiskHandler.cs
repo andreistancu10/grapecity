@@ -24,13 +24,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Risks.Commands.Update
         }
         public async Task<ResultObject> Handle(UpdateRiskCommand request, CancellationToken cancellationToken)
         {
-            var initialRisk = await _riskService.FindQuery().Where(item => item.Id == request.Id)
-                .Include(item => item.AssociatedGeneralObjective)
-                .Include(item => item.AssociatedSpecificObjective)
-                .Include(item => item.AssociatedActivity)
-                .Include(item => item.AssociatedAction)
-                .Include(item => item.RiskControlActions)
-                    .FirstOrDefaultAsync(cancellationToken);
+            var initialRisk = await _riskService.FindQuery()
+                    .Include(item => item.RiskControlActions)
+                    .FirstOrDefaultAsync(item => item.Id == request.Id, cancellationToken);
 
             if (initialRisk == null)
                 return ResultObject.Error(new ErrorMessage
@@ -56,7 +52,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Risks.Commands.Update
 
             await _riskService.UpdateAsync(initialRisk, cancellationToken);
 
-            if (request.RiskControlActions != null)
+            if (request.RiskControlActions.Any())
                 await _riskControlActionService.AddRangeAsync(request.RiskControlActions, initialRisk, cancellationToken);
 
             if (request.UploadedFileIds.Any())
