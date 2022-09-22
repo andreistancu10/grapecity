@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DigitNow.Domain.DocumentManagement.Public.GeneralObjectives
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     [Route("api/general-objectives")]
     public class GeneralObjectivesController : ApiController
