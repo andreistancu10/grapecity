@@ -31,7 +31,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Risks.Commands.CreateRisk
 
             await _riskService.AddAsync(risk, cancellationToken);
 
-            if (request.RiskControlActions != null)
+            if (request.RiskControlActions.Any())
                 await _riskControlActionService.AddRangeAsync(request.RiskControlActions, risk, cancellationToken);
 
             if (request.UploadedFileIds.Any())

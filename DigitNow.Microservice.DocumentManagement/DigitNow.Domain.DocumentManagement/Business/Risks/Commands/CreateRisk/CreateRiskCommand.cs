@@ -23,7 +23,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Risks.Commands.CreateRisk
         public string StrategyDetails { get; set; }
         public string? UtilizedDocumentation { get; set; }
 
-        public List<RiskControlActionDto> RiskControlActions { get; set; }
+        public List<RiskControlActionDto> RiskControlActions { get; set; } = new();
         public List<long> UploadedFileIds { get; set; }
     }
 }
