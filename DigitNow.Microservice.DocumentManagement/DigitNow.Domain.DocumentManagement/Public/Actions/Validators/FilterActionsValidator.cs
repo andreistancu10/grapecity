@@ -7,7 +7,6 @@ namespace DigitNow.Domain.DocumentManagement.Public.Actions.Validators
     {
         public FilterActionsValidator()
         {
-            RuleFor(item => item.ActivityId).NotNull().NotEmpty();
         }
     }
 }

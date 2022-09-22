@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Actions;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
@@ -33,21 +32,24 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Queries.FilterActi
         public async Task<ResultPagedList<ActionViewModel>> Handle(FilterActionsQuery request, CancellationToken cancellationToken)
         {
             var currentUser = await _identityService.GetCurrentUserAsync(cancellationToken);
-            var actionsPagedList = await _actionService.GetActionsAsync(_mapper.Map<ActionFilter>(request), cancellationToken);
+            var page = request.PageNumber ?? 1;
+            var count = request.PageSize ?? 50;
 
-            if (actionsPagedList.List.Count == 0)
+            var actions = await _actionService.GetActionsAsync(request.Filter, currentUser, page, count, cancellationToken);
+
+            if (actions.Count == 0)
             {
-                return new ResultPagedList<ActionViewModel>(new PagingHeader(0, 0, 0, 0), new List<ActionViewModel>());
+                return new ResultPagedList<ActionViewModel>(new PagingHeader(0,page,count,1), new List<ActionViewModel>());
             }
 
             await _actionRelationsFetcher.UseActionFetcherContext(
                     new ActionsFetcherContext
                     {
-                        Actions = actionsPagedList.List
+                        Actions = actions
                     })
                 .TriggerFetchersAsync(cancellationToken);
 
-            var actionViewModels = actionsPagedList.List.Select(c =>
+            var actionViewModels = actions.Select(c =>
                 _mapper.Map<ActionAggregate, ActionViewModel>(new ActionAggregate
                 {
                     Action = c,
@@ -58,7 +60,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Queries.FilterActi
                 }))
                 .ToList();
 
-            var resultPagedList = new ResultPagedList<ActionViewModel>(actionsPagedList.GetHeader(), actionViewModels.OrderByDescending(x => x.CreatedAt).ToList());
+            var pagedList = new PagedList<ActionViewModel>(actionViewModels, actionViewModels.Count, page, count);
+            var resultPagedList = new ResultPagedList<ActionViewModel>(pagedList.GetHeader(), actionViewModels.OrderByDescending(x => x.CreatedAt).ToList());
 
             return resultPagedList;
         }
