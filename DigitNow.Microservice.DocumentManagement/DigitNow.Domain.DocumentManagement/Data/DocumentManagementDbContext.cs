@@ -110,7 +110,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
             {
                 var optionsBuilder = new DbContextOptionsBuilder<DocumentManagementDbContext>();
 
-                optionsBuilder.UseSqlServer("Server=localhost,1433;Database=DigitNow-dev-DocumentManagement;User Id=sa;Password=admin123!;", builder =>
+                optionsBuilder.UseSqlServer("Server=localhost,1433;Database=DEV_DIGIT_NOW_DataKlas_DocumentManagement;User Id=sa;Password=admin123!;", builder =>
                 {
                     builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
                 });
