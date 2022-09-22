@@ -125,15 +125,33 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         }
 
 
-        private Task<DataExpressions<Activity>> GetActivitiesDataExpressions(
-            ActivityFilter filter,
-            UserModel currentUser,
-            CancellationToken token)
+        private async Task<DataExpressions<Activity>> GetActivitiesDataExpressions(ActivityFilter filter, UserModel currentUser, CancellationToken token)
+        {
+            var dataExpressions = new DataExpressions<Activity>();
+
+            dataExpressions.AddRange(await GetActivitiesExpressionsAsync(filter, token));
+            dataExpressions.AddRange(await GetActivitiesUserRightsExpressionsAsync(currentUser, token));
+
+            return dataExpressions;
+        }
+
+        private Task<DataExpressions<Activity>> GetActivitiesUserRightsExpressionsAsync(UserModel currentUser, CancellationToken token)
+        {
+            var rightsComponent = new ActivitiesPermissionsFilterComponent(_serviceProvider);
+            var rightsComponentContext = new ActivitiesPermissionsFilterComponentContext
+            {
+                CurrentUser = currentUser
+            };
+
+            return rightsComponent.ExtractDataExpressionsAsync(rightsComponentContext, token);
+        }
+
+        private Task<DataExpressions<Activity>> GetActivitiesExpressionsAsync(ActivityFilter filter, CancellationToken token)
         {
             var activitiesFilterComponent = new ActivitiesFilterComponent(_serviceProvider);
+
             var activitiesFilterComponentContext = new ActivitiesFilterComponentContext
             {
-                CurrentUser = currentUser,
                 ActivityFilter = filter
             };
 
