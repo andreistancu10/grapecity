@@ -17,11 +17,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IRiskService : IScimStateService
     {
+        // Create
         Task<Risk> AddAsync(Risk risk, CancellationToken cancellationToken);
-        Task UpdateAsync(Risk risk, CancellationToken cancellationToken);
-        Task<long> CountAsync(RiskFilter filter, CancellationToken cancellationToken);
-        IQueryable<Risk> FindQuery();
+        Task<RiskTrackingReport> CreateRiskTrackingReportAsync(RiskTrackingReport riskTrackingReport, CancellationToken cancellationToken);
+
+        // Read
+        IQueryable<Risk> GetByIdQuery(long riskId);
         Task<List<Risk>> GetAllAsync(RiskFilter filter, int page, int count, CancellationToken cancellationToken);
+        Task<long> CountAsync(RiskFilter filter, CancellationToken cancellationToken);
+
+        // Update
+        Task UpdateAsync(Risk risk, CancellationToken cancellationToken);
     }
 
     public class RiskService : ScimStateService, IRiskService
@@ -36,6 +42,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             _dbContext = dbContext;
             _identityService = identityService;
             _serviceProvider = serviceProvider;
+        }
+
+        public IQueryable<Risk> GetByIdQuery(long riskId)
+        {
+            return _dbContext.Risks.Where(risk => risk.Id == riskId);
         }
 
         public async Task<Risk> AddAsync(Risk risk, CancellationToken cancellationToken)
@@ -62,11 +73,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
 
             return risk;
-        }
-
-        public IQueryable<Risk> FindQuery()
-        {
-            return DbContext.Risks.AsQueryable();
         }
 
         public async Task UpdateAsync(Risk Risk, CancellationToken cancellationToken)
@@ -157,6 +163,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .ToListAsync(cancellationToken);
 
             return risks;
+        }
+
+        public async Task<RiskTrackingReport> CreateRiskTrackingReportAsync(RiskTrackingReport riskTrackingReport, CancellationToken cancellationToken)
+        {
+            await _dbContext.RiskTrackingReports.AddAsync(riskTrackingReport, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return riskTrackingReport;
         }
     }
 }

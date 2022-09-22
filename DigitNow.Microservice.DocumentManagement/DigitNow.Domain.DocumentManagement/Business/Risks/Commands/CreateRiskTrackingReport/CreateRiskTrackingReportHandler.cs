@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Data;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
+using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
@@ -10,19 +12,22 @@ namespace DigitNow.Domain.DocumentManagement.Business.Risks.Commands.CreateRiskT
     public class CreateRiskTrackingReportHandler : ICommandHandler<CreateRiskTrackingReportCommand, ResultObject>
     {
         private readonly IMapper _mapper;
-        private readonly DocumentManagementDbContext _dbContext;
+        private readonly IRiskService _riskService;
+        private readonly IUploadedFileService _uploadedFileService;
 
-        public CreateRiskTrackingReportHandler(DocumentManagementDbContext dbContext, IMapper mapper)
+        public CreateRiskTrackingReportHandler(IRiskService riskService, IUploadedFileService uploadedFileService, IMapper mapper)
         {
             _mapper = mapper;
-            _dbContext = dbContext;
+            _riskService = riskService;
+            _uploadedFileService = uploadedFileService;
         }
 
         public async Task<ResultObject> Handle(CreateRiskTrackingReportCommand command, CancellationToken cancellationToken)
         {
             var riskTrackingReport = _mapper.Map<RiskTrackingReport>(command);
 
-            var foundRisk = await _dbContext.Risks.FirstOrDefaultAsync(x => x.Id == riskTrackingReport.RiskId, cancellationToken);
+            var foundRisk = await _riskService.GetByIdQuery(riskTrackingReport.RiskId)
+                                              .FirstOrDefaultAsync(cancellationToken);
 
             if (foundRisk == null)
                 return ResultObject.Error(new ErrorMessage
@@ -32,10 +37,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Risks.Commands.CreateRiskT
                     Parameters = new object[] { command.RiskId }
                 });
 
-            await _dbContext.RiskTrackingReports.AddAsync(riskTrackingReport, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
+            var createdRiskTrackingReport = await _riskService.CreateRiskTrackingReportAsync(riskTrackingReport, cancellationToken);
 
-            return ResultObject.Created(riskTrackingReport.Id);
+            if (command.UploadedFileIds.Any())
+            {
+                await _uploadedFileService.UpdateUploadedFilesWithTargetIdAsync(command.UploadedFileIds, createdRiskTrackingReport.Id, TargetEntity.ScimRiskTrackingReport, cancellationToken);
+            }
+
+            return ResultObject.Created(createdRiskTrackingReport.Id);
         }
     }
 }

@@ -24,9 +24,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Risks.Commands.Update
         }
         public async Task<ResultObject> Handle(UpdateRiskCommand request, CancellationToken cancellationToken)
         {
-            var initialRisk = await _riskService.FindQuery()
+            var initialRisk = await _riskService.GetByIdQuery(request.Id)
                     .Include(item => item.RiskControlActions)
-                    .FirstOrDefaultAsync(item => item.Id == request.Id, cancellationToken);
+                    .FirstOrDefaultAsync(cancellationToken);
 
             if (initialRisk == null)
                 return ResultObject.Error(new ErrorMessage

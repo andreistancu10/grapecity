@@ -14,7 +14,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Risks
 {
-    //[Authorize]
     [ApiController]
     [Route("api/risk")]
     public class RiskController : ApiController
@@ -60,7 +59,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Risks
         {
             if(probability != 0 && impact != 0)
                 return Ok(RiskService.CalculateRiskExposureEvaluation(probability, impact));
-            return NotFound();
+            return BadRequest();
         }
 
         [HttpPost("get-risks")]
