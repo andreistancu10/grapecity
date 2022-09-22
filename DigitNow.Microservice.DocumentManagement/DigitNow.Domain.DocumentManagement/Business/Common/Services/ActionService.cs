@@ -102,14 +102,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             UserModel currentUser,
             CancellationToken token)
         {
-            var activitiesFilterComponent = new ActionsFilterComponent(_serviceProvider);
-            var activitiesFilterComponentContext = new ActionsFilterComponentContext
+            var actionsFilterComponent = new ActionsFilterComponent(_serviceProvider);
+            var actionsFilterComponentContext = new ActionsFilterComponentContext
             {
                 CurrentUser = currentUser,
                 ActionFilter = filter
             };
 
-            return activitiesFilterComponent.ExtractDataExpressionsAsync(activitiesFilterComponentContext, token);
+            return actionsFilterComponent.ExtractDataExpressionsAsync(actionsFilterComponentContext, token);
         }
 
         private IQueryable<Action> GetBuiltInActionsQuery()
