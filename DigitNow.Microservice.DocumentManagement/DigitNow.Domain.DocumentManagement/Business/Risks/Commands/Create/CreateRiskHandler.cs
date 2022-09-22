@@ -7,7 +7,7 @@ using HTSS.Platform.Core.CQRS;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Risks.Commands.Create
 {
-    internal class CreateRiskHandler : ICommandHandler<CreateRiskCommand, ResultObject>
+    public class CreateRiskHandler : ICommandHandler<CreateRiskCommand, ResultObject>
     {
         private readonly IRiskService _riskService;
         private readonly IUploadedFileService _uploadedFileService;

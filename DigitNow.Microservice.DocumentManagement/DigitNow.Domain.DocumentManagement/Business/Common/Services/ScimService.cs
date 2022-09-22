@@ -53,6 +53,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                     await ChangeRisksStateAsync(entityIds, state.Value, cancellationToken);
                     break;
 
+                case ScimEntity.ScimProcedure:
+                    await ChangeProceduresStateAsync(entityIds, state.Value, cancellationToken);
+                    break;
+
                 default:
                     throw new ArgumentOutOfRangeException(nameof(scimEntity), scimEntity, null);
             }
@@ -139,6 +143,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             risks.ForEach(c => c.State = state);
             DbContext.Risks.UpdateRange(risks);
+        }
+
+        private async Task ChangeProceduresStateAsync(ICollection<long> entityIds, ScimState state, CancellationToken cancellationToken)
+        {
+            var procedures = await DbContext.Procedures
+                .Where(c => entityIds.Contains(c.Id) && c.State != state)
+                .ToListAsync(cancellationToken);
+
+            procedures.ForEach(c => c.State = state);
+            DbContext.Procedures.UpdateRange(procedures);
         }
     }
 }
