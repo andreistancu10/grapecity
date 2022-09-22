@@ -39,7 +39,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Queries.FilterActi
 
             if (actions.Count == 0)
             {
-                return new ResultPagedList<ActionViewModel>(new PagingHeader(0, 0, 0, 0), new List<ActionViewModel>());
+                return new ResultPagedList<ActionViewModel>(new PagingHeader(0,page,count,1), new List<ActionViewModel>());
             }
 
             await _actionRelationsFetcher.UseActionFetcherContext(

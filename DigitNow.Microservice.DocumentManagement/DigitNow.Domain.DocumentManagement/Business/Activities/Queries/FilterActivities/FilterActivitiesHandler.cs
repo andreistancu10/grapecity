@@ -41,7 +41,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterA
 
             if (activities.Count == 0)
             {
-                return new ResultPagedList<ActivityViewModel>(new PagingHeader(0, 0, 0, 0), null);
+                return new ResultPagedList<ActivityViewModel>(new PagingHeader(0, page, count, 1), null);
             }
 
             await _activityRelationsFetcher.UseActivityFetcherContext(
