@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Risks
 {
+    [Authorize]
     [ApiController]
     [Route("api/risk")]
     public class RiskController : ApiController
