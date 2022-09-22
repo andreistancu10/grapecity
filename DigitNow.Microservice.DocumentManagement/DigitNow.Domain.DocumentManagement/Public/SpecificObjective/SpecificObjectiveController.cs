@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DigitNow.Domain.DocumentManagement.Public.SpecialObjective
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     [Route("api/specific-objectives")]
     public class SpecificObjectiveController : ApiController
