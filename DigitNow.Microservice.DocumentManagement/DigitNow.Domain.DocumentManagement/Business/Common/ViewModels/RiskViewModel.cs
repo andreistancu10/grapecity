@@ -4,6 +4,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
 {
     public class RiskViewModel
     {
+        public long Id { get; set; }
         public string Code { get; set; }
         public BasicViewModel SpecificObjective { get; set; }
         public BasicViewModel Department { get; set; }
