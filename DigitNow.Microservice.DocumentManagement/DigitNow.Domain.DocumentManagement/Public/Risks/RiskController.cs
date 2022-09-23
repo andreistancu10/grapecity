@@ -58,8 +58,11 @@ namespace DigitNow.Domain.DocumentManagement.Public.Risks
         [HttpGet("calculateRiskExposure/{probability}/{impact}")]
         public IActionResult CalculateRiskExposureEvaluation([FromRoute] RiskProbability probability, [FromRoute] RiskProbability impact)
         {
-            if(probability != 0 && impact != 0)
-                return Ok(RiskService.CalculateRiskExposureEvaluation(probability, impact));
+            if (probability != 0 && impact != 0)
+                return Ok(new
+                {
+                    RiskExposure = RiskService.CalculateRiskExposureEvaluation(probability, impact)
+                });
             return BadRequest();
         }
 
