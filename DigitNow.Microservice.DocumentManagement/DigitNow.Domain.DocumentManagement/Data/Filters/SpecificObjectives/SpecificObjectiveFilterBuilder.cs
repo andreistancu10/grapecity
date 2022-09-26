@@ -39,7 +39,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.SpecificObjectives
 
         private void BuildTitleFilter()
         {
-            if (EntityFilter.TitleFilter != null && EntityFilter.TitleFilter.Title != String.Empty)
+            if (EntityFilter.TitleFilter != null && EntityFilter.TitleFilter.Title != string.Empty)
             {
                 EntityPredicates.Add(x => x.Objective.Title == EntityFilter.TitleFilter.Title);
             }
@@ -65,7 +65,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.SpecificObjectives
         {
             if (EntityFilter.StateFilter != null)
             {
-                EntityPredicates.Add(x => x.Objective.State == EntityFilter.StateFilter.StateId);
+                EntityPredicates.Add(x => x.Objective.StateId == EntityFilter.StateFilter.StateId);
             }
         }
     }

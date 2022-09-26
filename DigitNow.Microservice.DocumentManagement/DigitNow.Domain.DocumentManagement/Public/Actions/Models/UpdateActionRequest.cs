@@ -6,7 +6,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Actions.Models
     {
         public long Id { get; set; }
         public string Title { get; set; }
-        public ScimState State { get; set; }
+        public long StateId{ get; set; }
         public string Details { get; set; }
         public List<long> ActionFunctionariesIds { get; set; }
         public List<long> UploadedFileIds { get; set; }

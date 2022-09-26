@@ -5,6 +5,7 @@ using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Text;
+using DigitNow.Domain.Catalog.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
@@ -29,12 +30,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     public class ActivityService : ScimStateService, IActivityService
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly ICatalogClient _catalogClient;
 
         public ActivityService(
             DocumentManagementDbContext dbContext,
-            IServiceProvider serviceProvider) : base(dbContext)
+            IServiceProvider serviceProvider,
+            ICatalogClient catalogClient) : base(dbContext)
         {
             _serviceProvider = serviceProvider;
+            _catalogClient = catalogClient;
         }
 
         public async Task<List<Activity>> GetActivitiesAsync(ActivityFilter filter, UserModel currentUser, int page, int count, CancellationToken cancellationToken)
@@ -56,22 +60,25 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .CountAsync(cancellationToken);
         }
 
-        public async Task<Activity> AddAsync(Activity activity, CancellationToken token)
+        public async Task<Activity> AddAsync(Activity activity, CancellationToken cancellationToken)
         {
-            activity.State = ScimState.Active;
+            var scimStates = await _catalogClient.ScimStates.GetScimStatesAsync(cancellationToken);
+            
+            //TODO how do I know which is the correct value
+            activity.StateId = ScimState.Active; 
             IDbContextTransaction dbContextTransaction = null;
 
             try
             {
-                dbContextTransaction = await DbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, token);
+                dbContextTransaction = await DbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
                 DbContext.Entry(activity).State = EntityState.Added;
-                await SetActivityCodeAsync(activity, token);
-                await DbContext.SaveChangesAsync(token);
-                await dbContextTransaction.CommitAsync(token);
+                await SetActivityCodeAsync(activity, cancellationToken);
+                await DbContext.SaveChangesAsync(cancellationToken);
+                await dbContextTransaction.CommitAsync(cancellationToken);
             }
             catch
             {
-                await dbContextTransaction?.RollbackAsync(token);
+                await dbContextTransaction?.RollbackAsync(cancellationToken);
                 throw;
             }
             finally
@@ -89,7 +96,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task UpdateAsync(Activity activity, CancellationToken cancellationToken)
         {
-            await ChangeStateAsync(new List<long> { activity.Id }, ScimEntity.ScimActivity, activity.State, cancellationToken);
+            await ChangeStateAsync(new List<long> { activity.Id }, ScimEntity.ScimActivity, activity.StateId, cancellationToken);
             await DbContext.SingleUpdateAsync(activity, cancellationToken);
             await DbContext.SaveChangesAsync(cancellationToken);
         }

@@ -4,6 +4,7 @@ using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using DigitNow.Domain.Catalog.Client;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -17,14 +18,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         private readonly IObjectiveService _objectiveService;
         private readonly IGeneralObjectiveService _generalObjectiveService;
+        private readonly ICatalogClient _catalogClient;
 
         public SpecificObjectiveService(
             DocumentManagementDbContext dbContext,
             IObjectiveService objectiveService,
-            IGeneralObjectiveService generalObjectiveService) : base(dbContext)
+            IGeneralObjectiveService generalObjectiveService,
+            ICatalogClient catalogClient) : base(dbContext)
         {
             _objectiveService = objectiveService;
             _generalObjectiveService = generalObjectiveService;
+            _catalogClient = catalogClient;
         }
 
         public async Task<SpecificObjective> AddAsync(SpecificObjective specificObjective, CancellationToken cancellationToken)
@@ -35,7 +39,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
 
             specificObjective.Objective.ObjectiveType = ObjectiveType.Specific;
-            specificObjective.Objective.State = ScimState.Active;
+            var scimStates = await _catalogClient.ScimStates.GetScimStatesAsync(cancellationToken);
+
+            //TODO how do I know which is the correct value
+            specificObjective.Objective.StateId = ScimState.Active;
             specificObjective.Objective.SpecificObjective = specificObjective;
             await _objectiveService.AddAsync(specificObjective.Objective, cancellationToken);
 
@@ -68,7 +75,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task UpdateAsync(SpecificObjective specificObjective, CancellationToken cancellationToken)
         {
-            await ChangeStateAsync(new List<long> { specificObjective.ObjectiveId }, ScimEntity.SpecificObjective, specificObjective.Objective?.State, cancellationToken);
+            await ChangeStateAsync(new List<long> { specificObjective.ObjectiveId }, ScimEntity.SpecificObjective, specificObjective.Objective?.StateId, cancellationToken);
             await DbContext.SingleUpdateAsync(specificObjective, cancellationToken);
             await DbContext.SaveChangesAsync(cancellationToken);
         }

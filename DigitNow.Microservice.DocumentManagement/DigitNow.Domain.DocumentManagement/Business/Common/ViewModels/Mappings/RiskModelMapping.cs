@@ -13,7 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(x => x.Code, opt => opt.MapFrom(src => src.Risk.Code))
                 .ForMember(x => x.SpecificObjective, opt => opt.MapFrom<MapRiskSpecificObjective>())
                 .ForMember(x => x.DateOfLastRevision, opt => opt.MapFrom(src => src.Risk.ModifiedAt ?? src.Risk.CreatedAt))
-                .ForMember(x => x.State, opt => opt.MapFrom(src => src.Risk.State))
+                .ForMember(x => x.StateId, opt => opt.MapFrom(src => src.Risk.StateId))
                 .ForMember(x => x.Department, opt => opt.MapFrom<MapDepartment>());
         }
     }

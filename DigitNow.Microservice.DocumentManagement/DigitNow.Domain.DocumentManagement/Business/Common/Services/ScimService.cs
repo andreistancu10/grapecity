@@ -7,7 +7,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
     public interface IScimStateService
     {
-        Task ChangeStateAsync(ICollection<long> entityIds, ScimEntity scimEntity, ScimState? state,
+        Task ChangeStateAsync(ICollection<long> entityIds, ScimEntity scimEntity, long? stateId,
             CancellationToken cancellationToken);
     }
 
@@ -23,10 +23,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         public virtual async Task ChangeStateAsync(
             ICollection<long> entityIds,
             ScimEntity scimEntity,
-            ScimState? state,
+            long? stateId,
             CancellationToken cancellationToken)
         {
-            if (!entityIds.Any() || !state.HasValue)
+            if (!entityIds.Any() || !stateId.HasValue)
             {
                 return;
             }
@@ -34,23 +34,23 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             switch (scimEntity)
             {
                 case ScimEntity.GeneralObjective:
-                    await ChangeGeneralObjectivesStateAsync(entityIds, state.Value, cancellationToken);
+                    await ChangeGeneralObjectivesStateAsync(entityIds, stateId.Value, cancellationToken);
                     break;
 
                 case ScimEntity.SpecificObjective:
-                    await ChangeSpecificObjectivesStateAsync(entityIds, state.Value, cancellationToken);
+                    await ChangeSpecificObjectivesStateAsync(entityIds, stateId.Value, cancellationToken);
                     break;
 
                 case ScimEntity.ScimActivity:
-                    await ChangeActivitiesStateAsync(entityIds, state.Value, cancellationToken);
+                    await ChangeActivitiesStateAsync(entityIds, stateId.Value, cancellationToken);
                     break;
 
                 case ScimEntity.ScimAction:
-                    await ChangeActionsStateAsync(entityIds, state.Value, cancellationToken);
+                    await ChangeActionsStateAsync(entityIds, stateId.Value, cancellationToken);
                     break;
 
                 case ScimEntity.ScimRisk:
-                    await ChangeRisksStateAsync(entityIds, state.Value, cancellationToken);
+                    await ChangeRisksStateAsync(entityIds, stateId.Value, cancellationToken);
                     break;
 
                 default:
@@ -58,14 +58,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
         }
 
-        private async Task ChangeGeneralObjectivesStateAsync(ICollection<long> entityIds, ScimState state, CancellationToken cancellationToken)
+        private async Task ChangeGeneralObjectivesStateAsync(ICollection<long> entityIds, long stateId, CancellationToken cancellationToken)
         {
             var generalObjectives = await DbContext.GeneralObjectives
                 .Include(c => c.Objective)
-                .Where(c => entityIds.Contains(c.Id) && c.Objective.State != state)
+                .Where(c => entityIds.Contains(c.Id) && c.Objective.StateId != stateId)
                 .ToListAsync(cancellationToken);
 
-            generalObjectives.ForEach(c => c.Objective.State = state);
+            generalObjectives.ForEach(c => c.Objective.StateId = stateId);
             DbContext.GeneralObjectives.UpdateRange(generalObjectives);
 
             var specificObjectiveIds = await DbContext.SpecificObjectives
@@ -78,19 +78,19 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .Select(c => c.Id)
                 .ToListAsync(cancellationToken);
 
-            await ChangeStateAsync(specificObjectiveIds, ScimEntity.SpecificObjective, state, cancellationToken);
-            await ChangeStateAsync(generalObjectiveActivityIds, ScimEntity.ScimActivity, state, cancellationToken);
+            await ChangeStateAsync(specificObjectiveIds, ScimEntity.SpecificObjective, stateId, cancellationToken);
+            await ChangeStateAsync(generalObjectiveActivityIds, ScimEntity.ScimActivity, stateId, cancellationToken);
             await DbContext.SaveChangesAsync(cancellationToken);
         }
 
-        private async Task ChangeSpecificObjectivesStateAsync(ICollection<long> entityIds, ScimState state, CancellationToken cancellationToken)
+        private async Task ChangeSpecificObjectivesStateAsync(ICollection<long> entityIds, long stateId, CancellationToken cancellationToken)
         {
             var specificObjectives = await DbContext.SpecificObjectives
                 .Include(c => c.Objective)
-                .Where(c => entityIds.Contains(c.Id) && c.Objective.State != state)
+                .Where(c => entityIds.Contains(c.Id) && c.Objective.StateId != stateId)
                 .ToListAsync(cancellationToken);
 
-            specificObjectives.ForEach(c => c.Objective.State = state);
+            specificObjectives.ForEach(c => c.Objective.StateId = stateId);
             DbContext.SpecificObjectives.UpdateRange(specificObjectives);
 
             var activityIds = await DbContext.Activities
@@ -98,17 +98,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .Select(c => c.Id)
                 .ToListAsync(cancellationToken);
 
-            await ChangeStateAsync(activityIds, ScimEntity.ScimActivity, state, cancellationToken);
+            await ChangeStateAsync(activityIds, ScimEntity.ScimActivity, stateId, cancellationToken);
             await DbContext.SaveChangesAsync(cancellationToken);
         }
 
-        private async Task ChangeActivitiesStateAsync(ICollection<long> entityIds, ScimState state, CancellationToken cancellationToken)
+        private async Task ChangeActivitiesStateAsync(ICollection<long> entityIds, long stateId, CancellationToken cancellationToken)
         {
             var activities = await DbContext.Activities
-                .Where(c => entityIds.Contains(c.Id) && c.State != state)
+                .Where(c => entityIds.Contains(c.Id) && c.StateId != stateId)
                 .ToListAsync(cancellationToken);
 
-            activities.ForEach(c => c.State = state);
+            activities.ForEach(c => c.StateId = stateId);
             DbContext.Activities.UpdateRange(activities);
 
             var actionIds = await DbContext.Actions
@@ -116,28 +116,28 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .Select(c => c.Id)
                 .ToListAsync(cancellationToken);
 
-            await ChangeStateAsync(actionIds, ScimEntity.ScimAction, state, cancellationToken);
+            await ChangeStateAsync(actionIds, ScimEntity.ScimAction, stateId, cancellationToken);
             await DbContext.SaveChangesAsync(cancellationToken);
         }
 
-        private async Task ChangeActionsStateAsync(ICollection<long> entityIds, ScimState state, CancellationToken cancellationToken)
+        private async Task ChangeActionsStateAsync(ICollection<long> entityIds, long stateId, CancellationToken cancellationToken)
         {
             var actions = await DbContext.Actions
-                .Where(c => entityIds.Contains(c.Id) && c.State != state)
+                .Where(c => entityIds.Contains(c.Id) && c.StateId != stateId)
                 .ToListAsync(cancellationToken);
 
-            actions.ForEach(c => c.State = state);
+            actions.ForEach(c => c.StateId = stateId);
             DbContext.Actions.UpdateRange(actions);
             await DbContext.SaveChangesAsync(cancellationToken);
         }
 
-        private async Task ChangeRisksStateAsync(ICollection<long> entityIds, ScimState state, CancellationToken cancellationToken)
+        private async Task ChangeRisksStateAsync(ICollection<long> entityIds, long stateId, CancellationToken cancellationToken)
         {
             var risks = await DbContext.Risks
-                .Where(c => entityIds.Contains(c.Id) && c.State != state)
+                .Where(c => entityIds.Contains(c.Id) && c.StateId != stateId)
                 .ToListAsync(cancellationToken);
 
-            risks.ForEach(c => c.State = state);
+            risks.ForEach(c => c.StateId = stateId);
             DbContext.Risks.UpdateRange(risks);
         }
     }

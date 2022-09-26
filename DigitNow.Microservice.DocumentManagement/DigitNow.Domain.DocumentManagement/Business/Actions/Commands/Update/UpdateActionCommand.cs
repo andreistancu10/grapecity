@@ -7,7 +7,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Commands.Update
     {
         public long Id { get; set; }
         public string Title { get; set; }
-        public ScimState StateId { get; set; }
+        public long StateId { get; set; }
         public string Details { get; set; }
         public List<long> ActionFunctionariesIds { get; set; }
         public List<long> UploadedFileIds { get; set; }

@@ -18,7 +18,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Common.Mappings
                 CreateMap<GeneralObjectiveCodeFilterDto, GeneralObjectiveCodeFilter>()
                     .ForMember(m => m.Code, opt => opt.MapFrom(src => src.GeneralObjectiveCode));
                 CreateMap<GeneralObjectiveStateFilterDto, GeneralObjectiveStateFilter>()
-                    .ForMember(m => m.State, opt => opt.MapFrom(src => src.GeneralObjectiveState));
+                    .ForMember(m => m.StateId, opt => opt.MapFrom(src => src.GeneralObjectiveStateId));
             }
             CreateMap<GetGeneralObjectivesRequest, GetGeneralObjectivesQuery>()
                .ForMember(m => m.Filter, opt => opt.MapFrom(src => src.Filter ?? new GeneralObjectiveFilterDto()));
