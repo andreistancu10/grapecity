@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
-    public class DocumentFileMappingConfiguration
+    public class DocumentFileMappingConfiguration : IEntityTypeConfiguration<DocumentFileMapping>
     {
         public void Configure(EntityTypeBuilder<DocumentFileMapping> builder)
         {

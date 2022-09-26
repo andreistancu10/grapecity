@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
-    public class DeliveryDetailConfiguration
+    public class DeliveryDetailConfiguration : IEntityTypeConfiguration<DeliveryDetail>
     {
         public void Configure(EntityTypeBuilder<DeliveryDetail> builder)
         {

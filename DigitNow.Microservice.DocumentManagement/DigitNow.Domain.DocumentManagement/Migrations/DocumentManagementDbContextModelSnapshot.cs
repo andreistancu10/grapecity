@@ -121,7 +121,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.HasIndex("ActionId");
 
-                    b.ToTable("ActionFunctionaries", "DocumentManagement");
+                    b.ToTable("ActionFunctionary", "DocumentManagement");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Activities.ActivityFunctionary", b =>
@@ -370,7 +370,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DeliveryDetails", "DocumentManagement");
+                    b.ToTable("DeliveryDetail", "DocumentManagement");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Document", b =>
@@ -505,7 +505,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.HasIndex("UploadedFileMappingId");
 
-                    b.ToTable("DocumentFileMappings", "DocumentManagement");
+                    b.ToTable("DocumentFileMapping", "DocumentManagement");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.DocumentResolution", b =>
@@ -876,7 +876,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.HasIndex("DynamicFormId");
 
-                    b.ToTable("DynamicFormFillingLogs", "DocumentManagement");
+                    b.ToTable("DynamicFormFillingLog", "DocumentManagement");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.GeneralObjective", b =>
@@ -1372,6 +1372,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
                     b.Property<string>("ControlMeasurement")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
@@ -1385,6 +1386,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnOrder(3);
 
                     b.Property<string>("Deadline")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ModifiedAt")
@@ -1556,7 +1558,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.HasIndex("SpecialRegisterId");
 
-                    b.ToTable("SpecialRegisterMappings", "DocumentManagement");
+                    b.ToTable("SpecialRegisterMapping", "DocumentManagement");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.SpecificObjective", b =>
@@ -1963,7 +1965,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicForm", "DynamicForm")
                         .WithMany()
                         .HasForeignKey("DynamicFormId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("DynamicForm");
