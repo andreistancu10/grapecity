@@ -7,6 +7,7 @@
         SpecificObjective,
         ScimActivity,
         ScimAction,
-        ScimRisk
+        ScimRisk,
+        ScimRiskTrackingReport
     }
 }

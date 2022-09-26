@@ -28,6 +28,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
         public string? UtilizedDocumentation { get; set; }
 
         public List<RiskControlActionDto> RiskControlActions { get; set; }
+        public List<RiskTrackingReportDto> RiskTrackingReports { get; set; }
 
         public GeneralObjectiveDto AssociatedGeneralObjective { get; set; }
         public SpecificObjectiveDto AssociatedSpecificObjective { get; set; }

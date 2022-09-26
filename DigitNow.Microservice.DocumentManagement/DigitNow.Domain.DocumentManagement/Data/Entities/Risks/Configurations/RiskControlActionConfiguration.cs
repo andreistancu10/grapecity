@@ -10,6 +10,8 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities.Risks.Configurations
             builder.ToTable(nameof(RiskControlAction), DocumentManagementDbContext.Schema);
 
             builder.HasKey(p => p.Id);
+            builder.Property(p => p.ControlMeasurement).IsRequired();
+            builder.Property(p => p.Deadline).IsRequired();
 
             builder.HasOne(item => item.Risk)
                  .WithMany(item => item.RiskControlActions)

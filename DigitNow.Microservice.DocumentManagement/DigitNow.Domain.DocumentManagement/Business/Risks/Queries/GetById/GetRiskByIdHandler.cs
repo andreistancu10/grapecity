@@ -20,8 +20,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Risks.Queries.GetById
 
         public async Task<GetRiskViewModel> Handle(GetRiskByIdQuery request, CancellationToken cancellationToken)
         {
-            var risk = await _riskService.FindQuery()
-                .Where(item => item.Id == request.Id)
+            var risk = await _riskService.GetByIdQuery(request.Id)
                 .Include(item => item.AssociatedGeneralObjective)
                 .Include(item => item.AssociatedGeneralObjective.Objective)
                 .Include(item => item.AssociatedSpecificObjective)
@@ -29,6 +28,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Risks.Queries.GetById
                 .Include(item => item.AssociatedActivity)
                 .Include(item => item.AssociatedAction)
                 .Include(item => item.RiskControlActions)
+                .Include(item => item.RiskTrackingReports)
+                .ThenInclude(item => item.RiskActionProposals)
                 .FirstOrDefaultAsync(cancellationToken);
 
             if (risk == null)

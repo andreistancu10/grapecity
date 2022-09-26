@@ -5,7 +5,7 @@ using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
 using HTSS.Platform.Core.CQRS;
 
-namespace DigitNow.Domain.DocumentManagement.Business.Risks.Commands.Create
+namespace DigitNow.Domain.DocumentManagement.Business.Risks.Commands.CreateRisk
 {
     internal class CreateRiskHandler : ICommandHandler<CreateRiskCommand, ResultObject>
     {
@@ -31,7 +31,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Risks.Commands.Create
 
             await _riskService.AddAsync(risk, cancellationToken);
 
-            if (request.RiskControlActions != null)
+            if (request.RiskControlActions.Any())
                 await _riskControlActionService.AddRangeAsync(request.RiskControlActions, risk, cancellationToken);
 
             if (request.UploadedFileIds.Any())

@@ -1,10 +1,5 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Dtos;
 using DigitNow.Domain.DocumentManagement.Contracts.Risks.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Risks.Models
 {
@@ -27,7 +22,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Risks.Models
         public string StrategyDetails { get; set; }
         public string? UtilizedDocumentation { get; set; }
 
-        public List<RiskControlActionDto> RiskControlActions { get; set; }
+        public List<RiskControlActionDto> RiskControlActions { get; set; } = new();
         public List<long> UploadedFileIds { get; set; }
     }
 }

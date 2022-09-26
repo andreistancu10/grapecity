@@ -20,8 +20,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task AddRangeAsync(List<RiskControlActionDto> riskControlActions, Risk risk, CancellationToken cancellationToken)
         {
-            if (!riskControlActions.Any()) return;
-
             var riskControlActionsToAdd = new List<RiskControlAction>();
 
             riskControlActions.ForEach(controlledAction =>

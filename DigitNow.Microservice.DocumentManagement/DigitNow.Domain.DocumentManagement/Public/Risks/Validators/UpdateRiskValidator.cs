@@ -14,6 +14,12 @@ namespace DigitNow.Domain.DocumentManagement.Public.Risks.Validators
             RuleFor(item => item.ImpactOfObjectivesEstimation).NotNull().NotEmpty();
             RuleFor(item => item.HeadOfDepartmentDecision).NotNull().NotEmpty();
             RuleFor(item => item.AdoptedStrategy).NotNull().NotEmpty();
+
+            RuleForEach(item => item.RiskControlActions).ChildRules(action =>
+            {
+                action.RuleFor(x => x.ControlMeasurement).NotEmpty();
+                action.RuleFor(x => x.Deadline).NotEmpty();
+            });
         }
     }
 }
