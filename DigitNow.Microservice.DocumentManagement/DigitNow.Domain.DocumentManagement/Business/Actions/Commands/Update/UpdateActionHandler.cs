@@ -41,7 +41,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Commands.Update
             var fileMappings = await _uploadedFileService.GetUploadedFileMappingsByTargetIdAsync(initialAction.Id, TargetEntity.ScimAction, cancellationToken);
 
             initialAction.Title = request.Title;
-            initialAction.State = request.State;
+            initialAction.State = request.StateId;
             initialAction.Details = request.Details;
             initialAction.ModificationMotive = request.ModificationMotive;
 
