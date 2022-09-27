@@ -59,9 +59,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         public async Task<Risk> AddAsync(Risk risk, CancellationToken cancellationToken)
         {
             var scimStates = await _catalogClient.ScimStates.GetScimStatesAsync(cancellationToken);
+            risk.StateId = scimStates.ScimStates.FirstOrDefault(c => c.Name.ToLower() == ScimState.Active.ToString().ToLower()).Id;
 
-            //TODO how do I know which is the correct value
-            risk.StateId = ScimState.Active;
             risk.RiskExposureEvaluation =
                 CalculateRiskExposureEvaluation(risk.ProbabilityOfApparitionEstimation, risk.ImpactOfObjectivesEstimation);
             var dbContextTransaction = await DbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
@@ -85,10 +84,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return risk;
         }
 
-        public async Task UpdateAsync(Risk Risk, CancellationToken cancellationToken)
+        public async Task UpdateAsync(Risk risk, CancellationToken cancellationToken)
         {
-            await ChangeStateAsync(new List<long> { Risk.Id }, ScimEntity.ScimRisk, Risk.StateId, cancellationToken);
-            await DbContext.SingleUpdateAsync(Risk, cancellationToken);
+            await ChangeStateAsync(new List<long> { risk.Id }, ScimEntity.ScimRisk, risk.StateId, cancellationToken);
+            await DbContext.SingleUpdateAsync(risk, cancellationToken);
             await DbContext.SaveChangesAsync(cancellationToken);
         }
 

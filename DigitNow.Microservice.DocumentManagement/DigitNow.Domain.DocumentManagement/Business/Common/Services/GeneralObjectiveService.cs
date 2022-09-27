@@ -36,9 +36,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             generalObjective.Objective.ObjectiveType = ObjectiveType.General;
             var scimStates = await _catalogClient.ScimStates.GetScimStatesAsync(cancellationToken);
-
-            //TODO how do I know which is the correct value
-            generalObjective.Objective.StateId = ScimState.Active;
+            generalObjective.Objective.StateId = scimStates.ScimStates.FirstOrDefault(c => c.Name.ToLower() == ScimState.Active.ToString().ToLower()).Id;
 
             await _objectiveService.AddAsync(generalObjective.Objective, cancellationToken);
             await DbContext.AddAsync(generalObjective, cancellationToken);

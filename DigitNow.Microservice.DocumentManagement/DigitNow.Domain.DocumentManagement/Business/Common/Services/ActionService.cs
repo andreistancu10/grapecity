@@ -50,9 +50,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         public async Task<Action> CreateAsync(Action action, CancellationToken cancellationToken)
         {
             var scimStates = await _catalogClient.ScimStates.GetScimStatesAsync(cancellationToken);
+            action.StateId = scimStates.ScimStates.FirstOrDefault(c => c.Name.ToLower() == ScimState.Active.ToString().ToLower()).Id;
 
-            //TODO how do I know which is the correct value
-            action.StateId = ScimState.Active;
             await SetActionCodeAsync(action, cancellationToken);
             await DbContext.Actions.AddAsync(action, cancellationToken);
             await DbContext.SaveChangesAsync(cancellationToken);

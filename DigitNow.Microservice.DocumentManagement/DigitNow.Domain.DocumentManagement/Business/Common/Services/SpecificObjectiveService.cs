@@ -40,9 +40,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             specificObjective.Objective.ObjectiveType = ObjectiveType.Specific;
             var scimStates = await _catalogClient.ScimStates.GetScimStatesAsync(cancellationToken);
-
-            //TODO how do I know which is the correct value
-            specificObjective.Objective.StateId = ScimState.Active;
+            specificObjective.Objective.StateId = scimStates.ScimStates.FirstOrDefault(c => c.Name.ToLower() == ScimState.Active.ToString().ToLower()).Id;
             specificObjective.Objective.SpecificObjective = specificObjective;
             await _objectiveService.AddAsync(specificObjective.Objective, cancellationToken);
 

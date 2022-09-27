@@ -63,9 +63,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         public async Task<Activity> AddAsync(Activity activity, CancellationToken cancellationToken)
         {
             var scimStates = await _catalogClient.ScimStates.GetScimStatesAsync(cancellationToken);
-            
-            //TODO how do I know which is the correct value
-            activity.StateId = ScimState.Active; 
+            activity.StateId = scimStates.ScimStates.FirstOrDefault(c => c.Name.ToLower() == ScimState.Active.ToString().ToLower()).Id;
             IDbContextTransaction dbContextTransaction = null;
 
             try
