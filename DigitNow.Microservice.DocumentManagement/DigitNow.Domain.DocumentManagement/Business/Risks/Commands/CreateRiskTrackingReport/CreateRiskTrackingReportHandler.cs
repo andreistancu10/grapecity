@@ -12,14 +12,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Risks.Commands.CreateRiskT
     public class CreateRiskTrackingReportHandler : ICommandHandler<CreateRiskTrackingReportCommand, ResultObject>
     {
         private readonly IMapper _mapper;
+        private readonly IRiskTrackingReportService _riskTrackingReportService;
         private readonly IRiskService _riskService;
         private readonly IUploadedFileService _uploadedFileService;
 
-        public CreateRiskTrackingReportHandler(IRiskService riskService, IUploadedFileService uploadedFileService, IMapper mapper)
+        public CreateRiskTrackingReportHandler(IRiskTrackingReportService riskTrackingReportService, IRiskService riskService, IUploadedFileService uploadedFileService, IMapper mapper)
         {
             _mapper = mapper;
-            _riskService = riskService;
+            _riskTrackingReportService = riskTrackingReportService;
             _uploadedFileService = uploadedFileService;
+            _riskService = riskService;
         }
 
         public async Task<ResultObject> Handle(CreateRiskTrackingReportCommand command, CancellationToken cancellationToken)
@@ -37,7 +39,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Risks.Commands.CreateRiskT
                     Parameters = new object[] { command.RiskId }
                 });
 
-            var createdRiskTrackingReport = await _riskService.CreateRiskTrackingReportAsync(riskTrackingReport, cancellationToken);
+            var createdRiskTrackingReport = await _riskTrackingReportService.CreateRiskTrackingReportAsync(riskTrackingReport, cancellationToken);
 
             if (command.UploadedFileIds.Any())
             {
