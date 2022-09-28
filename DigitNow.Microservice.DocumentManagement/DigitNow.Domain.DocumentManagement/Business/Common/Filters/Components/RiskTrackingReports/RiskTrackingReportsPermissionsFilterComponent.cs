@@ -10,13 +10,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
 
         protected override Task<DataExpressions<RiskTrackingReport>> SetCustomDataExpressionsAsync(RiskTrackingReportsPermissionsFilterComponentContext context, CancellationToken token)
         {
-            var currentUser = context.CurrentUser;
-
             var filter = new RiskTrackingReportsPermissionFilter
             {
                 UserPermissionsFilter = new RiskTrackingReportsUserPermissionsFilters
                 {
-                    DepartmentIds = currentUser.Departments.Select(x => x.Id).ToList()
+                    DepartmentIds = context.CurrentUser.Departments.Select(x => x.Id).ToList()
                 }
             };
 
