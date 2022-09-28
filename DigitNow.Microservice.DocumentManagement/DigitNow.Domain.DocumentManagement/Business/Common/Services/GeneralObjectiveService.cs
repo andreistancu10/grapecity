@@ -32,7 +32,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             generalObjective.Objective ??= new Objective();
 
             generalObjective.Objective.ObjectiveType = ObjectiveType.General;
-            var activeScimState = await _catalogClient.ScimStates.GetScimStateCodeIdAsync("activ", cancellationToken);
+            var activeScimState = await _catalogClient.ScimStates.GetScimStateByCodeAsync("activ", cancellationToken);
             generalObjective.Objective.StateId = activeScimState.Id;
 
             await _objectiveService.AddAsync(generalObjective.Objective, cancellationToken);

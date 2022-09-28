@@ -58,7 +58,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task<Risk> AddAsync(Risk risk, CancellationToken cancellationToken)
         {
-            var activeScimState = await _catalogClient.ScimStates.GetScimStateCodeIdAsync("activ", cancellationToken);
+            var activeScimState = await _catalogClient.ScimStates.GetScimStateByCodeAsync("activ", cancellationToken);
             risk.StateId = activeScimState.Id;
 
             risk.RiskExposureEvaluation =

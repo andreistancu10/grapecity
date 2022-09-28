@@ -31,7 +31,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.
 
         public async Task<GeneralObjectiveViewModel> Handle(GetGeneralObjectiveByIdQuery request, CancellationToken cancellationToken)
         {
-            var scimStates = await _catalogClient.ScimStates.GetScimStateCodeIdAsync("activ", cancellationToken);
             var generalObjective = await _generalObjectiveService.FindQuery()
                 .Where(item => item.ObjectiveId == request.ObjectiveId)
                 .Include(item => item.Objective)
