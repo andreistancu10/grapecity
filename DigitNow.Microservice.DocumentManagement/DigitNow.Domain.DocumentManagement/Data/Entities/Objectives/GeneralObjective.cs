@@ -1,5 +1,4 @@
-using DigitNow.Domain.DocumentManagement.Data.Entities.Procedures;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {

@@ -1,12 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities.Procedures.Configuration
+namespace DigitNow.Domain.DocumentManagement.Data.Entities.Configuration
 {
     public class ProcedureConfiguration : IEntityTypeConfiguration<Procedure>
     {

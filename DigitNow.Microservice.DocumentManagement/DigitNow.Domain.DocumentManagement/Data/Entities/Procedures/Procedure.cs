@@ -1,7 +1,7 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Contracts.Procedures;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities.Procedures
+namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
     public class Procedure : ExtendedEntity
     {

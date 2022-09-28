@@ -20,8 +20,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Procedures.Queries.GetById
 
         public async Task<GetProcedureViewModel> Handle(GetProcedureByIdQuery request, CancellationToken cancellationToken)
         {
-            var procedure = await _procedureService.FindQuery()
-                .Where(item => item.Id == request.Id)
+            var procedure = await _procedureService.GetByIdQuery(request.Id)
                 .Include(item => item.AssociatedGeneralObjective)
                 .Include(item => item.AssociatedGeneralObjective.Objective)
                 .Include(item => item.AssociatedSpecificObjective)

@@ -1,7 +1,4 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Activities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Procedures;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {

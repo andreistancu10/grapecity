@@ -1,4 +1,4 @@
-﻿#undef MIGRATION_ONLY
+﻿#define MIGRATION_ONLY
 
 #if    MIGRATION_ONLY
 using Microsoft.EntityFrameworkCore.Design;
@@ -7,10 +7,7 @@ using Microsoft.EntityFrameworkCore.Design;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Actions;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Activities;
 using Microsoft.EntityFrameworkCore;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Procedures;
 
 namespace DigitNow.Domain.DocumentManagement.Data
 {

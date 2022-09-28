@@ -1,7 +1,7 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Contracts.Scim;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Procedures;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 
@@ -11,7 +11,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         Task<Procedure> AddAsync(Procedure procedure, CancellationToken cancellationToken);
         Task UpdateAsync(Procedure procedure, CancellationToken cancellationToken);
-        IQueryable<Procedure> FindQuery();
+        IQueryable<Procedure> GetByIdQuery(long procedureId);
     }
 
     public class ProcedureService : ScimStateService, IProcedureService
@@ -44,9 +44,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return procedure;
         }
 
-        public IQueryable<Procedure> FindQuery()
+        public IQueryable<Procedure> GetByIdQuery(long procedureId)
         {
-            return DbContext.Procedures.AsQueryable();
+            return DbContext.Procedures.Where(p => p.Id == procedureId);
         }
 
         public async Task UpdateAsync(Procedure procedure, CancellationToken cancellationToken)

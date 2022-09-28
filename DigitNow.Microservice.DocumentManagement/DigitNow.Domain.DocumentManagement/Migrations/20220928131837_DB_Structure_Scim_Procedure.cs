@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
-    public partial class Scim_Procedure_DB_structure : Migration
+    public partial class DB_Structure_Scim_Procedure : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

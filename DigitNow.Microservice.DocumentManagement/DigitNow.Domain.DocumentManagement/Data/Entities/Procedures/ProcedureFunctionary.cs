@@ -1,4 +1,4 @@
-﻿namespace DigitNow.Domain.DocumentManagement.Data.Entities.Procedures
+﻿namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
     public class ProcedureFunctionary : ExtendedEntity
     {

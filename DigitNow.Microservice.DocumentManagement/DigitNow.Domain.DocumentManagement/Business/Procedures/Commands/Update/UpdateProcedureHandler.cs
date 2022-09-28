@@ -1,4 +1,5 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Services;
+﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
 using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using HTSS.Platform.Core.CQRS;
@@ -12,20 +13,23 @@ namespace DigitNow.Domain.DocumentManagement.Business.Procedures.Commands.Update
         private readonly IProcedureService _procedureService;
         private readonly IProcedureFunctionaryService _procedureFunctionaryService;
         private readonly IUploadedFileService _uploadedFileService;
+        private readonly IMapper _mapper;
 
         public UpdateProcedureHandler(
             IProcedureService procedureService,
             IProcedureFunctionaryService procedureFunctionaryService,
+            IMapper mapper,
             IUploadedFileService uploadedFileService)
         {
             _procedureService = procedureService;
             _procedureFunctionaryService = procedureFunctionaryService;
             _uploadedFileService = uploadedFileService;
+            _mapper = mapper;
         }
 
         public async Task<ResultObject> Handle(UpdateProcedureCommand request, CancellationToken cancellationToken)
         {
-            var initialProcedure = await _procedureService.FindQuery().Where(item => item.Id == request.Id)
+            var initialProcedure = await _procedureService.GetByIdQuery(request.Id)
                 .Include(item => item.ProcedureFunctionaries)
                     .FirstOrDefaultAsync(cancellationToken);
 
@@ -37,19 +41,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Procedures.Commands.Update
                     Parameters = new object[] { request.Id }
                 });
 
-            initialProcedure.ProcedureCategory = request.ProcedureCategory;
-            initialProcedure.Title = request.Title;
-            initialProcedure.Revision = request.Revision;
-            initialProcedure.StartDate = request.StartDate;
-            initialProcedure.Scope = request.Scope;
-            initialProcedure.DomainOfApplicability = request.DomainOfApplicability;
-            initialProcedure.InternationalReglementation = request.InternationalReglementation;
-            initialProcedure.PrimaryLegislation = request.PrimaryLegislation;
-            initialProcedure.SecondaryLegislation = request.SecondaryLegislation;
-            initialProcedure.OtherReglementationn = request.OtherReglementationn;
-            initialProcedure.DefinitionsAndAbbreviations = request.DefinitionsAndAbbreviations;
-            initialProcedure.ProcedureDescription = request.ProcedureDescription;
-            initialProcedure.Responsibility = request.Responsibility;
+            _mapper.Map(request, initialProcedure);
 
             await _procedureService.UpdateAsync(initialProcedure, cancellationToken);
 

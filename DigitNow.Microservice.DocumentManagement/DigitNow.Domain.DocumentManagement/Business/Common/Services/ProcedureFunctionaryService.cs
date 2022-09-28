@@ -1,5 +1,5 @@
 ﻿using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Procedures;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
@@ -47,7 +47,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             var initialProcedureFunctionary = await FindQuery().Where(item => item.ProcedureId == id).ToListAsync(cancellationToken);
 
-            if (initialProcedureFunctionary.Count != 0)
+            if (initialProcedureFunctionary.Count > 0)
             {
                 var initialFunctionaryIds = initialProcedureFunctionary.Select(x => x.FunctionaryId).ToList();
                 var functionaryIdsToRemove = initialFunctionaryIds.Except(functionaryIds);

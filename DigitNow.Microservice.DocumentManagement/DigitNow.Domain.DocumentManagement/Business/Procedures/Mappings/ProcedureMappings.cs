@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Procedures.Commands.Create;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Procedures;
+using DigitNow.Domain.DocumentManagement.Business.Procedures.Commands.Update;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Procedures.Mappings
 {
@@ -9,6 +10,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Procedures.Mappings
         public ProcedureMappings()
         {
             CreateMap<CreateProcedureCommand, Procedure>();
+            CreateMap<UpdateProcedureCommand, Procedure>();
 
         }
     }

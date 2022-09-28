@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Dtos;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
-using System.Diagnostics;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
+using Action = DigitNow.Domain.DocumentManagement.Data.Entities.Action;
+using Activity = DigitNow.Domain.DocumentManagement.Data.Entities.Activity;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
 {
