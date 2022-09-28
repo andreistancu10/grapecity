@@ -8,6 +8,7 @@
         ScimActivity,
         ScimAction,
         ScimRisk,
+        ScimRiskTrackingReport
         ScimProcedure
     }
 }

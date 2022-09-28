@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
-using DigitNow.Domain.DocumentManagement.Business.Risks.Commands.Create;
+using DigitNow.Domain.DocumentManagement.Business.Risks.Commands.CreateRisk;
+using DigitNow.Domain.DocumentManagement.Business.Risks.Commands.CreateRiskTrackingReport;
 using DigitNow.Domain.DocumentManagement.Business.Risks.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.Risks.Queries.GetById;
 using DigitNow.Domain.DocumentManagement.Business.Risks.Queries.GetRisks;
@@ -57,9 +58,12 @@ namespace DigitNow.Domain.DocumentManagement.Public.Risks
         [HttpGet("calculateRiskExposure/{probability}/{impact}")]
         public IActionResult CalculateRiskExposureEvaluation([FromRoute] RiskProbability probability, [FromRoute] RiskProbability impact)
         {
-            if(probability != 0 && impact != 0)
-                return Ok(RiskService.CalculateRiskExposureEvaluation(probability, impact));
-            return NotFound();
+            if (probability != 0 && impact != 0)
+                return Ok(new
+                {
+                    RiskExposure = RiskService.CalculateRiskExposureEvaluation(probability, impact)
+                });
+            return BadRequest();
         }
 
         [HttpPost("get-risks")]
@@ -67,6 +71,15 @@ namespace DigitNow.Domain.DocumentManagement.Public.Risks
         {
             var query = _mapper.Map<GetRisksQuery>(request);
             return CreateResponse(await _mediator.Send(query, cancellationToken));
+        }
+
+        [HttpPost("{id}/tracking-report")]
+        public async Task<IActionResult> CreateRiskTrackingReport([FromRoute] int id, [FromBody] CreateRiskTrackingReportRequest request, CancellationToken cancellationToken)
+        {
+            var command = _mapper.Map<CreateRiskTrackingReportCommand>(request);
+            command.RiskId = id;
+
+            return CreateResponse(await _mediator.Send(command, cancellationToken));
         }
     }
 }

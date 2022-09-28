@@ -58,6 +58,8 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<ActionFunctionary> ActionFunctionaries { get; set; }
         public DbSet<Risk> Risks { get; set; }
         public DbSet<RiskControlAction> RiskControlActions { get; set; }
+        public DbSet<RiskTrackingReport> RiskTrackingReports { get; set; }
+        public DbSet<RiskActionProposal> RiskActionProposals{ get; set; }
         public DbSet<Procedure> Procedures { get; set; }
         public DbSet<ProcedureFunctionary> ProcedureFunctionarys { get; set; }
 
@@ -113,7 +115,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
             {
                 var optionsBuilder = new DbContextOptionsBuilder<DocumentManagementDbContext>();
 
-                optionsBuilder.UseSqlServer("Server=localhost,1433;Database=DigitNow-dev-DocumentManagement;User Id=sa;Password=admin123!;", builder =>
+                optionsBuilder.UseSqlServer("Server=localhost,1433;Database=DEV_DIGIT_NOW_DataKlas_DocumentManagement;User Id=sa;Password=admin123!;", builder =>
                 {
                     builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
                 });

@@ -19,6 +19,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos.Mappings
             CreateMap<UploadedFileMapping, DocumentUploadedFileDto>().ReverseMap();
             CreateMap<Data.Entities.Action, ActionDto>().ReverseMap();
             CreateMap<Activity, ActivityDto>().ReverseMap();
+            CreateMap<RiskTrackingReportDto, RiskTrackingReport>().ReverseMap();
+            CreateMap<RiskActionProposalDto, RiskActionProposal>().ReverseMap();
 
             CreateMap<ConnectedDocument, ConnectedDocumentDto>()
                 .ForMember(x => x.RegistrationNumber, opt => opt.MapFrom(src => src.Document.RegistrationNumber))

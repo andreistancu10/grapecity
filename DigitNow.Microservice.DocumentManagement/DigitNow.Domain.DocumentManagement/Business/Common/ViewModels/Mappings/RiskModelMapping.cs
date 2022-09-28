@@ -8,6 +8,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
         public RiskModelMapping()
         {
             CreateMap<RiskAggregate, RiskViewModel>()
+                .ForMember(x => x.Id, opt => opt.MapFrom(src => src.Risk.Id))
                 .ForMember(x => x.Description, opt => opt.MapFrom(src => src.Risk.Description))
                 .ForMember(x => x.Code, opt => opt.MapFrom(src => src.Risk.Code))
                 .ForMember(x => x.SpecificObjective, opt => opt.MapFrom<MapRiskSpecificObjective>())
