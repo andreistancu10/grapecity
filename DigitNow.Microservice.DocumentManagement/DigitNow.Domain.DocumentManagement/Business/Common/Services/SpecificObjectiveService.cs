@@ -33,21 +33,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task<SpecificObjective> AddAsync(SpecificObjective specificObjective, CancellationToken cancellationToken)
         {
-            if (specificObjective.Objective == null)
-            {
-                specificObjective.Objective = new Objective();
-            }
+            specificObjective.Objective ??= new Objective();
 
             specificObjective.Objective.ObjectiveType = ObjectiveType.Specific;
-            var scimStates = await _catalogClient.ScimStates.GetScimStatesAsync(cancellationToken);
-            specificObjective.Objective.StateId = scimStates.ScimStates.FirstOrDefault(c => c.Name.ToLower() == ScimState.Active.ToString().ToLower()).Id;
+            var activeScimState = await _catalogClient.ScimStates.GetScimStateCodeIdAsync("activ", cancellationToken);
+            specificObjective.Objective.StateId = activeScimState.Id;
             specificObjective.Objective.SpecificObjective = specificObjective;
             await _objectiveService.AddAsync(specificObjective.Objective, cancellationToken);
 
             var generalObjective = await _generalObjectiveService.FindQuery().Where(x => x.ObjectiveId == specificObjective.GeneralObjectiveId).FirstOrDefaultAsync(cancellationToken);
 
             if (generalObjective.SpecificObjectives == null)
-                generalObjective.SpecificObjectives = new List<SpecificObjective>() { specificObjective };
+                generalObjective.SpecificObjectives = new List<SpecificObjective> { specificObjective };
             else
                 generalObjective.SpecificObjectives.Add(specificObjective);
 

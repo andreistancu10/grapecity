@@ -8,6 +8,7 @@
         ScimActivity,
         ScimAction,
         ScimRisk,
-        ScimRiskTrackingReport
+        ScimRiskTrackingReport = 6,
+        ScimRiskFUR = 7,
     }
 }

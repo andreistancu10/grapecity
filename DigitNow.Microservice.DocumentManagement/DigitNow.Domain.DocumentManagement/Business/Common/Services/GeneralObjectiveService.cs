@@ -29,14 +29,11 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task<GeneralObjective> AddAsync(GeneralObjective generalObjective, CancellationToken cancellationToken)
         {
-            if (generalObjective.Objective == null)
-            {
-                generalObjective.Objective = new Objective();
-            }
+            generalObjective.Objective ??= new Objective();
 
             generalObjective.Objective.ObjectiveType = ObjectiveType.General;
-            var scimStates = await _catalogClient.ScimStates.GetScimStatesAsync(cancellationToken);
-            generalObjective.Objective.StateId = scimStates.ScimStates.FirstOrDefault(c => c.Name.ToLower() == ScimState.Active.ToString().ToLower()).Id;
+            var activeScimState = await _catalogClient.ScimStates.GetScimStateCodeIdAsync("activ", cancellationToken);
+            generalObjective.Objective.StateId = activeScimState.Id;
 
             await _objectiveService.AddAsync(generalObjective.Objective, cancellationToken);
             await DbContext.AddAsync(generalObjective, cancellationToken);

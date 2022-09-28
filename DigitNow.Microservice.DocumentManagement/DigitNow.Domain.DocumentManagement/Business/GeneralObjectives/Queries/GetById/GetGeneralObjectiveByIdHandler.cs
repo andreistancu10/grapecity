@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DigitNow.Domain.Catalog.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
@@ -15,26 +16,29 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.
         private readonly IMapper _mapper;
         private readonly IGeneralObjectiveService _generalObjectiveService;
         private readonly GeneralObjectiveRelationsFetcher _generalObjectiveRelationsFetcher;
-
+        private readonly ICatalogClient _catalogClient;
 
         public GetGeneralObjectiveByIdHandler(IMapper mapper,
             IGeneralObjectiveService generalObjectiveService,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            ICatalogClient catalogClient)
         {
             _mapper = mapper;
             _generalObjectiveService = generalObjectiveService;
+            _catalogClient = catalogClient;
             _generalObjectiveRelationsFetcher = new GeneralObjectiveRelationsFetcher(serviceProvider);
         }
 
         public async Task<GeneralObjectiveViewModel> Handle(GetGeneralObjectiveByIdQuery request, CancellationToken cancellationToken)
         {
+            var scimStates = await _catalogClient.ScimStates.GetScimStateCodeIdAsync("activ", cancellationToken);
             var generalObjective = await _generalObjectiveService.FindQuery()
                 .Where(item => item.ObjectiveId == request.ObjectiveId)
                 .Include(item => item.Objective)
                 .FirstOrDefaultAsync(cancellationToken);
 
             await _generalObjectiveRelationsFetcher
-                .UseGeneralObjectivesContext(new GeneralObjectivesFetcherContext { GeneralObjectives = new List<GeneralObjective>() { generalObjective } })
+                .UseGeneralObjectivesContext(new GeneralObjectivesFetcherContext { GeneralObjectives = new List<GeneralObjective> { generalObjective } })
                 .TriggerFetchersAsync(cancellationToken);
 
             if (generalObjective == null)
@@ -42,7 +46,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.
                 return null;
             }
 
-            var aggregate = new GeneralObjectiveAggregate()
+            var aggregate = new GeneralObjectiveAggregate
             {
                 GeneralObjective = generalObjective,
                 Users = _generalObjectiveRelationsFetcher.GeneralObjectiveUsers

@@ -62,8 +62,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task<Activity> AddAsync(Activity activity, CancellationToken cancellationToken)
         {
-            var scimStates = await _catalogClient.ScimStates.GetScimStatesAsync(cancellationToken);
-            activity.StateId = scimStates.ScimStates.FirstOrDefault(c => c.Name.ToLower() == ScimState.Active.ToString().ToLower()).Id;
+            var activeScimState = await _catalogClient.ScimStates.GetScimStateCodeIdAsync("activ", cancellationToken);
+            activity.StateId = activeScimState.Id;
             IDbContextTransaction dbContextTransaction = null;
 
             try
