@@ -17,7 +17,7 @@
   },
   "DocumentManagementConnectionStringQuery": {
     "ElasticSearch": {
-      "Url": "http://13.74.68.10:9200/",
+      "Url": "http://127.0.0.1:9200/",
       "Username": "devuser",
       "password": "-t?xUhPrQ94gCa!#"
     }

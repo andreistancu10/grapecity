@@ -32,8 +32,8 @@ public class MigrateDatabaseHostedService : IHostedService
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         string migrateDatabase = Environment.GetEnvironmentVariable(EnvironmentVariables.MigrateDatebase);
-        bool.TryParse(migrateDatabase, out bool applyMigrations);
-        if (!applyMigrations)
+        
+        if (!bool.TryParse(migrateDatabase, out bool applyMigrations) || !applyMigrations)
         {
             _logger.LogInformation("Database migration skipped");
             return;

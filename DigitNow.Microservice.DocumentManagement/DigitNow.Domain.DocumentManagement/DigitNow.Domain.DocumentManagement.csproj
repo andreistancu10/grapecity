@@ -31,7 +31,7 @@
 		<Compile Include=".configurations\HostedServices\MigrateDatabaseHostedService.cs" />
 		<Compile Include=".configurations\MassTransitExtensions.cs" />
 		<Compile Include=".configurations\DomainServiceExtensions.cs" />
-		<Compile Include=".configurations\IConfigurationBuilderExtensions.cs" />
+		<Compile Include=".configurations\ConfigurationBuilderExtensions.cs" />
 		<Compile Include=".extensions\Autocorrect\StringExtensions.cs" />
 		<Compile Include=".extensions\User\UserExtension.cs" />
 		<Compile Include=".extensions\Validators\RuleBuilderExtensions.cs" />
@@ -86,9 +86,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="domain.DocumentManagementSettings.Development.json">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
 		<None Update="domain.DocumentManagementSettings.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
