@@ -1,5 +1,5 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Models;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates
 {
