@@ -1,6 +1,4 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Activities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
@@ -21,6 +19,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public List<ActivityFunctionary> ActivityFunctionaries { get; set; }
         public List<Action> Actions { get; set; }
         public List<Risk> Risks { get; set; }
+        public List<Procedure> Procedures { get; set; }
         #endregion
     }
 }

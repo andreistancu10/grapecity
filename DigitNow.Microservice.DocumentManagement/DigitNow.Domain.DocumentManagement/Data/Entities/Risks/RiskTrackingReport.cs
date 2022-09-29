@@ -1,6 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Risks.Enums;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities.Risks
+namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
     public class RiskTrackingReport : ExtendedEntity
     {
