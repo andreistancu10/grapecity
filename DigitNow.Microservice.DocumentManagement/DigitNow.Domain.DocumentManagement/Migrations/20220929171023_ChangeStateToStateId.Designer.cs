@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    [Migration("20220929165154_ProcedureStateId")]
-    partial class ProcedureStateId
+    [Migration("20220929171023_ChangeStateToStateId")]
+    partial class ChangeStateToStateId
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

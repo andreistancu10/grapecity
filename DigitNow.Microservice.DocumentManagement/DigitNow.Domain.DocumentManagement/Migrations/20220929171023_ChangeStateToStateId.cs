@@ -16,6 +16,11 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
             migrationBuilder.DropColumn(
                 name: "State",
                 schema: "DocumentManagement",
+                table: "Procedure");
+
+            migrationBuilder.DropColumn(
+                name: "State",
+                schema: "DocumentManagement",
                 table: "Objective");
 
             migrationBuilder.DropColumn(
@@ -28,32 +33,18 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 schema: "DocumentManagement",
                 table: "Action");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "Deadline",
-                schema: "DocumentManagement",
-                table: "RiskControlAction",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)",
-                oldNullable: true);
-
-            migrationBuilder.AlterColumn<string>(
-                name: "ControlMeasurement",
-                schema: "DocumentManagement",
-                table: "RiskControlAction",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)",
-                oldNullable: true);
-
             migrationBuilder.AddColumn<long>(
                 name: "StateId",
                 schema: "DocumentManagement",
                 table: "Risk",
+                type: "bigint",
+                nullable: false,
+                defaultValue: 0L);
+
+            migrationBuilder.AddColumn<long>(
+                name: "StateId",
+                schema: "DocumentManagement",
+                table: "Procedure",
                 type: "bigint",
                 nullable: false,
                 defaultValue: 0L);
@@ -93,6 +84,11 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
             migrationBuilder.DropColumn(
                 name: "StateId",
                 schema: "DocumentManagement",
+                table: "Procedure");
+
+            migrationBuilder.DropColumn(
+                name: "StateId",
+                schema: "DocumentManagement",
                 table: "Objective");
 
             migrationBuilder.DropColumn(
@@ -105,28 +101,18 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 schema: "DocumentManagement",
                 table: "Action");
 
-            migrationBuilder.AlterColumn<string>(
-                name: "Deadline",
-                schema: "DocumentManagement",
-                table: "RiskControlAction",
-                type: "nvarchar(max)",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "ControlMeasurement",
-                schema: "DocumentManagement",
-                table: "RiskControlAction",
-                type: "nvarchar(max)",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
-
             migrationBuilder.AddColumn<int>(
                 name: "State",
                 schema: "DocumentManagement",
                 table: "Risk",
+                type: "int",
+                nullable: false,
+                defaultValue: 0);
+
+            migrationBuilder.AddColumn<int>(
+                name: "State",
+                schema: "DocumentManagement",
+                table: "Procedure",
                 type: "int",
                 nullable: false,
                 defaultValue: 0);
