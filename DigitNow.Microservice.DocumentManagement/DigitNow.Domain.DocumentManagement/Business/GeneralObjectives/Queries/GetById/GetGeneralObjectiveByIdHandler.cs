@@ -16,16 +16,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.
         private readonly IMapper _mapper;
         private readonly IGeneralObjectiveService _generalObjectiveService;
         private readonly GeneralObjectiveRelationsFetcher _generalObjectiveRelationsFetcher;
-        private readonly ICatalogClient _catalogClient;
 
         public GetGeneralObjectiveByIdHandler(IMapper mapper,
             IGeneralObjectiveService generalObjectiveService,
-            IServiceProvider serviceProvider,
-            ICatalogClient catalogClient)
+            IServiceProvider serviceProvider)
         {
             _mapper = mapper;
             _generalObjectiveService = generalObjectiveService;
-            _catalogClient = catalogClient;
             _generalObjectiveRelationsFetcher = new GeneralObjectiveRelationsFetcher(serviceProvider);
         }
 
