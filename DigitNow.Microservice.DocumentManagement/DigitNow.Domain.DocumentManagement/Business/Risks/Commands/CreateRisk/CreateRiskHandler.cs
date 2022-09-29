@@ -2,12 +2,12 @@
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
 using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Risks.Commands.CreateRisk
 {
-    internal class CreateRiskHandler : ICommandHandler<CreateRiskCommand, ResultObject>
+    public class CreateRiskHandler : ICommandHandler<CreateRiskCommand, ResultObject>
     {
         private readonly IRiskService _riskService;
         private readonly IUploadedFileService _uploadedFileService;

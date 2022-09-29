@@ -5,6 +5,7 @@ using DigitNow.Domain.DocumentManagement.Business.Risks.Commands.CreateRiskTrack
 using DigitNow.Domain.DocumentManagement.Business.Risks.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.Risks.Queries.GetById;
 using DigitNow.Domain.DocumentManagement.Business.Risks.Queries.GetRisks;
+using DigitNow.Domain.DocumentManagement.Business.Risks.Queries.GetRiskTrackingReports;
 using DigitNow.Domain.DocumentManagement.Contracts.Risks.Enums;
 using DigitNow.Domain.DocumentManagement.Public.Risks.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
@@ -80,6 +81,15 @@ namespace DigitNow.Domain.DocumentManagement.Public.Risks
             command.RiskId = id;
 
             return CreateResponse(await _mediator.Send(command, cancellationToken));
+        }
+
+        [HttpPost("{id}/tracking-reports")]
+        public async Task<IActionResult> GetRiskTrackingReports([FromRoute] int id, [FromBody] GetRiskTrackingReportsRequest request, CancellationToken cancellationToken)
+        {
+            var query = _mapper.Map<GetRiskTrackingReportsQuery>(request);
+            query.RiskId = id;
+
+            return CreateResponse(await _mediator.Send(query, cancellationToken));
         }
     }
 }

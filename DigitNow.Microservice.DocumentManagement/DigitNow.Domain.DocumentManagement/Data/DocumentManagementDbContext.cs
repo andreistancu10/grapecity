@@ -7,9 +7,7 @@ using Microsoft.EntityFrameworkCore.Design;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Actions;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Activities;
 using Microsoft.EntityFrameworkCore;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
 
 namespace DigitNow.Domain.DocumentManagement.Data
 {
@@ -59,6 +57,8 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<RiskControlAction> RiskControlActions { get; set; }
         public DbSet<RiskTrackingReport> RiskTrackingReports { get; set; }
         public DbSet<RiskActionProposal> RiskActionProposals{ get; set; }
+        public DbSet<Procedure> Procedures { get; set; }
+        public DbSet<ProcedureFunctionary> ProcedureFunctionarys { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

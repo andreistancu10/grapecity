@@ -34,8 +34,8 @@ public class Program
         return Host.CreateDefaultBuilder(args)
             .UseSerilog()
             .ConfigureAppConfiguration((host, config) => config
-                .ConfigureApi(host.HostingEnvironment)
-                .ConfigureTenantNotificationDomain(host.HostingEnvironment))
+                .ConfigureApi()
+                .ConfigureTenantNotificationDomain())
             .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
     }
 }

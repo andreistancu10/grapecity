@@ -111,6 +111,10 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<IRiskControlActionService, RiskControlActionService>();
             services.AddTransient<IRiskService, RiskService>();
             services.AddTransient<IRiskMappingService, RiskMappingService>();
+            services.AddTransient<IRiskTrackingReportService, RiskTrackingReportService>();
+            services.AddTransient<IRiskTrackingReportMappingService, RiskTrackingReportMappingService>();
+            services.AddTransient<IProcedureService, ProcedureService>();
+            services.AddTransient<IProcedureFunctionaryService, ProcedureFunctionaryService>();
 
             return services;
         }

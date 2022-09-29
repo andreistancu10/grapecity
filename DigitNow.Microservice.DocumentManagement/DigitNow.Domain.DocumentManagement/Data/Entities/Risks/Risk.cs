@@ -1,7 +1,7 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Contracts.Risks.Enums;
 
-namespace DigitNow.Domain.DocumentManagement.Data.Entities.Risks
+namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
     public class Risk : ExtendedEntity
     {

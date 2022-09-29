@@ -20,7 +20,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             DbContext = dbContext;
         }
 
-        public virtual async Task ChangeStateAsync(
+        public virtual Task ChangeStateAsync(
             ICollection<long> entityIds,
             ScimEntity scimEntity,
             long? stateId,
@@ -28,34 +28,19 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             if (!entityIds.Any() || !stateId.HasValue)
             {
-                return;
+                return Task.CompletedTask;
             }
 
-            switch (scimEntity)
+            return scimEntity switch
             {
-                case ScimEntity.GeneralObjective:
-                    await ChangeGeneralObjectivesStateAsync(entityIds, stateId.Value, cancellationToken);
-                    break;
-
-                case ScimEntity.SpecificObjective:
-                    await ChangeSpecificObjectivesStateAsync(entityIds, stateId.Value, cancellationToken);
-                    break;
-
-                case ScimEntity.ScimActivity:
-                    await ChangeActivitiesStateAsync(entityIds, stateId.Value, cancellationToken);
-                    break;
-
-                case ScimEntity.ScimAction:
-                    await ChangeActionsStateAsync(entityIds, stateId.Value, cancellationToken);
-                    break;
-
-                case ScimEntity.ScimRisk:
-                    await ChangeRisksStateAsync(entityIds, stateId.Value, cancellationToken);
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(scimEntity), scimEntity, null);
-            }
+                ScimEntity.GeneralObjective => ChangeGeneralObjectivesStateAsync(entityIds, state.Value, cancellationToken),
+                ScimEntity.SpecificObjective => ChangeSpecificObjectivesStateAsync(entityIds, state.Value, cancellationToken),
+                ScimEntity.ScimActivity => ChangeActivitiesStateAsync(entityIds, state.Value, cancellationToken),
+                ScimEntity.ScimAction => ChangeActionsStateAsync(entityIds, state.Value, cancellationToken),
+                ScimEntity.ScimRisk => ChangeRisksStateAsync(entityIds, state.Value, cancellationToken),
+                ScimEntity.ScimProcedure => ChangeProceduresStateAsync(entityIds, state.Value, cancellationToken),
+                _ => throw new ArgumentOutOfRangeException(nameof(scimEntity), scimEntity, null),
+            };
         }
 
         private async Task ChangeGeneralObjectivesStateAsync(ICollection<long> entityIds, long stateId, CancellationToken cancellationToken)
@@ -118,7 +103,19 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .Select(c => c.Id)
                 .ToListAsync(cancellationToken);
 
+            var riskIds = await DbContext.Risks
+                .Where(c => entityIds.Contains(c.ActivityId))
+                .Select(c => c.Id)
+                .ToListAsync(cancellationToken);
+
+            var procedureIds = await DbContext.Procedures
+                .Where(c => entityIds.Contains(c.ActivityId))
+                .Select(c => c.Id)
+                .ToListAsync(cancellationToken);
+
             await ChangeStateAsync(actionIds, ScimEntity.ScimAction, stateId, cancellationToken);
+            await ChangeStateAsync(riskIds, ScimEntity.ScimRisk, state, cancellationToken);
+            await ChangeStateAsync(procedureIds, ScimEntity.ScimProcedure, state, cancellationToken);
             await DbContext.SaveChangesAsync(cancellationToken);
         }
 
@@ -141,6 +138,18 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             risks.ForEach(c => c.StateId = stateId);
             DbContext.Risks.UpdateRange(risks);
+            await DbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        private async Task ChangeProceduresStateAsync(ICollection<long> entityIds, ScimState state, CancellationToken cancellationToken)
+        {
+            var procedures = await DbContext.Procedures
+                .Where(c => entityIds.Contains(c.Id) && c.State != state)
+                .ToListAsync(cancellationToken);
+
+            procedures.ForEach(c => c.State = state);
+            DbContext.Procedures.UpdateRange(procedures);
+            await DbContext.SaveChangesAsync(cancellationToken);
         }
     }
 }
