@@ -15,7 +15,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities.Configuration
             builder.Property(p => p.DepartmentId).IsRequired();
             builder.Property(p => p.Code).IsRequired();
             builder.Property(p => p.Title).IsRequired();
-            builder.Property(p => p.State).IsRequired();
+            builder.Property(p => p.StateId).IsRequired();
             builder.Property(p => p.Edition).IsRequired();
             builder.Property(p => p.StartDate).IsRequired();
             builder.Property(p => p.Scope).IsRequired();
