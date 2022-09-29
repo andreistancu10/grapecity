@@ -3,8 +3,6 @@ using DigitNow.Domain.Authentication.Contracts;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Actions;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Activities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos.Mappings
 {

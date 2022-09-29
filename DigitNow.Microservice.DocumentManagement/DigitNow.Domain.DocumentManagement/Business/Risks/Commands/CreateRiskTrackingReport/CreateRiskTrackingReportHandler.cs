@@ -2,7 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
 using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;

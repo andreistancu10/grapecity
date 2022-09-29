@@ -1,4 +1,4 @@
-﻿namespace DigitNow.Domain.DocumentManagement.Data.Entities.Risks
+﻿namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
     public class RiskActionProposal : ExtendedEntity
     {

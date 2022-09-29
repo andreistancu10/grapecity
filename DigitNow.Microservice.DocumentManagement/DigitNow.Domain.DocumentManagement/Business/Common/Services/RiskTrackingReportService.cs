@@ -2,7 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.RiskTrackingReports;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
 using DigitNow.Domain.DocumentManagement.Data.Filters;
 using Microsoft.EntityFrameworkCore;

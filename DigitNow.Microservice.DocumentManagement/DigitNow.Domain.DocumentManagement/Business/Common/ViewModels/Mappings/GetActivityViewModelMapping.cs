@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Dtos;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Activities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
 {

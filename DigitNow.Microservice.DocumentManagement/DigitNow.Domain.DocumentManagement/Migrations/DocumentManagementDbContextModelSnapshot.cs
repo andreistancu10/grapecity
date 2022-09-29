@@ -124,49 +124,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("ActionFunctionary", "DocumentManagement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Activities.ActivityFunctionary", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasColumnName("Id")
-                        .HasColumnOrder(1);
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
-
-                    b.Property<long>("ActivityId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("CreatedAt")
-                        .HasColumnOrder(2);
-
-                    b.Property<long>("CreatedBy")
-                        .HasColumnType("bigint")
-                        .HasColumnName("CreatedBy")
-                        .HasColumnOrder(3);
-
-                    b.Property<long>("FunctionaryId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime?>("ModifiedAt")
-                        .HasColumnType("datetime2")
-                        .HasColumnName("ModifiedAt")
-                        .HasColumnOrder(4);
-
-                    b.Property<long?>("ModifiedBy")
-                        .HasColumnType("bigint")
-                        .HasColumnName("ModifiedBy")
-                        .HasColumnOrder(5);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ActivityId");
-
-                    b.ToTable("ActivityFunctionary", "DocumentManagement");
-                });
-
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Activity", b =>
                 {
                     b.Property<long>("Id")
@@ -228,6 +185,49 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.HasIndex("SpecificObjectiveId");
 
                     b.ToTable("Activity", "DocumentManagement");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.ActivityFunctionary", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("Id")
+                        .HasColumnOrder(1);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<long>("ActivityId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedAt")
+                        .HasColumnOrder(2);
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("CreatedBy")
+                        .HasColumnOrder(3);
+
+                    b.Property<long>("FunctionaryId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("ModifiedAt")
+                        .HasColumnOrder(4);
+
+                    b.Property<long?>("ModifiedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("ModifiedBy")
+                        .HasColumnOrder(5);
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActivityId");
+
+                    b.ToTable("ActivityFunctionary", "DocumentManagement");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.ConnectedDocument", b =>
@@ -1205,7 +1205,158 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("OutgoingDocument", "DocumentManagement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Risks.Risk", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Procedure", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("Id")
+                        .HasColumnOrder(1);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<long>("ActivityId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedAt")
+                        .HasColumnOrder(2);
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("CreatedBy")
+                        .HasColumnOrder(3);
+
+                    b.Property<string>("DefinitionsAndAbbreviations")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("DepartmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("DomainOfApplicability")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Edition")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("GeneralObjectiveId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("InternationalReglementation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("ModifiedAt")
+                        .HasColumnOrder(4);
+
+                    b.Property<long?>("ModifiedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("ModifiedBy")
+                        .HasColumnOrder(5);
+
+                    b.Property<string>("OtherReglementationn")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PrimaryLegislation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ProcedureCategory")
+                        .HasColumnType("int");
+
+                    b.Property<string>("ProcedureDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Responsibility")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Revision")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Scope")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SecondaryLegislation")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("SpecificObjectiveId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("State")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ActivityId");
+
+                    b.HasIndex("GeneralObjectiveId");
+
+                    b.HasIndex("SpecificObjectiveId");
+
+                    b.ToTable("Procedure", "DocumentManagement");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.ProcedureFunctionary", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("Id")
+                        .HasColumnOrder(1);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedAt")
+                        .HasColumnOrder(2);
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("CreatedBy")
+                        .HasColumnOrder(3);
+
+                    b.Property<long>("FunctionaryId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("ModifiedAt")
+                        .HasColumnOrder(4);
+
+                    b.Property<long?>("ModifiedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("ModifiedBy")
+                        .HasColumnOrder(5);
+
+                    b.Property<long>("ProcedureId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProcedureId");
+
+                    b.ToTable("ProcedureFunctionary", "DocumentManagement");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Risk", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1309,7 +1460,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("Risk", "DocumentManagement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Risks.RiskActionProposal", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.RiskActionProposal", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1361,7 +1512,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("RiskActionProposal", "DocumentManagement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Risks.RiskControlAction", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.RiskControlAction", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1409,7 +1560,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("RiskControlAction", "DocumentManagement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Risks.RiskTrackingReport", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.RiskTrackingReport", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1849,17 +2000,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("Action");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Activities.ActivityFunctionary", b =>
-                {
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Activity", "Activity")
-                        .WithMany("ActivityFunctionaries")
-                        .HasForeignKey("ActivityId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Activity");
-                });
-
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Activity", b =>
                 {
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.GeneralObjective", "AssociatedGeneralObjective")
@@ -1879,6 +2019,17 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("AssociatedGeneralObjective");
 
                     b.Navigation("AssociatedSpecificObjective");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.ActivityFunctionary", b =>
+                {
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Activity", "Activity")
+                        .WithMany("ActivityFunctionaries")
+                        .HasForeignKey("ActivityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Activity");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.ConnectedDocument", b =>
@@ -2041,7 +2192,47 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("Document");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Risks.Risk", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Procedure", b =>
+                {
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Activity", "AssociatedActivity")
+                        .WithMany("Procedures")
+                        .HasForeignKey("ActivityId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.GeneralObjective", "AssociatedGeneralObjective")
+                        .WithMany("Procedures")
+                        .HasForeignKey("GeneralObjectiveId")
+                        .HasPrincipalKey("ObjectiveId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.SpecificObjective", "AssociatedSpecificObjective")
+                        .WithMany("Procedures")
+                        .HasForeignKey("SpecificObjectiveId")
+                        .HasPrincipalKey("ObjectiveId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("AssociatedActivity");
+
+                    b.Navigation("AssociatedGeneralObjective");
+
+                    b.Navigation("AssociatedSpecificObjective");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.ProcedureFunctionary", b =>
+                {
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Procedure", "Procedure")
+                        .WithMany("ProcedureFunctionaries")
+                        .HasForeignKey("ProcedureId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Procedure");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Risk", b =>
                 {
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Action", "AssociatedAction")
                         .WithMany("Risks")
@@ -2077,18 +2268,18 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("AssociatedSpecificObjective");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Risks.RiskActionProposal", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.RiskActionProposal", b =>
                 {
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Risks.RiskTrackingReport", null)
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.RiskTrackingReport", null)
                         .WithMany("RiskActionProposals")
                         .HasForeignKey("RiskTrackingReportId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Risks.RiskControlAction", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.RiskControlAction", b =>
                 {
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Risks.Risk", "Risk")
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Risk", "Risk")
                         .WithMany("RiskControlActions")
                         .HasForeignKey("RiskId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2097,9 +2288,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("Risk");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Risks.RiskTrackingReport", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.RiskTrackingReport", b =>
                 {
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Risks.Risk", "Risk")
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Risk", "Risk")
                         .WithMany("RiskTrackingReports")
                         .HasForeignKey("RiskId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -2198,6 +2389,8 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.Navigation("ActivityFunctionaries");
 
+                    b.Navigation("Procedures");
+
                     b.Navigation("Risks");
                 });
 
@@ -2222,6 +2415,8 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                 {
                     b.Navigation("Activities");
 
+                    b.Navigation("Procedures");
+
                     b.Navigation("Risks");
 
                     b.Navigation("SpecificObjectives");
@@ -2244,14 +2439,19 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("ConnectedDocuments");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Risks.Risk", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Procedure", b =>
+                {
+                    b.Navigation("ProcedureFunctionaries");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Risk", b =>
                 {
                     b.Navigation("RiskControlActions");
 
                     b.Navigation("RiskTrackingReports");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Risks.RiskTrackingReport", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.RiskTrackingReport", b =>
                 {
                     b.Navigation("RiskActionProposals");
                 });
@@ -2259,6 +2459,8 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.SpecificObjective", b =>
                 {
                     b.Navigation("Activities");
+
+                    b.Navigation("Procedures");
 
                     b.Navigation("Risks");
 

@@ -1,10 +1,9 @@
 ﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Actions;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
 
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
-    public class Action: ExtendedEntity
+    public class Action : ExtendedEntity
     {
         public long ActivityId { get; set; }
         public long DepartmentId { get; set; }
