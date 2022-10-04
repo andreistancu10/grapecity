@@ -27,7 +27,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IIdentityService _identityService;
         private readonly IServiceProvider _serviceProvider;
-        private UserModel _currentUser;
 
         public ProcedureService(
             DocumentManagementDbContext dbContext,
@@ -83,8 +82,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task<long> CountAsync(ProcedureFilter filter, CancellationToken cancellationToken)
         {
-            _currentUser = await _identityService.GetCurrentUserAsync(cancellationToken);
-
             return await _dbContext.Procedures
                 .WhereAll((await GetProceduresExpressions(filter, cancellationToken)).ToPredicates())
                 .AsNoTracking()
@@ -96,23 +93,23 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var dataExpressions = new DataExpressions<Procedure>();
 
             dataExpressions.AddRange(await GetProceduresExpressionsAsync(filter, token));
-            //dataExpressions.AddRange(await GetProceduresUserRightsExpressionsAsync(currentUser, token));
+            dataExpressions.AddRange(await GetProceduresUserRightsExpressionsAsync(token));
 
             return dataExpressions;
         }
-        private Task<DataExpressions<Procedure>> GetProceduresUserRightsExpressionsAsync(UserModel currentUser, CancellationToken token)
+        private async Task<DataExpressions<Procedure>> GetProceduresUserRightsExpressionsAsync(CancellationToken token)
         {
-            return null;
-           
-            //var rightsComponent = new RisksPermissionsFilterComponent(_serviceProvider);
-            //var rightsComponentContext = new RisksPermissionsFilterComponentContext
-            //{
-            //    CurrentUser = currentUser
-            //};
+            var currentUser = await _identityService.GetCurrentUserAsync(token);
 
-            //return rightsComponent.ExtractDataExpressionsAsync(rightsComponentContext, token);
-        }
-        private Task<DataExpressions<Procedure>> GetProceduresExpressionsAsync(ProcedureFilter filter, CancellationToken token)
+            var rightsComponent = new ProceduresPermissionsFilterComponent(_serviceProvider);
+			var rightsComponentContext = new ProceduresPermissionsFilterComponentContext
+			{
+				CurrentUser = currentUser
+			};
+
+			return await rightsComponent.ExtractDataExpressionsAsync(rightsComponentContext, token);
+		}
+		private Task<DataExpressions<Procedure>> GetProceduresExpressionsAsync(ProcedureFilter filter, CancellationToken token)
         {
             var filterComponent = new ProceduresFilterComponent(_serviceProvider);
             var filterComponentContext = new ProceduresFilterComponentContext
