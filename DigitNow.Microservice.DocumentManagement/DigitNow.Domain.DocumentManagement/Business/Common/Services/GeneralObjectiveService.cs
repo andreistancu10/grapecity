@@ -2,6 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Contracts.Scim;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -47,6 +48,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task UpdateAsync(GeneralObjective generalObjective, CancellationToken cancellationToken)
         {
+            DbContext.Entry(generalObjective).State = EntityState.Modified;
             await ChangeStateAsync(new List<long> { generalObjective.ObjectiveId }, ScimEntity.GeneralObjective, generalObjective.Objective?.State, cancellationToken);
             await DbContext.SingleUpdateAsync(generalObjective, cancellationToken);
             await DbContext.SaveChangesAsync(cancellationToken);
