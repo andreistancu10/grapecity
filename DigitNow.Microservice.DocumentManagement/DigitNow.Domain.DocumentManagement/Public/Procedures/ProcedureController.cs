@@ -52,8 +52,8 @@ namespace DigitNow.Domain.DocumentManagement.Public.Procedures
             return CreateResponse(await _mediator.Send(command));
         }
 
-        [HttpPost("get-procedures")]
-        public async Task<IActionResult> GetFilteredProcedures([FromBody] GetFilteredProceduresRequest request, CancellationToken cancellationToken)
+        [HttpPost("get-all")]
+        public async Task<IActionResult> GetAllProceduresAsync([FromBody] GetFilteredProceduresRequest request, CancellationToken cancellationToken)
         {
             var query = _mapper.Map<GetFilteredProceduresQuery>(request);
             return CreateResponse(await _mediator.Send(query, cancellationToken));
