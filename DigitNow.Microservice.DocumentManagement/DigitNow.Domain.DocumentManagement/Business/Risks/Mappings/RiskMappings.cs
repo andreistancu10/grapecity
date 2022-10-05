@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Risks.Commands.CreateRisk;
 using DigitNow.Domain.DocumentManagement.Business.Risks.Commands.Update;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Risks.Mappings
 {

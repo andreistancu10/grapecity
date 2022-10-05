@@ -1,4 +1,4 @@
-﻿namespace DigitNow.Domain.DocumentManagement.Data.Entities.Activities
+﻿namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
     public class ActivityFunctionary : ExtendedEntity
     {

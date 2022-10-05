@@ -1,6 +1,6 @@
 ﻿using DigitNow.Domain.DocumentManagement.Business.Common.Dtos;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {

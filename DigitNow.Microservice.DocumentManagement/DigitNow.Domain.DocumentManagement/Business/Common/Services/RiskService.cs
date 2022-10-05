@@ -3,14 +3,13 @@ using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Contracts.Risks.Enums;
 using DigitNow.Domain.DocumentManagement.Contracts.Scim;
 using DigitNow.Domain.DocumentManagement.Data;
-using DigitNow.Domain.DocumentManagement.Data.Entities.Risks;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
 using DigitNow.Domain.DocumentManagement.Data.Filters.Risks;
 using DigitNow.Domain.DocumentManagement.Data.Filters;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
-using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Documents;
 using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Risks;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
@@ -19,7 +18,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         // Create
         Task<Risk> AddAsync(Risk risk, CancellationToken cancellationToken);
-        Task<RiskTrackingReport> CreateRiskTrackingReportAsync(RiskTrackingReport riskTrackingReport, CancellationToken cancellationToken);
 
         // Read
         IQueryable<Risk> GetByIdQuery(long riskId);
@@ -163,14 +161,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 .ToListAsync(cancellationToken);
 
             return risks;
-        }
-
-        public async Task<RiskTrackingReport> CreateRiskTrackingReportAsync(RiskTrackingReport riskTrackingReport, CancellationToken cancellationToken)
-        {
-            await _dbContext.RiskTrackingReports.AddAsync(riskTrackingReport, cancellationToken);
-            await _dbContext.SaveChangesAsync(cancellationToken);
-
-            return riskTrackingReport;
         }
     }
 }
