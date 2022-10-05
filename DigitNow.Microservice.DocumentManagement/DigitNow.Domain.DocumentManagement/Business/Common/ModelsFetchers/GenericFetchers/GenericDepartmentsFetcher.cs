@@ -19,7 +19,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Gene
         protected override async Task<List<DepartmentModel>> FetchInternalAsync(ModelFetcherContext context, CancellationToken cancellationToken)
         {
             var departmentsResponse = await _catalogClient.Departments.GetDepartmentsAsync(cancellationToken);
-
+            
             var documentDepartmentModels = departmentsResponse.Departments
                 .Select(x => _mapper.Map<DepartmentModel>(x))
                 .ToList();

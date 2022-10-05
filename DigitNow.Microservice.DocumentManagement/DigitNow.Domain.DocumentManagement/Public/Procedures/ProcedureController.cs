@@ -2,6 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Business.Procedures.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.Procedures.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.Procedures.Queries.GetById;
+using DigitNow.Domain.DocumentManagement.Business.Procedures.Queries.GetFilteredProcedures;
 using DigitNow.Domain.DocumentManagement.Public.Procedures.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
@@ -50,5 +51,13 @@ namespace DigitNow.Domain.DocumentManagement.Public.Procedures
 
             return CreateResponse(await _mediator.Send(command));
         }
+
+        [HttpPost("get-all")]
+        public async Task<IActionResult> GetAllProceduresAsync([FromBody] GetFilteredProceduresRequest request, CancellationToken cancellationToken)
+        {
+            var query = _mapper.Map<GetFilteredProceduresQuery>(request);
+            return CreateResponse(await _mediator.Send(query, cancellationToken));
+        }
+
     }
 }
