@@ -41,6 +41,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
             initialGeneralObjective.Objective.Details = request.Details;
             initialGeneralObjective.Objective.ModificationMotive = request.ModificationMotive;
 
+
             await _generalObjectiveService.UpdateAsync(initialGeneralObjective, cancellationToken);
 
             if (request.UploadedFileIds.Any())
