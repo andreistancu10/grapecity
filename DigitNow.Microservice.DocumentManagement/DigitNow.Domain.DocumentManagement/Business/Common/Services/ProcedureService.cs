@@ -10,6 +10,7 @@ using DigitNow.Domain.DocumentManagement.Data.Filters;
 using DigitNow.Domain.DocumentManagement.Data.Filters.Procedures;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using DigitNow.Domain.Catalog.Client;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -27,21 +28,25 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IIdentityService _identityService;
         private readonly IServiceProvider _serviceProvider;
+        private readonly ICatalogClient _catalogClient;
 
         public ProcedureService(
             DocumentManagementDbContext dbContext,
             IIdentityService identityService,
-            IServiceProvider serviceProvider) : base(dbContext)
+            IServiceProvider serviceProvider, ICatalogClient catalogClient) : base(dbContext)
         {
             _dbContext = dbContext;
             _identityService = identityService;
-            _serviceProvider = serviceProvider; 
+            _serviceProvider = serviceProvider;
+            _catalogClient = catalogClient;
         }
 
         public async Task<Procedure> AddAsync(Procedure procedure, CancellationToken cancellationToken)
         {
-            procedure.State = ScimState.Active;
+            var activeScimState = await _catalogClient.ScimStates.GetScimStateByCodeAsync("activ", cancellationToken);
+            procedure.StateId = activeScimState.Id;
             var dbContextTransaction = await DbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+
             try
             {
                 DbContext.Entry(procedure).State = EntityState.Added;
@@ -69,7 +74,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task UpdateAsync(Procedure procedure, CancellationToken cancellationToken)
         {
-            await ChangeStateAsync(new List<long> { procedure.Id }, ScimEntity.ScimProcedure, procedure.State, cancellationToken);
+            await ChangeStateAsync(new List<long> { procedure.Id }, ScimEntity.ScimProcedure, procedure.StateId, cancellationToken);
             await DbContext.SingleUpdateAsync(procedure, cancellationToken);
             await DbContext.SaveChangesAsync(cancellationToken);
         }

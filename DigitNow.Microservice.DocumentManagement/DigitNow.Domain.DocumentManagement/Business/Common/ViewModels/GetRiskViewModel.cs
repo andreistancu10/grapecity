@@ -14,7 +14,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
         public long DepartmentId { get; set; }
         public string Code { get; set; }
         public string Description { get; set; }
-        public ScimState State { get; set; }
+        public long StateId{ get; set; }
         public string RiskCauses { get; set; }
         public string RiskConsequences { get; set; }
         public RiskProbability ProbabilityOfApparitionEstimation { get; set; }

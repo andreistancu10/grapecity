@@ -6,7 +6,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.SpecificObjectives.Models
     {
         public long ObjectiveId { get; set; }
         public string Title { get; set; }
-        public ScimState State { get; set; }
+        public long StateId{ get; set; }
         public string Details { get; set; }
         public string ModificationMotive { get; set; }
         public List<long> UploadedFileIds { get; set; }

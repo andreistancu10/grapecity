@@ -9,6 +9,7 @@
         ScimAction,
         ScimRisk,
         ScimRiskTrackingReport,
+        ScimRiskFUR,
         ScimProcedure
     }
 }

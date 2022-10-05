@@ -29,6 +29,6 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Objectives
 
     public class GeneralObjectiveStateFilter
     {
-        public ScimState State { get; set; }
+        public long StateId{ get; set; }
     }
 }
