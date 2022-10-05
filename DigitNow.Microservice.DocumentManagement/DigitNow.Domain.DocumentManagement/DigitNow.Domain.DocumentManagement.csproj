@@ -7,10 +7,13 @@
 
 	<ItemGroup>
 	  <Compile Remove="Business\Common\FileUsageContexts\**" />
+	  <Compile Remove="Data\Entities\DynamicFormFillingLogs\**" />
 	  <Compile Remove="Data\Entities\UploadedFileMappings\Entities\**" />
 	  <EmbeddedResource Remove="Business\Common\FileUsageContexts\**" />
+	  <EmbeddedResource Remove="Data\Entities\DynamicFormFillingLogs\**" />
 	  <EmbeddedResource Remove="Data\Entities\UploadedFileMappings\Entities\**" />
 	  <None Remove="Business\Common\FileUsageContexts\**" />
+	  <None Remove="Data\Entities\DynamicFormFillingLogs\**" />
 	  <None Remove="Data\Entities\UploadedFileMappings\Entities\**" />
 	  <Compile Remove="Business\DynamicForms\Maping\**" />
 	  <EmbeddedResource Remove="Business\DynamicForms\Maping\**" />
@@ -102,7 +105,6 @@
 	<ItemGroup>
 	  <Folder Include="Business\Activities\Mappings\" />
 	  <Folder Include="Business\Activities\Queries\Get\" />
-	  <Folder Include="Data\Entities\DynamicFormFillingLogs\Configuration\" />
 	  <Folder Include="Data\Filters\Activities\" />
 	  <Folder Include="Business\Common\FileUsageContexts\" />
 	  <Folder Include="Migrations\" />

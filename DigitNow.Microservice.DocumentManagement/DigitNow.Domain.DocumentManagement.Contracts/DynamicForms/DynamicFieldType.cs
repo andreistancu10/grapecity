@@ -10,6 +10,7 @@
         CountryDropdown,
         DepartmentDropdown,
         Checkbox,
-        InternalDocumentType
+        InternalDocumentType,
+        Title
     }
 }

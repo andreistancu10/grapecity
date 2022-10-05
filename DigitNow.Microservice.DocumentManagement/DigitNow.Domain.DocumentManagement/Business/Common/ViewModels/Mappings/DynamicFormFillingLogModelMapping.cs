@@ -14,7 +14,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(c => c.Category, opt => opt.MapFrom<MapCategory>())
                 .ForMember(c => c.RegistrationAt, opt => opt.MapFrom(src => src.FormValues.CreatedAt))
                 .ForMember(c => c.RegistrationBy, opt => opt.MapFrom<MapRegistrationBy>())
-                .ForMember(c => c.Recipient, opt => opt.MapFrom<MapRecipient>());
+                .ForMember(c => c.Department, opt => opt.MapFrom<MapDepartment>());
         }
 
         private class MapRegistrationBy :
@@ -31,16 +31,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             }
         }
 
-        private class MapRecipient :
+        private class MapDepartment :
                 IValueResolver<DynamicFormAggregate, HistoricalArchiveDocumentsViewModel, BasicViewModel>
         {
             public BasicViewModel Resolve(DynamicFormAggregate source, HistoricalArchiveDocumentsViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
-                //TODO: Change this after a user is assigned to multiple departments
-                var userDepartment = source.Departments.FirstOrDefault();
-                if (userDepartment != null)
+                var destinationDepartment = source.Departments.FirstOrDefault(x => x.Id == source.FormValues.DestinationDepartmentId);
+                
+                if (destinationDepartment != null)
                 {
-                    return new BasicViewModel(userDepartment.Id, userDepartment.Name);
+                    return new BasicViewModel(destinationDepartment.Id, destinationDepartment.Name);
                 }
                 return default;
             }

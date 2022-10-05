@@ -15,6 +15,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(c => c.InitialValue, opt => opt.MapFrom(src => src.DynamicFormFieldMapping.InitialValue))
                 .ForMember(c => c.OrderNumber, opt => opt.MapFrom(src => src.DynamicFormFieldMapping.Order))
                 .ForMember(c => c.Required, opt => opt.MapFrom(src => src.DynamicFormFieldMapping.Required))
+                .ForMember(c => c.Context, opt => opt.MapFrom(src => src.DynamicFormFieldMapping.Context))
                 .ForMember(c => c.FieldType, opt => opt.MapFrom<FieldTypeResolver>())
                 .ForMember(c => c.Value, opt => opt.MapFrom<FieldValueResolver>());
         }

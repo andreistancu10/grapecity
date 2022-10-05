@@ -28,6 +28,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IServiceProvider _serviceProvider;
         private readonly IDynamicFormsMappingService _mappingService;
+        private const string DESTINATION_DEPARTMENT_ID = "destinationDepartmentId";
 
         public DynamicFormsService(
             DocumentManagementDbContext context, 
@@ -80,7 +81,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         public async Task SaveDataForDynamicFormAsync(long dynamicFormId, List<KeyValueRequestModel> values, CancellationToken cancellationToken)
         {
             var dynamicFormFieldMappings = await GetDynamicFormFieldMappingsQueryable(dynamicFormId).ToListAsync(cancellationToken);
-            var dynamicFormFillingLog = new DynamicFormFillingLog { DynamicFormId = dynamicFormId };
+            var destinationDepartmentId = GetDestinationDepartmentId(values);
+
+            var dynamicFormFillingLog = new DynamicFormFillingLog { DynamicFormId = dynamicFormId, DestinationDepartmentId = destinationDepartmentId };
 
             await _dbContext.DynamicFormFillingLogs.AddAsync(dynamicFormFillingLog, cancellationToken);
 
@@ -105,6 +108,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
+        private static long? GetDestinationDepartmentId(List<KeyValueRequestModel> values)
+        {
+            var departmentIdAsString = values.FirstOrDefault(x => x.Key == DESTINATION_DEPARTMENT_ID)?.Value;
+
+            if (long.TryParse(departmentIdAsString, out long destinationDepartmentId))
+            {
+                return destinationDepartmentId;
+            }
+
+            return null;
+        }
         public async Task<int> CountDynamicFilledFormsAsync(DynamicFormsFilter filter, CancellationToken token)
         {
             return await _dbContext.DynamicFormFillingLogs
