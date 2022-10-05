@@ -3,6 +3,7 @@ using DigitNow.Domain.DocumentManagement.Contracts.Scim;
 using DigitNow.Domain.DocumentManagement.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
+using DigitNow.Domain.Catalog.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Actions;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
@@ -24,12 +25,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     public class ActionService : ScimStateService, IActionService
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly ICatalogClient _catalogClient;
 
         public ActionService(
             DocumentManagementDbContext dbContext,
-            IServiceProvider serviceProvider) : base(dbContext)
+            IServiceProvider serviceProvider,
+            ICatalogClient catalogClient) : base(dbContext)
         {
             _serviceProvider = serviceProvider;
+            _catalogClient = catalogClient;
         }
 
         public async Task<List<Action>> GetActionsAsync(ActionFilter filter, UserModel currentUser, int page, int count, CancellationToken cancellationToken)
@@ -45,7 +49,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task<Action> CreateAsync(Action action, CancellationToken cancellationToken)
         {
-            action.State = ScimState.Active;
+            var activeScimState = await _catalogClient.ScimStates.GetScimStateByCodeAsync("activ", cancellationToken);
+            action.StateId = activeScimState.Id;
+
             await SetActionCodeAsync(action, cancellationToken);
             await DbContext.Actions.AddAsync(action, cancellationToken);
             await DbContext.SaveChangesAsync(cancellationToken);
@@ -55,7 +61,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task UpdateAsync(Action action, CancellationToken cancellationToken)
         {
-            await ChangeStateAsync(new List<long> { action.Id }, ScimEntity.ScimAction, action.State, cancellationToken);
+            await ChangeStateAsync(new List<long> { action.Id }, ScimEntity.ScimAction, action.StateId, cancellationToken);
             await DbContext.SingleUpdateAsync(action, cancellationToken);
             await DbContext.SaveChangesAsync(cancellationToken);
         }

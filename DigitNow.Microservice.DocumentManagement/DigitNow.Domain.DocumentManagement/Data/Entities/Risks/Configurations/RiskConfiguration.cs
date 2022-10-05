@@ -15,7 +15,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities.Configurations
             builder.Property(p => p.DepartmentId).IsRequired();
             builder.Property(p => p.Code).IsRequired();
             builder.Property(p => p.Description).IsRequired();
-            builder.Property(p => p.State).IsRequired();
+            builder.Property(p => p.StateId).IsRequired();
             builder.Property(p => p.RiskCauses).IsRequired();
             builder.Property(p => p.RiskConsequences).IsRequired();
             builder.Property(p => p.ProbabilityOfApparitionEstimation).IsRequired();

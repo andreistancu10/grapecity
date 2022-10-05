@@ -31,6 +31,6 @@ namespace DigitNow.Domain.DocumentManagement.Public.GeneralObjectives.Models
     }
     public class GeneralObjectiveStateFilterDto
     {
-        public ScimState GeneralObjectiveState { get; set; }
+        public long GeneralObjectiveStateId { get; set; }
     }
 }

@@ -4,6 +4,7 @@ using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using DigitNow.Domain.Catalog.Client;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -17,32 +18,33 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         private readonly IObjectiveService _objectiveService;
         private readonly IGeneralObjectiveService _generalObjectiveService;
+        private readonly ICatalogClient _catalogClient;
 
         public SpecificObjectiveService(
             DocumentManagementDbContext dbContext,
             IObjectiveService objectiveService,
-            IGeneralObjectiveService generalObjectiveService) : base(dbContext)
+            IGeneralObjectiveService generalObjectiveService,
+            ICatalogClient catalogClient) : base(dbContext)
         {
             _objectiveService = objectiveService;
             _generalObjectiveService = generalObjectiveService;
+            _catalogClient = catalogClient;
         }
 
         public async Task<SpecificObjective> AddAsync(SpecificObjective specificObjective, CancellationToken cancellationToken)
         {
-            if (specificObjective.Objective == null)
-            {
-                specificObjective.Objective = new Objective();
-            }
+            specificObjective.Objective ??= new Objective();
 
             specificObjective.Objective.ObjectiveType = ObjectiveType.Specific;
-            specificObjective.Objective.State = ScimState.Active;
+            var activeScimState = await _catalogClient.ScimStates.GetScimStateByCodeAsync("activ", cancellationToken);
+            specificObjective.Objective.StateId = activeScimState.Id;
             specificObjective.Objective.SpecificObjective = specificObjective;
             await _objectiveService.AddAsync(specificObjective.Objective, cancellationToken);
 
             var generalObjective = await _generalObjectiveService.FindQuery().Where(x => x.ObjectiveId == specificObjective.GeneralObjectiveId).FirstOrDefaultAsync(cancellationToken);
 
             if (generalObjective.SpecificObjectives == null)
-                generalObjective.SpecificObjectives = new List<SpecificObjective>() { specificObjective };
+                generalObjective.SpecificObjectives = new List<SpecificObjective> { specificObjective };
             else
                 generalObjective.SpecificObjectives.Add(specificObjective);
 
@@ -68,7 +70,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task UpdateAsync(SpecificObjective specificObjective, CancellationToken cancellationToken)
         {
-            await ChangeStateAsync(new List<long> { specificObjective.ObjectiveId }, ScimEntity.SpecificObjective, specificObjective.Objective?.State, cancellationToken);
+            await ChangeStateAsync(new List<long> { specificObjective.ObjectiveId }, ScimEntity.SpecificObjective, specificObjective.Objective?.StateId, cancellationToken);
             await DbContext.SingleUpdateAsync(specificObjective, cancellationToken);
             await DbContext.SaveChangesAsync(cancellationToken);
         }

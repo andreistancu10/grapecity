@@ -47,7 +47,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.SpecificObjectives.Command
             initialSpecificObjective.Objective.Title = request.Title;
             initialSpecificObjective.Objective.Details = request.Details;
             initialSpecificObjective.Objective.ModificationMotive = request.ModificationMotive;
-            initialSpecificObjective.Objective.State = request.State;
+            initialSpecificObjective.Objective.StateId = request.StateId;
 
             await _specificObjectiveService.UpdateAsync(initialSpecificObjective, cancellationToken);
 

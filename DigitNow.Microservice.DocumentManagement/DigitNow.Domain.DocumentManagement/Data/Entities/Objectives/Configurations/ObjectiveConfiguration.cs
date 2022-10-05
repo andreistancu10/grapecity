@@ -13,7 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities.Configurations
 
             builder.Property(p => p.ObjectiveType).IsRequired();
             builder.Property(p => p.Code).IsRequired();
-            builder.Property(p => p.State).IsRequired();
+            builder.Property(p => p.StateId).IsRequired();
             builder.Property(p => p.Title).IsRequired();
             builder.Property(p => p.Details).IsRequired();
         }

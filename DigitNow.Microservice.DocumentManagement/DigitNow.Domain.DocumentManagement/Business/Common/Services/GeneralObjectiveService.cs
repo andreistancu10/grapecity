@@ -1,4 +1,5 @@
-﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
+﻿using DigitNow.Domain.Catalog.Client;
+using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
 using DigitNow.Domain.DocumentManagement.Contracts.Scim;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
@@ -15,23 +16,24 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     public class GeneralObjectiveService : ScimStateService, IGeneralObjectiveService
     {
         private readonly IObjectiveService _objectiveService;
+        private readonly ICatalogClient _catalogClient;
 
         public GeneralObjectiveService(
             DocumentManagementDbContext dbContext,
-            IObjectiveService objectiveService) : base(dbContext)
+            IObjectiveService objectiveService,
+            ICatalogClient catalogClient) : base(dbContext)
         {
             _objectiveService = objectiveService;
+            _catalogClient = catalogClient;
         }
 
         public async Task<GeneralObjective> AddAsync(GeneralObjective generalObjective, CancellationToken cancellationToken)
         {
-            if (generalObjective.Objective == null)
-            {
-                generalObjective.Objective = new Objective();
-            }
+            generalObjective.Objective ??= new Objective();
 
             generalObjective.Objective.ObjectiveType = ObjectiveType.General;
-            generalObjective.Objective.State = ScimState.Active;
+            var activeScimState = await _catalogClient.ScimStates.GetScimStateByCodeAsync("activ", cancellationToken);
+            generalObjective.Objective.StateId = activeScimState.Id;
 
             await _objectiveService.AddAsync(generalObjective.Objective, cancellationToken);
             await DbContext.AddAsync(generalObjective, cancellationToken);
@@ -47,7 +49,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task UpdateAsync(GeneralObjective generalObjective, CancellationToken cancellationToken)
         {
-            await ChangeStateAsync(new List<long> { generalObjective.ObjectiveId }, ScimEntity.GeneralObjective, generalObjective.Objective?.State, cancellationToken);
+            await ChangeStateAsync(new List<long> { generalObjective.ObjectiveId }, ScimEntity.GeneralObjective, generalObjective.Objective?.StateId, cancellationToken);
             await DbContext.SingleUpdateAsync(generalObjective, cancellationToken);
             await DbContext.SaveChangesAsync(cancellationToken);
         }

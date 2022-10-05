@@ -10,6 +10,7 @@ using DigitNow.Domain.DocumentManagement.Data.Filters;
 using DigitNow.Domain.DocumentManagement.Data.Filters.Procedures;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using DigitNow.Domain.Catalog.Client;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -40,8 +41,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task<Procedure> AddAsync(Procedure procedure, CancellationToken cancellationToken)
         {
-            procedure.State = ScimState.Active;
+            var activeScimState = await _catalogClient.ScimStates.GetScimStateByCodeAsync("activ", cancellationToken);
+            procedure.StateId = activeScimState.Id;
             var dbContextTransaction = await DbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
+
             try
             {
                 DbContext.Entry(procedure).State = EntityState.Added;
@@ -69,7 +72,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task UpdateAsync(Procedure procedure, CancellationToken cancellationToken)
         {
-            await ChangeStateAsync(new List<long> { procedure.Id }, ScimEntity.ScimProcedure, procedure.State, cancellationToken);
+            await ChangeStateAsync(new List<long> { procedure.Id }, ScimEntity.ScimProcedure, procedure.StateId, cancellationToken);
             await DbContext.SingleUpdateAsync(procedure, cancellationToken);
             await DbContext.SaveChangesAsync(cancellationToken);
         }

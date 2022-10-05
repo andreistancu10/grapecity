@@ -37,7 +37,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Commands
             var fileMappings = await _uploadedFileService.GetUploadedFileMappingsByTargetIdAsync(initialGeneralObjective.ObjectiveId, TargetEntity.GeneralObjective, cancellationToken);
 
             initialGeneralObjective.Objective.Title = request.Title;
-            initialGeneralObjective.Objective.State = request.State;
+            initialGeneralObjective.Objective.StateId = request.StateId;
             initialGeneralObjective.Objective.Details = request.Details;
             initialGeneralObjective.Objective.ModificationMotive = request.ModificationMotive;
 

@@ -9,6 +9,7 @@ using DigitNow.Domain.DocumentManagement.Data.Filters.Risks;
 using DigitNow.Domain.DocumentManagement.Data.Filters;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using DigitNow.Domain.Catalog.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Risks;
 
@@ -33,13 +34,19 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IIdentityService _identityService;
         private readonly IServiceProvider _serviceProvider;
+        private readonly ICatalogClient _catalogClient;
         private UserModel _currentUser;
 
-        public RiskService(DocumentManagementDbContext dbContext, IIdentityService identityService, IServiceProvider serviceProvider) : base(dbContext)
+        public RiskService(
+            DocumentManagementDbContext dbContext, 
+            IIdentityService identityService, 
+            IServiceProvider serviceProvider,
+            ICatalogClient catalogClient) : base(dbContext)
         {
             _dbContext = dbContext;
             _identityService = identityService;
             _serviceProvider = serviceProvider;
+            _catalogClient = catalogClient;
         }
 
         public IQueryable<Risk> GetByIdQuery(long riskId)
@@ -49,7 +56,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task<Risk> AddAsync(Risk risk, CancellationToken cancellationToken)
         {
-            risk.State = ScimState.Active;
+            var activeScimState = await _catalogClient.ScimStates.GetScimStateByCodeAsync("activ", cancellationToken);
+            risk.StateId = activeScimState.Id;
+
             risk.RiskExposureEvaluation =
                 CalculateRiskExposureEvaluation(risk.ProbabilityOfApparitionEstimation, risk.ImpactOfObjectivesEstimation);
             var dbContextTransaction = await DbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable, cancellationToken);
@@ -73,10 +82,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return risk;
         }
 
-        public async Task UpdateAsync(Risk Risk, CancellationToken cancellationToken)
+        public async Task UpdateAsync(Risk risk, CancellationToken cancellationToken)
         {
-            await ChangeStateAsync(new List<long> { Risk.Id }, ScimEntity.ScimRisk, Risk.State, cancellationToken);
-            await DbContext.SingleUpdateAsync(Risk, cancellationToken);
+            await ChangeStateAsync(new List<long> { risk.Id }, ScimEntity.ScimRisk, risk.StateId, cancellationToken);
+            await DbContext.SingleUpdateAsync(risk, cancellationToken);
             await DbContext.SaveChangesAsync(cancellationToken);
         }
 

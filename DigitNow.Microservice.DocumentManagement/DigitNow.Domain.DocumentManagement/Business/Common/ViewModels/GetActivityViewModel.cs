@@ -11,7 +11,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
         public long DepartmentId { get; set; }
         public string Code { get; set; }
         public string Title { get; set; }
-        public ScimState State { get; set; }
+        public long StateId{ get; set; }
         public string Details { get; set; }
         public string ModificationMotive { get; set; }
         public GeneralObjectiveDto AssociatedGeneralObjective { get; set; }

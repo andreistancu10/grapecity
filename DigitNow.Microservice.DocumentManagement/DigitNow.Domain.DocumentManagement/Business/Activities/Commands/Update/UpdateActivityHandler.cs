@@ -42,7 +42,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Commands.Update
             initialActivity.Title = request.Title;
             initialActivity.Details = request.Details;
             initialActivity.ModificationMotive = request.ModificationMotive;
-            initialActivity.State = request.StateId;
+            initialActivity.StateId = request.StateId;
 
             await _activityService.UpdateAsync(initialActivity, cancellationToken);
 

@@ -44,7 +44,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Objectives
             if (stateFilter != null)
             {
                 EntityPredicates.Add(objective =>
-                    objective.Objective.State == stateFilter.State
+                    objective.Objective.StateId == stateFilter.StateId
                 );
             }
         }

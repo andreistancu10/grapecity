@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using DigitNow.Domain.Catalog.Client;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
@@ -15,7 +16,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.
         private readonly IMapper _mapper;
         private readonly IGeneralObjectiveService _generalObjectiveService;
         private readonly GeneralObjectiveRelationsFetcher _generalObjectiveRelationsFetcher;
-
 
         public GetGeneralObjectiveByIdHandler(IMapper mapper,
             IGeneralObjectiveService generalObjectiveService,
@@ -34,7 +34,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.
                 .FirstOrDefaultAsync(cancellationToken);
 
             await _generalObjectiveRelationsFetcher
-                .UseGeneralObjectivesContext(new GeneralObjectivesFetcherContext { GeneralObjectives = new List<GeneralObjective>() { generalObjective } })
+                .UseGeneralObjectivesContext(new GeneralObjectivesFetcherContext { GeneralObjectives = new List<GeneralObjective> { generalObjective } })
                 .TriggerFetchersAsync(cancellationToken);
 
             if (generalObjective == null)
@@ -42,7 +42,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.GeneralObjectives.Queries.
                 return null;
             }
 
-            var aggregate = new GeneralObjectiveAggregate()
+            var aggregate = new GeneralObjectiveAggregate
             {
                 GeneralObjective = generalObjective,
                 Users = _generalObjectiveRelationsFetcher.GeneralObjectiveUsers
