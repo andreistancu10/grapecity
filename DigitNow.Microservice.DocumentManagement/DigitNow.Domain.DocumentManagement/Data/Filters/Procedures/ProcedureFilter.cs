@@ -39,7 +39,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Procedures
 
     public class ProcedureStateFilter
     {
-        public ScimState ProcedureState { get; set; }
+        public long ProcedureState { get; set; }
     }
 
     public class ProcedureCategoriesFilter

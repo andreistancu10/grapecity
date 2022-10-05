@@ -13,7 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
         public DateTime StartDate { get; set; }
         public ProcedureCategory ProcedureCategory { get; set; }
         public string Code { get; set; }
-        public ScimState State { get; set; }
+        public long StateId { get; set; }
         public BasicViewModel SpecificObjective { get; set; }
         public BasicViewModel Department { get; set; }
 

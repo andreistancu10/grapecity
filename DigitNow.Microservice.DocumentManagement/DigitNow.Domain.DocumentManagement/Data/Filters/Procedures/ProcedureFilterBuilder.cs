@@ -39,7 +39,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Procedures
         {
             if (EntityFilter.ProcedureStateFilter != null)
             {
-                EntityPredicates.Add(x => x.State == EntityFilter.ProcedureStateFilter.ProcedureState);
+                EntityPredicates.Add(x => x.StateId == EntityFilter.ProcedureStateFilter.ProcedureState);
             }
         }
         private void BuildFilterByProceduresCategories()

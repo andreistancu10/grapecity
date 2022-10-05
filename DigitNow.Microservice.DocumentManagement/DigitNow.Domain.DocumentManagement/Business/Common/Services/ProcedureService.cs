@@ -28,15 +28,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IIdentityService _identityService;
         private readonly IServiceProvider _serviceProvider;
+        private readonly ICatalogClient _catalogClient;
 
         public ProcedureService(
             DocumentManagementDbContext dbContext,
             IIdentityService identityService,
-            IServiceProvider serviceProvider) : base(dbContext)
+            IServiceProvider serviceProvider, ICatalogClient catalogClient) : base(dbContext)
         {
             _dbContext = dbContext;
             _identityService = identityService;
-            _serviceProvider = serviceProvider; 
+            _serviceProvider = serviceProvider;
+            _catalogClient = catalogClient;
         }
 
         public async Task<Procedure> AddAsync(Procedure procedure, CancellationToken cancellationToken)

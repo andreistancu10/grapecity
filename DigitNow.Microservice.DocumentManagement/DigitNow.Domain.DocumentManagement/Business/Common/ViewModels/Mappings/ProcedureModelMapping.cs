@@ -16,7 +16,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(x => x.StartDate, opt => opt.MapFrom(src => src.Procedure.StartDate))
                 .ForMember(x => x.ProcedureCategory, opt => opt.MapFrom(src => src.Procedure.ProcedureCategory))
                 .ForMember(x => x.Code, opt => opt.MapFrom(src => src.Procedure.Code))
-                .ForMember(x => x.State, opt => opt.MapFrom(src => src.Procedure.State))
+                .ForMember(x => x.StateId, opt => opt.MapFrom(src => src.Procedure.StateId))
                 .ForMember(x => x.Department, opt => opt.MapFrom<MapDepartment>())
                 .ForMember(x => x.SpecificObjective, opt => opt.MapFrom<MapProcedureSpecificObjective>());
         }
