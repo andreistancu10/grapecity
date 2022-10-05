@@ -73,11 +73,8 @@ namespace DigitNow.Domain.DocumentManagement.Data
                 switch (entry.State)
                 {
                     case EntityState.Added:
-                        var currentUserId = _identityService.GetCurrentUserId();
                         entry.Entity.CreatedAt = DateTime.Now;
-                        entry.Entity.CreatedBy = currentUserId;
-                        entry.Entity.ModifiedAt = DateTime.Now;
-                        entry.Entity.ModifiedBy = currentUserId;
+                        entry.Entity.CreatedBy = _identityService.GetCurrentUserId();
                         break;
                     case EntityState.Modified:
                         entry.Entity.ModifiedAt = DateTime.Now;
