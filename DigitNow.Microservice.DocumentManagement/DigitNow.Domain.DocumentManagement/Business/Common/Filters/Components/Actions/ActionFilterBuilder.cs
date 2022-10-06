@@ -17,7 +17,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
                 BuildUserPermissionsFilter();
             }
 
-            if (EntityFilter.SpecificObjectivesFilter != null && EntityFilter.SpecificObjectivesFilter.SpecificObjectiveIds.Any())
+            if (EntityFilter.SpecificObjectiveFilter != null)
             {
                 BuildSpecificObjectivesFilter();
             }
@@ -47,9 +47,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
 
         private void BuildSpecificObjectivesFilter()
         {
-            var specificObjectiveIds = EntityFilter.SpecificObjectivesFilter.SpecificObjectiveIds;
+            var specificObjectiveCode = EntityFilter.SpecificObjectiveFilter.SpecificObjectiveCode;
 
-            EntityPredicates.Add(x => specificObjectiveIds.Contains(x.AssociatedActivity.SpecificObjectiveId));
+            EntityPredicates.Add(x => x.AssociatedActivity.AssociatedSpecificObjective.Objective.Code.Equals(specificObjectiveCode));
         }
 
         private void BuildActionsFilter()
