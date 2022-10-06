@@ -34,14 +34,24 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
         private class MapDepartment :
                 IValueResolver<DynamicFormAggregate, HistoricalArchiveDocumentsViewModel, BasicViewModel>
         {
+            private const string DESTINATION_DEPARTMENT_ID = "destinationDepartmentId";
+
             public BasicViewModel Resolve(DynamicFormAggregate source, HistoricalArchiveDocumentsViewModel destination, BasicViewModel destMember, ResolutionContext context)
             {
-                var destinationDepartment = source.Departments.FirstOrDefault(x => x.Id == source.FormValues.DestinationDepartmentId);
-                
-                if (destinationDepartment != null)
+                var foundMapping = source.DynamicFormFieldMappings
+                    .FirstOrDefault(x => x.Key == DESTINATION_DEPARTMENT_ID && x.DynamicFormFieldValues.Any(x => x.DynamicFormFillingLogId == source.FormValues.Id));
+                if(foundMapping == null) return default;
+
+                var foundDynamicValue = foundMapping.DynamicFormFieldValues.FirstOrDefault(x => x.DynamicFormFillingLogId == source.FormValues.Id);
+                if (foundDynamicValue == null) return default; 
+
+                if (long.TryParse(foundDynamicValue.Value, out long destinationDepartmentId))
                 {
+                    var destinationDepartment = source.Departments.FirstOrDefault(x => x.Id == destinationDepartmentId);
+
                     return new BasicViewModel(destinationDepartment.Id, destinationDepartment.Name);
                 }
+
                 return default;
             }
         }

@@ -213,7 +213,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                     FormValues = dynamicFormValue,
                     Categories = _dynamicFormRelationsFetcher.Categories,
                     Users = _dynamicFormRelationsFetcher.DynamicFormUsers,
-                    Departments = _dynamicFormRelationsFetcher.Departments
+                    Departments = _dynamicFormRelationsFetcher.Departments,
+                    DynamicFormFieldMappings = _dynamicFormRelationsFetcher.DynamicFormFieldMappings
                 };
 
                 result.Add(_mapper.Map<DynamicFormAggregate, HistoricalArchiveDocumentsViewModel>(aggregate));

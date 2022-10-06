@@ -5,7 +5,6 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
     public class DynamicFormFillingLog : ExtendedEntity
     {
         public long DynamicFormId { get; set; }
-        public long? DestinationDepartmentId { get; set; }
 
         #region [ References ]
 

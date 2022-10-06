@@ -2,6 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchers;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.GenericFetchers;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries
 {
@@ -16,6 +17,9 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
         public IReadOnlyList<DepartmentModel> Departments
             => GetItems<GenericDepartmentsFetcher, DepartmentModel>();
 
+        public IReadOnlyList<DynamicFormFieldMapping> DynamicFormFieldMappings
+            => GetItems<DynamicFormFieldValuesFetcher, DynamicFormFieldMapping>();
+
         public DynamicFormRelationsFetcher(IServiceProvider serviceProvider) : base(serviceProvider)
         {
             Aggregator
@@ -26,7 +30,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
         {
             Aggregator
                .UseRemoteFetcher<DynamicFormsUsersFetcher>(context)
-               .UseRemoteFetcher<GenericDepartmentsFetcher>(context);
+               .UseRemoteFetcher<GenericDepartmentsFetcher>(context)
+               .UseInternalFetcher<DynamicFormFieldValuesFetcher>(context);
                
             return this;
         }

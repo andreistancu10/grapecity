@@ -859,9 +859,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnName("CreatedBy")
                         .HasColumnOrder(3);
 
-                    b.Property<long?>("DestinationDepartmentId")
-                        .HasColumnType("bigint");
-
                     b.Property<long>("DynamicFormId")
                         .HasColumnType("bigint");
 
@@ -2098,9 +2095,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicFormFieldValue", b =>
                 {
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicFormFieldMapping", "DynamicFormFieldMapping")
-                        .WithMany()
+                        .WithMany("DynamicFormFieldValues")
                         .HasForeignKey("DynamicFormFieldMappingId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicFormFillingLog", "DynamicFormFillingLog")
@@ -2412,6 +2409,11 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("SpecialRegisterMappings");
 
                     b.Navigation("WorkflowHistories");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicFormFieldMapping", b =>
+                {
+                    b.Navigation("DynamicFormFieldValues");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.GeneralObjective", b =>

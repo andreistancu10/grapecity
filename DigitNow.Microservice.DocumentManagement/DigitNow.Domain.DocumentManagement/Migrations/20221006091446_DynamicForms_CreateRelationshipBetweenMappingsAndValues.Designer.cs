@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    [Migration("20221003100717_FormFillingLogs_AddDepartmentColumn")]
-    partial class FormFillingLogs_AddDepartmentColumn
+    [Migration("20221006091446_DynamicForms_CreateRelationshipBetweenMappingsAndValues")]
+    partial class DynamicForms_CreateRelationshipBetweenMappingsAndValues
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -860,9 +860,6 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("CreatedBy")
                         .HasColumnOrder(3);
-
-                    b.Property<long?>("DestinationDepartmentId")
-                        .HasColumnType("bigint");
 
                     b.Property<long>("DynamicFormId")
                         .HasColumnType("bigint");
@@ -2100,9 +2097,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicFormFieldValue", b =>
                 {
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicFormFieldMapping", "DynamicFormFieldMapping")
-                        .WithMany()
+                        .WithMany("DynamicFormFieldValues")
                         .HasForeignKey("DynamicFormFieldMappingId")
-                        .OnDelete(DeleteBehavior.NoAction)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicFormFillingLog", "DynamicFormFillingLog")
@@ -2414,6 +2411,11 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("SpecialRegisterMappings");
 
                     b.Navigation("WorkflowHistories");
+                });
+
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.DynamicFormFieldMapping", b =>
+                {
+                    b.Navigation("DynamicFormFieldValues");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.GeneralObjective", b =>
