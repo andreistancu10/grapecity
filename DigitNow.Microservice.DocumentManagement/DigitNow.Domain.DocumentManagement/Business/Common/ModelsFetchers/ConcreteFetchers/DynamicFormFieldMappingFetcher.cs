@@ -5,18 +5,18 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchers
 {
-    internal class DynamicFormFieldValuesFetcher : ModelFetcher<DynamicFormFieldMapping, ModelFetcherContext>
+    internal class DynamicFormFieldMappingFetcher : ModelFetcher<DynamicFormFieldMapping, ModelFetcherContext>
     {
         private readonly DocumentManagementDbContext _dbContext;
 
-        public DynamicFormFieldValuesFetcher(IServiceProvider serviceProvider)
+        public DynamicFormFieldMappingFetcher(IServiceProvider serviceProvider)
         {
             _dbContext = serviceProvider.GetService<DocumentManagementDbContext>();
         }
 
-        protected override async Task<List<DynamicFormFieldMapping>> FetchInternalAsync(ModelFetcherContext context, CancellationToken cancellationToken)
+        protected override Task<List<DynamicFormFieldMapping>> FetchInternalAsync(ModelFetcherContext context, CancellationToken cancellationToken)
         {
-            return await _dbContext.DynamicFormFieldMappings
+            return  _dbContext.DynamicFormFieldMappings
                 .Include(c => c.DynamicFormFieldValues)
                 .ToListAsync(cancellationToken);
         }

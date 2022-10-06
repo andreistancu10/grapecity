@@ -18,7 +18,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
             => GetItems<GenericDepartmentsFetcher, DepartmentModel>();
 
         public IReadOnlyList<DynamicFormFieldMapping> DynamicFormFieldMappings
-            => GetItems<DynamicFormFieldValuesFetcher, DynamicFormFieldMapping>();
+            => GetItems<DynamicFormFieldMappingFetcher, DynamicFormFieldMapping>();
 
         public DynamicFormRelationsFetcher(IServiceProvider serviceProvider) : base(serviceProvider)
         {
@@ -31,7 +31,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
             Aggregator
                .UseRemoteFetcher<DynamicFormsUsersFetcher>(context)
                .UseRemoteFetcher<GenericDepartmentsFetcher>(context)
-               .UseInternalFetcher<DynamicFormFieldValuesFetcher>(context);
+               .UseInternalFetcher<DynamicFormFieldMappingFetcher>(context);
                
             return this;
         }
