@@ -17,6 +17,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
 
         public DynamicForm DynamicForm { get; set; }
         public DynamicFormField DynamicFormField { get; set; }
+        public ICollection<DynamicFormFieldValue> DynamicFormFieldValues { get; set; }
 
         #endregion
 

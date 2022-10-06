@@ -4,6 +4,7 @@ using DigitNow.Domain.DocumentManagement.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    partial class DocumentManagementDbContextModelSnapshot : ModelSnapshot
+    [Migration("20221006091446_DynamicForms_CreateRelationshipBetweenMappingsAndValues")]
+    partial class DynamicForms_CreateRelationshipBetweenMappingsAndValues
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -68,8 +70,8 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnName("ModifiedBy")
                         .HasColumnOrder(5);
 
-                    b.Property<long>("StateId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("State")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
@@ -172,8 +174,8 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<long>("SpecificObjectiveId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("StateId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("State")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .HasColumnType("nvarchar(max)");
@@ -1119,8 +1121,8 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<int>("ObjectiveType")
                         .HasColumnType("int");
 
-                    b.Property<long>("StateId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("State")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -1295,8 +1297,8 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<long>("StateId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("State")
+                        .HasColumnType("int");
 
                     b.Property<string>("Title")
                         .IsRequired()
@@ -1438,8 +1440,8 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Property<long>("SpecificObjectiveId")
                         .HasColumnType("bigint");
 
-                    b.Property<long>("StateId")
-                        .HasColumnType("bigint");
+                    b.Property<int>("State")
+                        .HasColumnType("int");
 
                     b.Property<string>("StrategyDetails")
                         .HasColumnType("nvarchar(max)");

@@ -80,6 +80,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         public async Task SaveDataForDynamicFormAsync(long dynamicFormId, List<KeyValueRequestModel> values, CancellationToken cancellationToken)
         {
             var dynamicFormFieldMappings = await GetDynamicFormFieldMappingsQueryable(dynamicFormId).ToListAsync(cancellationToken);
+
             var dynamicFormFillingLog = new DynamicFormFillingLog { DynamicFormId = dynamicFormId };
 
             await _dbContext.DynamicFormFillingLogs.AddAsync(dynamicFormFillingLog, cancellationToken);

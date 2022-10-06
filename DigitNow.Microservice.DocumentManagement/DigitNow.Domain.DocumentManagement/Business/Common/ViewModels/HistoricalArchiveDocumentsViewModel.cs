@@ -7,6 +7,6 @@
         public BasicViewModel Category { get; set; }
         public DateTime RegistrationAt { get; set; }
         public BasicViewModel RegistrationBy { get; set; }
-        public BasicViewModel Recipient { get; set; }
+        public BasicViewModel Department { get; set; }
     }
 }

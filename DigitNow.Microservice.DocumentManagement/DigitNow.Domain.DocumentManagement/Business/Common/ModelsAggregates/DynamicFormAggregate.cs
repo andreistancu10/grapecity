@@ -9,5 +9,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates
         public IReadOnlyList<UserModel> Users { get; set; }
         public IReadOnlyList<ArchivedDocumentCategoryModel> Categories { get; set; }
         public IReadOnlyList<DepartmentModel> Departments { get; set; }
+        public IReadOnlyList<DynamicFormFieldMapping> DynamicFormFieldMappings { get; set; }
     }
 }

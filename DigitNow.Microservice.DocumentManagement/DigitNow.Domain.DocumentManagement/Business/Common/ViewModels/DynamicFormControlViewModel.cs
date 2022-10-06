@@ -11,5 +11,6 @@
         public bool Required { get; set; }
         public string InitialValue { get; set; }
         public string Value { get; set; }
+        public string Context { get; set; }
     }
 }

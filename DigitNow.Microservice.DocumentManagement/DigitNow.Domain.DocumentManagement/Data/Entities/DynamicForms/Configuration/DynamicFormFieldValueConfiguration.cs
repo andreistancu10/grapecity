@@ -10,9 +10,11 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities.Configuration
             builder.ToTable(nameof(DynamicFormFieldValue), DocumentManagementDbContext.Schema);
             builder.HasKey(p => p.Id);
 
-            builder.HasOne(c => c.DynamicFormFieldMapping)
-                .WithMany()
-                .OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(item => item.DynamicFormFieldMapping)
+                .WithMany(item => item.DynamicFormFieldValues)
+                .HasPrincipalKey(x => x.Id)
+                .OnDelete(DeleteBehavior.Restrict)
+                .HasForeignKey(item => item.DynamicFormFieldMappingId);
 
             builder.HasOne(c => c.DynamicFormFillingLog)
                 .WithMany()
