@@ -8,7 +8,6 @@ namespace DigitNow.Domain.DocumentManagement.Public.Activities.Validators
         public UpdateActivityValidator()
         {
             RuleFor(item => item.Id).NotNull().NotEmpty();
-            RuleFor(item => item.ModificationMotive).NotNull().NotEmpty();
         }
     }
 }
