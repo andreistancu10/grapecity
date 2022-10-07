@@ -63,7 +63,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
         {
             var activityIds = EntityFilter.ActivitiesFilter.ActivityIds;
 
-            EntityPredicates.Add(x => activityIds.Contains(x.Id));
+            EntityPredicates.Add(x => activityIds.Contains(x.ActivityId));
         }
 
         private void BuildFunctionariesFilter()
