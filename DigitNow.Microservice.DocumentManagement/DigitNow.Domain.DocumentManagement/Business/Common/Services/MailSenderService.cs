@@ -43,6 +43,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private readonly IAuthenticationClient _authenticationClient;
         private readonly IIdentityService _identityService;
         private readonly string _dateFormat;
+        private readonly string _appUrl;
 
 
         public MailSenderService(
@@ -60,6 +61,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             _identityService = identityService;
 
             _dateFormat = configuration.GetValue<string>("Date:Format");
+            _appUrl = configuration.GetValue<string>("Urls:AppUrl");
         }
 
         public async Task SendMail_OnSendBulkDocuments(UserModel headOfDepartmentUser, IList<long> documentIds, CancellationToken token)
@@ -71,7 +73,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             await _mailSender.SendMail(MailTemplateEnum.SendBulkDocumentsTemplate, headOfDepartmentUser.Email, new
             {
-                RegistryNumbers = String.Join(',', registryNumbers)
+                RegistryNumbers = String.Join(',', registryNumbers),
+                AppUrl = _appUrl
             }, token);
         }
 
@@ -85,7 +88,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             await _mailSender.SendMail(MailTemplateEnum.DelegateDocumentToFunctionaryTemplate, delegatedUser.Email, new
             {
                 UserName = $"{currentUser.LastName} {currentUser.FirstName}",
-                RegistryNumbers = string.Join(',', registryNumbers)
+                RegistryNumbers = string.Join(',', registryNumbers),
+                AppUrl = _appUrl
             }, token);
         }
 
@@ -102,7 +106,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             {
                 UserName = $"{currentUser.LastName} {currentUser.FirstName}",
                 DelegateUserName = $"{delegatedUser.LastName} {delegatedUser.FirstName}",
-                DocumentJustification = string.Join(',', registryNumbers) 
+                DocumentJustification = string.Join(',', registryNumbers) ,
+                AppUrl = _appUrl
             }, token);            
         }
 
@@ -122,7 +127,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                     Address = legalEntity.Name,
                     Name = $"{sender.FirstName} {sender.LastName}",
                     RegistryNumber = registrationId.ToString(),
-                    Date = date.ToString(_dateFormat, CultureInfo.InvariantCulture)
+                    Date = date.ToString(_dateFormat, CultureInfo.InvariantCulture),
+                    AppUrl = _appUrl
                 }, token);
         }
 
@@ -144,7 +150,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 {
                     Structure = department.Name,
                     RegistryNumber = document.RegistrationNumber,
-                    Date = document.RegistrationDate.ToString(_dateFormat, CultureInfo.InvariantCulture)
+                    Date = document.RegistrationDate.ToString(_dateFormat, CultureInfo.InvariantCulture),
+                    AppUrl = _appUrl
                 }, token);
         }
 
@@ -170,7 +177,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                {
                    Structure = senderDepartment.Name,
                    RegistryNumber = document.RegistrationNumber,
-                   Date = document.RegistrationDate.ToString(_dateFormat, CultureInfo.InvariantCulture)
+                   Date = document.RegistrationDate.ToString(_dateFormat, CultureInfo.InvariantCulture),
+                   AppUrl = _appUrl
                }, token);
         }
 
@@ -236,7 +244,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             new
             {
                 RegistryNumber = document.RegistrationNumber,
-                Date = document.RegistrationDate.ToString(_dateFormat, CultureInfo.InvariantCulture)
+                Date = document.RegistrationDate.ToString(_dateFormat, CultureInfo.InvariantCulture),
+                AppUrl = _appUrl
             }, token);
         }
 
@@ -257,12 +266,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 new
                 {
                     Structure = department.Name
+               
                 },
                 new
                 {
                     Structure = department.Name,
                     RegistryNumber = document.RegistrationNumber,
-                    Date = document.RegistrationDate.ToString(_dateFormat, CultureInfo.InvariantCulture)
+                    Date = document.RegistrationDate.ToString(_dateFormat, CultureInfo.InvariantCulture),
+                    AppUrl = _appUrl
                 }, token);
             }
         }
@@ -311,12 +322,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 {
                     RegistryNumber = document.RegistrationNumber,
                     Date = document.RegistrationDate.ToString(_dateFormat, CultureInfo.InvariantCulture)
+                
                 },
                 new
                 {
                     Structure = department.Name,
                     RegistryNumber = document.RegistrationNumber,
-                    Date = document.RegistrationDate.ToString(_dateFormat, CultureInfo.InvariantCulture)
+                    Date = document.RegistrationDate.ToString(_dateFormat, CultureInfo.InvariantCulture),
+                    AppUrl = _appUrl
 
                 }, token);
         }
