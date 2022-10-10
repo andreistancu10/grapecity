@@ -1,12 +1,9 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.Actions.Commands;
 using DigitNow.Domain.DocumentManagement.Business.Actions.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.Actions.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.Actions.Queries.FilterActions;
 using DigitNow.Domain.DocumentManagement.Business.Actions.Queries.GetById;
-using DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterActivities;
 using DigitNow.Domain.DocumentManagement.Public.Actions.Models;
-using DigitNow.Domain.DocumentManagement.Public.Activities.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -14,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Actions
 {
-    [AllowAnonymous]
+    [Authorize]
     [ApiController]
     [Route("api/actions")]
     public class ActionsController: ApiController

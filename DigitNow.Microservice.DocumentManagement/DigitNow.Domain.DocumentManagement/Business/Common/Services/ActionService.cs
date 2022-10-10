@@ -120,12 +120,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         private IQueryable<Action> GetBuiltInActionsQuery()
         {
-            var actions = DbContext.Actions
-                .Include(c => c.ActionFunctionaries)
-                .Include(x => x.AssociatedActivity.AssociatedSpecificObjective.Objective)
-                .ToList();
-
-
             return DbContext.Actions
                 .Include(c => c.ActionFunctionaries)
                 .Include(x => x.AssociatedActivity.AssociatedSpecificObjective.Objective);

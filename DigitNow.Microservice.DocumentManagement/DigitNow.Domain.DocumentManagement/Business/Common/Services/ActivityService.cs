@@ -1,17 +1,16 @@
-﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
+﻿using DigitNow.Domain.Catalog.Client;
+using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities;
+using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Contracts.Scim;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
-using Microsoft.EntityFrameworkCore;
-using System.Data;
-using System.Text;
-using DigitNow.Domain.Catalog.Client;
-using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Activities;
-using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Data.Extensions;
 using DigitNow.Domain.DocumentManagement.Data.Filters;
 using DigitNow.Domain.DocumentManagement.Data.Filters.Activities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using System.Data;
+using System.Text;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
