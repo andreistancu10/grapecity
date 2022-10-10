@@ -88,7 +88,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.IncomingDocuments.Commands
                 await _dbContext.SaveChangesAsync(cancellationToken);
                 await _specialRegisterMappingService.MapDocumentAsync(newIncomingDocument, cancellationToken);
 
-                if (request.ContactDetail?.Email != null)
+                if (!string.IsNullOrWhiteSpace(request.ContactDetail?.Email))
                 {
                     await _mailSenderService.SendMail_OnIncomingDocumentCreated(
                         new UserModel { FirstName = request.IssuerName, Email = request.ContactDetail.Email },
