@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Dtos;
-using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Actions;
 using DigitNow.Domain.DocumentManagement.Data.Filters.Actions;
 using DigitNow.Domain.DocumentManagement.Data.Filters.Activities;
 using DigitNow.Domain.DocumentManagement.Data.Filters.Common;
@@ -20,7 +19,10 @@ namespace DigitNow.Domain.DocumentManagement.Public.Common.Models.Mappings
             CreateMap<ActivitiesFilterDto, ActivitiesFilter>();
             CreateMap<DepartmentsFilterDto, DepartmentsFilter>();
             CreateMap<FunctionariesFilterDto, FunctionariesFilter>();
-            CreateMap<ActionsFilterDto, ActionFilter>();
+            CreateMap<ActionFilterDto, ActionFilter>();
+            {
+                CreateMap<SpecificObjectiveFilterDto, SpecificObjectiveFilter>();
+            }
         }
     }
 }
