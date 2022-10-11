@@ -109,7 +109,6 @@
 	  <Folder Include="Business\Common\FileUsageContexts\" />
 	  <Folder Include="Migrations\" />
 	  <Folder Include="Public\Activities\Validators\" />
-	  <Folder Include="Public\Common\Models\FilterDtos\" />
 	</ItemGroup>
 
 </Project>

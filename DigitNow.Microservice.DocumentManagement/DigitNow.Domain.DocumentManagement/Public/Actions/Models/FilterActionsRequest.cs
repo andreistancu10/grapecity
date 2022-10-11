@@ -13,7 +13,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Actions.Models
 
     public class ActionFilterDto
     {
-        public SpecificObjectivesFilterDto SpecificObjectivesFilter { get; set; }
+        public SpecificObjectiveFilterDto SpecificObjectiveFilter { get; set; }
         public ActionsFilterDto ActionsFilter { get; set; }
         public DepartmentsFilterDto DepartmentsFilter { get; set; }
         public FunctionariesFilterDto FunctionariesFilter { get; set; }

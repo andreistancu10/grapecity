@@ -6,7 +6,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
 {
     internal class ActionPermissionsFilter : DataFilter
     {
-        public SpecificObjectivesFilter SpecificObjectivesFilter { get; set; }
+        public SpecificObjectiveFilter SpecificObjectiveFilter { get; set; }
         public ActionsFilter ActionsFilter { get; set; }
         public ActivitiesFilter ActivitiesFilter { get; set; }
         public FunctionariesFilter FunctionariesFilter { get; set; }

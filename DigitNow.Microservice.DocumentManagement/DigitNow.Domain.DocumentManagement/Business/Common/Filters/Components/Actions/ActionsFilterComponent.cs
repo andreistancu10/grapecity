@@ -23,7 +23,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
                 },
                 ActionsFilter = context.ActionFilter?.ActionsFilter,
                 FunctionariesFilter = context.ActionFilter?.FunctionariesFilter,
-                SpecificObjectivesFilter = context.ActionFilter?.SpecificObjectivesFilter,
+                SpecificObjectiveFilter = context.ActionFilter?.SpecificObjectiveFilter,
                 ActivitiesFilter = context.ActionFilter?.ActivitiesFilter
             };
 

@@ -122,7 +122,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         {
             return DbContext.Actions
                 .Include(c => c.ActionFunctionaries)
-                .Include(x => x.AssociatedActivity);
+                .Include(x => x.AssociatedActivity.AssociatedSpecificObjective.Objective);
         }
     }
 }
