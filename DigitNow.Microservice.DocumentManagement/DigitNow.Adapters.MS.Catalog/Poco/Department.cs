@@ -12,5 +12,8 @@ namespace DigitNow.Adapters.MS.Catalog.Poco
 
         [JsonProperty("code")]
         public string Code { get; set; }
+
+        [JsonProperty("orderNumber")]
+        public long OrderNumber { get; set; }
     }
 }
