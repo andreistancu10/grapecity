@@ -155,7 +155,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             procedure.Code = sb.ToString();
         }
 
-        private string GetFirstOrderNumber(long? orderNumber)
+        private static string GetFirstOrderNumber(long? orderNumber)
         {
             return orderNumber == 0 ?
                 "01" : orderNumber < 10 ?
