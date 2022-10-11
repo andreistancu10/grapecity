@@ -106,8 +106,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 throw new ArgumentException("Legal entity cannot be found", nameof(procedure));
             }
 
-            var legalEntityOrderNumber = legalEntityResponse.LegalEntity.OrderNumber;
-
             var lastSystemProcedure = await DbContext.Procedures
                              .Where(item => item.ProcedureCategory == ProcedureCategory.System)
                              .OrderByDescending(p => p.CreatedAt)
@@ -117,11 +115,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             if (lastSystemProcedure == null)
             {
-                var firstOrderNumber = legalEntityOrderNumber == 0 ?
-                "01" : legalEntityOrderNumber < 10 ?
-                $"0{legalEntityOrderNumber}" : legalEntityOrderNumber.ToString();
-                
-                sb.Append(firstOrderNumber);
+                sb.Append(GetFirstOrderNumber(legalEntityResponse.LegalEntity.OrderNumber));
             }
             else
             {
@@ -138,7 +132,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             var departmentResponse = await _catalogAdapterClient.GetDepartmentByIdAsync(procedure.DepartmentId, token);
             if(departmentResponse == null)
             {
-                throw new ArgumentException("Department cannot be found", nameof(procedure.DepartmentId));
+                throw new ArgumentException("Department cannot be found", nameof(procedure));
             }
 
             var sb = new StringBuilder($"PO-{departmentResponse.Code}-");
@@ -150,13 +144,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             if (lastOperationalProcedure == null)
             {
-                var departmentOrderNumber = departmentResponse.OrderNumber;
-
-                var firstOrderNumber = departmentOrderNumber == 0 ?
-                "01" : departmentOrderNumber < 10 ?
-                $"0{departmentOrderNumber}" : departmentOrderNumber.ToString();
-
-                sb.Append(firstOrderNumber);
+                sb.Append(GetFirstOrderNumber(departmentResponse.OrderNumber));
             }
             else
             {
@@ -165,6 +153,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 sb.Append(nextOrderNumber < 10 ? $"0{nextOrderNumber}" : nextOrderNumber);
             }
             procedure.Code = sb.ToString();
+        }
+
+        private string GetFirstOrderNumber(long? orderNumber)
+        {
+            return orderNumber == 0 ?
+                "01" : orderNumber < 10 ?
+                $"0{orderNumber}" : orderNumber.ToString();
         }
 
         public async Task<long> CountAsync(ProcedureFilter filter, CancellationToken cancellationToken)
