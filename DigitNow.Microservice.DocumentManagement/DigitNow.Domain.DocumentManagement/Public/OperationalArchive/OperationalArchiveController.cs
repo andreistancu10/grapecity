@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using DigitNow.Domain.DocumentManagement.Business.OperationalArchive.Commands.Update;
+using DigitNow.Domain.DocumentManagement.Business.OperationalArchive.Commands.Update.MoveDocumentsToArchive;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
