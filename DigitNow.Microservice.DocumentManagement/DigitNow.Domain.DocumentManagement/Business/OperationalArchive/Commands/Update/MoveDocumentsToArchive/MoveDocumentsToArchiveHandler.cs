@@ -25,7 +25,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.OperationalArchive.Command
             var documents = await _dbContext.Documents
                 .Where(x => !x.IsArchived)
                 .Where(x => x.StatusModifiedAt.Date.AddDays(ARCHIVE_DOCUMENTS_DAYS_COUNT) < DateTime.Now.Date)
-                .Where(x => x.Status == DocumentStatus.Finalized || x.DocumentType == DocumentType.Internal && x.Status == DocumentStatus.InWorkMayorCountersignature)
+                .Where(x => x.Status == DocumentStatus.Finalized || (x.DocumentType == DocumentType.Internal && x.Status == DocumentStatus.InWorkMayorCountersignature))
                 .ToListAsync(cancellationToken);
 
             if (!documents.Any())
