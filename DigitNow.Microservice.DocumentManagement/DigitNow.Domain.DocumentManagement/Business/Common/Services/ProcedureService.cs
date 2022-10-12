@@ -1,7 +1,10 @@
-﻿using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
+﻿using DigitNow.Adapters.MS.Catalog;
+using DigitNow.Domain.Authentication.Client;
+using DigitNow.Domain.Authentication.Contracts.LegalEntities.GetLegalEntity;
+using DigitNow.Domain.Catalog.Client;
+using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.Procedures;
-using DigitNow.Domain.DocumentManagement.Business.Common.Models;
-using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
+using DigitNow.Domain.DocumentManagement.Contracts.Procedures;
 using DigitNow.Domain.DocumentManagement.Contracts.Scim;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
@@ -10,7 +13,7 @@ using DigitNow.Domain.DocumentManagement.Data.Filters;
 using DigitNow.Domain.DocumentManagement.Data.Filters.Procedures;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
-using DigitNow.Domain.Catalog.Client;
+using System.Text;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 {
@@ -29,16 +32,24 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private readonly IIdentityService _identityService;
         private readonly IServiceProvider _serviceProvider;
         private readonly ICatalogClient _catalogClient;
+        private readonly IAuthenticationClient _authenticationClient;
+        private readonly ICatalogAdapterClient _catalogAdapterClient;
+
 
         public ProcedureService(
             DocumentManagementDbContext dbContext,
             IIdentityService identityService,
-            IServiceProvider serviceProvider, ICatalogClient catalogClient) : base(dbContext)
+            IServiceProvider serviceProvider, 
+            ICatalogClient catalogClient,
+            IAuthenticationClient authenticationClient,
+            ICatalogAdapterClient catalogAdapterClient) : base(dbContext)
         {
             _dbContext = dbContext;
             _identityService = identityService;
             _serviceProvider = serviceProvider;
             _catalogClient = catalogClient;
+            _authenticationClient = authenticationClient;
+            _catalogAdapterClient = catalogAdapterClient;
         }
 
         public async Task<Procedure> AddAsync(Procedure procedure, CancellationToken cancellationToken)
@@ -50,7 +61,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             try
             {
                 DbContext.Entry(procedure).State = EntityState.Added;
-                await SetProcedureCodeAsync(procedure, cancellationToken);
+
+                if(procedure.ProcedureCategory == ProcedureCategory.System)
+                {
+                    await SetSystemProcedureCodeAsync(procedure, cancellationToken);
+                } else
+                {
+                    await SetOperationalProcedureCodeAsync(procedure, cancellationToken);
+                }
+
                 await DbContext.SaveChangesAsync(cancellationToken);
                 await dbContextTransaction.CommitAsync(cancellationToken);
             }
@@ -79,10 +98,72 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             await DbContext.SaveChangesAsync(cancellationToken);
         }
 
-        private static async Task SetProcedureCodeAsync(Procedure procedure, CancellationToken token)
+        private async Task SetSystemProcedureCodeAsync(Procedure procedure, CancellationToken token)
         {
-            //TODO: implement code
-            procedure.Code = $"ProcedureCode";
+            var legalEntityResponse = await _authenticationClient.LegalEntity.GetLegalEntityAsync(new GetLegalEntityRequest(), token);
+            if(legalEntityResponse.LegalEntity == null)
+            {
+                throw new ArgumentException("Legal entity cannot be found", nameof(procedure));
+            }
+
+            var lastSystemProcedure = await DbContext.Procedures
+                             .Where(item => item.ProcedureCategory == ProcedureCategory.System)
+                             .OrderByDescending(p => p.CreatedAt)
+                             .FirstOrDefaultAsync(token);
+
+            var sb = new StringBuilder("PS-");
+
+            if (lastSystemProcedure == null)
+            {
+                sb.Append(GetFirstOrderNumber(legalEntityResponse.LegalEntity.OrderNumber));
+            }
+            else
+            {
+                var subs = lastSystemProcedure.Code.Split('-');
+                var nextOrderNumber = int.Parse(subs[1]) + 1;
+                sb.Append(nextOrderNumber < 10 ? $"0{nextOrderNumber}" : nextOrderNumber);
+            }
+
+            procedure.Code = sb.ToString();
+        }
+
+        private async Task SetOperationalProcedureCodeAsync(Procedure procedure, CancellationToken token)
+        {
+            var departmentResponse = await _catalogAdapterClient.GetDepartmentByIdAsync(procedure.DepartmentId, token);
+
+            var sb = new StringBuilder($"PO-{departmentResponse.Code}-");
+
+            var lastOperationalProcedure = await DbContext.Procedures
+                             .Where(item => item.ProcedureCategory == ProcedureCategory.Operational && item.DepartmentId == procedure.DepartmentId)
+                             .OrderByDescending(p => p.CreatedAt)
+                             .FirstOrDefaultAsync(token);
+
+            if (lastOperationalProcedure == null)
+            {
+                sb.Append(GetFirstOrderNumber(departmentResponse.OrderNumber));
+            }
+            else
+            {
+                var subs = lastOperationalProcedure.Code.Split('-');
+                var nextOrderNumber = int.Parse(subs[2]) + 1;
+                sb.Append(nextOrderNumber < 10 ? $"0{nextOrderNumber}" : nextOrderNumber);
+            }
+            procedure.Code = sb.ToString();
+        }
+
+        private static string GetFirstOrderNumber(long? orderNumber)
+        {
+            if (orderNumber == 0)
+            {
+                return "01";
+            }
+
+            if (orderNumber < 10)
+            {
+                return $"0{orderNumber}";
+            }
+
+            return orderNumber.ToString();
         }
 
         public async Task<long> CountAsync(ProcedureFilter filter, CancellationToken cancellationToken)

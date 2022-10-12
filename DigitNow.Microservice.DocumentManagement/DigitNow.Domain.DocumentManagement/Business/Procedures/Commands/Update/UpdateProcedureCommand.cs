@@ -1,12 +1,10 @@
-﻿using DigitNow.Domain.DocumentManagement.Contracts.Procedures;
-using HTSS.Platform.Core.CQRS;
+﻿using HTSS.Platform.Core.CQRS;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Procedures.Commands.Update
 {
     public class UpdateProcedureCommand : ICommand<ResultObject>
     {
         public long Id { get; set; }
-        public ProcedureCategory ProcedureCategory { get; set; }
         public string Title { get; set; }
         public string Edition { get; set; }
         public string? Revision { get; set; }
