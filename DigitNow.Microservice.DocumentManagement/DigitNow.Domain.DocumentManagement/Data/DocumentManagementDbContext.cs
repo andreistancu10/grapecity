@@ -59,6 +59,8 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<RiskActionProposal> RiskActionProposals{ get; set; }
         public DbSet<Procedure> Procedures { get; set; }
         public DbSet<ProcedureFunctionary> ProcedureFunctionarys { get; set; }
+        public DbSet<Standard> Standards { get; set; }
+        public DbSet<StandardFunctionary> StandardFunctionaries { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
