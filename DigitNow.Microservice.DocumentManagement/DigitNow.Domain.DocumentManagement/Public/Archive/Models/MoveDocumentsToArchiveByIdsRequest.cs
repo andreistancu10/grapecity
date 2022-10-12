@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DigitNow.Domain.DocumentManagement.Public.OperationalArchive.Models
+namespace DigitNow.Domain.DocumentManagement.Public.Archive.Models
 {
     public class MoveDocumentsToArchiveByIdsRequest
     {
