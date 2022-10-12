@@ -56,6 +56,13 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Procedures
                 EntityPredicates.Add(x => EntityFilter.DepartmentsFilter.DepartmentIds.Contains(x.DepartmentId));
             }
         }
+        private void BuildFilterByProceduresFunctionary()
+        {
+            if (EntityFilter.FunctionaryFilter != null)
+            {
+                EntityPredicates.Add(x => x.ProcedureFunctionaries.Any(y => y.FunctionaryId == EntityFilter.FunctionaryFilter.FunctionaryId));
+            }
+        }
         private void BuildFilterByProceduresStartDate()
         {
             if (EntityFilter.StartDateFilter != null)
@@ -73,6 +80,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Procedures
             BuildFilterByProceduresState();
             BuildFilterByProceduresCategories();
             BuildFilterByProceduresDepartments();
+            BuildFilterByProceduresFunctionary();
             BuildFilterByProceduresStartDate();
         }
     }
