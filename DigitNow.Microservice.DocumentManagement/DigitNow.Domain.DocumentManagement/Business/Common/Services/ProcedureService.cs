@@ -101,7 +101,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private async Task SetSystemProcedureCodeAsync(Procedure procedure, CancellationToken token)
         {
             var legalEntityResponse = await _authenticationClient.LegalEntity.GetLegalEntityAsync(new GetLegalEntityRequest(), token);
-            if(legalEntityResponse == null)
+            if(legalEntityResponse.LegalEntity == null)
             {
                 throw new ArgumentException("Legal entity cannot be found", nameof(procedure));
             }
@@ -119,7 +119,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
             else
             {
-                string[] subs = lastSystemProcedure.Code.Split('-');
+                var subs = lastSystemProcedure.Code.Split('-');
                 var nextOrderNumber = int.Parse(subs[1]) + 1;
                 sb.Append(nextOrderNumber < 10 ? $"0{nextOrderNumber}" : nextOrderNumber);
             }
@@ -130,10 +130,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
         private async Task SetOperationalProcedureCodeAsync(Procedure procedure, CancellationToken token)
         {
             var departmentResponse = await _catalogAdapterClient.GetDepartmentByIdAsync(procedure.DepartmentId, token);
-            if(departmentResponse == null)
-            {
-                throw new ArgumentException("Department cannot be found", nameof(procedure));
-            }
 
             var sb = new StringBuilder($"PO-{departmentResponse.Code}-");
 
@@ -148,7 +144,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             }
             else
             {
-                string[] subs = lastOperationalProcedure.Code.Split('-');
+                var subs = lastOperationalProcedure.Code.Split('-');
                 var nextOrderNumber = int.Parse(subs[2]) + 1;
                 sb.Append(nextOrderNumber < 10 ? $"0{nextOrderNumber}" : nextOrderNumber);
             }
@@ -157,9 +153,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         private static string GetFirstOrderNumber(long? orderNumber)
         {
-            return orderNumber == 0 ?
-                "01" : orderNumber < 10 ?
-                $"0{orderNumber}" : orderNumber.ToString();
+            if (orderNumber == 0)
+            {
+                return "01";
+            }
+
+            if (orderNumber < 10)
+            {
+                return $"0{orderNumber}";
+            }
+
+            return orderNumber.ToString();
         }
 
         public async Task<long> CountAsync(ProcedureFilter filter, CancellationToken cancellationToken)
