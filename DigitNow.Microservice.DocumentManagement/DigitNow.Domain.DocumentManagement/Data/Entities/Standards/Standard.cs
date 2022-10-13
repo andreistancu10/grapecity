@@ -9,6 +9,7 @@
         public long DepartmentId { get; set; }
         public DateTime Deadline { get; set; }
         public string Observations { get; set; }
+        public string ModificationMotive { get; set; }
 
         #region [ References ]
         public List<StandardFunctionary> StandardFunctionaries { get; set; }

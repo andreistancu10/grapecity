@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
     [DbContext(typeof(DocumentManagementDbContext))]
-    [Migration("20221012143323_AddStandards")]
-    partial class AddStandards
+    [Migration("20221013150132_AddStandard")]
+    partial class AddStandard
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -1839,6 +1839,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     b.Property<long>("DepartmentId")
                         .HasColumnType("bigint");
+
+                    b.Property<string>("ModificationMotive")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2")

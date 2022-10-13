@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace DigitNow.Domain.DocumentManagement.Migrations
 {
-    public partial class AddStandards : Migration
+    public partial class AddStandard : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -26,7 +26,8 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     Activity = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DepartmentId = table.Column<long>(type: "bigint", nullable: false),
                     Deadline = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Observations = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Observations = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ModificationMotive = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
