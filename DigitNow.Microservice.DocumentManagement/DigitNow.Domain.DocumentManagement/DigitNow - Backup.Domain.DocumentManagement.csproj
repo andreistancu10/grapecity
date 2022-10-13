@@ -1,0 +1,116 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>		
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="Business\Common\FileUsageContexts\**" />
+	  <Compile Remove="Data\Entities\DynamicFormFillingLogs\**" />
+	  <Compile Remove="Data\Entities\UploadedFileMappings\Entities\**" />
+	  <EmbeddedResource Remove="Business\Common\FileUsageContexts\**" />
+	  <EmbeddedResource Remove="Data\Entities\DynamicFormFillingLogs\**" />
+	  <EmbeddedResource Remove="Data\Entities\UploadedFileMappings\Entities\**" />
+	  <None Remove="Business\Common\FileUsageContexts\**" />
+	  <None Remove="Data\Entities\DynamicFormFillingLogs\**" />
+	  <None Remove="Data\Entities\UploadedFileMappings\Entities\**" />
+	  <Compile Remove="Business\DynamicForms\Maping\**" />
+	  <EmbeddedResource Remove="Business\DynamicForms\Maping\**" />
+	  <None Remove="Business\DynamicForms\Maping\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="Business\Common\Export\Pdf\Templates\Html\registration_proof_template.html" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+	<ItemGroup>
+		<Compile Include=".configurations\Adapters\AdaptersExtensions.cs" />
+		<Compile Include=".configurations\ConfigureElasticContextExtensions.cs" />
+		<Compile Include=".configurations\ConfigureDbContextExtensions.cs" />
+		<Compile Include=".configurations\HostedServices\MigrateDatabaseHostedService.cs" />
+		<Compile Include=".configurations\MassTransitExtensions.cs" />
+		<Compile Include=".configurations\DomainServiceExtensions.cs" />
+		<Compile Include=".configurations\ConfigurationBuilderExtensions.cs" />
+		<Compile Include=".extensions\Autocorrect\StringExtensions.cs" />
+		<Compile Include=".extensions\User\UserExtension.cs" />
+		<Compile Include=".extensions\Validators\RuleBuilderExtensions.cs" />
+		<Compile Include=".utils\DocumentTypeTranslations.cs" />
+		<Compile Include=".utils\CustomMappings.cs" />
+		<Compile Include=".utils\DevOnlyActionFilter.cs" />
+		<Compile Include=".utils\DocumentTypeTranslation.cs" />
+		<Compile Include=".utils\FilterDescriptor.cs" />
+		<Compile Include=".utils\LanguagesUtils.cs" />
+	</ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Include="Business\Common\Export\Pdf\Templates\Html\registration_proof_template.html" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="DigitNow.Domain.Authentication.Client" Version="6.0.10" />
+		<PackageReference Include="DigitNow.Domain.Authentication.Contracts" Version="6.0.10" />
+		<PackageReference Include="DigitNow.Domain.Catalog.Client" Version="6.0.13" />
+		<PackageReference Include="DigitNow.Domain.Catalog.Contracts" Version="6.0.13" />
+		<PackageReference Include="Domain.Localization.Client" Version="6.0.1" />
+		<PackageReference Include="Domain.Mail.Client" Version="6.0.2" />
+		<PackageReference Include="Domain.Mail.Contracts" Version="6.0.2" />
+		<PackageReference Include="HTSS.Platform.Core.Files" Version="6.0.2" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.Api.Tools" Version="6.0.1" />
+		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+		<PackageReference Include="HTSS.Platform.Core.CQRS" Version="6.0.1" />
+		<PackageReference Include="HTSS.Platform.Core.Domain" Version="6.0.2" />
+		<PackageReference Include="HTSS.Platform.Core.Files.Csv" Version="6.0.2" />
+		<PackageReference Include="HTSS.Platform.Core.Files.Excel" Version="6.0.2" />
+		<PackageReference Include="HTSS.Platform.Core.Files.Json" Version="6.0.0" />
+		<PackageReference Include="HTSS.Platform.Core.Files.Xml" Version="6.0.0" />
+		<PackageReference Include="HTSS.Platform.Core.Helpers" Version="6.0.0" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.BusinessValidators.MassTransit" Version="1.0.1" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.Data.EntityFramework.MultiTenant" Version="6.0.5" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.ElasticsearchProvider.MultiTenant" Version="6.0.1" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.Cache.MultiTenant" Version="6.0.3" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.Environment" Version="6.0.0" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.Cache" Version="6.0.2" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.Data.EntityFramework" Version="6.0.5" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.ElasticsearchProvider" Version="6.0.0" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.MassTransit.MultiTenant" Version="6.0.3" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.ModelValidators.MassTransit" Version="1.0.1" />
+		<PackageReference Include="HTSS.Platform.Infrastructure.Security" Version="6.0.2" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.5" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.5">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="ShiftIn.Utils" Version="6.0.7" />
+		<PackageReference Include="Syncfusion.HtmlToPdfConverter.QtWebKit.Net.Core" Version="20.2.0.44" />
+		<PackageReference Include="Z.EntityFramework.Extensions.EFCore" Version="6.13.15" />
+		<PackageReference Include="Z.EntityFramework.Plus.EFCore" Version="6.13.15" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="domain.DocumentManagementSettings.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="domain.DocumentManagementSettings.tokenized.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\DigitNow.Adapters.MS.Catalog\DigitNow.Adapters.MS.Catalog.csproj" />
+		<ProjectReference Include="..\DigitNow.Domain.DocumentManagement.Contracts\DigitNow.Domain.DocumentManagement.Contracts.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Business\Activities\Mappings\" />
+	  <Folder Include="Business\Activities\Queries\Get\" />
+	  <Folder Include="Data\Filters\Activities\" />
+	  <Folder Include="Business\Common\FileUsageContexts\" />
+	  <Folder Include="Migrations\" />
+	  <Folder Include="Public\Activities\Validators\" />
+	  <Folder Include="Public\Common\Models\FilterDtos\" />
+	  <Folder Include="Public\PublicAcquisitions\Mappings\" />
+	</ItemGroup>
+
+</Project>
