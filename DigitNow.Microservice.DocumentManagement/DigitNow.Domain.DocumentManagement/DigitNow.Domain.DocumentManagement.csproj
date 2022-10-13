@@ -106,7 +106,6 @@
 	  <Folder Include="Business\Activities\Mappings\" />
 	  <Folder Include="Business\Activities\Queries\Get\" />
 	  <Folder Include="Data\Filters\Activities\" />
-	  <Folder Include="Business\Common\FileUsageContexts\" />
 	  <Folder Include="Migrations\" />
 	  <Folder Include="Public\Activities\Validators\" />
 	</ItemGroup>

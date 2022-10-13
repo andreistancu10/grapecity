@@ -13,34 +13,47 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(x => x.Code, opt => opt.MapFrom(src => src.Risk.Code))
                 .ForMember(x => x.SpecificObjective, opt => opt.MapFrom<MapRiskSpecificObjective>())
                 .ForMember(x => x.DateOfLastRevision, opt => opt.MapFrom(src => src.Risk.ModifiedAt ?? src.Risk.CreatedAt))
-                .ForMember(x => x.StateId, opt => opt.MapFrom(src => src.Risk.StateId))
+                .ForMember(dest => dest.State, opt => opt.MapFrom<MapState>())
                 .ForMember(x => x.Department, opt => opt.MapFrom<MapDepartment>());
         }
-    }
 
-    public class MapRiskSpecificObjective : IValueResolver<RiskAggregate, RiskViewModel, BasicViewModel>
-    {
-        public BasicViewModel Resolve(RiskAggregate source, RiskViewModel destination, BasicViewModel destMember,
-            ResolutionContext context)
+        private class MapState : IValueResolver<RiskAggregate, RiskViewModel, BasicViewModel>
         {
-            var foundSpecificObjective = source.SpecificObjectives.FirstOrDefault(c => c.ObjectiveId == source.Risk.SpecificObjectiveId);
-            return foundSpecificObjective == null
-                ? null
-                : new BasicViewModel(foundSpecificObjective.Id, foundSpecificObjective.Title);
+            public BasicViewModel Resolve(RiskAggregate source, RiskViewModel destination, BasicViewModel destMember,
+                ResolutionContext context)
+            {
+                var foundState = source.States.FirstOrDefault(x => x.Id == source.Risk.StateId);
+                if (foundState != null)
+                {
+                    return new BasicViewModel(foundState.Id, foundState.Name);
+                }
+                return default;
+            }
+        }
+
+        private class MapRiskSpecificObjective : IValueResolver<RiskAggregate, RiskViewModel, BasicViewModel>
+        {
+            public BasicViewModel Resolve(RiskAggregate source, RiskViewModel destination, BasicViewModel destMember,
+                ResolutionContext context)
+            {
+                var foundSpecificObjective = source.SpecificObjectives.FirstOrDefault(c => c.ObjectiveId == source.Risk.SpecificObjectiveId);
+                return foundSpecificObjective == null
+                    ? null
+                    : new BasicViewModel(foundSpecificObjective.Id, foundSpecificObjective.Title);
+            }
+        }
+
+        private class MapDepartment : IValueResolver<RiskAggregate, RiskViewModel, BasicViewModel>
+        {
+            public BasicViewModel Resolve(RiskAggregate source, RiskViewModel destination, BasicViewModel destMember,
+                ResolutionContext context)
+            {
+                var foundDepartment = source.Departments.FirstOrDefault(c => c.Id == source.Risk.DepartmentId);
+
+                return foundDepartment == null
+                    ? null
+                    : new BasicViewModel(foundDepartment.Id, foundDepartment.Name);
+            }
         }
     }
-
-    public class MapDepartment : IValueResolver<RiskAggregate, RiskViewModel, BasicViewModel>
-    {
-        public BasicViewModel Resolve(RiskAggregate source, RiskViewModel destination, BasicViewModel destMember,
-            ResolutionContext context)
-        {
-            var foundDepartment = source.Departments.FirstOrDefault(c => c.Id == source.Risk.DepartmentId);
-
-            return foundDepartment == null
-                ? null
-                : new BasicViewModel(foundDepartment.Id, foundDepartment.Name);
-        }
-    }
-
 }

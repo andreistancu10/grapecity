@@ -9,7 +9,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
         public BasicViewModel SpecificObjective { get; set; }
         public BasicViewModel Department { get; set; }
         public string Description { get; set; }
-        public long StateId{ get; set; }
+        public BasicViewModel State { get; set; }
         public DateTime DateOfLastRevision { get; set; }
     }
 }
