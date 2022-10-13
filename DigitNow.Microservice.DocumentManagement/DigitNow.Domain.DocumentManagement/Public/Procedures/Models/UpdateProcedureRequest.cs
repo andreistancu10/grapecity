@@ -5,7 +5,6 @@ namespace DigitNow.Domain.DocumentManagement.Public.Procedures.Models
     public class UpdateProcedureRequest
     {
         public long Id { get; set; }
-        public ProcedureCategory ProcedureCategory { get; set; }
         public string Title { get; set; }
         public string Edition { get; set; }
         public string? Revision { get; set; }

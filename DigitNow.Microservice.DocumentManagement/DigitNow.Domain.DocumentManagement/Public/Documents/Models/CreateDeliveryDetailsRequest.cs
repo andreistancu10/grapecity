@@ -6,5 +6,6 @@ namespace DigitNow.Domain.DocumentManagement.Public.Documents.Models
         public int DeliveryMode { get; set; }
         public int? DirectShipping { get; set; }
         public int? Post { get; set; }
+        public string OutboundNumber { get; set; }
     }
 }

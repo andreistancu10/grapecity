@@ -49,8 +49,8 @@
 	  <EmbeddedResource Include="Business\Common\Export\Pdf\Templates\Html\registration_proof_template.html" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="DigitNow.Domain.Authentication.Client" Version="6.0.10" />
-		<PackageReference Include="DigitNow.Domain.Authentication.Contracts" Version="6.0.10" />
+		<PackageReference Include="DigitNow.Domain.Authentication.Client" Version="6.0.13" />
+		<PackageReference Include="DigitNow.Domain.Authentication.Contracts" Version="6.0.13" />
 		<PackageReference Include="DigitNow.Domain.Catalog.Client" Version="6.0.13" />
 		<PackageReference Include="DigitNow.Domain.Catalog.Contracts" Version="6.0.13" />
 		<PackageReference Include="Domain.Localization.Client" Version="6.0.1" />

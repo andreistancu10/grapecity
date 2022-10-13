@@ -1,10 +1,5 @@
 ﻿using DigitNow.Domain.DocumentManagement.Public.Procedures.Models;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DigitNow.Domain.DocumentManagement.Public.Procedures.Validators
 {
@@ -13,7 +8,6 @@ namespace DigitNow.Domain.DocumentManagement.Public.Procedures.Validators
         public UpdateProcedureValidator()
         {
             RuleFor(item => item.Id).NotNull().NotEmpty();
-            RuleFor(item => item.ProcedureCategory).NotNull().NotEmpty();
             RuleFor(item => item.Title).NotNull().NotEmpty();
             RuleFor(item => item.Edition).NotNull().NotEmpty();
             RuleFor(item => item.StartDate).NotNull().NotEmpty();

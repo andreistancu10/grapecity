@@ -1,6 +1,6 @@
 ﻿using DigitNow.Adapters.MS.Catalog;
 using DigitNow.Domain.Authentication.Client;
-using DigitNow.Domain.Authentication.Contracts.ContactDetails.GetLegalEntity;
+using DigitNow.Domain.Authentication.Contracts.LegalEntities.GetLegalEntity;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.Notifications.Mail;
@@ -113,7 +113,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task SendMail_OnIncomingDocumentCreated(UserModel sender, long registrationId, DateTime date, CancellationToken token)
         {
-            var legalEntityResponse = await _authenticationClient.ContactDetails.GetLegalEntityAsync(new GetLegalEntityRequest(), token);
+            var legalEntityResponse = await _authenticationClient.LegalEntity.GetLegalEntityAsync(new GetLegalEntityRequest(), token);
 
             var legalEntity = legalEntityResponse.LegalEntity;
 
