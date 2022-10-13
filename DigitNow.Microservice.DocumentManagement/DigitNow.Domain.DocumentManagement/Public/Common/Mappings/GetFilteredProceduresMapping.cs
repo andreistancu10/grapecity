@@ -21,6 +21,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Common.Mappings
                 CreateMap<ProcedureStateFilterDto, ProcedureStateFilter>();
                 CreateMap<ProcedureCategoriesFilterDto, ProcedureCategoriesFilter>();
                 CreateMap<DepartmentsFilterDto, DepartmentsFilter>();
+                CreateMap<FunctionaryFilterDto, FunctionaryFilter>();
                 CreateMap<StartDateFilterDto, StartDateFilter>();
             }
         }
