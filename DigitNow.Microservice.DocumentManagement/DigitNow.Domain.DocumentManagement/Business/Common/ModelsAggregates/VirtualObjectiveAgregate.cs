@@ -8,6 +8,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates
     {
         public T VirtualObjective { get; set; }
         internal UserModel CurrentUser { get; set; }
+        internal IReadOnlyList<StateModel> States { get; set; }
         internal IReadOnlyList<UserModel> Users { get; set; }
         internal IReadOnlyList<DepartmentModel> Departments { get; set; }
     }

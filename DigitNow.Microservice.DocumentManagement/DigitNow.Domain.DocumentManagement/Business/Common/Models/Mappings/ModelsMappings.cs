@@ -5,6 +5,7 @@ using DigitNow.Domain.Catalog.Contracts.ArchivedDocumentCategories.GetAll;
 using DigitNow.Domain.Catalog.Contracts.Departments.GetDepartments;
 using DigitNow.Domain.Catalog.Contracts.DocumentTypes.GetDocumentTypes;
 using DigitNow.Domain.Catalog.Contracts.InternalDocumentTypes;
+using DigitNow.Domain.Catalog.Contracts.ScimStates.GetScimStates;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
@@ -67,6 +68,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings
             CreateMap<SpecificObjective, ObjectiveModel>()
                 .ForMember(c => c.Id, opt => opt.MapFrom(src => src.Id))
                 .ForMember(c => c.Title, opt => opt.MapFrom(src => src.Objective.Title));
+
+            CreateMap<IScimStatesResponse, StateModel>();
         }
 
         private class MapDocumentCategoryId :

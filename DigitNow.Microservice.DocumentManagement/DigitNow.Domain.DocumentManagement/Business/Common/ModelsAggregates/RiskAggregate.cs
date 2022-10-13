@@ -7,6 +7,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates
     {
         public Risk Risk { get; set; }
         public IReadOnlyList<DepartmentModel> Departments { get; set; }
+        public IReadOnlyList<StateModel> States { get; set; }
         public IReadOnlyList<ObjectiveModel> SpecificObjectives { get; set; }
     }
 }

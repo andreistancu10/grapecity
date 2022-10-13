@@ -11,7 +11,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Activity.Id))
                 .ForMember(dest => dest.Code, opt => opt.MapFrom(src => src.Activity.Code))
                 .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Activity.Title))
-                .ForMember(dest => dest.StateId, opt => opt.MapFrom(src => src.Activity.StateId))
+                .ForMember(dest => dest.State, opt => opt.MapFrom<MapState>())
                 .ForMember(dest => dest.Detail, opt => opt.MapFrom(src => src.Activity.Details))
                 .ForMember(dest => dest.ModificationMotive, opt => opt.MapFrom(src => src.Activity.ModificationMotive))
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.Activity.CreatedAt))
@@ -23,7 +23,21 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(dest => dest.ModifiedBy, opt => opt.MapFrom<MapModifiedBy>());
         }
 
-        public class MapDepartment : IValueResolver<ActivityAggregate, ActivityViewModel, BasicViewModel>
+        private class MapState : IValueResolver<ActivityAggregate, ActivityViewModel, BasicViewModel>
+        {
+            public BasicViewModel Resolve(ActivityAggregate source, ActivityViewModel destination, BasicViewModel destMember,
+                ResolutionContext context)
+            {
+                var foundState = source.States.FirstOrDefault(x => x.Id == source.Activity.StateId);
+                if (foundState != null)
+                {
+                    return new BasicViewModel(foundState.Id, foundState.Name);
+                }
+                return default;
+            }
+        }
+
+        private class MapDepartment : IValueResolver<ActivityAggregate, ActivityViewModel, BasicViewModel>
         {
             public BasicViewModel Resolve(ActivityAggregate source, ActivityViewModel destination, BasicViewModel destMember,
                 ResolutionContext context)
@@ -36,7 +50,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             }
         }
 
-        public class MapCreatedBy : IValueResolver<ActivityAggregate, ActivityViewModel, BasicViewModel>
+        private class MapCreatedBy : IValueResolver<ActivityAggregate, ActivityViewModel, BasicViewModel>
         {
             public BasicViewModel Resolve(ActivityAggregate source, ActivityViewModel destination, BasicViewModel destMember,
                 ResolutionContext context)
@@ -48,7 +62,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                     : new BasicViewModel(foundUser.Id, $"{foundUser.FirstName} {foundUser.LastName}");
             }
         }
-        public class MapModifiedBy : IValueResolver<ActivityAggregate, ActivityViewModel, BasicViewModel>
+
+        private class MapModifiedBy : IValueResolver<ActivityAggregate, ActivityViewModel, BasicViewModel>
         {
             public BasicViewModel Resolve(ActivityAggregate source, ActivityViewModel destination, BasicViewModel destMember,
                 ResolutionContext context)
@@ -68,29 +83,29 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 return default;
             }
         }
-    }
 
-    public class MapSpecificObjective : IValueResolver<ActivityAggregate, ActivityViewModel, BasicViewModel>
-    {
-        public BasicViewModel Resolve(ActivityAggregate source, ActivityViewModel destination, BasicViewModel destMember,
-            ResolutionContext context)
+        private class MapSpecificObjective : IValueResolver<ActivityAggregate, ActivityViewModel, BasicViewModel>
         {
-            var foundSpecificObjective = source.SpecificObjectives.FirstOrDefault(c => c.ObjectiveId == source.Activity.SpecificObjectiveId);
-            return foundSpecificObjective == null
-                ? null
-                : new BasicViewModel(foundSpecificObjective.ObjectiveId, foundSpecificObjective.Title);
+            public BasicViewModel Resolve(ActivityAggregate source, ActivityViewModel destination, BasicViewModel destMember,
+                ResolutionContext context)
+            {
+                var foundSpecificObjective = source.SpecificObjectives.FirstOrDefault(c => c.ObjectiveId == source.Activity.SpecificObjectiveId);
+                return foundSpecificObjective == null
+                    ? null
+                    : new BasicViewModel(foundSpecificObjective.ObjectiveId, foundSpecificObjective.Title);
+            }
         }
-    }
 
-    public class MapGeneralObjective : IValueResolver<ActivityAggregate, ActivityViewModel, BasicViewModel>
-    {
-        public BasicViewModel Resolve(ActivityAggregate source, ActivityViewModel destination, BasicViewModel destMember,
-            ResolutionContext context)
+        private class MapGeneralObjective : IValueResolver<ActivityAggregate, ActivityViewModel, BasicViewModel>
         {
-            var foundGeneralObjective = source.GeneralObjectives.FirstOrDefault(c => c.ObjectiveId == source.Activity.GeneralObjectiveId);
-            return foundGeneralObjective == null
-                ? null
-                : new BasicViewModel(foundGeneralObjective.ObjectiveId, foundGeneralObjective.Title);
+            public BasicViewModel Resolve(ActivityAggregate source, ActivityViewModel destination, BasicViewModel destMember,
+                ResolutionContext context)
+            {
+                var foundGeneralObjective = source.GeneralObjectives.FirstOrDefault(c => c.ObjectiveId == source.Activity.GeneralObjectiveId);
+                return foundGeneralObjective == null
+                    ? null
+                    : new BasicViewModel(foundGeneralObjective.ObjectiveId, foundGeneralObjective.Title);
+            }
         }
     }
 }

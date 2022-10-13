@@ -13,11 +13,15 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
         public IReadOnlyList<DepartmentModel> ObjectiveDepartments
             => GetItems<GenericDepartmentsFetcher, DepartmentModel>();
 
+        public IReadOnlyList<StateModel> States 
+            => GetItems<GenericStatesFetcher, StateModel>();
+
         public SpecificObjectiveRelationsFetcher(IServiceProvider serviceProvider)
            : base(serviceProvider)
         {
             Aggregator
-                .UseGenericRemoteFetcher<GenericDepartmentsFetcher>();
+                .UseGenericRemoteFetcher<GenericDepartmentsFetcher>()
+                .UseGenericRemoteFetcher<GenericStatesFetcher>();
         }
 
         public SpecificObjectiveRelationsFetcher UseSpecificObjectiveContext(ObjectivesFetcherContext context)

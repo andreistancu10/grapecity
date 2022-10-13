@@ -50,11 +50,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Filters.Components.
 
         private async Task<DocumentDepartmentPermissionsFilters> BuildDepartmentsPermissionsFilterAsync(DocumentPermissionsFilterComponentContext context, CancellationToken token)
         {
+            var registryOfficeDepartment = await GetRegistryOfficeDepartmentAsync(token);
+            if (registryOfficeDepartment == null) throw new InvalidOperationException("Registry Office department was not found!");
+
             return new DocumentDepartmentPermissionsFilters
             {
                 RegistryOfficeRightsFilter = new DocumentRegistryOfficeDepartmentRightsFilter
                 {
-                    DepartmentId = (await GetRegistryOfficeDepartmentAsync(token)).Id,
+                    DepartmentId = registryOfficeDepartment.Id,
                     UserId = context.CurrentUser.Id
                 }
             };
