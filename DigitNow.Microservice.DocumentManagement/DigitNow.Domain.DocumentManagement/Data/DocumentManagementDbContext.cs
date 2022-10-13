@@ -1,4 +1,4 @@
-﻿#undef MIGRATION_ONLY
+﻿#define MIGRATION_ONLY
 
 #if    MIGRATION_ONLY
 using Microsoft.EntityFrameworkCore.Design;
@@ -59,6 +59,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<RiskActionProposal> RiskActionProposals{ get; set; }
         public DbSet<Procedure> Procedures { get; set; }
         public DbSet<ProcedureFunctionary> ProcedureFunctionarys { get; set; }
+        public DbSet<PublicAcquisitionProject> PublicAcquisitionProjects { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
