@@ -10,7 +10,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.PublicAcquisitions.Command
         private readonly IPublicAcquisitionService _publicAcquisitionService;
         private readonly IMapper _mapper;
 
-        public CreatePublicAcquisitionProjectHandler(IPublicAcquisitionService publicAcquisitionService, IMapper mapper, )
+        public CreatePublicAcquisitionProjectHandler(IPublicAcquisitionService publicAcquisitionService, IMapper mapper)
         {
             _publicAcquisitionService = publicAcquisitionService;
             _mapper = mapper;
