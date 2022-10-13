@@ -10,7 +10,7 @@ using DigitNow.Domain.DocumentManagement.Business.PublicAcquisitions.Commands.Up
 
 namespace DigitNow.Domain.DocumentManagement.Public.PublicAcquisitions
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
     [Route("api/public-acquisitions")]
     public class PublicAcquisitionController : ApiController

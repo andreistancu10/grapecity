@@ -4,7 +4,7 @@
     {
         public long Id { get; set; }
         public int ProjectYear { get; set; }
-        public long Code { get; set; }
+        public string Code { get; set; }
         public string Type { get; set; }
         public long CpvCode { get; set; }
         public float EstimatedValue { get; set; }

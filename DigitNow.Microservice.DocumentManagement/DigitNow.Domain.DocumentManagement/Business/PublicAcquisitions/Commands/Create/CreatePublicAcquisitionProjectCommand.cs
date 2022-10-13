@@ -4,6 +4,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.PublicAcquisitions.Command
 {
     public class CreatePublicAcquisitionProjectCommand : ICommand<ResultObject>
     {
+        public int ProjectYear { get; set; }
         public string Type { get; set; }
         public long CpvCode { get; set; }
         public float EstimatedValue { get; set; }
