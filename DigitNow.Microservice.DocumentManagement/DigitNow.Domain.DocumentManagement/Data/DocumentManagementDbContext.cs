@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore.Design;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Actions;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Suppliers;
 using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Data
@@ -59,6 +60,8 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<RiskActionProposal> RiskActionProposals{ get; set; }
         public DbSet<Procedure> Procedures { get; set; }
         public DbSet<ProcedureFunctionary> ProcedureFunctionarys { get; set; }
+        public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<SupplierLegalRepresentative> SupplierLegalRepresentatives { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

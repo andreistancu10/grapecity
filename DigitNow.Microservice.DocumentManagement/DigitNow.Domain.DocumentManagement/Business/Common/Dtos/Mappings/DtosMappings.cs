@@ -3,6 +3,7 @@ using DigitNow.Domain.Authentication.Contracts;
 using DigitNow.Domain.DocumentManagement.Data;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Actions;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Suppliers;
 
 namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos.Mappings
 {
@@ -38,6 +39,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos.Mappings
 
             CreateMap<SpecificObjectiveFunctionary, FunctionaryDto>()
                .ForMember(x => x.EntityId, opt => opt.MapFrom(src => src.SpecificObjectiveId));
+            CreateMap<SupplierLegalRepresentative, SupplierLegalRepresentativeDto>();
         }
     }
 }
