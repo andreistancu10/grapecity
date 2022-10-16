@@ -10,6 +10,7 @@
         ScimRisk,
         ScimRiskTrackingReport,
         ScimRiskFUR,
-        ScimProcedure
+        ScimProcedure,
+        ScimStandard
     }
 }
