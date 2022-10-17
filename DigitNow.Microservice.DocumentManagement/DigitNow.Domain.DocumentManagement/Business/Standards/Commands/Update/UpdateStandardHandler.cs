@@ -3,6 +3,7 @@ using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services.FileServices;
 using DigitNow.Domain.DocumentManagement.Contracts.UploadedFiles.Enums;
 using DigitNow.Domain.DocumentManagement.Data;
+using DigitNow.Domain.DocumentManagement.Data.Entities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Core.Errors;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +16,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Standards.Commands.Update
         private readonly IUploadedFileService _uploadedFileService;
         private readonly IStandardService _standardService;
         private readonly IStandardFunctionaryService _standardFunctionaryService;
+        private readonly IMapper _mapper;
 
         public UpdateStandardHandler(
             DocumentManagementDbContext dbContext,
@@ -27,6 +29,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Standards.Commands.Update
             _uploadedFileService = uploadedFileService;
             _standardService = standardService;
             _standardFunctionaryService = standardFunctionaryService;
+            _mapper = mapper;
         }
         public async Task<ResultObject> Handle(UpdateStandardCommand request, CancellationToken cancellationToken)
         {
@@ -42,13 +45,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Standards.Commands.Update
 
             var fileMappings = await _uploadedFileService.GetUploadedFileMappingsByTargetIdAsync(initialStandard.Id, TargetEntity.ScimStandard, cancellationToken);
 
-            initialStandard.Title = request.Title;
-            initialStandard.StateId = request.StateId;
-            initialStandard.Activity = request.Activity;
-            initialStandard.DepartmentId = request.DepartmentId;
-            initialStandard.Deadline = request.Deadline;
-            initialStandard.Observations = request.Observations;
-            initialStandard.ModificationMotive = request.ModificationMotive;
+            _mapper.Map(request, initialStandard);
 
             await _standardService.UpdateAsync(initialStandard, cancellationToken);
 
