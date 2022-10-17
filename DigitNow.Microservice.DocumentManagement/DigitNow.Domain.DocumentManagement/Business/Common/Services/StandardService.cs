@@ -14,15 +14,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     }
     public class StandardService : ScimStateService, IStandardService
     {
-        private readonly IServiceProvider _serviceService;
         private readonly ICatalogClient _catalogClient;
 
         public StandardService(
             DocumentManagementDbContext dbContext,
-            IServiceProvider serviceProvider,
             ICatalogClient catalogClient) : base(dbContext)
         {
-            _serviceService = serviceProvider;
             _catalogClient = catalogClient; 
         }
         public async Task<Standard> CreateAsync(Standard standard, CancellationToken cancellationToken)

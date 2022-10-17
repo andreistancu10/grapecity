@@ -29,13 +29,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Standards.Commands.Create
             _standardService = standardService;
             _standardFunctionaryService = standardFunctionaryService;
         }
-        public async Task<ResultObject> Handle(CreateStandardCommand request, CancellationToken token)
+        public async Task<ResultObject> Handle(CreateStandardCommand request, CancellationToken cancellationToken)
         {
             var newStandard = _mapper.Map<Standard>(request);
-            await _standardService.CreateAsync(newStandard, token);
+            await _standardService.CreateAsync(newStandard, cancellationToken);
 
             if (request.StandardFunctionariesIds.Any())
-                await _standardFunctionaryService.AddRangeAsync(newStandard.Id, request.StandardFunctionariesIds, token);
+                await _standardFunctionaryService.AddRangeAsync(newStandard.Id, request.StandardFunctionariesIds, cancellationToken);
 
             if (request.UploadedFileIds.Any())
             {
@@ -43,10 +43,10 @@ namespace DigitNow.Domain.DocumentManagement.Business.Standards.Commands.Create
                     request.UploadedFileIds,
                     newStandard.Id,
                     TargetEntity.ScimStandard,
-                    token);
+                    cancellationToken);
             }
 
-            await _dbContext.SaveChangesAsync(token);
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return ResultObject.Created(newStandard.Id);
         }

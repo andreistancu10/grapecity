@@ -13,7 +13,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Standards.Commands.Update
     {
         private readonly DocumentManagementDbContext _dbContext;
         private readonly IUploadedFileService _uploadedFileService;
-        private readonly IMapper _mapper;
         private readonly IStandardService _standardService;
         private readonly IStandardFunctionaryService _standardFunctionaryService;
 
@@ -26,13 +25,12 @@ namespace DigitNow.Domain.DocumentManagement.Business.Standards.Commands.Update
         {
             _dbContext = dbContext;
             _uploadedFileService = uploadedFileService;
-            _mapper = mapper;
             _standardService = standardService;
             _standardFunctionaryService = standardFunctionaryService;
         }
         public async Task<ResultObject> Handle(UpdateStandardCommand request, CancellationToken cancellationToken)
         {
-            var initialStandard = await _dbContext.Standards.FirstOrDefaultAsync(x => x.Id == request.Id);
+            var initialStandard = await _dbContext.Standards.FirstOrDefaultAsync(x => x.Id == request.Id, cancellationToken);
 
             if (initialStandard == null)
                 return ResultObject.Error(new ErrorMessage
