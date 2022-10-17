@@ -14,10 +14,24 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(c => c.Title, opt => opt.MapFrom(src => src.VirtualObjective.Objective.Title))
                 .ForMember(c => c.CreatedAt, opt => opt.MapFrom(src => src.VirtualObjective.CreatedAt))
                 .ForMember(c => c.ModifiedAt, opt => opt.MapFrom(src => src.VirtualObjective.ModifiedAt ?? src.VirtualObjective.CreatedAt))
-                .ForMember(c => c.StateId, opt => opt.MapFrom(src => src.VirtualObjective.Objective.StateId))
+                .ForMember(c => c.State, opt => opt.MapFrom<MapState>())
                 .ForMember(c => c.Department, opt => opt.MapFrom<MapObjectiveDepartment>())
                 .ForMember(c => c.Functionary, opt => opt.MapFrom<MapObjectiveFunctionary>())
                 .ForMember(c => c.User, opt => opt.MapFrom<MapObjectiveUser>());
+        }
+        
+        private class MapState : IValueResolver<VirtualObjectiveAgregate<SpecificObjective>, SpecificObjectiveViewModel, BasicViewModel>
+        {
+            public BasicViewModel Resolve(VirtualObjectiveAgregate<SpecificObjective> source, SpecificObjectiveViewModel destination, BasicViewModel destMember,
+                ResolutionContext context)
+            {
+                var foundState = source.States.FirstOrDefault(x => x.Id == source.VirtualObjective.Objective.StateId);
+                if (foundState != null)
+                {
+                    return new BasicViewModel(foundState.Id, foundState.Name);
+                }
+                return default;
+            }
         }
 
         private class MapObjectiveDepartment :

@@ -61,6 +61,8 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<ProcedureFunctionary> ProcedureFunctionarys { get; set; }
         public DbSet<Standard> Standards { get; set; }
         public DbSet<StandardFunctionary> StandardFunctionaries { get; set; }
+        public DbSet<PublicAcquisitionProject> PublicAcquisitionProjects { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -28,7 +28,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
             CreateMap<GeneralObjectiveAggregate, GeneralObjectiveViewModel>()
                 .ForMember(c => c.Id, opt => opt.MapFrom(src => src.GeneralObjective.ObjectiveId))
                 .ForMember(c => c.Code, opt => opt.MapFrom(src => src.GeneralObjective.Objective.Code))
-                .ForMember(c => c.StateId, opt => opt.MapFrom(src => src.GeneralObjective.Objective.StateId))
+                .ForMember(c => c.State, opt => opt.MapFrom<MapState>())
                 .ForMember(c => c.Title, opt => opt.MapFrom(src => src.GeneralObjective.Objective.Title))
                 .ForMember(c => c.Details, opt => opt.MapFrom(src => src.GeneralObjective.Objective.Details))
                 .ForMember(c => c.ModificationMotive, opt => opt.MapFrom(src => src.GeneralObjective.Objective.ModificationMotive))
@@ -36,6 +36,20 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
                 .ForMember(c => c.ModifiedAt, opt => opt.MapFrom(src => src.GeneralObjective.Objective.ModifiedAt ?? src.GeneralObjective.Objective.CreatedAt))
                 .ForMember(c => c.CreatedBy, opt => opt.MapFrom<MapObjectiveUser>())
                 .ForMember(c => c.ModifiedBy, opt => opt.MapFrom<MapModifiedBy>());
+        }
+
+        private class MapState : IValueResolver<GeneralObjectiveAggregate, GeneralObjectiveViewModel, BasicViewModel>
+        {
+            public BasicViewModel Resolve(GeneralObjectiveAggregate source, GeneralObjectiveViewModel destination, BasicViewModel destMember,
+                ResolutionContext context)
+            {
+                var foundState = source.States.FirstOrDefault(x => x.Id == source.GeneralObjective.Objective.StateId);
+                if (foundState != null)
+                {
+                    return new BasicViewModel(foundState.Id, foundState.Name);
+                }
+                return default;
+            }
         }
 
         private class MapObjectiveUser : IValueResolver<GeneralObjectiveAggregate, GeneralObjectiveViewModel, BasicViewModel>

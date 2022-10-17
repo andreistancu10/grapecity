@@ -12,6 +12,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Procedures
         public ProcedureStateFilter ProcedureStateFilter { get; set; }
         public ProcedureCategoriesFilter ProcedureCategoriesFilter { get; set; }
         public DepartmentsFilter DepartmentsFilter { get; set; }
+        public FunctionaryFilter FunctionaryFilter { get; set; }
         public StartDateFilter StartDateFilter { get; set; }
 
         public static ProcedureFilter Empty => new();
@@ -51,6 +52,10 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Procedures
         public List<long> DepartmentIds { get; set; }
     }
 
+    public class FunctionaryFilter
+    {
+        public long FunctionaryId { get; set; }
+    }
     public class StartDateFilter
     {
         public DateTime StartDate { get; set; }

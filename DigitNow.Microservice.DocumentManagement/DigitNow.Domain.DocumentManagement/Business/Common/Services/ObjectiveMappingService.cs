@@ -41,8 +41,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 var aggregate = new GeneralObjectiveAggregate
                 {
                     GeneralObjective = generalObjective,
-                    Users = _generalObjectiveRelationsFetcher.GeneralObjectiveUsers,
-                    
+                    States = _generalObjectiveRelationsFetcher.States,
+                    Users = _generalObjectiveRelationsFetcher.GeneralObjectiveUsers
                 };
 
                 result.Add(_mapper.Map<GeneralObjectiveAggregate, GeneralObjectiveViewModel>(aggregate));

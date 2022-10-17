@@ -1,12 +1,10 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
-using DigitNow.Domain.DocumentManagement.Business.Common.Models;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsAggregates;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.ConcreteFetchersContexts;
 using DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Registries;
 using DigitNow.Domain.DocumentManagement.Business.Common.Services;
 using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels;
-using DigitNow.Domain.DocumentManagement.Data.Filters.Activities;
 using HTSS.Platform.Core.CQRS;
 using HTSS.Platform.Infrastructure.Data.Abstractions;
 
@@ -56,6 +54,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Activities.Queries.FilterA
                 {
                     Activity = c,
                     Departments = _activityRelationsFetcher.Departments,
+                    States = _activityRelationsFetcher.States,
                     Users = _activityRelationsFetcher.Users,
                     GeneralObjectives = _activityRelationsFetcher.GeneralObjective,
                     SpecificObjectives = _activityRelationsFetcher.SpecificObjective
