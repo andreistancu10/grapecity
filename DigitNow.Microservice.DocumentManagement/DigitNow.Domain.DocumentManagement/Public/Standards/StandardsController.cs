@@ -2,6 +2,7 @@
 using DigitNow.Domain.DocumentManagement.Business.Standards.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.Standards.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.Standards.Queries.GetById;
+using DigitNow.Domain.DocumentManagement.Business.Standards.Queries.GetStandards;
 using DigitNow.Domain.DocumentManagement.Public.Standards.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
@@ -53,6 +54,14 @@ namespace DigitNow.Domain.DocumentManagement.Public.Standards
                 var result => Ok(result)
             };
         }
+
+        [HttpPost("get-standards")]
+        public async Task<IActionResult> GetStandardsAsync([FromBody] GetStandardsRequest request, CancellationToken cancellationToken)
+        {
+            var query = _mapper.Map<GetStandardsQuery>(request);
+            return CreateResponse(await _mediator.Send(query, cancellationToken));
+        }
+
 
     }
 }
