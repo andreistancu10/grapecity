@@ -3,6 +3,8 @@ using DigitNow.Domain.DocumentManagement.Business.Archive.Commands;
 using DigitNow.Domain.DocumentManagement.Business.Archive.Historical.Commands.RemoveHistoricalArchiveDocument;
 using DigitNow.Domain.DocumentManagement.Business.Archive.Queries;
 using DigitNow.Domain.DocumentManagement.Business.DynamicForms.Queries.GetDynamicForms;
+using DigitNow.Domain.DocumentManagement.Business.OperationalArchive.Commands.Update.MoveDocumentsToArchive;
+using DigitNow.Domain.DocumentManagement.Business.OperationalArchive.Commands.Update.MoveDocumentsToArchiveByIds;
 using DigitNow.Domain.DocumentManagement.Public.Archive.Models;
 using DigitNow.Domain.DocumentManagement.Public.Dashboard.Models;
 using DigitNow.Domain.DocumentManagement.Public.DynamicForms.Models;
@@ -56,6 +58,29 @@ namespace DigitNow.Domain.DocumentManagement.Public.Archive
             var deleteDocumentCommand = _mapper.Map<RemoveHistoricalArchiveDocumentCommand>(request);
 
             return CreateResponse(await _mediator.Send(deleteDocumentCommand, cancellationToken));
+        }
+
+        [HttpPut("operational/job")]
+        public async Task<IActionResult> MoveDocumentsToArchiveAsync()
+        {
+            return await _mediator.Send(new MoveDocumentsToArchiveCommand())
+           switch
+            {
+                null => NotFound(),
+                var result => Ok(result)
+            };
+        }
+
+        [HttpPut("operational/byIds")]
+        public async Task<IActionResult> MoveDocumentsToArchiveByIdsAsync([FromBody] MoveDocumentsToArchiveByIdsRequest request)
+        {
+            var command = _mapper.Map<MoveDocumentsToArchiveByIdsCommand>(request);
+            return await _mediator.Send(command)
+           switch
+            {
+                null => NotFound(),
+                var result => Ok(result)
+            };
         }
     }
 }

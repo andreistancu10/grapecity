@@ -1362,6 +1362,77 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("ProcedureFunctionary", "DocumentManagement");
                 });
 
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.PublicAcquisitionProject", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("Id")
+                        .HasColumnOrder(1);
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<long>("CpvCode")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedAt")
+                        .HasColumnOrder(2);
+
+                    b.Property<long>("CreatedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("CreatedBy")
+                        .HasColumnOrder(3);
+
+                    b.Property<long>("EstablishedProcedure")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("EstimatedMonthForInitiatingProcedure")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EstimatedMonthForProcedureAssignment")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<float>("EstimatedValue")
+                        .HasColumnType("real");
+
+                    b.Property<long>("FinancingSource")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("ModifiedAt")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("ModifiedAt")
+                        .HasColumnOrder(4);
+
+                    b.Property<long?>("ModifiedBy")
+                        .HasColumnType("bigint")
+                        .HasColumnName("ModifiedBy")
+                        .HasColumnOrder(5);
+
+                    b.Property<long>("ProcedureAssignmentMethod")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("ProcedureAssignmentResponsible")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("ProjectYear")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("PublicAcquisitionProject", "DocumentManagement");
+                });
+
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Risk", b =>
                 {
                     b.Property<long>("Id")
@@ -1809,7 +1880,7 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.ToTable("SpecificObjectiveFunctionary", "DocumentManagement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Suppliers.Supplier", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Standard", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1819,14 +1890,11 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
-                    b.Property<long>("CertificateRegistration")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("CommercialRegistration")
+                    b.Property<string>("Activity")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("CompanyType")
-                        .HasColumnType("int");
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2")
@@ -1838,6 +1906,15 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnName("CreatedBy")
                         .HasColumnOrder(3);
 
+                    b.Property<DateTime>("Deadline")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long>("DepartmentId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("ModificationMotive")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("ModifiedAt")
@@ -1848,37 +1925,21 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnName("ModifiedBy")
                         .HasColumnOrder(5);
 
-                    b.Property<string>("Name")
-                        .IsRequired()
+                    b.Property<string>("Observations")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long?>("RegisteredOfficeContactDetailId")
+                    b.Property<long>("StateId")
                         .HasColumnType("bigint");
 
-                    b.Property<bool>("RegisteredWorkplace")
-                        .HasColumnType("bit");
-
-                    b.Property<long?>("RegisteredWorkplaceContactDetailId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("Status")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(1);
-
-                    b.Property<bool>("VatPayer")
-                        .HasColumnType("bit");
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RegisteredOfficeContactDetailId");
-
-                    b.HasIndex("RegisteredWorkplaceContactDetailId");
-
-                    b.ToTable("Supplier", "DocumentManagement");
+                    b.ToTable("Standard", "DocumentManagement");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Suppliers.SupplierLegalRepresentative", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.StandardFunctionary", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
@@ -1898,6 +1959,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnName("CreatedBy")
                         .HasColumnOrder(3);
 
+                    b.Property<long>("FunctionaryId")
+                        .HasColumnType("bigint");
+
                     b.Property<DateTime?>("ModifiedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("ModifiedAt")
@@ -1908,30 +1972,14 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                         .HasColumnName("ModifiedBy")
                         .HasColumnOrder(5);
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NationalId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RepresentativeQuality")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("SupplierId")
+                    b.Property<long>("StandardId")
                         .HasColumnType("bigint");
-
-                    b.Property<string>("Surname")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("SupplierId");
+                    b.HasIndex("StandardId");
 
-                    b.ToTable("SupplierLegalRepresentative", "DocumentManagement");
+                    b.ToTable("StandardFunctionary", "DocumentManagement");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.WorkflowHistoryLog", b =>
@@ -2481,30 +2529,15 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("SpecificObjective");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Suppliers.Supplier", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.StandardFunctionary", b =>
                 {
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.ContactDetail", "RegisteredOfficeContactDetail")
-                        .WithMany()
-                        .HasForeignKey("RegisteredOfficeContactDetailId");
-
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.ContactDetail", "RegisteredWorkplaceContactDetail")
-                        .WithMany()
-                        .HasForeignKey("RegisteredWorkplaceContactDetailId");
-
-                    b.Navigation("RegisteredOfficeContactDetail");
-
-                    b.Navigation("RegisteredWorkplaceContactDetail");
-                });
-
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Suppliers.SupplierLegalRepresentative", b =>
-                {
-                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Suppliers.Supplier", "Supplier")
-                        .WithMany("LegalRepresentatives")
-                        .HasForeignKey("SupplierId")
+                    b.HasOne("DigitNow.Domain.DocumentManagement.Data.Entities.Standard", "Standard")
+                        .WithMany("StandardFunctionaries")
+                        .HasForeignKey("StandardId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Supplier");
+                    b.Navigation("Standard");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.WorkflowHistoryLog", b =>
@@ -2629,9 +2662,9 @@ namespace DigitNow.Domain.DocumentManagement.Migrations
                     b.Navigation("SpecificObjectiveFunctionaries");
                 });
 
-            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Suppliers.Supplier", b =>
+            modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.Entities.Standard", b =>
                 {
-                    b.Navigation("LegalRepresentatives");
+                    b.Navigation("StandardFunctionaries");
                 });
 
             modelBuilder.Entity("DigitNow.Domain.DocumentManagement.Data.UploadedFile", b =>

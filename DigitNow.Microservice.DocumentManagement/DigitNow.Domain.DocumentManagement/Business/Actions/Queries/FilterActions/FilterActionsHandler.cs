@@ -36,7 +36,6 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Queries.FilterActi
             var count = request.PageSize ?? 50;
 
             var actions = await _actionService.GetActionsAsync(request.Filter, currentUser, page, count, cancellationToken);
-
             if (actions.Count == 0)
             {
                 return new ResultPagedList<ActionViewModel>(new PagingHeader(0,page,count,1), new List<ActionViewModel>());
@@ -54,6 +53,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Actions.Queries.FilterActi
                 {
                     Action = c,
                     Departments = _actionRelationsFetcher.Departments,
+                    States = _actionRelationsFetcher.States,
                     Users = _actionRelationsFetcher.Users,
                     GeneralObjectives = _actionRelationsFetcher.GeneralObjective,
                     SpecificObjectives = _actionRelationsFetcher.SpecificObjective

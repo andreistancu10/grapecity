@@ -39,6 +39,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 var aggregate = new RiskAggregate
                 {
                     Risk = risk,
+                    States = _riskRelationsFetcher.States,
                     Departments = _riskRelationsFetcher.Departments,
                     SpecificObjectives = _riskRelationsFetcher.SpecificObjective
                 };

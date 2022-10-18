@@ -73,6 +73,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 {
                     VirtualObjective = childObjective,
                     CurrentUser = _currentUser,
+                    States = _specificObjectiveRelationsFetcher.States,
                     Users = _specificObjectiveRelationsFetcher.ObjectiveUsers,
                     Departments = _specificObjectiveRelationsFetcher.ObjectiveDepartments
                 };

@@ -7,14 +7,25 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ModelsFetchers.Regi
 {
     internal class RiskRelationsFetcher : BaseRelationsFetcher
     {
-        public IReadOnlyList<DepartmentModel> Departments => GetItems<GenericDepartmentsFetcher, DepartmentModel>();
-        public IReadOnlyList<ObjectiveModel> SpecificObjective => GetItems<RiskSpecificObjectiveFetcher, ObjectiveModel>();
-        public RiskRelationsFetcher(IServiceProvider serviceProvider) : base(serviceProvider){}
+        public IReadOnlyList<DepartmentModel> Departments 
+            => GetItems<GenericDepartmentsFetcher, DepartmentModel>();
 
-        public RiskRelationsFetcher UseRiskFetcherContext(RisksFetcherContext context)
+        public IReadOnlyList<StateModel> States 
+            => GetItems<GenericStatesFetcher, StateModel>();
+
+        public IReadOnlyList<ObjectiveModel> SpecificObjective 
+            => GetItems<RiskSpecificObjectiveFetcher, ObjectiveModel>();
+
+        public RiskRelationsFetcher(IServiceProvider serviceProvider) : base(serviceProvider) 
         {
             Aggregator
                 .UseGenericRemoteFetcher<GenericDepartmentsFetcher>()
+                .UseGenericRemoteFetcher<GenericStatesFetcher>();
+        }
+
+        public RiskRelationsFetcher UseRiskFetcherContext(RisksFetcherContext context)
+        {
+            Aggregator                
                 .UseInternalFetcher<RiskSpecificObjectiveFetcher>(context);
 
             return this;

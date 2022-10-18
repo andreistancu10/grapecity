@@ -3,6 +3,7 @@ using DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Export;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Commands.UpdateUserRecipient;
 using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries;
+using DigitNow.Domain.DocumentManagement.Business.Dashboard.Queries.OperationalDocumentArchiveExport;
 using DigitNow.Domain.DocumentManagement.Business.SpecialRegisters.Queries.Exports;
 using DigitNow.Domain.DocumentManagement.Public.Dashboard.Models;
 using HTSS.Platform.Core.Files;
@@ -55,6 +56,16 @@ public class DashboardController : ApiController
     public async Task<IActionResult> ExportExcelAsync([FromBody] GetDocumentsRequest request, CancellationToken cancellationToken)
     {
         var command = _mapper.Map<DocumentsExportQuery>(request);
+        var result = await _mediator.Send(command, cancellationToken);
+        var fileResult = await _exportService.CreateExcelFile("Documents", "DocumentsSheet", result);
+
+        return File(fileResult.Content, fileResult.ContentType, fileResult.Name);
+    }
+
+    [HttpPost("export-excel-operational-archive")]
+    public async Task<IActionResult> ExportExcelOperacionalArchiveAsync([FromBody] GetDocumentsRequest request, CancellationToken cancellationToken)
+    {
+        var command = _mapper.Map<OperationalDocumentArchiveExportQuery>(request);
         var result = await _mediator.Send(command, cancellationToken);
         var fileResult = await _exportService.CreateExcelFile("Documents", "DocumentsSheet", result);
 
