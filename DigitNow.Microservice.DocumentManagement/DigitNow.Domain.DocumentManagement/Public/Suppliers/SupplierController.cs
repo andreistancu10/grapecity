@@ -38,7 +38,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Suppliers
         }
       
 
-        [HttpPut("update")]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromBody] UpdateSupplierRequest request)
         {
             var command = _mapper.Map<UpdateSupplierCommand>(request);
