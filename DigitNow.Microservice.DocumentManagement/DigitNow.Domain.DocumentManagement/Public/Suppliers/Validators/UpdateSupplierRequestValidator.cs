@@ -12,13 +12,13 @@ namespace DigitNow.Domain.DocumentManagement.Public.Suppliers.Validators
     {
         public UpdateSupplierRequestValidator()
         {
-            RuleFor(item => item.Name).NotNull().NotEmpty();
+           RuleFor(item => item.Status).NotNull();
+           RuleFor(item => item.Name).NotNull().NotEmpty();
             RuleFor(item => item.CertificateRegistration).NotNull().NotEmpty();
-            RuleFor(item => item.VatPayer).NotNull().NotEmpty();
-            RuleFor(item => item.Status).NotNull();
+            RuleFor(item => item.VatPayer).NotNull();
             RuleFor(item => item.CompanyType).NotNull().NotEmpty();
             RuleFor(item => item.RegisteredOfficeContactDetail).NotNull().NotEmpty();
-            RuleFor(item => item.RegisteredWorkplace).NotNull().NotEmpty();
+            RuleFor(item => item.RegisteredWorkplace).NotNull();
             RuleFor(item => item.LegalRepresentatives).NotNull().NotEmpty();
 
         }

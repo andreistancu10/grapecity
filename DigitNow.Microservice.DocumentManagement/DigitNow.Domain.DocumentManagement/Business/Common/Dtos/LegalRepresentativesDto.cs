@@ -8,6 +8,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Dtos
 {
     public class SupplierLegalRepresentativeDto
     {
+       
         public string Name { get; set; }
         public string Surname { get; set; }
         public string RepresentativeQuality { get; set; }
