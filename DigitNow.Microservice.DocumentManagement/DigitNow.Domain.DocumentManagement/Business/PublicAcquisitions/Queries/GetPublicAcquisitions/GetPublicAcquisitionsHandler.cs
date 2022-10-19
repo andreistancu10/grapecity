@@ -6,8 +6,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.PublicAcquisitions.Queries
 {
     public class GetPublicAcquisitionsHandler : IQueryHandler<GetPublicAcquisitionsQuery, ResultObject>
     {
-        private IPublicAcquisitionService _publicAcquisitionsService;
-        private IPublicAcquisitionsMappingService _publicAcquisitionsMappingService;
+        private readonly IPublicAcquisitionService _publicAcquisitionsService;
+        private readonly IPublicAcquisitionsMappingService _publicAcquisitionsMappingService;
 
         public GetPublicAcquisitionsHandler(IPublicAcquisitionService publicAcquisitionsService, IPublicAcquisitionsMappingService publicAcquisitionsMappingService)
         {
