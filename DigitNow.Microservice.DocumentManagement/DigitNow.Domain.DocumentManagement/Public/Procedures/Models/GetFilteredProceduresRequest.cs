@@ -45,7 +45,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.Procedures.Models
 
     public class ProcedureStateFilterDto
     {
-        public ScimState ProcedureState { get; set; }
+        public long ProcedureState { get; set; }
     }
 
     public class ProcedureCategoriesFilterDto
