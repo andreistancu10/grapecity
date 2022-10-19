@@ -105,6 +105,7 @@
 	<ItemGroup>
 	  <Folder Include="Business\Activities\Mappings\" />
 	  <Folder Include="Business\Activities\Queries\Get\" />
+	  <Folder Include="Business\PerformanceIndicators\Mappings\" />
 	  <Folder Include="Data\Filters\Activities\" />
 	  <Folder Include="Migrations\" />
 	  <Folder Include="Public\Activities\Validators\" />

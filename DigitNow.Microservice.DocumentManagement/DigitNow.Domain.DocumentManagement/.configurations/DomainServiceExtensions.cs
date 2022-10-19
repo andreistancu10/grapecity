@@ -119,7 +119,8 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<IStandardService, StandardService>();
             services.AddTransient<IStandardFunctionaryService, StandardFunctionaryService>();
             services.AddTransient<IPublicAcquisitionService, PublicAcquisitionService>();
-
+            services.AddTransient<IPerformanceIndicatorService, PerformanceIndicatorService>();
+            services.AddTransient<IPerformanceIndicatorFunctionaryService, PerformanceIndicatorFunctionaryService>();
             return services;
         }
     }
