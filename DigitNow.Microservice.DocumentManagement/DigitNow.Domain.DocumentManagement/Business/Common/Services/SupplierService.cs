@@ -29,16 +29,14 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     public class SupplierService : ISupplierService
     {
         private readonly DocumentManagementDbContext _dbContext;
-        private readonly IIdentityService _identityService;
+      
         private readonly IServiceProvider _serviceProvider;
-        private readonly IAuthenticationClient _authenticationClient;
+      
        
 
-        public SupplierService(DocumentManagementDbContext dbContext, IIdentityService identityService, IServiceProvider serviceProvider, IAuthenticationClient authenticationClient)
+        public SupplierService(DocumentManagementDbContext dbContext, IServiceProvider serviceProvider)
         {
             _dbContext = dbContext;
-            _authenticationClient =authenticationClient;
-            _identityService=identityService;
             _serviceProvider=serviceProvider;
 
         }
