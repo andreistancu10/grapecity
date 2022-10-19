@@ -7,6 +7,7 @@ using DigitNow.Domain.DocumentManagement.Public.PublicAcquisitions.Models;
 using DigitNow.Domain.DocumentManagement.Business.PublicAcquisitions.Queries.GetById;
 using DigitNow.Domain.DocumentManagement.Business.PublicAcquisitions.Commands.Create;
 using DigitNow.Domain.DocumentManagement.Business.PublicAcquisitions.Commands.Update;
+using DigitNow.Domain.DocumentManagement.Business.PublicAcquisitions.Queries.GetPublicAcquisitions;
 
 namespace DigitNow.Domain.DocumentManagement.Public.PublicAcquisitions
 {
@@ -49,6 +50,13 @@ namespace DigitNow.Domain.DocumentManagement.Public.PublicAcquisitions
             var command = _mapper.Map<UpdatePublicAcquisitionProjectCommand>(request);
 
             return CreateResponse(await _mediator.Send(command));
+        }
+
+        [HttpPost("get-public-acquisitions")]
+        public async Task<IActionResult> GetRisksAsync([FromBody] GetPublicAcquisitionsRequest request, CancellationToken cancellationToken)
+        {
+            var query = _mapper.Map<GetPublicAcquisitionsQuery>(request);
+            return CreateResponse(await _mediator.Send(query, cancellationToken));
         }
     }
 }

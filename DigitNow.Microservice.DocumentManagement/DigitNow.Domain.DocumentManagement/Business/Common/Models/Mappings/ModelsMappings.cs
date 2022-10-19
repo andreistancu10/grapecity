@@ -2,8 +2,10 @@
 using DigitNow.Adapters.MS.Catalog.Poco;
 using DigitNow.Domain.Authentication.Contracts;
 using DigitNow.Domain.Catalog.Contracts.ArchivedDocumentCategories.GetAll;
+using DigitNow.Domain.Catalog.Contracts.CpvCodes.GetCpvCodes;
 using DigitNow.Domain.Catalog.Contracts.Departments.GetDepartments;
 using DigitNow.Domain.Catalog.Contracts.DocumentTypes.GetDocumentTypes;
+using DigitNow.Domain.Catalog.Contracts.EstablishedProcedures.GetEstablishedProcedures;
 using DigitNow.Domain.Catalog.Contracts.InternalDocumentTypes;
 using DigitNow.Domain.Catalog.Contracts.ScimStates.GetScimStates;
 using DigitNow.Domain.DocumentManagement.Business.UploadFiles.Commands.Upload;
@@ -70,6 +72,8 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Models.Mappings
                 .ForMember(c => c.Title, opt => opt.MapFrom(src => src.Objective.Title));
 
             CreateMap<IScimStatesResponse, StateModel>();
+            CreateMap<ICpvCodesResponse, CpvCodeModel>();
+            CreateMap<IEstablishedProceduresResponse, EstablishedProcedureModel>();
         }
 
         private class MapDocumentCategoryId :
