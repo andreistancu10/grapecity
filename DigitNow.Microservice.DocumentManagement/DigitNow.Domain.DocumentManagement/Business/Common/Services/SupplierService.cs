@@ -17,6 +17,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         Task<Supplier> AddAsync(Supplier supplier, CancellationToken cancellationToken);
         Task UpdateAsync(Supplier supplier, CancellationToken cancellationToken);
+        Task DeleteAsync(long supplierId,CancellationToken cancellationToken);
         IQueryable<Supplier> GetByIdQuery(long supplierId);
       //  Task<long> CountAsync(Supplier filter, CancellationToken cancellationToken);
       //  Task<List<Supplier>> GetAllAsync(Supplier filter, int page, int count, CancellationToken cancellationToken);
@@ -60,10 +61,22 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             return supplier;
         }
 
+        public async Task DeleteAsync(long supplierId, CancellationToken cancellationToken)
+        {
+            var supplier = await _dbContext.Suppliers.Where(p => p.Id == supplierId).FirstOrDefaultAsync();
+            if (supplier != null)
+            {
+            
+            await _dbContext.SingleDeleteAsync(supplier, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+             }
+
+        }
 
         public IQueryable<Supplier> GetByIdQuery(long supplierId)
         {
-            return _dbContext.Suppliers.Where(p => p.Id == supplierId);
+            return  _dbContext.Suppliers.Where(p => p.Id == supplierId);
+
         }
 
         public async Task UpdateAsync(Supplier supplier, CancellationToken cancellationToken)

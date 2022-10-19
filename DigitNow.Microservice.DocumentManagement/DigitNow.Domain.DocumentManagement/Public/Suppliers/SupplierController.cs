@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DigitNow.Domain.DocumentManagement.Business.Suppliers.Commands.Create;
+using DigitNow.Domain.DocumentManagement.Business.Suppliers.Commands.Delete;
 using DigitNow.Domain.DocumentManagement.Business.Suppliers.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.Suppliers.Queries.GetById;
 using DigitNow.Domain.DocumentManagement.Public.Suppliers.Models;
@@ -43,6 +44,17 @@ namespace DigitNow.Domain.DocumentManagement.Public.Suppliers
         {
             var command = _mapper.Map<UpdateSupplierCommand>(request);
             return CreateResponse(await _mediator.Send(command));
+        }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] long id)
+        {
+            var command = new DeleteSupplierCommand(id);
+            return await _mediator.Send(command)
+            switch
+            {
+                null => NotFound(),
+                var result => Ok(result)
+            };
         }
 
         [HttpGet("{id:long}")]
