@@ -53,7 +53,7 @@ namespace DigitNow.Domain.DocumentManagement.Public.PublicAcquisitions
         }
 
         [HttpPost("get-public-acquisitions")]
-        public async Task<IActionResult> GetRisksAsync([FromBody] GetPublicAcquisitionsRequest request, CancellationToken cancellationToken)
+        public async Task<IActionResult> GetPublicAcquisitionsAsync([FromBody] GetPublicAcquisitionsRequest request, CancellationToken cancellationToken)
         {
             var query = _mapper.Map<GetPublicAcquisitionsQuery>(request);
             return CreateResponse(await _mediator.Send(query, cancellationToken));
