@@ -33,7 +33,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Filters.Standards
         {
             if (EntityFilter.DeadlineFilter != null)
             {
-                EntityPredicates.Add(x => x.Deadline.Date == EntityFilter.DeadlineFilter.Deadline);
+                EntityPredicates.Add(x => x.Deadline.Date == EntityFilter.DeadlineFilter.Deadline.Date);
             }
         }
         protected override void InternalBuild()
