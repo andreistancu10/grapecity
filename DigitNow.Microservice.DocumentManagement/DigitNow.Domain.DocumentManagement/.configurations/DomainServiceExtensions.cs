@@ -118,12 +118,14 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<IProcedureFunctionaryService, ProcedureFunctionaryService>();
             services.AddTransient<IProcedureMappingService, ProcedureMappingService>();
             services.AddTransient<IProcedureHistoryMappingService, ProcedureHistoryMappingService>();
+            services.AddTransient<ISupplierService, SupplierService>();
             services.AddTransient<IStandardService, StandardService>();
             services.AddTransient<IStandardFunctionaryService, StandardFunctionaryService>();
             services.AddTransient<IPublicAcquisitionService, PublicAcquisitionService>();
             services.AddTransient<IPublicAcquisitionsMappingService, PublicAcquisitionsMappingService>();
             services.AddTransient<IStandardMappingService, StandardMappingService>();
-
+            services.AddTransient<IPerformanceIndicatorService, PerformanceIndicatorService>();
+            services.AddTransient<IPerformanceIndicatorFunctionaryService, PerformanceIndicatorFunctionaryService>();
             return services;
         }
     }

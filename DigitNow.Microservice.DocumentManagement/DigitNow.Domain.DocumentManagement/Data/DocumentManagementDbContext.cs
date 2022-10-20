@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore.Design;
 using DigitNow.Domain.DocumentManagement.Business.Common.Documents.Services;
 using DigitNow.Domain.DocumentManagement.Data.Entities;
 using DigitNow.Domain.DocumentManagement.Data.Entities.Actions;
+using DigitNow.Domain.DocumentManagement.Data.Entities.Suppliers;
 using Microsoft.EntityFrameworkCore;
 
 namespace DigitNow.Domain.DocumentManagement.Data
@@ -62,9 +63,13 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<Procedure> Procedures { get; set; }
         public DbSet<ProcedureHistory> ProcedureHistories { get; set; }
         public DbSet<ProcedureFunctionary> ProcedureFunctionarys { get; set; }
+        public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<SupplierLegalRepresentative> SupplierLegalRepresentatives { get; set; }
         public DbSet<Standard> Standards { get; set; }
         public DbSet<StandardFunctionary> StandardFunctionaries { get; set; }
         public DbSet<PublicAcquisitionProject> PublicAcquisitionProjects { get; set; }
+        public DbSet<PerformanceIndicator> PerformanceIndicators { get; set; }
+        public DbSet<PerformanceIndicatorFunctionary> PerformanceIndicatorFunctionaries { get; set; }
 
         #endregion
 

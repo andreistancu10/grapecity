@@ -7,6 +7,8 @@
         ScimActivity,
         ScimAction,
         ScimRisk,
-        ScimProcedure
+        ScimProcedure,
+        ScimStandard,
+        ScimPerformanceIndicator
     }
 }
