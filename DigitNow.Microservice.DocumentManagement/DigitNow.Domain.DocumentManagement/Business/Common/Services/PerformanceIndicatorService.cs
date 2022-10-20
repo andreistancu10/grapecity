@@ -62,7 +62,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public IQueryable<PerformanceIndicator> GetByIdQuery(long performanceIndicatorId)
         {
-            return DbContext.PerformanceIndicators.AsQueryable();
+            return DbContext.PerformanceIndicators.Where(x => x.Id == performanceIndicatorId).AsQueryable();
         }
 
         public async Task UpdateAsync(PerformanceIndicator performanceIndicator, CancellationToken cancellationToken)

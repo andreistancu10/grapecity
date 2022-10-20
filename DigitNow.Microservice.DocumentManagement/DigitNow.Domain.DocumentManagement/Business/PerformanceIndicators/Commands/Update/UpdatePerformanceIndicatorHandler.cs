@@ -18,7 +18,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.PerformanceIndicators.Comm
              IPerformanceIndicatorService performanceIndicatorService,
              IUploadedFileService uploadedFileService,
              IPerformanceIndicatorFunctionaryService performanceIndicatorFunctionaryService,
-             Mapper mapper)
+             IMapper mapper)
         {
             _performanceIndicatorService = performanceIndicatorService;
             _performanceIndicatorFunctionaryService = performanceIndicatorFunctionaryService;
