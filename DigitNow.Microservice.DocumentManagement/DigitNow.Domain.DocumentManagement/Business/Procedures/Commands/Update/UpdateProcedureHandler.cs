@@ -12,6 +12,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Procedures.Commands.Update
     {
         private readonly IProcedureService _procedureService;
         private readonly IProcedureFunctionaryService _procedureFunctionaryService;
+        private readonly IProcedureHistoryService _procedureHistoryService;
         private readonly IUploadedFileService _uploadedFileService;
         private readonly IMapper _mapper;
 
@@ -19,11 +20,13 @@ namespace DigitNow.Domain.DocumentManagement.Business.Procedures.Commands.Update
             IProcedureService procedureService,
             IProcedureFunctionaryService procedureFunctionaryService,
             IMapper mapper,
-            IUploadedFileService uploadedFileService)
+            IUploadedFileService uploadedFileService, 
+            IProcedureHistoryService procedureHistoryService)
         {
             _procedureService = procedureService;
             _procedureFunctionaryService = procedureFunctionaryService;
             _uploadedFileService = uploadedFileService;
+            _procedureHistoryService = procedureHistoryService;
             _mapper = mapper;
         }
 
@@ -44,6 +47,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Procedures.Commands.Update
             _mapper.Map(request, initialProcedure);
 
             await _procedureService.UpdateAsync(initialProcedure, cancellationToken);
+            await _procedureHistoryService.AddAsync(initialProcedure,cancellationToken);
 
             if (request.ProcedureFunctionariesIds != null)
             {

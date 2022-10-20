@@ -1,4 +1,4 @@
-﻿#undef MIGRATION_ONLY
+﻿#define MIGRATION_ONLY
 
 #if    MIGRATION_ONLY
 using Microsoft.EntityFrameworkCore.Design;
@@ -26,6 +26,8 @@ namespace DigitNow.Domain.DocumentManagement.Data
         {
             _identityService = identityService;
         }
+
+        #region DbSets
 
         public DbSet<Document> Documents { get; set; }
         public DbSet<IncomingDocument> IncomingDocuments { get; set; }
@@ -58,11 +60,13 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<RiskTrackingReport> RiskTrackingReports { get; set; }
         public DbSet<RiskActionProposal> RiskActionProposals{ get; set; }
         public DbSet<Procedure> Procedures { get; set; }
+        public DbSet<ProcedureHistory> ProcedureHistories { get; set; }
         public DbSet<ProcedureFunctionary> ProcedureFunctionarys { get; set; }
         public DbSet<Standard> Standards { get; set; }
         public DbSet<StandardFunctionary> StandardFunctionaries { get; set; }
         public DbSet<PublicAcquisitionProject> PublicAcquisitionProjects { get; set; }
 
+        #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
