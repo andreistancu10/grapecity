@@ -14,11 +14,11 @@ namespace DigitNow.Domain.DocumentManagement.Public.Suppliers.Mappings
                 .ForMember(s => s.Filter, opt => opt.MapFrom(src => src.Filter ?? new SupplierFilterDto()));
 
             CreateMap<SupplierFilterDto, SupplierFilter>();
-            {
-                CreateMap<SupplierNameFilterDto, SupplierNameFilter>();
-                CreateMap<SupplierCertificateRegistrationFilterDto, SupplierCertificateRegistrationFilter>();
-                CreateMap<SupplierStatusFilterDto, SupplierStatusFilter>();
-            }
+            CreateMap<SupplierNameFilterDto, SupplierNameFilter>();
+            CreateMap<SupplierCertificateRegistrationFilterDto, SupplierCertificateRegistrationFilter>();
+            CreateMap<SupplierStatusFilterDto, SupplierStatusFilter>();
+
+
         }
     }
 }
