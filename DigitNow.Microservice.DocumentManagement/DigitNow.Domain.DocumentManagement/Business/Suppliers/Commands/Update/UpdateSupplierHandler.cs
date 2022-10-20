@@ -24,7 +24,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Suppliers.Commands.Update
                                     .Include(item => item.LegalRepresentatives)
                                     .Include(item => item.RegisteredOfficeContactDetail)
                                     .Include(item => item.RegisteredWorkplaceContactDetail)
-                                    .FirstOrDefaultAsync();
+                                    .FirstOrDefaultAsync(cancellationToken);
 
             if (supplierToupdate == null)
                 return ResultObject.Error(new ErrorMessage

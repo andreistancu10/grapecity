@@ -14,7 +14,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels.Mappings
         {
             CreateMap<Supplier, SupplierViewModel>()
               .ForMember(x => x.Status, opt => opt.MapFrom(src => src.Status.ToString()));
-          //CreateMap<List<Supplier>, List<SupplierViewModel> >();
+        
 
         }
     }

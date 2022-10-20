@@ -65,8 +65,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task<long> CountAsync(SupplierFilter filter, CancellationToken cancellationToken)
         {
-            var x = (await GetSupplierExpressions(filter, cancellationToken)).ToPredicates();
-
+           
             return await _dbContext.Suppliers
                   .WhereAll((await GetSupplierExpressions(filter, cancellationToken)).ToPredicates())
                   .AsNoTracking()
@@ -75,7 +74,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task DeleteAsync(long supplierId, CancellationToken cancellationToken)
         {
-            var supplier = await _dbContext.Suppliers.Where(p => p.Id == supplierId).FirstOrDefaultAsync();
+            var supplier = await _dbContext.Suppliers.Where(p => p.Id == supplierId).FirstOrDefaultAsync(cancellationToken);
             if (supplier != null)
             {
             
