@@ -29,7 +29,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Suppliers.Queries.GetById
                                   .Include(item => item.LegalRepresentatives)
                                   .Include(item => item.RegisteredOfficeContactDetail)
                                   .Include(item => item.RegisteredWorkplaceContactDetail)
-                                  .FirstOrDefaultAsync();
+                                  .FirstOrDefaultAsync(cancellationToken);
 
             if (supplier == null)
                 return new GetSupplierByIdResponse();

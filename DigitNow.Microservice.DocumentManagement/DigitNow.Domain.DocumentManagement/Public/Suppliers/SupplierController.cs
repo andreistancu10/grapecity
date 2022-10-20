@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
+using DigitNow.Domain.DocumentManagement.Business.Procedures.Queries.GetFilteredProcedures;
 using DigitNow.Domain.DocumentManagement.Business.Suppliers.Commands.Create;
+using DigitNow.Domain.DocumentManagement.Business.Suppliers.Commands.Delete;
 using DigitNow.Domain.DocumentManagement.Business.Suppliers.Commands.Update;
 using DigitNow.Domain.DocumentManagement.Business.Suppliers.Queries.GetById;
+using DigitNow.Domain.DocumentManagement.Business.Suppliers.Queries.GetFilteredSuppliers;
 using DigitNow.Domain.DocumentManagement.Public.Suppliers.Models;
 using HTSS.Platform.Infrastructure.Api.Tools;
 using MediatR;
@@ -44,6 +47,17 @@ namespace DigitNow.Domain.DocumentManagement.Public.Suppliers
             var command = _mapper.Map<UpdateSupplierCommand>(request);
             return CreateResponse(await _mediator.Send(command));
         }
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] long id)
+        {
+            var command = new DeleteSupplierCommand(id);
+            return await _mediator.Send(command)
+            switch
+            {
+                null => NotFound(),
+                var result => Ok(result)
+            };
+        }
 
         [HttpGet("{id:long}")]
         public async Task<IActionResult> Get([FromRoute] long id)
@@ -55,6 +69,12 @@ namespace DigitNow.Domain.DocumentManagement.Public.Suppliers
                 null => NotFound(),
                 var result => Ok(result)
             };
-    }
+        }
+        [HttpPost("filter")]
+        public async Task<IActionResult> GetAllProceduresAsync([FromBody] GetFilteredSupplierRequest request, CancellationToken cancellationToken)
+        {
+            var query = _mapper.Map<GetFilteredSuppliersQuery>(request);
+            return CreateResponse(await _mediator.Send(query, cancellationToken));
+        }
     }
 }

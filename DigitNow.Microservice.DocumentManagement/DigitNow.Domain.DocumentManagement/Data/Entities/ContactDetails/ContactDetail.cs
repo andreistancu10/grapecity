@@ -14,6 +14,6 @@
         public string? PostCode { get; set; }
         public string? PhoneNumber { get; set; }
         public string? Email { get; set; }
-        public string? Fax { get; set; }    
+        public string Fax { get; set; }    
     }
 }
