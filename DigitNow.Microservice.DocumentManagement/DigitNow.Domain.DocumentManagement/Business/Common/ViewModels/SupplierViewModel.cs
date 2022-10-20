@@ -11,7 +11,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.ViewModels
     {
         public long Id { get; set; }
         public string Name { get; set; }
-        public SupplierStatus Status { get; set; }
+        public string Status { get; set; }
         public long CertificateRegistration { get; set; }
 
     }
