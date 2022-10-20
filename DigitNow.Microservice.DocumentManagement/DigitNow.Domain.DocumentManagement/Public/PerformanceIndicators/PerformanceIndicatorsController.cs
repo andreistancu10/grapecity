@@ -25,24 +25,19 @@ namespace DigitNow.Domain.DocumentManagement.Public.PerformanceIndicators
         [HttpPost]
         public async Task<IActionResult> CreatePerformanceIndicatorAsync([FromBody] CreatePerformanceIndicatorRequest request)
         {
-            return await _mediator.Send(_mapper.Map<CreatePerformanceIndicatorCommand>(request))
-                switch
-            {
-                null => NotFound(),
-                var result => Ok(result)
-            };
+            var command = _mapper.Map<CreatePerformanceIndicatorCommand>(request);
+            return CreateResponse(await _mediator.Send(command));
         }
 
         [HttpPut]
-        public async Task<IActionResult> UpdateStandardAsync([FromBody] UpdatePerformanceIndicatorRequest request)
+        public async Task<IActionResult> UpdatePerformanceIndicatorAsync([FromBody] UpdatePerformanceIndicatorRequest request)
         {
             var command = _mapper.Map<UpdatePerformanceIndicatorCommand>(request);
-
             return CreateResponse(await _mediator.Send(command));
         }
 
         [HttpGet("{id:long}")]
-        public async Task<IActionResult> GetStandardByIdAsync([FromRoute] long id)
+        public async Task<IActionResult> GetPerformanceIndicatorByIdAsync([FromRoute] long id)
         {
             return await _mediator.Send(new GetPerformanceIndicatorByIdQuery(id))
                 switch

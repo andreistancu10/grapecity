@@ -8,7 +8,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
     {
         Task AddRangeAsync(long id, List<long> functionaryIds, CancellationToken cancellationToken);
         Task UpdateRangeAsync(long id, List<long> functionaryIds, CancellationToken cancellationToken);
-        IQueryable<PerformanceIndicatorFunctionary> FindQuery();
+        IQueryable<PerformanceIndicatorFunctionary> FindByIdQuery(long performanceIndicatorId);
     }
     public class PerformanceIndicatorFunctionaryService : IPerformanceIndicatorFunctionaryService
     {
@@ -35,16 +35,16 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
             await _dbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public IQueryable<PerformanceIndicatorFunctionary> FindQuery()
+        public IQueryable<PerformanceIndicatorFunctionary> FindByIdQuery(long performanceIndicatorId)
         {
-            return _dbContext.PerformanceIndicatorFunctionaries.AsQueryable();
+            return _dbContext.PerformanceIndicatorFunctionaries.Where(x => x.PerformanceIndicatorId == performanceIndicatorId).AsQueryable();
         }
 
         public async Task UpdateRangeAsync(long id, List<long> functionaryIds, CancellationToken cancellationToken)
         {
             if (!functionaryIds.Any()) return;
 
-            var initialPerformanceIndicatorFunctionary = await FindQuery().Where(item => item.PerformanceIndicatorId == id).ToListAsync(cancellationToken);
+            var initialPerformanceIndicatorFunctionary = await FindByIdQuery(id).ToListAsync(cancellationToken);
 
             if (initialPerformanceIndicatorFunctionary.Count > 0)
             {
