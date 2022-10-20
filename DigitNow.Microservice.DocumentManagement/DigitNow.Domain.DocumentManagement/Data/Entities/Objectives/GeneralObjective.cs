@@ -1,5 +1,3 @@
-using DigitNow.Domain.DocumentManagement.Data.Entities;
-
 namespace DigitNow.Domain.DocumentManagement.Data.Entities
 {
     public class GeneralObjective: VirtualObjective
@@ -10,6 +8,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public List<Activity> Activities { get; set; }
         public List<Risk> Risks { get; set; }
         public List<Procedure> Procedures { get; set; }
+        public List<PerformanceIndicator> PerformanceIndicators { get; set; } 
 
         #endregion
     }

@@ -11,6 +11,7 @@
         ScimRiskTrackingReport,
         ScimRiskFUR,
         ScimProcedure,
-        ScimStandard
+        ScimStandard,
+        ScimPerformanceIndicator
     }
 }

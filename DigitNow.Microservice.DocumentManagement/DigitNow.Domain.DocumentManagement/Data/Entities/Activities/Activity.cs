@@ -20,6 +20,8 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities
         public List<Action> Actions { get; set; }
         public List<Risk> Risks { get; set; }
         public List<Procedure> Procedures { get; set; }
+        public List<PerformanceIndicator> PerformanceIndicators { get; set; }
+
         #endregion
     }
 }

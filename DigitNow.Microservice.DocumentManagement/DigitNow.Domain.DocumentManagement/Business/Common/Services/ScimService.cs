@@ -1,5 +1,4 @@
-﻿using DigitNow.Domain.DocumentManagement.Contracts.Objectives;
-using DigitNow.Domain.DocumentManagement.Contracts.Scim;
+﻿using DigitNow.Domain.DocumentManagement.Contracts.Scim;
 using DigitNow.Domain.DocumentManagement.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -39,6 +38,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
                 ScimEntity.ScimAction => ChangeActionsStateAsync(entityIds, stateId.Value, cancellationToken),
                 ScimEntity.ScimRisk => ChangeRisksStateAsync(entityIds, stateId.Value, cancellationToken),
                 ScimEntity.ScimProcedure => ChangeProceduresStateAsync(entityIds, stateId.Value, cancellationToken),
+                ScimEntity.ScimPerformanceIndicator => ChangePerformanceIndicatorsStateAsync(entityIds, stateId.Value, cancellationToken),
                 _ => throw new ArgumentOutOfRangeException(nameof(scimEntity), scimEntity, null),
             };
         }
@@ -149,6 +149,17 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
             procedures.ForEach(c => c.StateId = state);
             DbContext.Procedures.UpdateRange(procedures);
+            await DbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        private async Task ChangePerformanceIndicatorsStateAsync(ICollection<long> entityIds, long state, CancellationToken cancellationToken)
+        {
+            var performanceIndicators = await DbContext.PerformanceIndicators
+                .Where(c => entityIds.Contains(c.Id) && c.StateId != state)
+                .ToListAsync(cancellationToken);
+
+            performanceIndicators.ForEach(c => c.StateId = state);
+            DbContext.PerformanceIndicators.UpdateRange(performanceIndicators);
             await DbContext.SaveChangesAsync(cancellationToken);
         }
     }

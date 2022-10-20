@@ -68,7 +68,7 @@ namespace DigitNow.Domain.DocumentManagement.Business.Common.Services
 
         public async Task UpdateAsync(Standard standard, CancellationToken cancellationToken)
         {
-            await ChangeStateAsync(new List<long> { standard.Id }, ScimEntity.ScimAction, standard.StateId, cancellationToken);
+            await ChangeStateAsync(new List<long> { standard.Id }, ScimEntity.ScimStandard, standard.StateId, cancellationToken);
             await DbContext.SingleUpdateAsync(standard, cancellationToken);
             await DbContext.SaveChangesAsync(cancellationToken);
         }
