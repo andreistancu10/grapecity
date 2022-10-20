@@ -116,6 +116,7 @@ namespace DigitNow.Domain.DocumentManagement.configurations
             services.AddTransient<IProcedureService, ProcedureService>();
             services.AddTransient<IProcedureFunctionaryService, ProcedureFunctionaryService>();
             services.AddTransient<IProcedureMappingService, ProcedureMappingService>();
+            services.AddTransient<ISupplierService, SupplierService>();
             services.AddTransient<IStandardService, StandardService>();
             services.AddTransient<IStandardFunctionaryService, StandardFunctionaryService>();
             services.AddTransient<IPublicAcquisitionService, PublicAcquisitionService>();
