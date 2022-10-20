@@ -12,23 +12,23 @@ namespace DigitNow.Domain.DocumentManagement.Public.Suppliers.Models
 {
     public class CreateSupplierRequest
     {
-        public string Name { get; set; }
-        public long CertificateRegistration { get; set; }
-        public string CommercialRegistration { get; set; }
-        public bool VatPayer { get; set; }
-        public SupplierCompanyType CompanyType { get; set; }
-        public bool RegisteredWorkplace { get; set; }
-        public ContactDetailsRequest RegisteredOfficeContactDetail { get; set; }
-        public ContactDetailsRequest RegisteredWorkplaceContactDetail { get; set; }
-        public List<CreateSupplierLegalRepresentativeRequest> LegalRepresentatives { get; set; }
+        public string? Name { get; set; }
+        public long? CertificateRegistration { get; set; }
+        public string? CommercialRegistration { get; set; }
+        public bool? VatPayer { get; set; }
+        public SupplierCompanyType? CompanyType { get; set; }
+        public bool? RegisteredWorkplace { get; set; }
+        public ContactDetailsRequest? RegisteredOfficeContactDetail { get; set; }
+        public ContactDetailsRequest? RegisteredWorkplaceContactDetail { get; set; }
+        public List<CreateSupplierLegalRepresentativeRequest>? LegalRepresentatives { get; set; }
     }
 
     public class CreateSupplierLegalRepresentativeRequest
     {
-        public string Name { get; set; }
-        public string Surname { get; set; }
-        public string RepresentativeQuality { get; set; }
-        public string NationalId { get; set; }
+        public string? Name { get; set; }
+        public string? Surname { get; set; }
+        public string? RepresentativeQuality { get; set; }
+        public string? NationalId { get; set; }
        
     }
 }
