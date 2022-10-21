@@ -7,7 +7,7 @@ namespace DigitNow.Domain.DocumentManagement.Data.Entities.Configuration
     {
         public void Configure(EntityTypeBuilder<ProcedureHistory> builder)
         {
-           
+            builder.ToTable(nameof(Procedure), DocumentManagementDbContext.Schema);
         }
     }
 }
