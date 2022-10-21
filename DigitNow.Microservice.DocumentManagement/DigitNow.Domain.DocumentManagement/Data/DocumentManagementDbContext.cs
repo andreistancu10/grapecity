@@ -28,6 +28,8 @@ namespace DigitNow.Domain.DocumentManagement.Data
             _identityService = identityService;
         }
 
+        #region DbSets
+
         public DbSet<Document> Documents { get; set; }
         public DbSet<IncomingDocument> IncomingDocuments { get; set; }
         public DbSet<OutgoingDocument> OutgoingDocuments { get; set; }
@@ -59,6 +61,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<RiskTrackingReport> RiskTrackingReports { get; set; }
         public DbSet<RiskActionProposal> RiskActionProposals{ get; set; }
         public DbSet<Procedure> Procedures { get; set; }
+        public DbSet<ProcedureHistory> ProcedureHistories { get; set; }
         public DbSet<ProcedureFunctionary> ProcedureFunctionarys { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<SupplierLegalRepresentative> SupplierLegalRepresentatives { get; set; }
@@ -68,6 +71,7 @@ namespace DigitNow.Domain.DocumentManagement.Data
         public DbSet<PerformanceIndicator> PerformanceIndicators { get; set; }
         public DbSet<PerformanceIndicatorFunctionary> PerformanceIndicatorFunctionaries { get; set; }
 
+        #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
